@@ -1,0 +1,8 @@
+{
+  "order": [
+    "base.js"
+  ],
+  "dependencies": {
+    "base.js": []
+  }
+}
