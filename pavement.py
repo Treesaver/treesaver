@@ -29,7 +29,7 @@ options(
 # Closure compiler options
 options(
     compiler_errors = [
-        '',
+        '', # First one blank for join()
         'accessControls',
         'checkRegExp',
         'checkTypes',
@@ -42,7 +42,7 @@ options(
         'visibility'
     ],
     compiler_warnings = [
-        '',
+        '', # First one blank for join()
         'nonStandardJsDocs',
         'strictModuleDepCheck',
         'unknownDefines',
@@ -71,14 +71,21 @@ def clean():
     options.tmp_dir.rmtree()
 
 @task
-def default():
+@consume_args
+def default(args = []):
     """Write out dependency file in order to test non-compiled scripts"""
     js_files = options.src_dir.files('*.js')
-    sh('python %s -i %s -p % s -d %s -o deps --output_file %s' % (
+
+    output_mode = 'deps'
+    if '--list' in args:
+        output_mode = 'list'
+
+    sh('python %s -i %s -p % s -d %s -o %s --output_file %s' % (
         options.calcdeps,
         ' -i '.join(js_files),
         options.src_dir,
         options.closure_library_dir,
+        output_mode,
         options.test_dir / 'deps.js'
     ))
 
@@ -95,7 +102,7 @@ def lint():
 
     lint_flag.touch()
 
-    for file in options.src_dir.files('*.js'):
+    for file in options.src_dir.walkfiles('*.js'):
         if not last_run or (last_run < file.mtime):
             sh('%s %s' % (
                 options.closure_lint,
@@ -105,7 +112,7 @@ def lint():
 @task
 def fix_lint():
     """Run Closure lint fixer on all source files"""
-    for file in options.src_dir.files('*.js'):
+    for file in options.src_dir.walkfiles('*.js'):
         sh('%s %s' % (
             options.closure_fix_lint,
             file
@@ -148,14 +155,25 @@ def compile(args):
         ' --jscomp_error '.join(options.compiler_errors),
         ' --jscomp_warning '.join(options.compiler_warnings),
         # Don't leak global variables
-        """--output_wrapper '(function(){"use strict";%output%}());'"""
+        """--output_wrapper '(function(){"use strict";%output%}());'""",
+        # Not sure why compiler doesn't do this automatically
+        '--define="COMPILED=true"'
     ]
+
+    if ('--nolegacy' in args):
+        compiler_flags.append('--define="SUPPORT_LEGACY=false"')
+
+    if ('--noie' in args):
+        compiler_flags.append('--define="SUPPORT_IE=false"')
 
     # Make pretty output for debug mode
     if '--debug' in args:
         compiler_flags.append('--debug=true')
         compiler_flags.append('--formatting=PRETTY_PRINT')
         compiler_flags.append('--formatting=PRINT_INPUT_DELIMITER')
+    else:
+        # Let code know modules are not being used
+        compiler_flags.append('--define="goog.DEBUG=false"')
 
     # Externs definitions
     if options.externs_dir.isdir():
@@ -202,6 +220,8 @@ def compile(args):
                 file_counts[i],
                 dependencies
             ))
+
+            compiler_flags.append("""--module_wrapper %s:'(function(){"use strict";%%s}());'""" % js_file[:-3])
 
     # Run the compilation
     sh('java -jar %s %s' % (

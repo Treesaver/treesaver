@@ -1,7 +1,5 @@
 # Dependencies
 
-Tools required for building:
-
 * [Paver](http://www.blueskyonmars.com/projects/paver/): For running build script. Requires Python.
 * [Closure Compiler](http://code.google.com/closure/compiler/): Aggregates and minifies JavaScript.
 * [Closure Library](http://code.google.com/closure/library/): Required for best use of Closure Compiler.
