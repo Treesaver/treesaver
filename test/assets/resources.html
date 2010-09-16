@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Grids</title>
+  </head>
+  <body>
+    <!-- Content for testing -->
+    <div id="textonly" class="content">
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 100px"></p>
+      <p style="height: 100px"></p>
+      <p style="height: 100px"></p>
+      <p style="height: 100px"></p>
+      <p style="height: 100px"></p>
+      <p style="height: 400px"></p>
+      <p style="height: 400px"></p>
+    </div>
+
+    <div id="simple" class="content">
+      <h1 style="height: 60px" class="hybrid" data-sizes="title"></h1>
+      <img src="assets/photo_200.jpg" data-sizes="one two three"
+          data-one="assets/photo_200.jpg"
+          data-two="assets/photo_400.jpg"
+          data-three="assets/photo_600.jpg"
+        />
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 40px"></p>
+      <p style="height: 80px"></p>
+      <p style="height: 80px"></p>
+      <p style="height: 80px"></p>
+      <p style="height: 80px"></p>
+      <p style="height: 80px"></p>
+    </div>
+
+    <!-- Loading and error pages -->
+    <div id="loading">
+      Loading ...
+    </div>
+
+    <div id="error">
+      Error. Change size or reload.
+    </div>
+
+    <!-- Grids for testing -->
+    <div class="textonly grid onecol">
+      <div class="column col-1"></div>
+    </div>
+
+    <div class="textonly grid twocol">
+      <div class="column col-1"></div>
+      <div class="column col-2"></div>
+    </div>
+
+    <div class="textonly grid threecol">
+      <div class="field" data-fieldname="title">title field</div>
+      <div class="column col-1"></div>
+      <div class="column col-2"></div>
+      <div class="column col-3"></div>
+    </div>
+
+    <div class="grid onecol">
+      <div class="container top" data-sizes="title one"></div>
+      <div class="column col-1 bottom"></div>
+    </div>
+
+    <div class="textonly grid twocol">
+      <div class="container top" data-sizes="title two"></div>
+      <div class="column col-1 bottom"></div>
+      <div class="column col-2 bottom"></div>
+    </div>
+
+    <div class="textonly grid threecol">
+      <div class="field" data-fieldname="title">title field</div>
+      <div class="container top" data-sizes="title three"></div>
+      <div class="column col-1 bottom"></div>
+      <div class="column col-2 bottom"></div>
+      <div class="column col-3 bottom"></div>
+    </div>
+
+    <div class="textonly grid threecol odd">
+      <div class="field" data-fieldname="title">title field</div>
+      <div class="container top" data-sizes="title three"></div>
+      <div class="column col-1 bottom"></div>
+      <div class="column col-2 bottom"></div>
+      <div class="column col-3 bottom"></div>
+    </div>
+
+    <div class="textonly grid threecol even">
+      <div class="field" data-fieldname="title">title field</div>
+      <div class="container top" data-sizes="title three"></div>
+      <div class="column col-1 bottom"></div>
+      <div class="column col-2 bottom"></div>
+      <div class="column col-3 bottom"></div>
+    </div>
+
+    <!-- Basic chrome -->
+    <div class="chrome">
+      <div class="viewer">
+      </div>
+      <div class="controls">
+        <button class="prev">Prev</button>
+        <span class="info">
+          <span class="pagenumber">1</span>
+          of
+          <span class="pagecount">1</span>
+        </span>
+        <button class="next">Next</button>
+      </div>
+    </div>
+  </body>
+</html>

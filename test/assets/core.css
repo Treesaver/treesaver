@@ -1,0 +1,121 @@
+.column {
+  line-height: 20px;
+}
+
+h1 {
+  margin: 0 0 20px;
+  border: 1px solid #ccc;
+  padding: 19px 0;
+  font-size: 30px;
+  line-height: 40px;
+}
+
+h1.bad {
+  line-height: 24px;
+  border-width: 2px 0;
+  margin-top: 10px;
+}
+
+p {
+  font-size: 16px;
+  line-height: 20px;
+  margin: 0;
+}
+
+p.bad {
+  line-height: 19px;
+  margin: 5px 0;
+  border-bottom: 20px solid black;
+  border-top: 5px solid black;
+}
+
+p.keeptogether.abnormal {
+  font-size: 12px;
+  line-height: 15px;
+}
+
+p.margin {
+  margin: 20px 0 40px;
+}
+
+div.border {
+  border: 1px solid #ccc;
+  padding: 19px 5px;
+}
+
+.supernested p {
+  line-height: 40px;
+}
+
+p.double {
+  line-height: 40px;
+}
+
+canvas {
+  display: block;
+  background: navy;
+  width: 300px;
+  height: 147px;
+  font-weight: bold;
+}
+
+video {
+  display: block;
+  border: 1px solid black;
+  background: red;
+  width: 300px;
+  height: 200px;
+  font-weight: bold;
+}
+
+figure, div.figure {
+  display: block;
+  border: 1px solid black;
+  width: 200px;
+  height: 200px;
+  padding: 10px;
+  background: #ccf;
+}
+
+div.figure {
+  border-width: 4px;
+  padding: 5px;
+}
+
+abbr {
+  font-style: italic;
+}
+
+.column ul {
+  margin: 0 0 25px 1em;
+}
+
+.column li {
+  margin: 10px 0;
+}
+
+div.contained {
+  border: 1px solid black;
+  margin-bottom: 2px;
+}
+
+div.contained p, div.transparent p {
+  margin: 10px;
+  margin-bottom: 0;
+}
+
+.annoying-nesting {
+  padding: 20px;
+}
+
+.annoying-nesting h3 {
+  height: 60px;
+  line-height: 20px;
+  margin: 0 0 20px;
+}
+
+p.intro {
+  height: 120px;
+  margin: 0;
+}
+

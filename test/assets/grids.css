@@ -1,0 +1,23 @@
+.grid {
+  position: absolute;
+  line-height: 20px;
+  width: 200px;
+}
+
+.column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+}
+
+.container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.grid.fiver {
+  min-height: 200px;
+  max-height: 600px;
+}

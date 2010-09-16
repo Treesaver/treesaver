@@ -1,0 +1,39 @@
+/* Used for temporary items that should never be visible */
+.offscreen {
+  position: absolute;
+  top: -200%;
+  right: -200%;
+  visibility: hidden;
+}
+
+/* Make sure seams aren't visible */
+.chrome, .viewer, .grid, .column {
+  overflow: hidden;
+}
+
+body {
+  font-size: 14px;
+  line-height: 20px;
+  overflow: hidden;
+}
+
+.chrome, .viewer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.grid {
+  position: absolute;
+  width: 320px;
+}
+
+.column {
+  position: absolute;
+  width: 300px;
+  top: 0;
+  bottom: 0;
+  left: 10px;
+}
