@@ -14,7 +14,7 @@ treesaver.dimensions.Size;
 /**
  * Alias for SizeRange type
  *
- * @typedef {{ minW: number, minH: number, maxW: number, maxH: number }}
+ * @typedef {{ width: number, height: number, maxW: number, maxH: number }}
  */
 treesaver.dimensions.SizeRange;
 
@@ -41,6 +41,7 @@ treesaver.dimensions.inSizeRange = function(range, size) {
  * @param {treesaver.dimensions.SizeRange} a
  * @param {treesaver.dimensions.Metrics} b
  * @param {boolean} outer
+ * @return {treesaver.dimensions.SizeRange}
  */
 treesaver.dimensions.mergeSizeRange = function(a, b, outer) {
   a = a || {};

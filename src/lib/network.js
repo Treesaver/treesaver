@@ -22,8 +22,8 @@ treesaver.network.DEFAULT_TIMEOUT = 10000; // 10 seconds
  * @type {Object.<string, string>}
  */
 treesaver.network.events = {
-  ONLINE: 'treesaver.network.online',
-  OFFLINE: 'treesaver.network.offline'
+  ONLINE: 'treesaver.online',
+  OFFLINE: 'treesaver.offline'
 };
 
 /**

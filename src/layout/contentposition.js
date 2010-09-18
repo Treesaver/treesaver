@@ -25,6 +25,15 @@ treesaver.layout.ContentPosition.END =
   new treesaver.layout.ContentPosition(Infinity, Infinity, Infinity);
 
 /**
+ * Is the current content position at the beginning?
+ *
+ * @return {boolean} True if at beginning of content
+ */
+treesaver.layout.ContentPosition.prototype.atBeginning = function() {
+  return !this.block && !this.figure && !this.overhang;
+};
+
+/**
  * Sort function for ContentPositions
  *
  * @param {!treesaver.layout.ContentPosition} a

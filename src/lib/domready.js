@@ -14,7 +14,7 @@ goog.require('treesaver.scheduler');
  * @type {Object.<string, string>}
  */
 treesaver.domready.events = {
-  READY: 'treesaver.domready.ready'
+  READY: 'treesaver.ready'
 };
 
 /**
