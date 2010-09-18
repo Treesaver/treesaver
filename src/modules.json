@@ -1,12 +1,10 @@
 {
   "order": [
     "treesaver.js",
-    "layout.js",
     "ui.js"
   ],
   "dependencies": {
     "treesaver.js": [],
-    "layout.js": ["treesaver.js"],
-    "ui.js": ["treesaver.js", "layout.js"]
+    "ui.js": ["treesaver.js"]
   }
 }

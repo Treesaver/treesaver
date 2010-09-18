@@ -50,14 +50,8 @@ treesaver.boot.load = function() {
     if (!COMPILED) {
       var gr = goog.require;
 
-      gr('treesaver.layout');
       gr('treesaver.ui');
     }
-
-    treesaver.scriptloader.load('layout.js', function (name) {
-      treesaver.boot.layoutLoaded_ = true;
-      treesaver.boot.loadProgress_();
-    });
 
     treesaver.scriptloader.load('ui.js', function (name) {
       treesaver.boot.uiLoaded_ = true;
@@ -140,7 +134,6 @@ treesaver.boot.cleanup_ = function() {
   // Kill loading flags
   delete treesaver.boot.resourcesLoaded_;
   delete treesaver.boot.uiLoaded_;
-  delete treesaver.boot.layoutLoaded_;
   delete treesaver.boot.domReady_;
 
   // Kill other data storage
@@ -182,7 +175,7 @@ treesaver.boot.loadProgress_ = function() {
     return;
   }
 
-  if (USE_MODULES && !(treesaver.boot.uiLoaded_ && treesaver.boot.layoutLoaded_)) {
+  if (USE_MODULES && !treesaver.boot.uiLoaded_) {
     // Must wait for the other modules to load
     return;
   }

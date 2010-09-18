@@ -5,6 +5,7 @@ goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.layout.BreakRecord');
 goog.require('treesaver.layout.Grid');
+goog.require('treesaver.layout.Block');
 
 /**
   * Page class

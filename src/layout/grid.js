@@ -9,9 +9,11 @@ goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.dimensions');
+goog.require('treesaver.layout.Block');
 goog.require('treesaver.layout.BreakRecord');
 goog.require('treesaver.layout.Column');
 goog.require('treesaver.layout.Container');
+goog.require('treesaver.layout.Figure');
 
 /**
  * Grid class
