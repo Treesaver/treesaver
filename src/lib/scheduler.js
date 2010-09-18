@@ -260,7 +260,7 @@ treesaver.scheduler.resume = function() {
  * @param {!string} name Task name
  */
 treesaver.scheduler.clear = function(name) {
-  delete treesaver.scheduler.tasks_[name];
+  delete treesaver.scheduler.namedTasks_[name];
 
   treesaver.scheduler.tasks_.forEach(function(task, i) {
     if (task.name === name) {
