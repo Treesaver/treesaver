@@ -35,6 +35,9 @@ treesaver.ui.StateManager.load = function() {
     size: { w: 0, h: 0 }
   };
 
+  // Clean the body
+  treesaver.dom.clearChildren(/** @type {!Element} */ (document.body));
+
   // Install container for chrome used to measure screen space, etc
   treesaver.ui.StateManager.state_.chromeContainer = treesaver.ui.StateManager.getChromeContainer_();
 
