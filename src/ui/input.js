@@ -41,15 +41,15 @@ treesaver.ui.input.unload = function() {
  * @type {!Object.<string, string>}
  */
 treesaver.ui.input.events = {
-  KEYDOWN: 'treesaver.ui.events.keydown',
-  CLICK: 'treesaver.ui.events.click',
-  MOUSEWHEEL: 'treesaver.ui.events.mousewheel',
-  MOUSEUP: 'treesaver.ui.events.mouseup',
-  MOUSEDOWN: 'treesaver.ui.events.mousedown',
-  MOUSEMOVE: 'treesaver.ui.events.mousemove',
-  MOUSECANCEL: 'treesaver.ui.events.mousecancel',
-  ACTIVE: 'treesaver.ui.events.active',
-  IDLE: 'treesaver.ui.events.idle'
+  KEYDOWN: 'treesaver.keydown',
+  CLICK: 'treesaver.click',
+  MOUSEWHEEL: 'treesaver.mousewheel',
+  MOUSEUP: 'treesaver.mouseup',
+  MOUSEDOWN: 'treesaver.mousedown',
+  MOUSEMOVE: 'treesaver.mousemove',
+  MOUSECANCEL: 'treesaver.mousecancel',
+  ACTIVE: 'treesaver.active',
+  IDLE: 'treesaver.idle'
 };
 
 /**

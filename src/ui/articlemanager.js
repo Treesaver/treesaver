@@ -176,9 +176,9 @@ treesaver.ui.ArticleManager.unload = function() {
  * @type {Object.<string, string>}
  */
 treesaver.ui.ArticleManager.events = {
-  TOCUPDATED: 'treesaver.ui.articlemanager.tocupdated',
-  ARTICLECHANGED: 'treesaver.ui.articlemanager.articlechanged',
-  PAGESCHANGED: 'treesaver.ui.articlemanager.pageschanged'
+  TOCUPDATED: 'treesaver.tocupdated',
+  ARTICLECHANGED: 'treesaver.articlechanged',
+  PAGESCHANGED: 'treesaver.pageschanged'
 };
 
 /**

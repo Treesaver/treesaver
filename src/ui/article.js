@@ -14,6 +14,7 @@ goog.require('treesaver.scheduler');
 goog.require('treesaver.layout.BreakRecord');
 goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Content');
+goog.require('treesaver.layout.ContentPosition');
 goog.require('treesaver.layout.Page');
 
 /**
@@ -127,10 +128,10 @@ treesaver.ui.Article = function(url, title, grids, html) {
  * @type {Object.<string, string>}
  */
 treesaver.ui.Article.events = {
-  LOADFAILED: 'treesaver.ui.article.loadfailed',
-  LOADED: 'treesaver.ui.article.loaded',
-  PAGINATIONERROR: 'treesaver.ui.article.paginationerror',
-  PAGINATIONPROGRESS: 'treesaver.ui.article.paginationprogress'
+  LOADFAILED: 'treesaver.loadfailed',
+  LOADED: 'treesaver.loaded',
+  PAGINATIONERROR: 'treesaver.paginationerror',
+  PAGINATIONPROGRESS: 'treesaver.paginationprogress'
 };
 
 /**
@@ -550,7 +551,7 @@ treesaver.ui.Article.prototype.getPageIndex = function(position) {
   var i, len, cur;
 
   // Special case for first page
-  if (!position) {
+  if (!position || position.atBeginning()) {
     return 0;
   }
 
