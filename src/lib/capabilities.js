@@ -260,6 +260,7 @@ treesaver.capabilities.update_ = function() {
     treesaver.capabilities.caps_ = [];
     treesaver.capabilities.caps_.push(
       // Use the same class names as modernizr when applicable
+      p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
       p(treesaver.capabilities.SUPPORTS_CANVAS) + 'canvas',
       p(treesaver.capabilities.SUPPORTS_LOCALSTORAGE) + 'localstorage',
       p(treesaver.capabilities.SUPPORTS_VIDEO) + 'video',
