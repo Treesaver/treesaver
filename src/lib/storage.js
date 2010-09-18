@@ -22,11 +22,15 @@ treesaver.storage.set = function set(key, value, persist) {
  * @return {*} Previously stored value, if any
  */
 treesaver.storage.get = function set(key) {
-  // Try session storage first, then local
-  return window.JSON.parse(
-    /** @type {string} */
-    (window.sessionStorage.getItem(key) || window.localStorage.getItem(key) || '')
-  );
+  // Session take precedence over local
+  var val = window.sessionStorage.getItem(key) || window.localStorage.getItem(key);
+
+  if (val) {
+    return window.JSON.parse( /** @type {string} */ (val));
+  }
+  else {
+    return null;
+  };
 };
 
 /**
