@@ -154,12 +154,29 @@ treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
     // Note: This is pretty slow, but that's what you get for using an
     // old browser
     elements.forEach(function (el) {
-      if (el.getAttribute(propName) && regexp.test(el.getAttribute(propName))) {
+      if (treesaver.dom.hasAttr(el, propName) && regexp.test(el.getAttribute(propName))) {
         result.push(el);
       }
     });
 
     return result;
+  }
+};
+
+/**
+ * Whether the element has the given attribute. Proxy because IE doesn't
+ * have the native method
+ *
+ * @param {!Element} el
+ * @param {!string}  propName
+ * @return {boolean}
+ */
+treesaver.dom.hasAttr = function(el, propName) {
+  if (!treesaver.capabilities.SUPPORT_IE || 'hasAttribute' in el) {
+    return el.hasAttribute(propName);
+  }
+  else {
+    return typeof el.getAttribute(propName) !== 'undefined';
   }
 };
 
