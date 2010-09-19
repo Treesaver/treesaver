@@ -126,6 +126,10 @@ treesaver.dom.getElementsByTagName = function(tagName, root) {
  * @param {HTMLDocument|Element=} root    Element root (optional)
  */
 treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
+  if (!root) {
+    root = document;
+  }
+
   tagName = tagName || '*';
 
   // Modern browsers do this quite well via querySelectorAll

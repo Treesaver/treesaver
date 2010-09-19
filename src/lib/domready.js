@@ -152,21 +152,6 @@ treesaver.domready.pollState_ = function() {
  * @param {Event=} e
  */
 treesaver.domready['handleEvent'] = function(e) {
-  // IE doesn't do events correctly
-  // TODO: Use event library
-  if (SUPPORT_IE && !e) {
-    e = window.event;
-    e.target = e.target || e.srcElement;
-  }
-
-  // Make sure it's not coming from a script tag or something else
-  // that bubbled up
-  if (!(e.target === document || e.target === window)) {
-    treesaver.debug.warn('Stray loading event from: ' + e.target);
-
-    return;
-  }
-
   treesaver.debug.info('DOM event received: ' + e.type);
 
   if (/load|DOMContentLoaded/.test(e.type)) {
