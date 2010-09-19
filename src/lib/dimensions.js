@@ -101,10 +101,12 @@ if (SUPPORT_IE &&
  * @param {!Element} el
  * @param {!string} propName
  * @param {!number} val
+ * @return {!number} The value supplied
  */
 treesaver.dimensions.setCssPx = function(el, propName, val) {
   el.style[propName] = val + 'px';
-  return;
+
+  return val;
 };
 
 
