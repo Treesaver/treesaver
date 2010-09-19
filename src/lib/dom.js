@@ -129,7 +129,7 @@ treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
   tagName = tagName || '*';
 
   // Modern browsers do this quite well via querySelectorAll
-  if (!treesaver.capabilities.SUPPORT_LEGACY || 'querySelectorAll' in root) {
+  if (!SUPPORT_LEGACY || 'querySelectorAll' in root) {
     if (!root) {
       root = document;
     }
@@ -172,7 +172,7 @@ treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
  * @return {boolean}
  */
 treesaver.dom.hasAttr = function(el, propName) {
-  if (!treesaver.capabilities.SUPPORT_IE || 'hasAttribute' in el) {
+  if (!SUPPORT_IE || 'hasAttribute' in el) {
     return el.hasAttribute(propName);
   }
   else {

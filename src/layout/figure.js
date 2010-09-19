@@ -7,6 +7,7 @@ goog.require('treesaver.dom');
 //goog.require('treesaver.layout.Block');
 goog.require('treesaver.layout.FigureSize');
 goog.require('treesaver.string'); // trim
+goog.require('treesaver.json');
 
 /**
  * A figure element
@@ -305,7 +306,7 @@ treesaver.layout.Figure.prototype.processTemplateValues = function processTempla
 
   if (payload) {
     // Parse the JSON
-    values = window.JSON.parse(payload);
+    values = treesaver.json.parse(payload);
 
     // Values must be an Array. It's not really worth doing any sophisticated
     // checks here, so let's just check for length

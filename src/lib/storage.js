@@ -6,6 +6,7 @@ goog.provide('treesaver.storage');
 
 goog.require('treesaver.array'); // forEach
 goog.require('treesaver.debug');
+goog.require('treesaver.json');
 
 /**
  * @param {!string} key
@@ -14,7 +15,7 @@ goog.require('treesaver.debug');
  */
 treesaver.storage.set = function set(key, value, persist) {
   var store = persist ? window.localStorage : window.sessionStorage;
-  store.setItem(key, window.JSON.stringify(value));
+  store.setItem(key, treesaver.json.stringify(value));
 };
 
 /**
@@ -26,7 +27,7 @@ treesaver.storage.get = function set(key) {
   var val = window.sessionStorage.getItem(key) || window.localStorage.getItem(key);
 
   if (val) {
-    return window.JSON.parse( /** @type {string} */ (val));
+    return treesaver.json.parse( /** @type {string} */ (val));
   }
   else {
     return null;
