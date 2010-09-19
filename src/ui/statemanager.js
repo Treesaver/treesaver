@@ -94,7 +94,7 @@ treesaver.ui.StateManager.getChromeContainer_ = function() {
  * @return {!Element}
  */
 treesaver.ui.StateManager.getViewport_ = function() {
-  var viewport = treesaver.dom.$('meta[name=viewport]')[0];
+  var viewport = treesaver.dom.getElementsByProperty('name', 'viewport', 'meta')[0];
 
   if (!viewport) {
     // Create a viewport if one doesn't exist

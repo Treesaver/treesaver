@@ -259,7 +259,7 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
  * @return {string}
  */
 treesaver.ui.ArticleManager.getTOCLocation = function() {
-  var link = treesaver.dom.$('link[rel*=contents]')[0],
+  var link = treesaver.dom.getElementsByProperty('rel', 'contents', 'link')[0],
       url;
 
   // Is the current document the index?
@@ -332,7 +332,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
 
   container.innerHTML = html;
 
-  treesaver.dom.$('a[rev*=contents]', container).forEach(function(node) {
+  treesaver.dom.getElementsByProperty('rev', 'contents', 'a', container).forEach(function(node) {
     var url = treesaver.network.absoluteURL(node.href),
         article,
         i;

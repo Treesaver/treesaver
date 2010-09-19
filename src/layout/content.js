@@ -66,7 +66,7 @@ treesaver.layout.Content = function(el) {
   this.fields = {};
 
   // TODO: Real microdata implementation
-  treesaver.dom.$('*[itemprop]', el).forEach(function(dataNode) {
+  treesaver.dom.getElementsByProperty('itemprop', null, null, el).forEach(function(dataNode) {
     var propname = (dataNode.getAttribute('itemprop') || '').toLowerCase();
 
     if (propname) {

@@ -62,7 +62,7 @@ treesaver.dom.classes = function(el) {
  * Query an element tree using a class name
  *
  * @param {!string} className
- * @param {Element=} root Element root (optional)
+ * @param {HTMLDocument|Element=} root Element root (optional)
  * @return {!Array.<Element>} Array of matching elements
  */
 treesaver.dom.getElementsByClassName = function(className, root) {
@@ -104,7 +104,7 @@ treesaver.dom.getElementsByClassName = function(className, root) {
  * Query an element tree by tag name
  *
  * @param {!string} tagName
- * @param {Element=} root Element root (optional)
+ * @param {HTMLDocument|Element=} root Element root (optional)
  * @return {!Array.<Element>} Array of matching elements
  */
 treesaver.dom.getElementsByTagName = function(tagName, root) {
@@ -116,24 +116,50 @@ treesaver.dom.getElementsByTagName = function(tagName, root) {
 };
 
 /**
- * Query an element tree via CSS selector
+ * Query an element by property name and value
  *
- * @param {!string} selector
- * @param {Element=} root Element root (optional)
- * @return {!Array.<Element>} Array of matching elements
+ * In modern browsers, this wraps querySelectorAll
+ *
+ * @param {!string} propName Property name
+ * @param {?string=} value   Value contained (optional)
+ * @param {?string=} tagName Tag name (optional)
+ * @param {HTMLDocument|Element=} root    Element root (optional)
  */
-treesaver.dom.$ = function(selector, root) {
-  if (!root) {
-    root = document;
-  }
+treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
+  tagName = tagName || '*';
 
-  if ('querySelectorAll' in root) {
+  // Modern browsers do this quite well via querySelectorAll
+  if (!treesaver.capabilities.SUPPORT_LEGACY || 'querySelectorAll' in root) {
+    if (!root) {
+      root = document;
+    }
+
+    // Construct a selector via the arguments
+    var selector = tagName + '[' + propName +
+      // Note, this queries based on a space separated single value match
+      (value ? '~=' + value : '') + ']';
+
     return treesaver.array.toArray(root.querySelectorAll(selector));
   }
   else {
-    treesaver.debug.error('querySelectorAll called on unsupported browser');
+    // Have to do the work manually
+    var result = [],
+        elements = treesaver.dom.getElementsByTagName(tagName, root),
+        // Use a regexp to test if there is a value, otherwise mock out a test
+        // function to always return true
+        regexp = value ? new RegExp("(^|\\s)" + value + "(\\s|$)")
+          : { test: function() { return true; } };
 
-    return [];
+    // Cycle through each element and test
+    // Note: This is pretty slow, but that's what you get for using an
+    // old browser
+    elements.forEach(function (el) {
+      if (el.getAttribute(propName) && regexp.test(el.getAttribute(propName))) {
+        result.push(el);
+      }
+    });
+
+    return result;
   }
 };
 
