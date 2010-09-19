@@ -1,0 +1,60 @@
+/* Used for temporary items that should never be visible */
+.offscreen {
+  position: absolute;
+  top: -200%;
+  right: -200%;
+  visibility: hidden;
+}
+
+/* Make sure seams aren't visible */
+.chrome, .viewer, .grid, .column {
+  overflow: hidden;
+}
+
+body.treesaver {
+  font-size: 14px;
+  line-height: 20px;
+  overflow: hidden;
+}
+
+article {
+  line-height: 20px;
+}
+
+.chrome, .viewer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  line-height: 20px;
+}
+
+.grid {
+  position: absolute;
+  width: 320px;
+  line-height: 20px;
+}
+
+.column {
+  position: absolute;
+  width: 300px;
+  top: 0;
+  bottom: 0;
+  left: 10px;
+  line-height: 20px;
+}
+
+h1 {
+  margin: 0 0 20px;
+  line-height: 40px;
+  font-size: 36px;
+}
+
+.loading, .error {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  line-height: 200px;
+  text-align: center;
+}

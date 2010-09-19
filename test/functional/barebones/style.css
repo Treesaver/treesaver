@@ -11,10 +11,14 @@
   overflow: hidden;
 }
 
-body {
+body.treesaver {
   font-size: 14px;
   line-height: 20px;
   overflow: hidden;
+}
+
+article {
+  line-height: 20px;
 }
 
 .chrome, .viewer {
@@ -23,11 +27,13 @@ body {
   left: 0;
   bottom: 0;
   right: 0;
+  line-height: 20px;
 }
 
 .grid {
   position: absolute;
   width: 320px;
+  line-height: 20px;
 }
 
 .column {
@@ -36,4 +42,19 @@ body {
   top: 0;
   bottom: 0;
   left: 10px;
+  line-height: 20px;
+}
+
+h1 {
+  margin: 0 0 20px;
+  line-height: 40px;
+  font-size: 36px;
+}
+
+.loading, .error {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  line-height: 200px;
+  text-align: center;
 }
