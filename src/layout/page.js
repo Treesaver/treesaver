@@ -61,12 +61,12 @@ treesaver.layout.Page = function(content, grids, br) {
   this.node.style.height = this.size.height + 'px';
 
   // Fill in fields
-  treesaver.dom.getElementsByTagName('output', this.node).forEach(function (node) {
+  treesaver.dom.getElementsByTagName('output', this.node).forEach(function(node) {
     treesaver.layout.Page.fillField(node, content.fields);
   });
 
   // Containers
-  treesaver.dom.getElementsByClassName('container', this.node).forEach(function (containerNode, i) {
+  treesaver.dom.getElementsByClassName('container', this.node).forEach(function(containerNode, i) {
     var mapping = best.containers[i],
         figure, figureIndex, success;
 
@@ -102,7 +102,7 @@ treesaver.layout.Page = function(content, grids, br) {
   }, this);
 
   // Columns
-  treesaver.dom.getElementsByClassName('column', this.node).forEach(function (colNode, i) {
+  treesaver.dom.getElementsByClassName('column', this.node).forEach(function(colNode, i) {
     var col = best.grid.cols[i];
     treesaver.layout.Page.fillColumn(content, br, colNode,
       best.grid.maxColHeight, col.minH);
@@ -152,7 +152,7 @@ treesaver.layout.Page = function(content, grids, br) {
  * @param {?number} lineHeight
  * @return {boolean} True if the figure fit within the container
  */
-treesaver.layout.Page.fillContainer = function fillContainer(container, figure, map,
+treesaver.layout.Page.fillContainer = function(container, figure, map,
     lineHeight) {
   var size, figureSize,
       containerHeight, sibling,
@@ -272,8 +272,7 @@ treesaver.layout.Page.fillContainer = function fillContainer(container, figure, 
   * @param {number} maxColHeight
   * @param {number} minH Minimum height of the column
   */
-treesaver.layout.Page.fillColumn = function fillColumn(content, br, node,
-    maxColHeight, minH) {
+treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, minH) {
   var colHeight = node.offsetHeight,
       height = 0,
       remainingHeight,
@@ -791,8 +790,7 @@ treesaver.layout.Page.fillColumn = function fillColumn(content, br, node,
  * @param {number} height
  * @return {number} The final column height required for this
  */
-treesaver.layout.Page.computeOverhang =
-  function computeOverhang(br, lastBlock, colHeight, height) {
+treesaver.layout.Page.computeOverhang = function(br, lastBlock, colHeight, height) {
   var contentOnlyOverhang,
       excess;
 
@@ -858,7 +856,7 @@ treesaver.layout.Page.computeOverhang =
  * @param {!Element} node
  * @param {!Object} fields
  */
-treesaver.layout.Page.fillField = function fillField(node, fields) {
+treesaver.layout.Page.fillField = function(node, fields) {
   // The field name to put in this element
   var fieldName = node.getAttribute('name').toLowerCase();
   if (fieldName && fields[fieldName]) {
@@ -880,7 +878,7 @@ treesaver.layout.Page.fillField = function fillField(node, fields) {
  * Initialize page as necessary before displaying
  * @return {Element}
  */
-treesaver.layout.Page.prototype.activate = function activatePage() {
+treesaver.layout.Page.prototype.activate = function() {
   // Run only once
   if (this.active) {
     return this.node;
@@ -901,13 +899,13 @@ treesaver.layout.Page.prototype.activate = function activatePage() {
 /**
  * Deactivate page
  */
-treesaver.layout.Page.prototype.deactivate = function deactivatePage() {
+treesaver.layout.Page.prototype.deactivate = function() {
   this.active = false;
   this.node = null;
 };
 
 if (goog.DEBUG) {
-  treesaver.layout.Page.prototype.toString = function toString() {
+  treesaver.layout.Page.prototype.toString = function() {
     return "[Page]";
   };
 }
