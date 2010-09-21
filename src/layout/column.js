@@ -23,14 +23,20 @@ treesaver.layout.Column = function(el, gridHeight) {
   /**
    * @type {number}
    */
-  this.height = el.offsetHeight;
+  this.minH = treesaver.dimensions.toPixels(
+    treesaver.dimensions.getStyleObject(el).minHeight
+  ) || 0;
+
+  // Need to clear the minHeight, if there is one, in order to get an accurate
+  // delta reading
+  if (this.minH) {
+    treesaver.dimensions.setCssPx(el, 'minHeight', 0);
+  }
 
   /**
    * @type {number}
    */
-  this.minH = treesaver.dimensions.toPixels(
-    treesaver.dimensions.getStyleObject(el).minHeight
-  ) || 0;
+  this.height = el.offsetHeight;
 
   /**
    * @type {number}

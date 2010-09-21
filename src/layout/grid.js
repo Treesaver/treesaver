@@ -45,11 +45,6 @@ treesaver.layout.Grid = function(node) {
    */
   this.scoringFlags = treesaver.layout.Grid.findScoringFlags(this.classes);
 
-  /**
-   * @type {string}
-   */
-  this.html = treesaver.dom.outerHTML(node);
-
   // Sizing
   // Flex grids get stretched later
   this.stretchedSize = this.size = new treesaver.dimensions.Metrics(node);
@@ -117,6 +112,13 @@ treesaver.layout.Grid = function(node) {
     var cur = new treesaver.layout.Container(containerNode, this.size.height);
     this.containers.push(cur);
   }, this);
+
+  // Save out the HTML after processing Columns and Containers, in order to maintain
+  // any sanitization that may have occurred.
+  /**
+   * @type {string}
+   */
+  this.html = treesaver.dom.outerHTML(node);
 
   // Remove the child
   document.body.removeChild(node);
