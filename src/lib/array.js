@@ -1,12 +1,12 @@
 /**
- * @fileoverview Helper functions for manipulating arrays
+ * @fileoverview Helper functions for manipulating arrays.
  */
 
 goog.provide('treesaver.array');
 
 // IE has no Array.indexOf (why?)
 if (SUPPORT_IE && !Array.prototype.indexOf) {
-  Array.prototype.indexOf = function (obj, start) {
+  Array.prototype.indexOf = function(obj, start) {
     var i, len;
     for (i = (start || 0), len = this.length; i < len; i += 1) {
       if (this[i] === obj) {
@@ -24,7 +24,7 @@ if (SUPPORT_IE && !Array.prototype.indexOf) {
  * @param {!number} from
  * @param {number=} to
  */
-Array.prototype.remove = function (from, to) {
+Array.prototype.remove = function(from, to) {
   var rest = this.slice((to || from) + 1 || this.length);
   this.length = from < 0 ? this.length + from : from;
   return this.push.apply(this, rest);

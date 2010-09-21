@@ -1,5 +1,5 @@
 /**
- * @fileoverview DOM helper functions
+ * @fileoverview DOM helper functions.
  */
 
 goog.provide('treesaver.dom');
@@ -16,7 +16,7 @@ goog.require('treesaver.array');
 treesaver.dom.addClass = function(el, className) {
   if (el.className) {
     if (!treesaver.dom.hasClass(el, className)) {
-      el.className += " " + className;
+      el.className += ' ' + className;
     }
   }
   else {
@@ -32,8 +32,8 @@ treesaver.dom.addClass = function(el, className) {
  * @param {!string} className
  */
 treesaver.dom.removeClass = function(el, className) {
-  var regexp = new RegExp("(^|\\s)" + className + "(\\s|$)");
-  el.className = el.className.replace(regexp, "$2");
+  var regexp = new RegExp('(^|\\s)' + className + '(\\s|$)');
+  el.className = el.className.replace(regexp, '$2');
 };
 
 /**
@@ -42,16 +42,16 @@ treesaver.dom.removeClass = function(el, className) {
  *
  * @param {!Element} el
  * @param {!string} className
- * @return {boolean} True if the element has that class
+ * @return {boolean} True if the element has that class.
  */
 treesaver.dom.hasClass = function(el, className) {
-  var regexp = new RegExp("(^|\\s)" + className + "(\\s|$)");
+  var regexp = new RegExp('(^|\\s)' + className + '(\\s|$)');
   return !!(el.className && regexp.test(el.className));
 };
 
 /**
  * @param {!Element} el
- * @return {!Array.<string>} Array of all the element's classes
+ * @return {!Array.<string>} Array of all the element's classes.
  */
 treesaver.dom.classes = function(el) {
   return el.className && el.className.split ?
@@ -62,8 +62,8 @@ treesaver.dom.classes = function(el) {
  * Query an element tree using a class name
  *
  * @param {!string} className
- * @param {HTMLDocument|Element=} root Element root (optional)
- * @return {!Array.<Element>} Array of matching elements
+ * @param {HTMLDocument|Element=} root Element root (optional).
+ * @return {!Array.<Element>} Array of matching elements.
  */
 treesaver.dom.getElementsByClassName = function(className, root) {
   if (!root) {
@@ -88,9 +88,9 @@ treesaver.dom.getElementsByClassName = function(className, root) {
     // Slow path for old browsers (IE7)
     // TODO: Use a faster/better implementation?
     var allElements = root.getElementsByTagName('*'),
-        classPattern = new RegExp("(^|\\s)" + className + "(\\s|$)");
+        classPattern = new RegExp('(^|\\s)' + className + '(\\s|$)');
 
-    treesaver.array.toArray(allElements).forEach(function (child) {
+    treesaver.array.toArray(allElements).forEach(function(child) {
       if (classPattern.test(child.className)) {
         result.push(child);
       }
@@ -104,8 +104,8 @@ treesaver.dom.getElementsByClassName = function(className, root) {
  * Query an element tree by tag name
  *
  * @param {!string} tagName
- * @param {HTMLDocument|Element=} root Element root (optional)
- * @return {!Array.<Element>} Array of matching elements
+ * @param {HTMLDocument|Element=} root Element root (optional).
+ * @return {!Array.<Element>} Array of matching elements.
  */
 treesaver.dom.getElementsByTagName = function(tagName, root) {
   if (!root) {
@@ -120,10 +120,10 @@ treesaver.dom.getElementsByTagName = function(tagName, root) {
  *
  * In modern browsers, this wraps querySelectorAll
  *
- * @param {!string} propName Property name
- * @param {?string=} value   Value contained (optional)
- * @param {?string=} tagName Tag name (optional)
- * @param {HTMLDocument|Element=} root    Element root (optional)
+ * @param {!string} propName Property name.
+ * @param {?string=} value   Value contained (optional).
+ * @param {?string=} tagName Tag name (optional).
+ * @param {HTMLDocument|Element=} root    Element root (optional).
  */
 treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
   if (!root) {
@@ -151,14 +151,15 @@ treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
         elements = treesaver.dom.getElementsByTagName(tagName, root),
         // Use a regexp to test if there is a value, otherwise mock out a test
         // function to always return true
-        regexp = value ? new RegExp("(^|\\s)" + value + "(\\s|$)")
+        regexp = value ? new RegExp('(^|\\s)' + value + '(\\s|$)')
           : { test: function() { return true; } };
 
     // Cycle through each element and test
     // Note: This is pretty slow, but that's what you get for using an
     // old browser
-    elements.forEach(function (el) {
-      if (treesaver.dom.hasAttr(el, propName) && regexp.test(el.getAttribute(propName))) {
+    elements.forEach(function(el) {
+      if (treesaver.dom.hasAttr(el, propName) &&
+          regexp.test(el.getAttribute(propName))) {
         result.push(el);
       }
     });
@@ -200,26 +201,27 @@ treesaver.dom.clearChildren = function(el) {
  * InnerText wrapper for browsers that don't have it
  *
  * @param {!Node} node
- * @return {!string} The text content of the node
+ * @return {!string} The text content of the node.
  */
 treesaver.dom.innerText = function(node) {
   if (!SUPPORT_IE || 'textContent' in node) {
     return node.textContent;
   }
-
-  // IE-only fallback
-  return node.innerText
+  else {
+    // IE-only fallback
+    return node.innerText;
+  }
 };
 
 /**
  * OuterHTML wrapper for browsers that don't have it
  *
  * @param {!Element} el
- * @return {!string} The outer HTML of the element
+ * @return {!string} The outer HTML of the element.
  */
 treesaver.dom.outerHTML = function(el) {
   // IE, WebKit, and Opera all have outerHTML
-  if (el.outerHTML) {
+  if ('outerHTML' in el) {
     return el.outerHTML;
   }
 
@@ -240,7 +242,7 @@ treesaver.dom.outerHTML = function(el) {
  * Make an element from HTML
  *
  * @param {!string} html
- * @return {Element|null}
+ * @return {?Element}
  */
 treesaver.dom.createElementFromHTML = function(html) {
   // Container must be in tree to ensure proper HTML5 parsing by IE
@@ -275,8 +277,10 @@ if ('Node' in window && Node.prototype && !Node.prototype.contains) {
 
 /**
  * Temporary element used for DOM operations
+ *
+ * @private
  * @type {!Element}
  */
 treesaver.dom.dummyDiv_ = document.createElement('div');
 // Prevent all layout on the element
-treesaver.dom.dummyDiv_.style.display = "none";
+treesaver.dom.dummyDiv_.style.display = 'none';
