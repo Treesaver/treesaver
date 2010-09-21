@@ -14,9 +14,13 @@ treesaver.ui.input.load = function() {
   treesaver.events.addListener(document, 'DOMMouseScroll', treesaver.ui.input.mouseWheel);
   treesaver.events.addListener(document, 'mousedown', treesaver.ui.input.mouseDown);
   treesaver.events.addListener(document, 'touchstart', treesaver.ui.input.mouseDown);
+  // On desktops, make any mouse move show the UI
   treesaver.events.addListener(document, 'mouseover', treesaver.ui.input.mouseOver);
   treesaver.events.addListener(document, 'click', treesaver.ui.input.click);
   treesaver.events.addListener(document, treesaver.ui.input.events.ACTIVE, treesaver.ui.input.active);
+
+  // Start idle timer in a bit
+  treesaver.ui.input.active();
 };
 
 treesaver.ui.input.unload = function() {
@@ -113,7 +117,7 @@ treesaver.ui.input.mouseWheel = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.input.mouseDown = function(e) {
-  var isTouch = 'touches' in e,
+  var isTouch = !!e.touches,
       retVal,
       mouseData;
 
@@ -168,7 +172,7 @@ treesaver.ui.input.mouseDown = function(e) {
  */
 treesaver.ui.input.mouseMove = function(e) {
   // Collect relevant mouse data
-  var mouseData = treesaver.ui.input.getMouseData_(e, 'touches' in e),
+  var mouseData = treesaver.ui.input.getMouseData_(e, !!e.touches),
       retVal;
 
   // Fire event
@@ -186,7 +190,7 @@ treesaver.ui.input.mouseMove = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.input.mouseUp = function(e) {
-  var mouseData = treesaver.ui.input.getMouseData_(e, 'touches' in e),
+  var mouseData = treesaver.ui.input.getMouseData_(e, !!e.touches),
       retVal;
 
   // Clean up
@@ -214,7 +218,7 @@ treesaver.ui.input.mouseUp = function(e) {
  */
 treesaver.ui.input.mouseOver = function(e) {
   // Don't do anything on touch devices
-  if (!'touches' in e) {
+  if (!!!e.touches) {
     // Need to make sure UI is visible if a user is trying to click on it
     treesaver.events.fireEvent(document, treesaver.ui.input.events.ACTIVE);
   }
