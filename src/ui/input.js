@@ -153,9 +153,9 @@ treesaver.ui.input.mouseDown = function(e) {
     treesaver.events.addListener(document, 'touchcancel', treesaver.ui.input.mouseCancel);
   }
   else {
-    // Ignore if done with a modifier key
-    if (treesaver.ui.input.specialKeyPressed_(e)) {
-      treesaver.debug.info('Click ignored due to modifier key');
+    // Ignore if not done with a modifier key
+    if (!treesaver.ui.input.specialKeyPressed_(e)) {
+      treesaver.debug.info('Mousedown ignored due to modifier key');
 
       return;
     }
@@ -177,7 +177,7 @@ treesaver.ui.input.mouseDown = function(e) {
 
   retVal = treesaver.events.fireEvent(document, treesaver.ui.input.events.MOUSEDOWN, mouseData);
 
-  if (!retVal) {
+  if (!retVal || !isTouch) {
     e.preventDefault();
   }
 
@@ -196,7 +196,7 @@ treesaver.ui.input.mouseMove = function(e) {
   // Fire event
   retVal = treesaver.events.fireEvent(document, treesaver.ui.input.events.MOUSEMOVE, mouseData);
 
-  if (!retVal) {
+  if (!retVal || !e.touches) {
     e.preventDefault();
   }
 
@@ -217,7 +217,7 @@ treesaver.ui.input.mouseUp = function(e) {
   // Fire event
   retVal = treesaver.events.fireEvent(document, treesaver.ui.input.events.MOUSEUP, mouseData);
 
-  if (!retVal) {
+  if (!retVal || !e.touches) {
     e.preventDefault();
   }
   else {
