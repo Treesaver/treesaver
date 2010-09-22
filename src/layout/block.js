@@ -179,6 +179,8 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   if (goog.DEBUG) {
     node.setAttribute('data-index', this.index);
     node.setAttribute('data-outerHeight', this.metrics.outerH);
+    node.setAttribute('data-marginTop', this.metrics.marginTop);
+    node.setAttribute('data-marginBottom', this.metrics.marginBottom);
     node.setAttribute('data-firstLine', this.firstLine);
   }
 

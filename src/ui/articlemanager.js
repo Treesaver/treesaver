@@ -688,7 +688,10 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   // Set our position if we don't have one
   if (!treesaver.ui.ArticleManager.currentPosition ||
       treesaver.ui.ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
-    treesaver.ui.ArticleManager.currentPosition = pages[buffer].begin;
+    // Loading/error pages don't have markers
+    if (pages[buffer] && pages[buffer].begin) {
+      treesaver.ui.ArticleManager.currentPosition = pages[buffer].begin;
+    }
   }
 
   if (!treesaver.ui.ArticleManager.currentPageWidth) {

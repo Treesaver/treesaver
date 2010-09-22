@@ -13,7 +13,7 @@ goog.require('treesaver.layout.Block');
  * A chunk of content
  *
  * @constructor
- * @param {!Element} el HTML node
+ * @param {!Element} el HTML node which contains all content
  */
 treesaver.layout.Content = function(el) {
   var indices = {
@@ -36,7 +36,7 @@ treesaver.layout.Content = function(el) {
    *
    * @type {number}
    */
-  this.colWidth = el.parentNode.offsetWidth;
+  this.colWidth = el.offsetWidth;
 
   // Before we go through and construct our data objects, it really
   // pays off to sanitize all the content, correcting for invalid

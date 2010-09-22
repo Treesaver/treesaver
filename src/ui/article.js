@@ -215,24 +215,22 @@ treesaver.ui.Article.prototype.processHTML = function(html) {
     this.setGrids(this.grids);
   }
 
-  // Shove the content in
-  fake_column.appendChild(article_node);
+  // Move the content from the article to the column
+  while (article_node.firstChild) {
+    fake_column.appendChild(article_node.firstChild);
+  }
   fake_grid.appendChild(fake_column);
-  // Make sure article_node isn't changing the size with padding or border
-  article_node.style.margin = 0;
-  article_node.style.border = 0;
-  article_node.style.padding = 0;
   // Re-enable visibility, so the browser can measure layout
   fake_column.style.display = 'block';
   fake_grid.style.display = 'block';
 
   // Construct
-  this.content = new treesaver.layout.Content(article_node);
+  this.content = new treesaver.layout.Content(fake_column);
 
   // Clean up the DOM
   document.body.removeChild(fake_grid);
   fake_grid.removeChild(fake_column);
-  fake_column.removeChild(article_node);
+  treesaver.dom.clearChildren(fake_column);
 
   return true;
 };
