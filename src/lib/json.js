@@ -20,7 +20,7 @@ treesaver.json.parse = function(str) {
 /**
  * Convert a value into JSON
  *
- * @param {*} value
+ * @param {*} val
  * @return {!string}
  */
 treesaver.json.stringify = function(val) {

@@ -289,7 +289,7 @@ treesaver.ui.input.click = function(e) {
 };
 
 /**
- * @param {!Event} e
+ * @param {!Event=} e
  */
 treesaver.ui.input.active = function(e) {
   // Fire the idle event on a timer using debouncing, which delays the function
