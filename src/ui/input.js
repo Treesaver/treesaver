@@ -82,6 +82,14 @@ treesaver.ui.input.keyDown = function(e) {
 };
 
 /**
+ * The last time a mousewheel event was received
+ *
+ * @private
+ * @type {number}
+ */
+treesaver.ui.input.lastMouseWheel;
+
+/**
  * Sanitize and pass on mousewheel events
  *
  * @param {!Event} e
@@ -91,6 +99,16 @@ treesaver.ui.input.mouseWheel = function(e) {
     // Ignore if special key is down (user could be zooming)
     return true;
   }
+
+  var now = goog.now();
+
+  if (treesaver.ui.input.lastMouseWheel &&
+      ((now - treesaver.ui.input.lastMouseWheel) < MOUSE_WHEEL_INTERVAL)) {
+    // Ignore if too frequent (magic mouse)
+    return true;
+  }
+
+  treesaver.ui.input.lastMouseWheel = now;
 
   // Firefox handles this differently than others
   // http://adomas.org/javascript-mouse-wheel/

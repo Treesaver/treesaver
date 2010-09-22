@@ -66,3 +66,11 @@ var MAX_ANIMATION_DURATION = 200; // .2 seconds
  * @define {number}
  */
 var CHECK_STATE_INTERVAL = 100; // .1 seconds
+
+/**
+ * How long to wait between mouse wheel events
+ * Magic mouse can generate a ridiculous number of events
+ *
+ * @define {number}
+ */
+var MOUSE_WHEEL_INTERVAL = 1500; // 1.5 seconds
