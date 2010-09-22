@@ -155,7 +155,7 @@ def compile(args):
         ' --jscomp_error '.join(options.compiler_errors),
         ' --jscomp_warning '.join(options.compiler_warnings),
         # Don't leak global variables
-        """--output_wrapper '(function(){"use strict";%output%}());'""",
+        """--output_wrapper '(function(){ "use strict"; %output% }());'""",
         # Not sure why compiler doesn't do this automatically
         '--define="COMPILED=true"'
     ]
@@ -169,6 +169,10 @@ def compile(args):
     # Make pretty output for debug mode
     if '--debug' in args:
         compiler_flags.append('--debug=true')
+        compiler_flags.append('--formatting=PRETTY_PRINT')
+        compiler_flags.append('--formatting=PRINT_INPUT_DELIMITER')
+    elif '--pretty' in args:
+        compiler_flags[0] = '--compilation_level=WHITESPACE_ONLY'
         compiler_flags.append('--formatting=PRETTY_PRINT')
         compiler_flags.append('--formatting=PRINT_INPUT_DELIMITER')
     else:
@@ -221,7 +225,7 @@ def compile(args):
                 dependencies
             ))
 
-            compiler_flags.append("""--module_wrapper %s:'(function(){"use strict";%%s}());'""" % js_file[:-3])
+            #compiler_flags.append("""--module_wrapper %s:'(function(){"use strict";%%s}());'""" % js_file[:-3])
 
     # Run the compilation
     sh('java -jar %s %s' % (
