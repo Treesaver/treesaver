@@ -77,6 +77,15 @@ treesaver.capabilities.IS_MOBILE =
   treesaver.capabilities.ua_.indexOf('mobile') !== -1;
 
 /**
+ * Does the device have a small screen
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.IS_SMALL_SCREEN =
+  window.screen.width <= 600;
+
+/**
  * Name of the current browser. Possible values:
  *   - msie
  *   - mozilla
@@ -272,6 +281,7 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_ORIENTATION) + 'orientation',
       p(treesaver.capabilities.IS_LEGACY) + 'legacy',
       p(treesaver.capabilities.IS_MOBILE) + 'mobile',
+      p(treesaver.capabilities.IS_SMALL_SCREEN) + 'smallscreen',
       // Browser/platform info
       'browser-' + treesaver.capabilities.BROWSER_NAME,
       'os-' + treesaver.capabilities.BROWSER_OS
