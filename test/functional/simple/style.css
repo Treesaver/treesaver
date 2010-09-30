@@ -11,6 +11,18 @@
   overflow: hidden;
 }
 
+.controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+}
+
+.active .controls {
+  display: block;
+}
+
 body.treesaver {
   font-size: 14px;
   line-height: 20px;
@@ -36,6 +48,14 @@ article {
   line-height: 20px;
 }
 
+.grid.cols-2 {
+  width: 640px;
+}
+
+.grid.cols-3 {
+  width: 960px;
+}
+
 .column {
   position: absolute;
   width: 300px;
@@ -43,6 +63,16 @@ article {
   bottom: 0;
   left: 10px;
   line-height: 20px;
+}
+
+.column.col-2 {
+  left: 320px;
+  min-height: 300px;
+  top: 200px;
+}
+
+.column.col-3 {
+  left: 640px;
 }
 
 h1 {
