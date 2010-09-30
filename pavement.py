@@ -166,6 +166,11 @@ def compile(args):
     if ('--noie' in args):
         compiler_flags.append('--define="SUPPORT_IE=false"')
 
+    if ('--ios' in args):
+        compiler_flags.append('--define="SUPPORT_IE=false"')
+        compiler_flags.append('--define="SUPPORT_LEGACY=false"')
+        compiler_flags.append('--define="WITHIN_IOS_WRAPPER=true"')
+
     # Make pretty output for debug mode
     if '--debug' in args:
         compiler_flags.append('--debug=true')
