@@ -6,7 +6,7 @@
 goog.provide('treesaver.html5');
 
 // Use eval because Closure Compiler strips out comments
-if (eval('/*@cc_on!@*/0')) {
+if (SUPPORT_IE && eval('/*@cc_on!@*/0')) {
   (function() {
     var els = ['abbr', 'article', 'aside', 'audio', 'canvas', 'details',
                'figcaption', 'figure', 'footer', 'header', 'hgroup',
