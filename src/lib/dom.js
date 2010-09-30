@@ -276,6 +276,26 @@ if ('Node' in window && Node.prototype && !Node.prototype.contains) {
 }
 
 /**
+ * Compares the document position of two elements.
+ * MIT Licensed, John Resig: http://ejohn.org/blog/comparing-document-position/
+ * 
+ * @param {!Element} a Element to compare with b.
+ * @param {!Element} b Element to compare against a.
+ */
+treesaver.dom.compareDocumentPosition = function (a, b) {
+  return a.compareDocumentPosition ?
+    a.compareDocumentPosition(b) :
+    a.contains ?
+      (a != b && a.contains(b) && 16) +
+      (a != b && b.contains(a) && 8) +
+      (a.sourceIndex >= 0 && b.sourceIndex >= 0 ?
+        (a.sourceIndex < b.sourceIndex && 4) +
+        (a.sourceIndex > b.sourceIndex && 2) : 
+      1) +
+    0 : 0;
+};
+
+/**
  * Temporary element used for DOM operations
  *
  * @private
