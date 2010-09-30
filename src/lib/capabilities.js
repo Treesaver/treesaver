@@ -88,19 +88,45 @@ treesaver.capabilities.IS_SMALL_SCREEN =
 /**
  * Name of the current browser. Possible values:
  *   - msie
- *   - mozilla
  *   - chrome
  *   - safari
  *   - webkit
+ *   - mozilla
  *   - opera
  *   - unknown
  *
  * @const
  * @type {string}
  */
-treesaver.capabilities.BROWSER_NAME =
-  /(chrome|safari|webkit|opera|msie|mozilla)/.
-  exec(treesaver.capabilities.ua_)[0] || 'unknown';
+treesaver.capabilities.BROWSER_NAME = (function () {
+  if (WITHIN_IOS_WRAPPER) {
+    return 'safari';
+  }
+
+  // TODO: This code is all terrible
+  // Luckily it runs only once
+  if (/webkit/.test(treesaver.capabilities.ua_)) {
+    if (/chrome|safari/.test(treesaver.capabilities.ua_)) {
+      return /(chrome|safari)/.exec(treesaver.capabilities.ua_)[0];
+    }
+    else {
+      return 'webkit';
+    }
+  }
+  else if (/opera/.test(treesaver.capabilities.ua_)) {
+    return 'opera';
+  }
+  else if (/msie/.test(treesaver.capabilities.ua_)) {
+    return 'msie';
+  }
+  else if (!/compatible/.test(treesaver.capabilities.ua_) &&
+    /mozilla/.test(treesaver.capabilities.ua_)) {
+    return 'mozilla';
+  }
+  else {
+    return 'unknown';
+  }
+}());
 
 /**
  * Which OS is the browser running on, possible values:
@@ -269,7 +295,6 @@ treesaver.capabilities.update_ = function() {
     treesaver.capabilities.caps_ = [];
     treesaver.capabilities.caps_.push(
       // Use the same class names as modernizr when applicable
-      p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
       p(treesaver.capabilities.SUPPORTS_CANVAS) + 'canvas',
       p(treesaver.capabilities.SUPPORTS_LOCALSTORAGE) + 'localstorage',
       p(treesaver.capabilities.SUPPORTS_VIDEO) + 'video',
