@@ -24,7 +24,7 @@ $(function() {
     equals(treesaver.scriptloader.getDirectoryName_('path'), '', 'getDirectoryName_');
     equals(treesaver.scriptloader.getDirectoryName_('/path'), '/', 'getDirectoryName_');
 
-    equals(treesaver.scriptloader.getUrlFromName_('path.js'), '../../src/path.js', 'getUrlFromName_: Relative path');
+    equals(treesaver.scriptloader.getUrlFromName_('path.js'), treesaver.scriptloader.getScriptPath_() + 'path.js', 'getUrlFromName_: Relative path');
     equals(treesaver.scriptloader.getUrlFromName_('/dir/path.js'), '/dir/path.js', 'getUrlFromName_: Absolute path');
     equals(treesaver.scriptloader.getUrlFromName_('http://example.com/path.js'), 'http://example.com/path.js', 'getUrlFromName_: http path');
     equals(treesaver.scriptloader.getUrlFromName_('https://example.com/path.js'), 'https://example.com/path.js', 'getUrlFromName_: https path');
