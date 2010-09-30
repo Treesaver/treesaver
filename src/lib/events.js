@@ -97,6 +97,13 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
     "storagecommit", "submit", "timeout", "unload"
   ];
 
+  /**
+   * @this {Event}
+   */
+  treesaver.events.preventDefault = function() {
+    this.returnValue = false;
+  };
+
   treesaver.events.fireEvent = function(obj, type, data) {
     var e = document.createEventObject(),
         cur;
@@ -110,7 +117,10 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
       }
     }
 
-    // TODO: add 'preventDefault' on here?
+    // Add 'preventDefault' if it doesn't already exist
+    if (!e.preventDefault) {
+      e.preventDefault = treesaver.events.preventDefault;
+    }
 
     // If it's an event IE supports natively, fire it through the
     // event system
@@ -152,6 +162,9 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
       // IE uses srcElement instead of target
       e.target = e.target || e.srcElement;
 
+      // Need to set up preventDefault
+      e.preventDefault = treesaver.events.preventDefault;
+
       // Call each handler
       obj.custom_handlers[type].handlers.forEach(function (fun) {
         // For now, wrap handlers in try/catch
@@ -163,7 +176,7 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
         try {
           if ('handleEvent' in fun) {
             // Dispatch to handleEvent if it's an object
-            fun.handleEvent(e);
+            fun['handleEvent'](e);
           }
           else {
             // Otherwise call handler with correct 'this'
