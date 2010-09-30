@@ -25,6 +25,16 @@ $(function() {
     ok(!treesaver.dom.hasClass(div, 'test'), 'hasClass: Removed class');
   });
 
+  test('hasAttr', function () {
+    var div = document.createElement('div'),
+        attr = document.createAttribute('width');
+
+    div.setAttributeNode(attr);
+    
+    ok(!treesaver.dom.hasAttr(div, 'test'), 'Non existing attribute');
+    ok(treesaver.dom.hasAttr(div, 'width'), 'Property exists');
+  });
+
   test('getElementsByClassName', function () {
     var div = document.createElement('div');
     div.innerHTML = '<p class="one"><span class="one inner"></span></p>';

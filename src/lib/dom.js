@@ -181,7 +181,7 @@ treesaver.dom.hasAttr = function(el, propName) {
     return el.hasAttribute(propName);
   }
   else {
-    return typeof el.getAttribute(propName) !== 'undefined';
+    return el.getAttribute(propName) !== null;
   }
 };
 
