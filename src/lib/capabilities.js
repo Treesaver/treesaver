@@ -226,6 +226,15 @@ treesaver.capabilities.SUPPORTS_FONTFACE = (function() {
 }());
 
 /**
+ * Whether the browser has native support for the microdata API
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.SUPPORTS_MICRODATA =
+  'getItems' in document;
+
+/**
  * Whether the browser supports <canvas>
  *
  * @const
@@ -301,6 +310,7 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_APPLICATIONCACHE) + 'applicationcache',
       p(treesaver.capabilities.SUPPORTS_FONTFACE) + 'fontface',
       // Not in modernizr
+      p(treesaver.capabilities.SUPPORTS_MICRODATA) + 'microdata',
       p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
       p(treesaver.capabilities.SUPPORTS_FLASH) + 'flash',
       p(treesaver.capabilities.SUPPORTS_ORIENTATION) + 'orientation',
