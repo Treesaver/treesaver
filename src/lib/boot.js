@@ -57,6 +57,11 @@ treesaver.boot.load = function() {
       treesaver.boot.uiLoaded_ = true;
       treesaver.boot.loadProgress_();
     });
+
+    // TODO: Separate out legacy code into a separate file
+    if (treesaver.capabilities.IS_LEGACY) {
+      treesaver.boot.legacyLoaded_ = true;
+    }
   }
 
   // Watch for dom ready
@@ -134,6 +139,7 @@ treesaver.boot.cleanup_ = function() {
   // Kill loading flags
   delete treesaver.boot.resourcesLoaded_;
   delete treesaver.boot.uiLoaded_;
+  delete treesaver.boot.legacyLoaded_;
   delete treesaver.boot.domReady_;
 
   // Kill other data storage
