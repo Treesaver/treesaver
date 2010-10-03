@@ -141,7 +141,7 @@ treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
     // Construct a selector via the arguments
     var selector = tagName + '[' + propName +
       // Note, this queries based on a space separated single value match
-      (value ? '~=' + value : '') + ']';
+      (value ? '~="' + value + '"' : '') + ']';
 
     return treesaver.array.toArray(root.querySelectorAll(selector));
   }
