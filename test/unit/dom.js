@@ -45,6 +45,11 @@ $(function() {
     equals(treesaver.dom.getElementsByClassName('outer', div).length, 0);
   });
 
+  test('createDocumentFragmentFromHTML', function () {
+    equals(treesaver.dom.createDocumentFragmentFromHTML('<p>hello world</p>').childNodes.length, 1);
+    equals(treesaver.dom.createDocumentFragmentFromHTML('<p>hello</p><p>world</p>').childNodes.length, 2);
+  });
+
   test('getElementsByProperty', function () {
     var div = document.createElement('div');
     div.innerHTML = '<p class="one" itemscope><span class="one inner"></span></p>';

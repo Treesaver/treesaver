@@ -273,6 +273,45 @@ treesaver.dom.createElementFromHTML = function(html) {
   return /** @type {!Element} */ (node);
 };
 
+/**
+ * Make a Node from HTML.
+ *
+ * @param {!string} html The string to parse.
+ * @return {?Node} Returns the parsed representation of the
+ * html as a DOM node.
+ */
+treesaver.dom.createDocumentFragmentFromHTML = function(html) {
+  var node;
+
+  // Container must be in tree to ensure proper HTML5 parsing by IE
+  if (SUPPORT_IE) {
+    document.body.appendChild(treesaver.dom.dummyDiv_);
+  }
+
+  treesaver.dom.dummyDiv_.innerHTML = html;
+
+  if (treesaver.dom.dummyDiv_.childNodes.length === 1) {
+    node = treesaver.dom.dummyDiv_.firstChild;
+  } else {
+    node = document.createDocumentFragment();
+    while (treesaver.dom.dummyDiv_.firstChild) {
+      node.appendChild(treesaver.dom.dummyDiv_.firstChild);
+    }
+  }
+  treesaver.dom.clearChildren(treesaver.dom.dummyDiv_);
+
+  if (SUPPORT_IE) {
+    document.body.removeChild(treesaver.dom.dummyDiv_);
+  }
+
+  // Make sure it's an actual Node
+  if (!node || !(node.nodeType === 1 || node.nodeType === 11)) {
+    return null;
+  }
+
+  return /** @type {!Node} */ (node);
+};
+
 if ('Node' in window && Node.prototype && !Node.prototype.contains) {
   // Mozilla doesn't support contains() fix from PPK
   // http://www.quirksmode.org/blog/archives/2006/01/contains_for_mo.html
