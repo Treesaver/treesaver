@@ -151,8 +151,10 @@ treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
         elements = treesaver.dom.getElementsByTagName(tagName, root),
         // Use a regexp to test if there is a value, otherwise mock out a test
         // function to always return true
-        regexp = value ? new RegExp('(^|\\s)' + value + '(\\s|$)')
+        regexp = value ? new RegExp('(^|\\s)' + value.replace(/[.*+?\^${}()|\[\]\/\\]/g, '\\$&') + '(\\s|$)')
           : { test: function() { return true; } };
+
+    propName = propName === 'class' ? 'className' : propName;
 
     // Cycle through each element and test
     // Note: This is pretty slow, but that's what you get for using an
@@ -181,7 +183,11 @@ treesaver.dom.hasAttr = function(el, propName) {
     return el.hasAttribute(propName);
   }
   else {
-    return el.getAttribute(propName) !== null;
+    if (propName === 'className') {
+      return el.className !== '';
+    } else {
+      return el.getAttribute(propName) !== null;
+    }
   }
 };
 

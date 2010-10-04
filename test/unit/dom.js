@@ -49,12 +49,12 @@ $(function() {
     var div = document.createElement('div');
     div.innerHTML = '<p class="one" itemscope><span class="one inner"></span></p>';
     div.innerHTML += '<p class="two"><span class="two inner"></span></p>';
-    div.innerHTML += '<script type="text/x-treesaver-template">hello world</script>';
+    div.innerHTML += '<p type="text/x-treesaver-template">hello world</p>';
 
     equals(treesaver.dom.getElementsByProperty('class', null, null, div).length, 4);
     equals(treesaver.dom.getElementsByProperty('class', 'one', null, div).length, 2);
     equals(treesaver.dom.getElementsByProperty('class', 'one', 'p', div).length, 1);
     equals(treesaver.dom.getElementsByProperty('itemscope', null, null, div).length, 1, 'Property without value');
-    equals(treesaver.dom.getElementsByProperty('type', 'text/x-treesaver-template', 'script', div).length, 1);
+    equals(treesaver.dom.getElementsByProperty('type', null, null, div).length, 1);
   });
 });
