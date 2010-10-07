@@ -340,8 +340,9 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
 
     // Make sure to always use the same form of the current URL. If the current link
     // being processed is the TOC, ignore whatever is specified in the href
-    if (node.getAttribute('rel') && node.getAttribute('rel').indexOf('self') !== -1 &&
-        treesaver.ui.ArticleManager.initialUrl === toc_url) {
+    if (treesaver.dom.hasAttr(node, 'rev') &&
+        treesaver.ui.ArticleManager.initialUrl === toc_url &&
+        node.getAttribute('rev').indexOf('self') !== -1) {
       url = treesaver.ui.ArticleManager.initialUrl;
     }
 
@@ -359,7 +360,8 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
       treesaver.ui.ArticleManager.articleMap[url] = [i];
       unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + url);
 
-      if (url === treesaver.ui.ArticleManager.initialUrl) {
+      if (!foundCurrentArticle &&
+          url === treesaver.ui.ArticleManager.initialUrl) {
         // Current article is initial
         treesaver.ui.ArticleManager.currentArticleIndex = i;
         foundCurrentArticle = true;
