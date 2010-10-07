@@ -410,7 +410,7 @@ treesaver.ui.Chrome.prototype.mouseUp = function(e) {
   else {
     // Not a swipe, animate back to the initial position
     // and let the event process
-    this.animationStart = (new Date()).getTime();
+    this.animationStart = goog.now();
     this._updatePagePositions();
 
     return;
@@ -622,7 +622,7 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
 
   // Calculate any page offsets to use in animation
   if (direction !== treesaver.ui.ArticleManager.transitionDirection.NEUTRAL) {
-    this.animationStart = (new Date()).getTime();
+    this.animationStart = goog.now();
 
     if (direction === treesaver.ui.ArticleManager.transitionDirection.BACKWARD) {
       this.pageOffset = nextPage ?
@@ -668,7 +668,7 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
     treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
   }
 
-  var now = (new Date()).getTime(),
+  var now = goog.now(),
       percentRemaining = !preventAnimation ?
         Math.max(0, (this.animationStart || 0) +
           MAX_ANIMATION_DURATION - now) / MAX_ANIMATION_DURATION :
