@@ -386,25 +386,33 @@ treesaver.ui.Chrome.prototype.mouseMove = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.mouseUp = function(e) {
+  var pageChanged = false;
+
   if ((Math.abs(e.deltaX) > Math.abs(e.deltaY)) &&
       (Math.abs(e.deltaX) > SWIPE_THRESHOLD) &&
       e.deltaTime < SWIPE_TIME_LIMIT) {
-    // A swipe
+    // A swipe, but we have to check and see if it actually
+    // caused a page change
     if (e.deltaX < 0) {
-      treesaver.ui.ArticleManager.nextPage();
+      pageChanged = treesaver.ui.ArticleManager.nextPage();
     }
     else {
-      treesaver.ui.ArticleManager.previousPage();
+      pageChanged = treesaver.ui.ArticleManager.previousPage();
     }
+  }
 
+  if (pageChanged) {
+    // Page swiped and animation will occur. preventDefault in order to avoid
+    // activating links, etc
     e.preventDefault();
     return false;
   }
   else {
-    // Not a swipe, restore our offset and let the event process
-    this.pageOffset = 0;
+    // Not a swipe, animate back to the initial position
+    // and let the event process
     this.animationStart = (new Date()).getTime();
     this._updatePagePositions();
+
     return;
   }
 };
