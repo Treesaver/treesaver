@@ -7,7 +7,7 @@
 }
 
 /* Make sure seams aren't visible */
-.chrome, .viewer, .grid, .column {
+.chrome, .viewer, .grid, .column, .container {
   overflow: hidden;
 }
 
@@ -46,6 +46,9 @@ article {
   position: absolute;
   width: 320px;
   line-height: 20px;
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 20px;
 }
 
 .grid.cols-2 {
@@ -59,26 +62,65 @@ article {
 .column {
   position: absolute;
   width: 300px;
-  top: 0;
-  bottom: 0;
-  left: 10px;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
   line-height: 20px;
 }
 
 .column.col-2 {
-  left: 320px;
-  min-height: 300px;
-  top: 200px;
+  left: 340px;
 }
 
 .column.col-3 {
-  left: 640px;
+  left: 660px;
+}
+
+.container {
+  position: absolute;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
+  width: 300px;
+}
+
+.container.cols-2 {
+  width: 620px;
+}
+
+.container.cols-3 {
+  width: 940px;
 }
 
 h1 {
   margin: 0 0 20px;
   line-height: 40px;
   font-size: 36px;
+  font-family: Sans-Serif;
+  color: #334;
+}
+
+h2 {
+  font-family: Sans-Serif;
+  color: #556;
+  font-size: 20px;
+  margin: 0;
+}
+
+h2 a {
+  color: #556;
+  text-decoration: none;
+}
+
+p[itemprop=byline] {
+  margin: 0;
+  color: #778;
+  font-family: Sans-Serif;
+  font-size: 12px;
+}
+
+p[itemprop=abstract] {
+  margin-top: 0;
 }
 
 .loading, .error {
