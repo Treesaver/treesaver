@@ -304,17 +304,22 @@ treesaver.ui.ArticleManager.generateTOC = function() {
  * @param {string} toc_url URL of the TOC
  */
 treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
+  var initialArticleIsTOC = (toc_url === treesaver.ui.ArticleManager.initialUrl);
+
   if (html) {
-    // Cache the result
+    // Cache the result no matter what
     treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url,
         html, true);
 
-    if (toc_url === treesaver.ui.ArticleManager.initialUrl &&
-        treesaver.network.loadedFromCache() && treesaver.network.isOnline()) {
-      // Re-process the current article with the updated content
-      treesaver.ui.ArticleManager.currentArticle.processHTML(html);
-      // Make sure chrome re-queries pages
-      treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
+    // If the initial was loaded from the cache, we could have stale content in the DOM
+    if (initialArticleIsTOC && treesaver.network.loadedFromCache()) {
+      // Content would only be new if we are online
+      if (treesaver.network.isOnline()) {
+        // Re-process the current article with the updated content
+        treesaver.ui.ArticleManager.currentArticle.processHTML(html);
+        // Make sure chrome re-queries pages
+        treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
+      }
     }
   }
   else {
@@ -322,28 +327,31 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     html = treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
 
     if (!html) {
-      // We don't have a TOC
+      // We don't have content for a TOC, so there is nothing more we can do
       return;
     }
   }
 
   var container = document.createElement('div'),
       unique_urls = [],
-      foundCurrentArticle = false;
+      foundTOC = false;
 
   container.innerHTML = html;
 
   treesaver.dom.getElementsByProperty('rev', 'contents', 'a', container).forEach(function(node) {
-    var url = treesaver.network.absoluteURL(node.href),
+    var url,
         article,
         i;
 
-    // Make sure to always use the same form of the current URL. If the current link
-    // being processed is the TOC, ignore whatever is specified in the href
-    if (treesaver.dom.hasAttr(node, 'rev') &&
-        treesaver.ui.ArticleManager.initialUrl === toc_url &&
-        node.getAttribute('rev').indexOf('self') !== -1) {
-      url = treesaver.ui.ArticleManager.initialUrl;
+    // rev=self is used by the TOC to indicate its position in the article order
+    // make sure to use the TOC url we already computed in order to avoid duplicates
+    // such as '/' and '/index.html'
+    if (/self/.test(node.getAttribute('rev'))) {
+      url = toc_url;
+      foundTOC = true;
+    }
+    else {
+      url = treesaver.network.absoluteURL(node.href);
     }
 
     article = treesaver.ui.ArticleManager.articles[url];
@@ -351,23 +359,25 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
 
     // Have we seen this URL before?
     if (!article) {
+      // Have not seen the url, create a new article and store
       article = new treesaver.ui.Article(url, treesaver.dom.innerText(node), treesaver.ui.ArticleManager.grids_);
-
       treesaver.ui.ArticleManager.articles[url] = article;
     }
 
+    // Now store the indicies where the article occurs (since an article can appear
+    // multiple times)
     if (!treesaver.ui.ArticleManager.articleMap[url]) {
+      // First time seeing the article
       treesaver.ui.ArticleManager.articleMap[url] = [i];
       unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + url);
 
-      if (!foundCurrentArticle &&
-          url === treesaver.ui.ArticleManager.initialUrl) {
+      if (url === treesaver.ui.ArticleManager.initialUrl) {
         // Current article is initial
         treesaver.ui.ArticleManager.currentArticleIndex = i;
-        foundCurrentArticle = true;
       }
     }
     else {
+      // Add another occurence
       treesaver.ui.ArticleManager.articleMap[url].push(i);
     }
 
@@ -375,14 +385,30 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     treesaver.ui.ArticleManager.articleOrder.push(article);
   });
 
-  // Make sure there's an entry for the current URL (if it's the index)
-  var current_url = treesaver.ui.ArticleManager.initialUrl
-  if (toc_url === current_url && !foundCurrentArticle) {
-    // Create an entry for the current article at the beginning
-    treesaver.ui.ArticleManager.articleMap[current_url] = [-1]; // Will be incremented
-    unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + current_url);
-    treesaver.ui.ArticleManager.currentArticleIndex = 0;
-    treesaver.ui.ArticleManager.articleOrder.unshift(treesaver.ui.ArticleManager.currentArticle);
+  // Did the TOC provide its own position in the article list?
+  if (!foundTOC) {
+    // Make sure we have an object for the article
+    var article = treesaver.ui.ArticleManager.articles[toc_url];
+
+    if (!article) {
+      // TODO: What to use as the title here? Document title will be processed later ...
+      article = new treesaver.ui.Article(toc_url, 'TOC', treesaver.ui.ArticleManager.grids_);
+      treesaver.ui.ArticleManager.articles[toc_url] = article;
+    }
+
+    // Insert the TOC into the first position
+    treesaver.ui.ArticleManager.articleMap[toc_url] = [-1]; // Will be incremented
+    unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
+    treesaver.ui.ArticleManager.articleOrder.unshift(article);
+
+    // The TOC is the current article if that's what was loaded originally
+    if (initialArticleIsTOC) {
+      treesaver.ui.ArticleManager.currentArticleIndex = 0;
+    }
+    else {
+      // Need to increment the article index, since we are offsetting by one
+      treesaver.ui.ArticleManager.currentArticleIndex += 1;
+    }
 
     // Since the current article is being inserted at the zeroth position,
     // we have to push everything else back
