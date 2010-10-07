@@ -464,7 +464,7 @@ treesaver.ui.ArticleManager.previousPage = function() {
 treesaver.ui.ArticleManager.nextPage = function() {
   if (goog.DEBUG) {
     if (!treesaver.ui.ArticleManager.currentArticle) {
-      treesaver.debug.error('Tried to go to next article without an article');
+      treesaver.debug.error('Tried to go to next page without an article');
       return false;
     }
   }
@@ -476,7 +476,7 @@ treesaver.ui.ArticleManager.nextPage = function() {
       }
     }
 
-    // We have no idea what page we're on, so we can't go back a page
+    // We have no idea what page we're on, so we can't go to the next page
     // TODO: Is there something sane to do here?
     return false;
   }
@@ -497,7 +497,6 @@ treesaver.ui.ArticleManager.nextPage = function() {
 
     // We know there will be a next page, but we don't know
     // anything else yet so stay put
-
     // No change in state, can return now
     return false;
   }

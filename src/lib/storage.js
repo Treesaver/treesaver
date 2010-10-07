@@ -15,7 +15,19 @@ goog.require('treesaver.json');
  */
 treesaver.storage.set = function set(key, value, persist) {
   var store = persist ? window.localStorage : window.sessionStorage;
-  store.setItem(key, treesaver.json.stringify(value));
+
+  // iPad throws QUOTA_EXCEEDED_ERR frequently here, even though we're not
+  // using that much storage
+  // Clear the storage first in order to avoid this error
+  store.removeItem(key);
+
+  try {
+    store.setItem(key, treesaver.json.stringify(value));
+  }
+  catch (ex) {
+    // Still happened, not much we can do about it
+    // TODO: Do something about it? :)
+  }
 };
 
 /**

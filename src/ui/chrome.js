@@ -173,11 +173,18 @@ treesaver.ui.Chrome.watchedEvents = [
   treesaver.ui.input.events.CLICK,
   treesaver.ui.input.events.MOUSEWHEEL,
   treesaver.ui.input.events.MOUSEDOWN,
-  treesaver.ui.input.events.MOUSEMOVE,
-  treesaver.ui.input.events.MOUSEUP,
-  treesaver.ui.input.events.MOUSECANCEL,
   treesaver.ui.input.events.ACTIVE,
   treesaver.ui.input.events.IDLE
+];
+
+/**
+ * @private
+ * @type {Array.<string>}
+ */
+treesaver.ui.Chrome.optInMouseEvents_ = [
+  treesaver.ui.input.events.MOUSEMOVE,
+  treesaver.ui.input.events.MOUSEUP,
+  treesaver.ui.input.events.MOUSECANCEL
 ];
 
 /**
@@ -355,6 +362,11 @@ treesaver.ui.Chrome.prototype.mouseDown = function(e) {
 
   // Only listen to events within the viewer, don't want errant swipes
   if (this.viewer.contains(e.el)) {
+    // Start listening to relevant events
+    treesaver.ui.Chrome.optInMouseEvents_.forEach(function(evt) {
+      treesaver.events.addListener(document, evt, this);
+    }, this);
+
     // Hm, preventing default seems to kill iPhone link following.
     // Don't do anything for now ...
     //e.preventDefault();
@@ -387,6 +399,9 @@ treesaver.ui.Chrome.prototype.mouseMove = function(e) {
  */
 treesaver.ui.Chrome.prototype.mouseUp = function(e) {
   var pageChanged = false;
+
+  // Stop listening to events
+  this.removeMouseHandlers_();
 
   if ((Math.abs(e.deltaX) > Math.abs(e.deltaY)) &&
       (Math.abs(e.deltaX) > SWIPE_THRESHOLD) &&
@@ -422,7 +437,25 @@ treesaver.ui.Chrome.prototype.mouseUp = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.mouseCancel = function(e) {
-  // Nothing?
+  // This event can be tough to duplicate on touch devices, but need to make
+  // sure the page position gets restored when it happens
+  this.animationStart = goog.now();
+  this._updatePagePositions();
+
+  // Stop listening to events
+  this.removeMouseHandlers_();
+};
+
+/**
+ * Remove opt-in mouse event handlers
+ *
+ * @private
+ */
+treesaver.ui.Chrome.prototype.removeMouseHandlers_ = function() {
+  // Remove event handlers
+  treesaver.ui.Chrome.optInMouseEvents_.forEach(function(evt) {
+    treesaver.events.removeListener(document, evt, this);
+  }, this);
 };
 
 /**

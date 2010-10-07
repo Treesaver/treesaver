@@ -236,7 +236,7 @@ treesaver.ui.input.mouseUp = function(e) {
  */
 treesaver.ui.input.mouseOver = function(e) {
   // Don't do anything on touch devices
-  if (!!!e.touches) {
+  if (!e.touches) {
     // Need to make sure UI is visible if a user is trying to click on it
     treesaver.events.fireEvent(document, treesaver.ui.input.events.ACTIVE);
   }
@@ -253,6 +253,7 @@ treesaver.ui.input.mouseCancel = function(e) {
 
   // Not exactly sure when this gets called as a real handler, so not sure if
   // an event should be fired
+  treesaver.events.fireEvent(document, treesaver.ui.input.events.MOUSECANCEL);
 };
 
 /**
