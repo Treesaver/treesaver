@@ -145,4 +145,53 @@ $(function () {
     ok(items[0].properties[0].itemProp === 'image', 'itemprop === image');
     ok(items[0].properties[0].itemValue === 'http://www.google.com/google-logo.png', 'correct img@src value');        
   });
+
+  test('nested itemprop', function () {
+    var items = [];
+  
+    items = document.getItems('http://www.example.org/ns/#nested-itemprop');
+    equals(items.length, 1, 'one item returned');
+    equals(items[0].properties.length, 2, 'two properties');
+  });
+
+  test('multiple properties from a single itemprop', function () {
+    var items = [];
+
+    items = document.getItems('http://www.example.org/ns/#multi-prop');
+
+    // TODO: figure out what this should do. It is given as an example in the specification,
+    // but shouldn't be supported according to the algorithm in the specification.
+    equals(items.length, 1, 'one item returned');
+    equals(items[0].properties.length, 2, 'two properties');
+    equals(items[0].properties[0].itemProp, 'favorite-color', 'fav. color available');
+    equals(items[0].properties[1].itemProp, 'favorite-fruit', 'fav. fruit available');
+  });
+
+  test('getJSONItems() simple', function () {
+    var data = treesaver.microdata.getJSONItems('json-simple');
+
+    equals(data.length, 1, 'one object returned');
+    equals(data[0].type, 'json-simple', 'type is set correctly');
+    ok(data[0].properties, 'properties property available');
+    ok(data[0].properties.test, 'test property available');
+    equals(data[0].properties.test.length, 1, 'one test property');
+    equals(data[0].properties.test[0], 'Hello World', 'correct value');
+  });
+
+  test('getJSONItems() multiple itemprop', function () {  
+    var data = treesaver.microdata.getJSONItems('json-multiple-itemprop');
+
+    equals(data.length, 1, 'one object returned');
+    equals(data[0].properties.test.length, 2, 'multiple identical itemprops are mapped to the same property');
+  });
+
+  test('getJSONItems() nested itemscope', function () {
+    var data = treesaver.microdata.getJSONItems('json-nested-scope');
+  
+    equals(data.length, 1, 'one object returned');
+    equals(data[0].properties.test.length, 1, 'one test property');
+    equals(data[0].properties.test2.length, 1, 'one test2 property');
+    ok(data[0].properties.test2[0].properties, 'nested scope has properties');
+    ok(data[0].properties.test2[0].properties.url, 'nested scope has url property.');
+  });
 });

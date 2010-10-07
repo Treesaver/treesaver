@@ -141,8 +141,8 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
           current['itemScope'] = true;
           current['properties'] = getProperties(current);
         }
-
-      } else {
+      }
+      if (!treesaver.dom.hasAttr(current, 'itemscope')) {
         // Push all the child elements of current onto pending, in tree order
         // (so the first child of current will be the next element to be
         // popped from pending).
@@ -222,4 +222,57 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
     return items;
   }
   document['getItems'] = getItems;
+}
+
+// This code assumes the microdata API is available. Either
+// the implementation above, or a native one.
+if (SUPPORT_MICRODATA) {
+  /**
+   * Returns the JSON representation of a microdata item.
+   *
+   * @private
+   * @param {!Element} item The element to generate the representation for.
+   * @return {!Object} The JSON representation of an item.
+   */
+  treesaver.microdata.getObject_ = function(item) {
+    var result = {},
+        properties = {};
+
+    if (item.itemType) {
+      result['type'] = item.itemType;
+    }
+    if (item.itemId) {
+      result['id'] = item.itemId;
+    }
+    item.properties.forEach(function(property) {
+      var value = property.itemValue;
+
+      // If value is an item (i.e. value has an itemScope attribute)
+      if (value.itemScope) {
+        value = treesaver.microdata.getObject_(value);
+      }
+
+      if (!properties.hasOwnProperty(property.itemProp)) {
+        properties[property.itemProp] = [];
+      }
+      properties[property.itemProp].push(value);
+    });
+    result['properties'] = properties;
+    return result;
+  };
+
+  /**
+   * Returns a JSON representation of the microdata items
+   * that match the given types.
+   *
+   * @param {string=} types A space-separated list of types.
+   * @return {!Array} A Array of Objects representing micro-
+   * data items.
+   */
+  treesaver.microdata.getJSONItems = function(types) {
+    var items = document.getItems(types);
+    return items.map(function(item) {
+      return treesaver.microdata.getObject_(item);
+    });
+  };
 }

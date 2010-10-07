@@ -45,6 +45,10 @@
   </ul>
 </div>
 
+<div itemscope itemtype="http://www.example.org/ns/#multiproperty">
+  <span itemprop="favorite-color favorite-fruit">orange</span>
+</div>
+
 <div itemscope itemtype="http://www.example.org/ns/#textcontent">
   <span itemprop="hello">world</span>
 </div>
@@ -87,6 +91,42 @@
   <div itemprop="value-one">hello</div>
 </div>
 
+<div itemtype="http://www.example.org/ns/#nested-itemprop" itemscope>
+  <div itemprop="parent"><a href="#" itemprop="child">link</a></div>
+</div>
+
+<div itemscope itemtype="http://www.example.org/ns/#multi-prop">
+ <span itemprop="favorite-color favorite-fruit">orange</span>
+</div>
+
 <div id="untyped-single" itemscope>
   <span itemprop="test">Hello World</span>
+</div>
+
+<div itemscope itemtype="json-simple">
+  <span itemprop="test">Hello World</span>
+</div>
+
+<div itemscope itemtype="json-multiple-itemprop">
+  <span itemprop="test">Hello</span>
+  <span itemprop="test">World</span>
+</div>
+
+<div itemscope itemtype="json-nested-scope">
+  <span itemprop="test">Hello World</span>
+  <p itemprop="test2" itemscope><a itemprop="url" href="#">link</a></p>
+</div>
+
+<div itemscope itemtype="toc-entry">
+  <h2 itemprop="title"><a href="article.html" itemprop="url">Article Number one</a></h2>
+  <p itemprop="byline">Author name</p>
+  <img src="thumb.jpg" itemprop="thumbnail"/>
+  <p itemprop="abstract">Lorem ipsum dolor sit amet...</p>
+</div>
+
+<div itemscope itemtype="toc-entry">
+  <h2 itemprop="title"><a href="article.html" itemprop="url">Article Number two</a></h2>
+  <p itemprop="byline">Author name</p>
+  <img src="thumb.jpg" itemprop="thumbnail"/>
+  <p itemprop="abstract">Lorem ipsum dolor sit amet...</p>
 </div>
