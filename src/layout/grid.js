@@ -196,7 +196,7 @@ treesaver.layout.Grid.prototype.stretch = function(totalHeight) {
   this.stretchedSize.outerH = finalHeight + this.size.bpHeight;
 
   // Max
-  if (!this.scoringFlags.sizeToContainer) {
+  if (!this.scoringFlags['sizeToContainer']) {
     this.stretchedSize.maxH =
       Math.min(this.size.maxH, finalHeight + this.lineHeight * 3);
   }

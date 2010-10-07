@@ -135,7 +135,7 @@ treesaver.layout.Page = function(content, grids, br) {
     br.pageNumber += 1;
 
     // Are we finished?
-    br.finished = best.grid.scoringFlags.onlypage || br.atEnd(content);
+    br.finished = best.grid.scoringFlags['onlypage'] || br.atEnd(content);
   }
 
   // Cleanup
