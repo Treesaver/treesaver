@@ -328,7 +328,8 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
   }
 
   var container = document.createElement('div'),
-      unique_urls = [];
+      unique_urls = [],
+      foundCurrentArticle = false;
 
   container.innerHTML = html;
 
@@ -361,6 +362,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
       if (url === treesaver.ui.ArticleManager.initialUrl) {
         // Current article is initial
         treesaver.ui.ArticleManager.currentArticleIndex = i;
+        foundCurrentArticle = true;
       }
     }
     else {
@@ -373,8 +375,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
 
   // Make sure there's an entry for the current URL (if it's the index)
   var current_url = treesaver.ui.ArticleManager.initialUrl
-  if (toc_url === current_url &&
-      treesaver.ui.ArticleManager.currentArticleIndex === null) {
+  if (toc_url === current_url && !foundCurrentArticle) {
     // Create an entry for the current article at the beginning
     treesaver.ui.ArticleManager.articleMap[current_url] = [-1]; // Will be incremented
     unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + current_url);
