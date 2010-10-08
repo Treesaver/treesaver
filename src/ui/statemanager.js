@@ -64,6 +64,9 @@ treesaver.ui.StateManager.load = function() {
     treesaver.events.addListener(window, 'orientationchange', treesaver.ui.StateManager.onOrientationChange);
   }
 
+  // Hide the address bar on iPhone
+  treesaver.scheduler.queue(window.scrollTo, [0, 1]);
+
   return true;
 };
 
@@ -157,9 +160,11 @@ treesaver.ui.StateManager.onOrientationChange = function() {
       'width=device-width, height=device-height');
   }
 
-  window.scrollTo(0, 0);
+  // Hide the address bar on the iPhone
+  window.scrollTo(0, 1);
 
   // TODO: Update classes for styling?
+
   // TODO: Access widths to force layout?
 };
 
@@ -170,12 +175,12 @@ treesaver.ui.StateManager.onOrientationChange = function() {
  * @return {{ w: number, h: number }}
  */
 treesaver.ui.StateManager.getAvailableSize_ = function() {
-  if (window.pageYOffset) {
-    window.scrollTo(0, 0);
+  if (window.pageYOffset || window.pageXOffset) {
+    window.scrollTo(0, 1);
   }
 
   // IE9+ and all other browsers
-  if ('innerWidth' in window) {
+  if (SUPPORT_IE || 'innerWidth' in window) {
     return {
       w: window.innerWidth,
       h: window.innerHeight
