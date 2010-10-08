@@ -21,11 +21,17 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  display: none;
+  /*display: none;*/
+  background: #445;
+  padding: 5px 10px;
+  text-align: right;
+  opacity: 0;
+  -webkit-transition: opacity .25s linear;
 }
 
 .active .controls {
-  display: block;
+  /*display: block;*/
+  opacity: 1;
 }
 
 body.treesaver {
@@ -120,6 +126,11 @@ h2 {
 h2 a {
   color: #556;
   text-decoration: none;
+}
+
+h2 a:hover {
+  color: #33a;
+  text-decoration: underline;
 }
 
 p[itemprop=byline] {
