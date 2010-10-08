@@ -68,7 +68,7 @@ treesaver.network.load = function() {
 
     // Hook up event handlers
     treesaver.network.watchedEvents_.forEach(function (evt) {
-      treesaver.events.addListener(window, evt, treesaver.network);
+      treesaver.events.addListener(document, evt, treesaver.network);
     });
     treesaver.network.watchedCacheEvents_.forEach(function (evt) {
       treesaver.events.addListener(window.applicationCache, evt, treesaver.network);
@@ -128,18 +128,24 @@ treesaver.network.loadedFromCache = function() {
  * Handle events
  * @param {Event} e
  */
-treesaver.network['handleEvent'] = function handleEvent(e) {
+treesaver.network['handleEvent'] = function(e) {
   treesaver.debug.info('Network event recieved: ' + e);
 
   switch (e.type) {
   case 'online':
     treesaver.debug.info('Application online');
 
+    // TODO: Refactor this and create an event handler in capabilities
+    treesaver.capabilities.updateClasses();
+
     treesaver.events.fireEvent(window, treesaver.network.events.ONLINE);
     return;
 
   case 'offline':
     treesaver.debug.info('Application offline');
+
+    // TODO: Refactor this and create an event handler in capabilities
+    treesaver.capabilities.updateClasses();
 
     treesaver.events.fireEvent(window, treesaver.network.events.OFFLINE);
     return;

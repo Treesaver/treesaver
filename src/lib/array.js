@@ -64,6 +64,22 @@ if (SUPPORT_IE) {
     };
   }
 
+  if (!Array.prototype.every) {
+    Array.prototype.every = function arrayEvery(fun /*, thisp*/) {
+      var i = 0,
+          len = this.length,
+          thisp = arguments[1];
+
+      for (; i < len; i += 1) {
+        if (i in this && !fun.call(thisp, this[i], i, this)) {
+          return false;
+        }
+      }
+
+      return true;
+    };
+  }
+
   if (!Array.prototype.map) {
     Array.prototype.map = function arrayMap(fun /*, thisp*/) {
       var i = 0,

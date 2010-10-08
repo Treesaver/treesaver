@@ -146,6 +146,9 @@ treesaver.ui.StateManager.onOrientationChange = function() {
   }
 
   // TODO: Fire event?
+  //
+  // TODO: Refactor this manual update
+  treesaver.capabilities.updateClasses();
 
   treesaver.ui.StateManager.state_.orientation = window['orientation'];
 

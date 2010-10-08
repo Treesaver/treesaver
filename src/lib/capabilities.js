@@ -8,6 +8,8 @@ goog.provide('treesaver.capabilities');
 goog.require('treesaver.array'); // array.some
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
+// Avoid circular dependency
+// goog.require('treesaver.network');
 
 /**
  * Cached value of browser user agent
@@ -73,11 +75,11 @@ treesaver.capabilities.IS_IE8INIE7 = SUPPORT_IE &&
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.IS_MOBILE =
-  treesaver.capabilities.ua_.indexOf('mobile') !== -1;
+treesaver.capabilities.IS_MOBILE = WITHIN_IOS_WRAPPER ||
+  /mobile/.test(treesaver.capabilities.ua_);
 
 /**
- * Does the device have a small screen
+ * Does the device have a small screen?
  *
  * @const
  * @type {boolean}
@@ -161,7 +163,7 @@ treesaver.capabilities.SUPPORTS_ORIENTATION = 'orientation' in window;
  */
 treesaver.capabilities.SUPPORTS_TOUCH = 'createTouch' in document ||
   // Android doesn't expose createTouch, must test userAgent manually
-  treesaver.capabilities.ua_.indexOf('android') !== -1;
+  /android/.test(treesaver.capabilities.ua_);
 
 /**
  * Does the browser have flash support?
@@ -202,7 +204,7 @@ treesaver.capabilities.SUPPORTS_FLASH = (function() {
  * @type {boolean}
  */
 treesaver.capabilities.SUPPORTS_FONTFACE = (function() {
-  if (treesaver.capabilities.IS_LEGACY) {
+  if (SUPPORT_LEGACY && treesaver.capabilities.IS_LEGACY) {
     // Only legacy browser with @font-face support is IE7,
     // which we don't care enough about
     return false;
@@ -250,6 +252,7 @@ treesaver.capabilities.SUPPORTS_VIDEO =
  * @type {boolean}
  */
 treesaver.capabilities.SUPPORTS_LOCALSTORAGE =
+  'localStorage' in window &&
   // FF3 supports localStorage, but doesn't have native JSON
   !treesaver.capabilities.IS_LEGACY;
 
@@ -265,9 +268,18 @@ treesaver.capabilities.SUPPORTS_APPLICATIONCACHE = 'applicationCache' in window;
  * Current browser capabilities
  *
  * @private
- * @type {Array.<boolean>}
+ * @type {Array.<string>}
  */
 treesaver.capabilities.caps_;
+
+/**
+ * Transient browser capabilities, such as online/offline, that may change
+ * after a page is loaded
+ *
+ * @private
+ * @type {Array.<string>}
+ */
+treesaver.capabilities.transientCaps_;
 
 /**
  * Return 'no-' if false
@@ -286,15 +298,16 @@ treesaver.capabilities.doPrefix_ = function(val) {
  * @private
  */
 treesaver.capabilities.update_ = function() {
-  if (!treesaver.capabilities.caps_) {
-    // Ugh, closure style makes this really gross, store function
-    // for some reprieve
-    var p = treesaver.capabilities.doPrefix_;
+  // Ugh, closure style makes this really gross, store function
+  // for some reprieve
+  var p = treesaver.capabilities.doPrefix_;
 
+  if (!treesaver.capabilities.caps_) {
     // First run through, populate the static capabilities that never change
     treesaver.capabilities.caps_ = [];
     treesaver.capabilities.caps_.push(
       // Use the same class names as modernizr when applicable
+      'js',
       p(treesaver.capabilities.SUPPORTS_CANVAS) + 'canvas',
       p(treesaver.capabilities.SUPPORTS_LOCALSTORAGE) + 'localstorage',
       p(treesaver.capabilities.SUPPORTS_VIDEO) + 'video',
@@ -307,40 +320,136 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.IS_LEGACY) + 'legacy',
       p(treesaver.capabilities.IS_MOBILE) + 'mobile',
       p(treesaver.capabilities.IS_SMALL_SCREEN) + 'smallscreen',
+      p(treesaver.network.loadedFromCache()) + 'cached',
       // Browser/platform info
       'browser-' + treesaver.capabilities.BROWSER_NAME,
       'os-' + treesaver.capabilities.BROWSER_OS
     );
   }
 
-  // TODO: Update transient info
-  // online/offline
-  // orienatation
+  // Always update transient info
+  treesaver.capabilities.transientCaps_ = [
+    // Online/offline
+    p(!treesaver.network.isOnline()) + 'offline'
+  ];
+
+  if (treesaver.capabilities.SUPPORTS_ORIENTATION) {
+    // Orientation
+    treesaver.capabilities.transientCaps_.push(
+      'orientation-' + (window['orientation'] ? 'horizontal' : 'vertical')
+    );
+  }
 };
+
+/**
+ * Have the stable capability flags been added to the <html> element?
+ *
+ * @private
+ * @type {boolean}
+ */
+treesaver.capabilities.capsFlagged_ = false;
 
 /**
  * Update the classes on the <html> element based on current capabilities
  */
 treesaver.capabilities.updateClasses = function() {
-  if (!treesaver.capabilities.update_()) {
-    // TODO: Remove stale classes
-    treesaver.capabilities.update_();
-    treesaver.dom.addClass(document.documentElement, treesaver.capabilities.caps_.join(' '));
+  // Refresh stored capabilities
+  treesaver.capabilities.update_();
+
+  var className = document.documentElement.className;
+
+  if (!treesaver.capabilities.capsFlagged_) {
+    treesaver.capabilities.capsFlagged_ = true;
+
+    if (className) {
+      // First time through, remove no-js and no-treesaver flags, if present
+      treesaver.dom.removeClass(document.documentElement, 'no-js');
+      treesaver.dom.removeClass(document.documentElement, 'no-treesaver');
+    }
+    else {
+      // Class was blank, give an initial value
+      className = '';
+    }
+
+    // Add the non-transient capabilities on the body
+    className += treesaver.capabilities.caps_.join(' ');
   }
+
+  // Now, remove values of transient capabilities
+  // TODO: As we get more of these, need a simpler way to filter out the old values
+  className = className.replace(treesaver.capabilities.transientCapabilityRegex_, '');
+
+  className += ' ' + treesaver.capabilities.transientCaps_.join(' ');
+
+  // Now set the classes (and normalize whitespace)
+  document.documentElement.className = className.split(/\s+/).join(' ');
 };
+
+/**
+ * Array with all the transient capability names
+ *
+ * @private
+ * @type {!Array.<string>}
+ */
+treesaver.capabilities.transientCapabilityList_ = [
+  'offline',
+  'orientation-vertical',
+  'orientation-horizontal'
+];
+
+/**
+ * Regex for removing transient capabilities from a string
+ *
+ * @private
+ * @type {!RegExp}
+ */
+treesaver.capabilities.transientCapabilityRegex_ = (function () {
+  var terms = treesaver.capabilities.transientCapabilityList_.map(function (term) {
+    return '((no-)?' + term + ')';
+  });
+
+  return new RegExp(terms.join('|'));
+}());
 
 /**
  * Check if a set of requirements are met by the current browser state
  *
  * @param {!Array.<string>} required Required capabilities
+ * @param {boolean=} useTransient Whether transient capabilities should be
+ *                                checked as well
  * @return {boolean} True if requirements are met
  */
-treesaver.capabilities.check = function checkCapabilities(required) {
+treesaver.capabilities.check = function checkCapabilities(required, useTransient) {
   if (!required.length) {
     return true;
   }
 
-  return !required.some(function (req) {
-    return treesaver.capabilities.caps_.indexOf(req) === -1;
+  // Requirements are in the form of 'flash', 'offline', or 'no-orientation'
+  return required.every(function (req) {
+    var isNegation = req.substr(0, 3) === 'no-',
+        rootReq = isNegation ? req.substr(3) : req,
+        allCaps = treesaver.capabilities.caps_.concat(
+          useTransient ? treesaver.capabilities.transientCaps_ : []
+        );
+
+    if (isNegation) {
+      // If it's negation, make sure the capability isn't in the capability list
+      return allCaps.indexOf(rootReq) === -1;
+    }
+    else {
+      if (allCaps.indexOf(rootReq) !== -1) {
+        // Have the capability, all good
+        return true;
+      }
+
+      // Requirement may be a transient property, need to check
+      if (!useTransient &&
+          treesaver.capabilities.transientCapabilityList_.indexOf(rootReq) !== -1) {
+          // Requirement isn't met, but is transient, let it pass for now
+          return true;
+      }
+
+      return false;
+    }
   });
 };
