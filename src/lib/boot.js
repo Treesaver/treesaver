@@ -31,6 +31,9 @@ treesaver.boot.load = function() {
     document.documentElement.style.display = 'none';
   }
 
+  // Initialize the network module
+  treesaver.network.load();
+
   // Set capability flags
   treesaver.capabilities.updateClasses();
 
