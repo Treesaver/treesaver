@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.ui.Chrome');
 
+goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
@@ -28,6 +29,15 @@ treesaver.ui.Chrome = function(node) {
       treesaver.debug.error('Chrome is not only child in container');
     }
   }
+
+  /**
+   * List of required capabilities for this Chrome
+   * TODO: Only store transient capabilities
+   *
+   * @type {?Array.<string>}
+   */
+  this.requirements = treesaver.dom.hasAttr(node, 'data-requires') ?
+    node.getAttribute('data-requires').split(' ') : null;
 
   /**
    * @type {?Element}
@@ -473,6 +483,17 @@ treesaver.ui.Chrome.prototype.uiIdle = function() {
 };
 
 /**
+ * @return {boolean} True if the Chrome meets current browser capabilities
+ */
+treesaver.ui.Chrome.prototype.meetsRequirements = function() {
+  if (!this.requirements) {
+    return true;
+  }
+
+  return treesaver.capabilities.check(this.requirements, true);
+};
+
+/**
  * @param {treesaver.dimensions.Size} availSize
  * @return {boolean} True if fits
  */
@@ -778,7 +799,7 @@ treesaver.ui.Chrome.select = function(chromes, availSize) {
 
   for (i = 0, len = chromes.length; i < len; i += 1) {
     current = chromes[i];
-    if (current.fits(availSize)) {
+    if (current.meetsRequirements() && current.fits(availSize)) {
       chrome = current;
       break;
     }

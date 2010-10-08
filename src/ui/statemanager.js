@@ -210,7 +210,9 @@ treesaver.ui.StateManager.checkState = function() {
     treesaver.ui.StateManager.state_.size = availSize;
 
     // Check if chrome still fits
-    if (!treesaver.ui.StateManager.state_.chrome || !treesaver.ui.StateManager.state_.chrome.fits(availSize)) {
+    if (!treesaver.ui.StateManager.state_.chrome ||
+        !treesaver.ui.StateManager.state_.chrome.meetsRequirements() ||
+        !treesaver.ui.StateManager.state_.chrome.fits(availSize)) {
       // Chrome doesn't fit, need to install a new one
       newChrome = treesaver.ui.Chrome.select(treesaver.ui.StateManager.chromes_, availSize);
 
