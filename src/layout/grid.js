@@ -31,6 +31,15 @@ treesaver.layout.Grid = function(node) {
   document.body.appendChild(node);
 
   /**
+   * List of required capabilities for this Grid
+   * TODO: Only store transient capabilities
+   *
+   * @type {?Array.<string>}
+   */
+  this.requirements = treesaver.dom.hasAttr(node, 'data-requires') ?
+    node.getAttribute('data-requires').split(' ') : null;
+
+  /**
    * @type {Array.<string>}
    */
   this.classes = treesaver.dom.classes(node);
@@ -366,6 +375,19 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
  */
 treesaver.layout.Grid.prototype.hasTheme = function(themeName) {
   return this.classes.indexOf(themeName) !== -1;
+};
+
+/**
+ * Eliminate a grid if it does not meet the current browser capabilities
+ *
+ * @return {boolean} False if the grid does not qualify
+ */
+treesaver.layout.Grid.prototype.capabilityFilter = function() {
+  if (!this.requirements) {
+    return true;
+  }
+
+  return treesaver.capabilities.check(this.requirements, true);
 };
 
 /**

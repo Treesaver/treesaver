@@ -262,7 +262,7 @@ treesaver.ui.Article.prototype.setGrids = function(all_grids) {
  */
 treesaver.ui.Article.prototype.stretchGrids = function(size) {
   this.eligible_grids = this.grids.filter(function(grid) {
-    return grid.sizeFilter(size);
+    return grid.capabilityFilter() && grid.sizeFilter(size);
   }).map(function(grid) {
     // Now stretch to the space
     return grid.stretch(size.h);
