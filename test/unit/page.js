@@ -66,14 +66,10 @@ $(function () {
         $container = $('<div class="container testonly"></div>').appendTo($page).css({ top: 0, bottom: 0 }),
         figure = {
           sizes: {
-            size: {
-              size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0]))
-            },
+            size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
             bogus: {
-              size: {
-                applySize: function () { },
-                revertSize: function () { }
-              }
+              applySize: function () { },
+              revertSize: function () { }
             }
           }
         },
@@ -125,9 +121,7 @@ $(function () {
         $container = $('<div class="container testonly"></div>').appendTo($page).height(400),
         figure = {
           sizes: {
-            size: {
-              size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0]))
-            }
+            size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0]))
           }
         },
         map = {
@@ -185,7 +179,7 @@ $(function () {
     // If the container is really big, we can end up taking up all the space, test that
     $container.html('').removeClass('matched size').addClass('bottom').height(1000);
     $page.find('.column').removeClass('fixed flexed').css({ top: 0, bottom: 0, height: 'auto' });
-    figure.sizes.size.size.html = treesaver.dom.outerHTML($(figure.sizes.size.size.html).height(1000)[0]);
+    figure.sizes.size.html = treesaver.dom.outerHTML($(figure.sizes.size.html).height(1000)[0]);
 
     success = treesaver.layout.Page.fillContainer($container[0], figure, map);
     ok(success, 'Full-height container: Filling success');
@@ -207,9 +201,7 @@ $(function () {
         }).appendTo($page),
         figure = {
           sizes: {
-            size: {
-              size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0]))
-            }
+            size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0]))
           }
         },
         map = {

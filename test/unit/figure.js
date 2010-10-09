@@ -41,8 +41,8 @@ $(function () {
     equals(indices.figureIndex, 1, 'figureIndex incremented');
     equals(indices.index, 1, 'Index incremented');
     // Check for our size payload
-    ok(figure.sizes['one'] && figure.sizes['one'].size, 'Size extraction one');
-    equals(escapeHTML(figure.sizes['one'].size.html), escapeHTML('<p>Size one</p>'), 'Size extraction one: HTML');
+    ok(figure.sizes['one'], 'Size extraction one');
+    equals(escapeHTML(figure.sizes['one'].html), escapeHTML('<p>Size one</p>'), 'Size extraction one: HTML');
     // Now, check the fallback
     ok(figure.fallback, 'Fallback extraction');
     equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Paragraph within figure within container'), 'Fallback extraction: HTML');
@@ -54,20 +54,20 @@ $(function () {
     equals(indices.figureIndex, 2, 'figureIndex incremented');
     equals(indices.index, 4, 'Index incremented three times when fallback has two children');
     if (!treesaver.capabilities.IS_LEGACY) {
-      equals(figure.sizes['two'].size.minH, 40, 'minHeight extraction');
-      ok(!figure.sizes['two'].size.minW, 'No phantom minWidth extraction');
+      equals(figure.sizes['two'].minH, 40, 'minHeight extraction');
+      ok(!figure.sizes['two'].minW, 'No phantom minWidth extraction');
     }
-    ok(!figure.sizes['three'].size.minH, 'No phantom minHeight extraction');
-    equals(figure.sizes['three'].size.minW, 100, 'minWidth extraction');
+    ok(!figure.sizes['three'].minH, 'No phantom minHeight extraction');
+    equals(figure.sizes['three'].minW, 100, 'minWidth extraction');
 
     ok(figure.fallback, 'Fallback constructed when shared payload');
     ok(!$(figure.fallback.html)[0].getAttribute('data-sizes'), 'Fallback HTML strips data-sizes parameter');
-    ok(figure.sizes['three'].size === figure.sizes['one'].size, 'Data-requires filtered bogus requirement');
+    ok(figure.sizes['three'] === figure.sizes['one'], 'Data-requires filtered bogus requirement');
     if (!treesaver.capabilities.IS_LEGACY) {
-      ok(figure.sizes['two'].size !== figure.sizes['one'].size, 'Data-requires success on no legacy');
+      ok(figure.sizes['two'] !== figure.sizes['one'], 'Data-requires success on no legacy');
     }
     else {
-      ok(figure.sizes['two'].size === figure.sizes['one'].size, 'Data-requires failure on no legacy');
+      ok(figure.sizes['two'] === figure.sizes['one'], 'Data-requires failure on no legacy');
     }
 
     // A figure without a fallback, and with tempalted payloads
@@ -77,9 +77,9 @@ $(function () {
     equals(indices.index, 4, 'No fallback: Index not incremented');
     ok(!figure.fallback, 'No fallback: Fallback not generated');
     ok(figure.sizes['three'], 'No fallback: Templated size generated (three)');
-    equals(escapeHTML(figure.sizes['three'].size.html), escapeHTML('<p>Templated: 3</p>'), 'Templated applied correctly');
+    equals(escapeHTML(figure.sizes['three'].html), escapeHTML('<p>Templated: 3</p>'), 'Templated applied correctly');
     ok(figure.sizes['four'], 'No fallback: Templated size generated (four)');
-    equals(figure.sizes['four'].size.minH, 300, 'No fallback: MinHeight extraction');
+    equals(figure.sizes['four'].minH, 300, 'No fallback: MinHeight extraction');
   });
 
   test('Figure - applyTemplate', function () {

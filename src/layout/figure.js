@@ -25,10 +25,8 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   indices.figureIndex += 1;
   /** @type {?treesaver.layout.Block} */
   this.fallback = null;
-  /** @type {Object.<string, {index: number, size: treesaver.layout.FigureSize}>} */
+  /** @type {Object.<string, treesaver.layout.FigureSize>} */
   this.sizes = {};
-  /** @type {number } */
-  this.sizeCount = 0;
 
   /**
    * Does this figure need to be displayed? If not, then it may be omitted
@@ -60,7 +58,7 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
 
   // Now check for a fallback, and process separately
   if (this.sizes[treesaver.layout.Figure.fallbackString]) {
-    this.processFallback(this.sizes[treesaver.layout.Figure.fallbackString].size.html,
+    this.processFallback(this.sizes[treesaver.layout.Figure.fallbackString].html,
         el, baseLineHeight, indices);
 
     // Remove the fallback from figure sizes
@@ -68,7 +66,6 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   }
 
   // No longer needed
-  delete this.sizeCount;
   delete this.templates;
 }
 
@@ -228,14 +225,7 @@ treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, mi
       return;
     }
 
-    this.sizes[size] = {
-      index: this.sizeCount,
-      size: figureSize
-    };
-
-    if (size !== treesaver.layout.Figure.fallbackString) {
-      this.sizeCount += 1;
-    }
+    this.sizes[size] = figureSize;
   }, this);
 };
 

@@ -85,35 +85,27 @@ $(function () {
           // fallback
           optional: true,
           sizes: {
-            one: {
-              index: 0,
-              size: {}
-            }
+            one: {}
           }
         },
         { // Should match final container
           optional: false,
           sizes: {
-            five: {
-              index: 0,
-              size: {}
-            }
+            five: {}
           }
         },
         { // Can't match any container (uses bogus size)
           optional: false,
           sizes: {
-            bogus: {
-              index: 0
-            }
+            bogus: {}
           }
         },
         { // Has multiple sizes, but should give preference to largest
           optional: false,
           sizes: {
-            one: { index: 0, size: {} },
-            two: { index: 1, size: {} },
-            three: { index: 2, size: {} }
+            one: { },
+            two: { },
+            three: { }
           }
         }
       ]

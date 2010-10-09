@@ -330,7 +330,7 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
         // TODO: Watch for previous failures at this size
 
         if (figure.sizes[size]) {
-          figureSize = figure.sizes[size].size;
+          figureSize = figure.sizes[size];
 
           // Make sure the height fits for flexible containers
           // Fixed containers should know better than to specify
@@ -345,8 +345,6 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
           map[i] = {
             figureIndex: currentIndex,
             size: size,
-            // The figure's index of the size matched, used for scoring
-            index: figure.sizes[size].index, // container.sizes[k].index,
             // Also used for scoring
             flexible: container.flexible
           };
@@ -414,7 +412,6 @@ treesaver.layout.Grid.SCORING = {
   DIFFERENT_LINEHEIGHT: 2000,
   DIFFERENT_COLWIDTH: Infinity,
   CONTAINER_BONUS: 1000,
-  CONTAINER_INDEX_BONUS: 500,
   BLOCK_DELAY_PENALTY: 100,
   REQUIRED_BLOCK_BONUS: 4000,
   PAGE_NUMBER: 12000,
@@ -480,8 +477,7 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
       if (mapped_container) {
         figure = content.figures[mapped_container.figureIndex];
 
-        score += treesaver.layout.Grid.SCORING.CONTAINER_BONUS +
-          treesaver.layout.Grid.SCORING.CONTAINER_INDEX_BONUS * mapped_container.index;
+        score += treesaver.layout.Grid.SCORING.CONTAINER_BONUS;
 
         if (!figure.optional) {
           score += treesaver.layout.Grid.SCORING.REQUIRED_BLOCK_BONUS;
