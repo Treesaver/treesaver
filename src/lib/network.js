@@ -213,7 +213,7 @@ treesaver.network.stripHash = function(url) {
     return url;
   }
   else {
-    return url.substr(0, hash_index - 1);
+    return url.substr(0, hash_index);
   }
 };
 

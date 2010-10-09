@@ -62,7 +62,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
                                           initialHTML);
 
     if (!initialArticle.error) {
-      treesaver.ui.ArticleManager.articles[document.location.href] = initialArticle;
+      treesaver.ui.ArticleManager.articles[treesaver.ui.ArticleManager.initialUrl] = initialArticle;
       treesaver.ui.ArticleManager._setArticle(initialArticle, null, 0, true);
     }
     else {
