@@ -60,11 +60,6 @@ treesaver.boot.load = function() {
       treesaver.boot.uiLoaded_ = true;
       treesaver.boot.loadProgress_();
     });
-
-    // TODO: Separate out legacy code into a separate file
-    if (treesaver.capabilities.IS_LEGACY) {
-      treesaver.boot.legacyLoaded_ = true;
-    }
   }
 
   // Watch for dom ready
@@ -117,14 +112,6 @@ treesaver.boot.unload = function() {
 };
 
 /**
- * Has legacy module loaded yet?
- *
- * @private
- * @type {boolean}
- */
-treesaver.boot.legacyLoaded_;
-
-/**
  * Clean up boot-related timers and handlers
  * @private
  */
@@ -142,7 +129,6 @@ treesaver.boot.cleanup_ = function() {
   // Kill loading flags
   delete treesaver.boot.resourcesLoaded_;
   delete treesaver.boot.uiLoaded_;
-  delete treesaver.boot.legacyLoaded_;
   delete treesaver.boot.domReady_;
 
   // Kill other data storage
@@ -186,11 +172,6 @@ treesaver.boot.loadProgress_ = function() {
 
   if (USE_MODULES && !treesaver.boot.uiLoaded_) {
     // Must wait for the other modules to load
-    return;
-  }
-
-  if (treesaver.capabilities.IS_LEGACY && !treesaver.boot.legacyLoaded_) {
-    // Must wait for legacy to load
     return;
   }
 
