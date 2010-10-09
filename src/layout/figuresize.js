@@ -11,9 +11,10 @@ goog.require('treesaver.dom');
  * @param {string} html Content payload
  * @param {number|string} minW
  * @param {number|string} minH
+ * @param {?Array.<string>} requirements
  * @constructor
  */
-treesaver.layout.FigureSize = function(html, minW, minH) {
+treesaver.layout.FigureSize = function(html, minW, minH, requirements) {
   /**
    * The full HTML content for this payload.
    *
@@ -35,7 +36,26 @@ treesaver.layout.FigureSize = function(html, minW, minH) {
    * @type {number}
    */
   this.minH = parseInt(minH || 0, 10);
+
+  /**
+   * List of required capabilities for this Chrome
+   * TODO: Only store transient capabilities
+   *
+   * @type {?Array.<string>}
+   */
+  this.requirements = requirements;
 }
+
+/**
+ * @return {boolean} True if the figureSize meets current browser capabilities
+ */
+treesaver.layout.FigureSize.prototype.meetsRequirements = function() {
+  if (!this.requirements) {
+    return true;
+  }
+
+  return treesaver.capabilities.check(this.requirements, true);
+};
 
 /**
  * Apply the figure size to the element

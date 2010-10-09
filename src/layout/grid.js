@@ -283,7 +283,7 @@ treesaver.layout.Grid.prototype.score = function(content, breakRecord) {
  * Typedef for compiler
  * TODO: Make a real typedef
  *
- * @typedef {{figureIndex, size, index, flexible}}
+ * @typedef {{figureIndex, figureSize, flexible}}
  */
 treesaver.layout.Grid.ContainerMap;
 
@@ -329,9 +329,9 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
 
         // TODO: Watch for previous failures at this size
 
-        if (figure.sizes[size]) {
-          figureSize = figure.sizes[size];
+        figureSize = figure.getSize(size);
 
+        if (figureSize) {
           // Make sure the height fits for flexible containers
           // Fixed containers should know better than to specify
           // a size that doesn't fit
@@ -344,6 +344,7 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
           // Container fits, store mapping
           map[i] = {
             figureIndex: currentIndex,
+            figureSize: figureSize,
             size: size,
             // Also used for scoring
             flexible: container.flexible

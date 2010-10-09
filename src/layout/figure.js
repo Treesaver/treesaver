@@ -25,7 +25,7 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   indices.figureIndex += 1;
   /** @type {?treesaver.layout.Block} */
   this.fallback = null;
-  /** @type {Object.<string, treesaver.layout.FigureSize>} */
+  /** @type {Object.<string, Array.<treesaver.layout.FigureSize>>} */
   this.sizes = {};
 
   /**
@@ -57,12 +57,13 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   }, this);
 
   // Now check for a fallback, and process separately
-  if (this.sizes[treesaver.layout.Figure.fallbackString]) {
-    this.processFallback(this.sizes[treesaver.layout.Figure.fallbackString].html,
-        el, baseLineHeight, indices);
+  if (this.sizes['fallback']) {
+    // TODO: Support multiple fallbacks?
+    // TODO: Requirements on fallback?
+    this.processFallback(this.sizes['fallback'][0].html, el, baseLineHeight, indices);
 
     // Remove the fallback from figure sizes
-    delete this.sizes[treesaver.layout.Figure.fallbackString];
+    delete this.sizes['fallback'];
   }
 
   // No longer needed
@@ -174,20 +175,15 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
  */
 treesaver.layout.Figure.prototype.processChildNode =
   function processChildNode(childNode, baseLineHeight, indices) {
-  var requires = childNode.getAttribute(treesaver.layout.Figure.dataRequiresString),
-      isScript = childNode.nodeName.toLowerCase() === 'script',
-      type = !isScript ? null : childNode.getAttribute('type');
+  var type;
 
-  // Check requirements. If we don't meet them, discard
-  if (requires && !treesaver.capabilities.check(requires.split(' '))) {
-    // Ignore this node
-    return;
-  }
+  // Script payload?
+  if (childNode.nodeName.toLowerCase() === 'script') {
+    type = childNode.getAttribute('type');
 
-  if (type) {
     if (type === 'text/html') {
-      // Template or cloaked
-      if (childNode.getAttribute(treesaver.layout.Figure.dataSizeString)) {
+      // Template or cloaked? Cloaked elements have a data-size property
+      if (treesaver.dom.hasAttr(childNode, 'data-sizes')) {
         this.processCloaked(childNode);
       }
       else {
@@ -210,22 +206,44 @@ treesaver.layout.Figure.prototype.processChildNode =
 };
 
 /**
+ * Retrieve a qualifying figureSize for the given size name
+ *
+ * @param {!string} size
+ * @return {?treesaver.layout.FigureSize} Null if not found
+ */
+treesaver.layout.Figure.prototype.getSize = function(size) {
+  var i, len;
+
+  if (this.sizes[size]) {
+    for (i = 0, len = this.sizes[size].length; i < len; i += 1) {
+      if (this.sizes[size][i].meetsRequirements()) {
+        return this.sizes[size][i];
+      }
+    };
+  }
+
+  // None found
+  return null;
+};
+
+/**
  * @param {!Array.<string>} sizes
  * @param {!string} html
  * @param {number} minW
  * @param {number} minH
+ * @param {?Array.<string>} requirements
  */
-treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, minW, minH) {
+treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, minW, minH, requirements) {
   // First, create the FigureSize
-  var figureSize = new treesaver.layout.FigureSize(html, minW, minH);
+  var figureSize = new treesaver.layout.FigureSize(html, minW, minH, requirements);
 
   sizes.forEach(function (size) {
-    // We only accept one payload at each size
     if (this.sizes[size]) {
-      return;
+      this.sizes[size].push(figureSize);
     }
-
-    this.sizes[size] = figureSize;
+    else {
+      this.sizes[size] = [figureSize];
+    }
   }, this);
 };
 
@@ -233,7 +251,7 @@ treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, mi
  * @param {!Element} el
  */
 treesaver.layout.Figure.prototype.processScriptTemplate = function processScriptTemplate(el) {
-  var name = el.getAttribute(treesaver.layout.Figure.dataNameString) || '_default',
+  var name = el.getAttribute('data-name') || '_default',
       // Extract the HTML template
       payload = treesaver.dom.innerText(el) || el.innerHTML;
 
@@ -250,46 +268,61 @@ treesaver.layout.Figure.prototype.processScriptTemplate = function processScript
  * @param {!Element} el
  */
 treesaver.layout.Figure.prototype.processCloaked = function processCloaked(el) {
-  var sizes = el.getAttribute(treesaver.layout.Figure.dataSizeString).split(' '),
+  var sizes = el.getAttribute('data-sizes').split(' '),
       html = (el.innerText || el.textContent || el.innerHTML).trim(),
-      minW = parseInt(el.getAttribute(treesaver.layout.Figure.dataMinWidthString), 10),
-      minH = parseInt(el.getAttribute(treesaver.layout.Figure.dataMinHeightString), 10);
+      minW = parseInt(el.getAttribute('data-minWidth'), 10),
+      minH = parseInt(el.getAttribute('data-minHeight'), 10),
+      requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
+        el.getAttribute('data-requires').split(' ') : null;
 
-  this.saveSizes(sizes, html, minW, minH);
+  if (requirements) {
+    if (!treesaver.capabilities.check(requirements)) {
+      // Does not meet requirements, skip
+      return;
+    }
+  }
+
+  this.saveSizes(sizes, html, minW, minH, requirements);
 };
 
 /**
  * @param {!Element} el
  */
 treesaver.layout.Figure.prototype.processElement = function processElement(el) {
-  var sizes = el.getAttribute(treesaver.layout.Figure.dataSizeString),
-      minW = parseInt(el.getAttribute(treesaver.layout.Figure.dataMinWidthString), 10),
-      minH = parseInt(el.getAttribute(treesaver.layout.Figure.dataMinHeightString), 10),
+  var sizes = el.getAttribute('data-sizes'),
+      minW = parseInt(el.getAttribute('data-minWidth'), 10),
+      minH = parseInt(el.getAttribute('data-minHeight'), 10),
+      requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
+        el.getAttribute('data-requires').split(' ') : null,
       html;
 
-  // Remove the properties we don't need to store
-  treesaver.layout.Figure.dataPropertyStrings.forEach(function (attr) {
-    el.removeAttribute(attr);
-  });
+  if (requirements) {
+    if (!treesaver.capabilities.check(requirements)) {
+      // Does not meet requirements, skip
+      return;
+    }
+  }
+
+  // TODO: Remove properties we don't need to store (data-*)
 
   // Grab HTML
   html = treesaver.dom.outerHTML(el);
 
   if (!sizes) {
-    sizes = [treesaver.layout.Figure.fallbackString];
+    sizes = ['fallback'];
   }
   else {
     sizes = sizes.split(' ');
   }
 
-  this.saveSizes(sizes, html, minW, minH);
+  this.saveSizes(sizes, html, minW, minH, requirements);
 };
 
 /**
  * @param {!Element} el
  */
 treesaver.layout.Figure.prototype.processTemplateValues = function processTemplateValues(el) {
-  var template_name = el.getAttribute(treesaver.layout.Figure.dataTemplateString) || '_default',
+  var template_name = el.getAttribute('data-template') || '_default',
       // Extract the JSON
       payload = (el.innerText || el.textContent || el.innerHTML),
       values;
@@ -299,18 +332,19 @@ treesaver.layout.Figure.prototype.processTemplateValues = function processTempla
     values = treesaver.json.parse(payload);
 
     // Values must be an Array. It's not really worth doing any sophisticated
-    // checks here, so let's just check for length
-    if (!values.length) {
+    // checks here, so let's just check for forEach
+    if (values.forEach) {
+      // Process each size
+      values.forEach(function (val) {
+        this.processValue(val, template_name);
+      }, this);
+    }
+    else {
       treesaver.debug.error('Non-array passed as template values: ' + values);
 
       // Ignore
       return;
     }
-
-    // Process each size
-    values.forEach(function (val) {
-      this.processValue(val, template_name);
-    }, this);
   }
   else {
     treesaver.debug.warn('Empty figure template values');
@@ -319,8 +353,9 @@ treesaver.layout.Figure.prototype.processTemplateValues = function processTempla
 
 /**
  * @param {!Object} value
+ * @param {string} default_template
  */
-treesaver.layout.Figure.prototype.processValue = function processValue(value, template_name) {
+treesaver.layout.Figure.prototype.processValue = function processValue(value, default_template) {
   if (!value['sizes']) {
     treesaver.debug.error('No sizes parameter in template value');
 
@@ -329,11 +364,20 @@ treesaver.layout.Figure.prototype.processValue = function processValue(value, te
   }
 
   // Find the appropriate template
-  var template = this.templates[value['template'] || template_name],
-      html;
+  var template = this.templates[value['template'] || default_template],
+      html,
+      requirements = value['requires'] ? value['requires'].split(' ') : null;
+
+  if (requirements) {
+    if (!treesaver.capabilities.check(requirements)) {
+      // Does not meet requirements, skip
+      return;
+    }
+  }
 
   if (!template) {
-    treesaver.debug.error('Unknown template name for value: ' + value['template'] || template_name);
+    treesaver.debug.error('Unknown template name for value: ' +
+        value['template'] || default_template);
 
     // Ignore
     return;
@@ -343,8 +387,8 @@ treesaver.layout.Figure.prototype.processValue = function processValue(value, te
   html = treesaver.layout.Figure.applyTemplate(template, value);
 
   // Save the sizes
-  this.saveSizes(value['sizes'].split(' '), html,
-      value['minWidth'], value['minHeight']);
+  this.saveSizes(value['sizes'].split(' '), html, value['minWidth'],
+    value['minHeight'], requirements);
 };
 
 /**
@@ -371,25 +415,6 @@ treesaver.layout.Figure.isFigure = function isFigure(el) {
   var nodeName = el.nodeName.toLowerCase();
   return el.nodeType === 1 && nodeName === 'figure';
 };
-
-/** @type {string} */
-treesaver.layout.Figure.fallbackString = 'fallback';
-/** @type {string} */
-treesaver.layout.Figure.dataSizeString = 'data-sizes';
-/** @type {string} */
-treesaver.layout.Figure.dataRequiresString = 'data-requires';
-/** @type {string} */
-treesaver.layout.Figure.dataTemplateString = 'data-template';
-/** @type {string} */
-treesaver.layout.Figure.dataNameString = 'data-name';
-/** @type {string} */
-treesaver.layout.Figure.dataMinWidthString = 'data-minWidth';
-/** @type {string} */
-treesaver.layout.Figure.dataMinHeightString = 'data-minHeight';
-/** @type {Array.<string>} */
-treesaver.layout.Figure.dataPropertyStrings = [treesaver.layout.Figure.dataSizeString, treesaver.layout.Figure.dataRequiresString,
-  treesaver.layout.Figure.dataTemplateString, treesaver.layout.Figure.dataNameString, treesaver.layout.Figure.dataMinWidthString,
-  treesaver.layout.Figure.dataMinHeightString];
 
 if (goog.DEBUG) {
   // Expose for testing

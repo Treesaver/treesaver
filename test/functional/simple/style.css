@@ -79,14 +79,6 @@ article {
   line-height: 20px;
 }
 
-.column.col-2 {
-  left: 340px;
-}
-
-.column.col-3 {
-  left: 660px;
-}
-
 .container {
   position: absolute;
   top: 20px;
@@ -101,6 +93,20 @@ article {
 
 .container.cols-3 {
   width: 940px;
+}
+
+.col-2 {
+  left: 340px;
+}
+
+.col-3 {
+  left: 660px;
+}
+
+.pullquote {
+  font-style: italic;
+  font-size: 25px;
+  color: #933;
 }
 
 h1 {

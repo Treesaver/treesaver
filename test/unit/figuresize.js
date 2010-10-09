@@ -15,12 +15,13 @@ $(function () {
   });
 
   test('Construction', function () {
-    var fs = new treesaver.layout.FigureSize('HTML Content', '100', 200);
+    var fs = new treesaver.layout.FigureSize('HTML Content', '100', 200, ['flash']);
 
     ok(fs, 'Object constructed');
     equals(fs.html, 'HTML Content', 'HTML stored');
     equals(fs.minW, 100, 'Width: Parse string');
     equals(fs.minH, 200, 'Height: Number');
+    equals(fs.requirements.length, 1, 'Requirements array');
   });
 
   test('Apply/Revert', function () {

@@ -42,7 +42,7 @@ $(function () {
     equals(indices.index, 1, 'Index incremented');
     // Check for our size payload
     ok(figure.sizes['one'], 'Size extraction one');
-    equals(escapeHTML(figure.sizes['one'].html), escapeHTML('<p>Size one</p>'), 'Size extraction one: HTML');
+    equals(escapeHTML(figure.sizes['one'][0].html), escapeHTML('<p>Size one</p>'), 'Size extraction one: HTML');
     // Now, check the fallback
     ok(figure.fallback, 'Fallback extraction');
     equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Paragraph within figure within container'), 'Fallback extraction: HTML');
@@ -54,21 +54,22 @@ $(function () {
     equals(indices.figureIndex, 2, 'figureIndex incremented');
     equals(indices.index, 4, 'Index incremented three times when fallback has two children');
     if (!treesaver.capabilities.IS_LEGACY) {
-      equals(figure.sizes['two'].minH, 40, 'minHeight extraction');
-      ok(!figure.sizes['two'].minW, 'No phantom minWidth extraction');
+      equals(figure.sizes['two'][0].minH, 40, 'minHeight extraction');
+      ok(!figure.sizes['two'][0].minW, 'No phantom minWidth extraction');
     }
-    ok(!figure.sizes['three'].minH, 'No phantom minHeight extraction');
-    equals(figure.sizes['three'].minW, 100, 'minWidth extraction');
+    ok(!figure.sizes['three'][0].minH, 'No phantom minHeight extraction');
+    equals(figure.sizes['three'][0].minW, 100, 'minWidth extraction');
 
     ok(figure.fallback, 'Fallback constructed when shared payload');
-    ok(!$(figure.fallback.html)[0].getAttribute('data-sizes'), 'Fallback HTML strips data-sizes parameter');
-    ok(figure.sizes['three'] === figure.sizes['one'], 'Data-requires filtered bogus requirement');
+    //ok(!$(figure.fallback.html)[0].getAttribute('data-sizes'), 'Fallback HTML strips data-sizes parameter');
+    ok(figure.sizes['three'][0] === figure.sizes['one'][0], 'Data-requires filtered bogus requirement');
     if (!treesaver.capabilities.IS_LEGACY) {
-      ok(figure.sizes['two'] !== figure.sizes['one'], 'Data-requires success on no legacy');
+      ok(figure.sizes['two'][0] !== figure.sizes['one'][0], 'Data-requires success on no legacy');
     }
     else {
-      ok(figure.sizes['two'] === figure.sizes['one'], 'Data-requires failure on no legacy');
+      ok(figure.sizes['two'][0] === figure.sizes['one'][0], 'Data-requires failure on no legacy');
     }
+    equals(figure.sizes['four'].length, 2, 'Transient capability figureSizes preserved');
 
     // A figure without a fallback, and with tempalted payloads
     figureNode = $('.column figure.nofallback')[0];
@@ -77,9 +78,9 @@ $(function () {
     equals(indices.index, 4, 'No fallback: Index not incremented');
     ok(!figure.fallback, 'No fallback: Fallback not generated');
     ok(figure.sizes['three'], 'No fallback: Templated size generated (three)');
-    equals(escapeHTML(figure.sizes['three'].html), escapeHTML('<p>Templated: 3</p>'), 'Templated applied correctly');
+    equals(escapeHTML(figure.sizes['three'][0].html), escapeHTML('<p>Templated: 3</p>'), 'Templated applied correctly');
     ok(figure.sizes['four'], 'No fallback: Templated size generated (four)');
-    equals(figure.sizes['four'].minH, 300, 'No fallback: MinHeight extraction');
+    equals(figure.sizes['four'][0].minH, 300, 'No fallback: MinHeight extraction');
   });
 
   test('Figure - applyTemplate', function () {
@@ -97,5 +98,43 @@ $(function () {
   });
 
   test('Figure - Templated', function () {
+  });
+
+
+  // TODO: Make these tests more betterer
+  test('getSize', function() {
+    var indices = {
+          index: 0,
+          figureIndex: 0
+        },
+        figureNode = $('.column figure.figuretest')[0],
+        figure = new treesaver.layout.Figure(figureNode, 20, indices),
+        size,
+        caps = [];
+
+    ok(!figure.getSize('bogus'), 'Bogus size returns nothing');
+    ok(figure.getSize('one'), 'Real size returns payload');
+
+    // Mock out the capability checking function
+    treesaver.capabilities.check_ = treesaver.capabilities.check;
+    treesaver.capabilities.check = function (reqs) {
+      // Ghetto mock that only checks the first requirement
+      return caps.indexOf(reqs[0]) !== -1;
+    };
+
+    // Nothing in caps array means all checks will fail
+    ok(!figure.getSize('four'), 'Figure sizes filtered by capability');
+    // Now let offline figures through
+    caps = ['offline'];
+    ok(figure.getSize('four'), 'Figure sizes filtered by capability');
+    // Store the offline figure, and change caps to get online, confirm they
+    // are different
+    size = figure.getSize('four');
+    caps = ['no-offline'];
+    ok(figure.getSize('four') !== size, 'Figure sizes filtered by capability');
+
+    // Restore non-mocked function
+    treesaver.capabilities.check = treesaver.capabilities.check_;
+    delete treesaver.capabilities.check_;
   });
 });

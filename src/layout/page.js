@@ -160,15 +160,16 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
       anchoredTop = true;
 
   size = map.size;
+  figureSize = map.figureSize;
 
-  if (!size) {
-    treesaver.debug.error('Empty size!');
-  }
+  if (goog.DEBUG) {
+    if (!size) {
+      treesaver.debug.error('Empty size!');
+    }
 
-  figureSize = figure.sizes[size];
-
-  if (!figureSize) {
-    treesaver.debug.error('Empty figureSize!');
+    if (!figureSize) {
+      treesaver.debug.error('Empty figureSize!');
+    }
   }
 
   maxContainerHeight = container.offsetHeight;
