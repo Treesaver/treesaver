@@ -48,6 +48,10 @@ treesaver.template.expandObject_ = function(view, mappings, scope) {
 
     elements = treesaver.dom.getElementsByClassName(key, scope);
 
+    if (treesaver.dom.hasClass(scope, key)) {
+      elements.push(scope);
+    }
+
     elements.forEach(function(e) {
       if (Array.isArray(view[key])) {
         if (!mappings[key]) {
