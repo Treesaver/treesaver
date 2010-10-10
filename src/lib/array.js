@@ -17,6 +17,18 @@ if (SUPPORT_IE && !Array.prototype.indexOf) {
   };
 }
 
+if (!Array.isArray) {
+  /**
+   * Test Array-ness.
+   *
+   * @param {!Object} value Test if value is an array.
+   * @return {!boolean} True if the given value is an array, false otherwise.
+   */
+  Array.isArray = function(value) {
+    return Object.prototype.toString.apply(value) === '[object Array]';
+  };
+}
+
 /**
  * Remove an index from an array
  * By John Resig (MIT Licensed)
