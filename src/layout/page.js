@@ -80,6 +80,11 @@ treesaver.layout.Page = function(content, grids, br) {
       if (success) {
         br.useFigure(figureIndex);
 
+        // Need to store some extra data when supporting zoom
+        if (figure.zoomable) {
+          containerNode.setAttribute('data-figureindex', figureIndex);
+        }
+
         // Size to the container
         if (i === 0 && best.grid.sizeToContainer) {
           this.size.height = containerNode.offsetHeight +

@@ -108,6 +108,12 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
   // Insert into the tree, to get proper styling
   parent.insertBefore(fallbackNode, node);
 
+  // Add flags into DOM for zooming
+  if (this.zoomable) {
+    treesaver.dom.addClass(fallbackNode, 'zoomable');
+    fallbackNode.setAttribute('data-figureindex', this.figureIndex);
+  }
+
   // Figures are skipped during sanitization, so must do it manually here
   treesaver.layout.Block.sanitizeNode(fallbackNode, baseLineHeight);
 
