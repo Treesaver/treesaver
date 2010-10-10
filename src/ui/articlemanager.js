@@ -11,6 +11,7 @@ goog.require('treesaver.events');
 goog.require('treesaver.network');
 goog.require('treesaver.resources');
 goog.require('treesaver.storage');
+goog.require('treesaver.ui.toc');
 goog.require('treesaver.ui.Article');
 
 /**
@@ -334,9 +335,15 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
 
   var container = document.createElement('div'),
       unique_urls = [],
-      foundTOC = false;
+      foundTOC = false,
+      microdataTOC;
 
   container.innerHTML = html;
+
+  container.style.display = 'none';
+  document.body.appendChild(container);
+  microdataTOC = treesaver.ui.toc.getToc();
+  document.body.removeChild(container);
 
   treesaver.dom.getElementsByProperty('rev', 'contents', 'a', container).forEach(function(node) {
     var url,
