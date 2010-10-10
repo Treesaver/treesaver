@@ -114,6 +114,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageNum = treesaver.dom.getElementsByClassName('pagenumber', this.node);
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
+    this.articleURL = treesaver.dom.getElementsByClassName('article-url', this.node);
 
     this.pages = [];
 
@@ -151,6 +152,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageNum = null;
   this.pageCount = null;
   this.pageWidth = null;
+  this.articleURL = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -180,6 +182,7 @@ treesaver.ui.Chrome.events = {
 treesaver.ui.Chrome.watchedEvents = [
   treesaver.ui.ArticleManager.events.TOCUPDATED,
   treesaver.ui.ArticleManager.events.PAGESCHANGED,
+  treesaver.ui.ArticleManager.events.ARTICLECHANGED,
   treesaver.ui.input.events.KEYDOWN,
   treesaver.ui.input.events.CLICK,
   treesaver.ui.input.events.MOUSEWHEEL,
@@ -211,6 +214,9 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     // fetch them again
     // Article changed and TOC changed will affect nav indicators
     return this.selectPagesDelayed();
+
+  case treesaver.ui.ArticleManager.events.ARTICLECHANGED:
+    return this.updatePageURL(e);
 
   case treesaver.ui.input.events.ACTIVE:
     return this.uiActive();
@@ -535,6 +541,21 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
 
   // Re-query for pages later
   this.selectPagesDelayed();
+};
+
+/**
+ * Update any URL bindings to the active article in the Chrome.
+ * @private
+ * @param {!Object} e The article changed event.
+ */
+treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
+  this.articleURL.forEach(function(el) {
+    treesaver.template.expand({
+        'article-url': e.url
+      }, {
+        'article-url': 'href'
+      }, el);
+  });
 };
 
 /**
