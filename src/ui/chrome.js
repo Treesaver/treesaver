@@ -10,6 +10,7 @@ goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
+goog.require('treesaver.template');
 goog.require('treesaver.ui.input');
 goog.require('treesaver.ui.ArticleManager');
 
@@ -543,7 +544,9 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
  */
 treesaver.ui.Chrome.prototype.updatePageIndex = function(index) {
   this.pageNum.forEach(function(el) {
-    el.firstChild.nodeValue = index;
+    treesaver.template.expand({
+        pagenumber: index
+      }, {}, el);
   });
 };
 
@@ -554,7 +557,9 @@ treesaver.ui.Chrome.prototype.updatePageIndex = function(index) {
  */
 treesaver.ui.Chrome.prototype.updatePageCount = function(count) {
   this.pageCount.forEach(function(el) {
-    el.firstChild.nodeValue = count;
+    treesaver.template.expand({
+      pagecount: count
+    }, {}, el);
   });
 };
 
