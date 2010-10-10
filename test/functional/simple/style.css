@@ -150,6 +150,23 @@ p[itemprop=abstract] {
   margin-top: 0;
 }
 
+p.caption {
+  font-family: Sans-serif;
+  color: #667;
+  margin: 0;
+  font-size: 12px;
+}
+
+.image-preview {
+  border: 1px dotted #ccc;
+  padding: 5px;
+}
+
+.image-preview img {
+  float: left;
+  margin: 0 5px 0 0;
+}
+
 .loading, .error {
   position: absolute;
   width: 200px;
