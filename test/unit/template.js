@@ -82,11 +82,11 @@ $(function() {
     treesaver.template.expand(view, {url: 'href'}, div);
     equals(div.innerHTML, '<a href="http://www.example.org" class="url">some link</a>');
 
-    div.innerHTML = '<a class="url" href="http://www.twitter.com/?status={{url}}">Tweet this</a>';
+    div.innerHTML = '<a class="url" data-href="http://www.twitter.com/?status={{url}}">Tweet this</a>';
     view = { url: 'http://www.example.org' };
     treesaver.template.expand(view, { url: 'href'}, div);
 
-    equals(div.innerHTML, '<a class="url" href="http://www.twitter.com/?status=http%3A%2F%2Fwww.example.org">Tweet this</a>');
+    equals(div.innerHTML, '<a href="http://www.twitter.com/?status=http%3A%2F%2Fwww.example.org" class="url" data-href="http://www.twitter.com/?status={{url}}">Tweet this</a>');
   });
 
   test('multiple class names', function() {

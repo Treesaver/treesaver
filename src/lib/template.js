@@ -40,7 +40,7 @@ treesaver.template.expandObject_ = function(view, mappings, scope) {
       matches = {};
 
   keys.forEach(function(key) {
-    var elements = [];
+    var elements = [], text;
 
     if (matches[key]) {
       return;
@@ -97,11 +97,9 @@ treesaver.template.expandObject_ = function(view, mappings, scope) {
           );
         }
       } else {
-        var text;
-
         // If we have a custom mapping from class name to attribute
         if (mappings[key]) {
-          text = e.getAttribute(mappings[key]);
+          text = (treesaver.template.escapeURL_[mappings[key]] ? decodeURI(e.getAttribute('data-' + mappings[key])) : e.getAttribute(mappings[key]));
         } else {
           text = e.innerHTML;
         }
@@ -126,6 +124,7 @@ treesaver.template.expandObject_ = function(view, mappings, scope) {
         } else {
           text = treesaver.template.escape_(view[key], true, mappings[key]);
         }
+
         if (mappings[key]) {
           e.setAttribute(mappings[key], text);
         } else {
