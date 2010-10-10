@@ -36,6 +36,12 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   this.optional = !treesaver.dom.hasClass(el, 'required');
 
   /**
+   * Does the figure support zooming/lightboxing?.
+   * @type {boolean}
+   */
+  this.zoomable = treesaver.dom.hasClass(el, 'zoomable');
+
+  /**
    * Temporarily holds any content templates
    * @private
    * @type {Array.<string>}

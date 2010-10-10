@@ -40,6 +40,9 @@ $(function () {
     // First, make sure that the indices were updated
     equals(indices.figureIndex, 1, 'figureIndex incremented');
     equals(indices.index, 1, 'Index incremented');
+    // Check flags
+    ok(!figure.zoomable, 'Zoomable flag');
+    ok(figure.optional, 'Optional flag');
     // Check for our size payload
     ok(figure.sizes['one'], 'Size extraction one');
     equals(escapeHTML(figure.sizes['one'][0].html), escapeHTML('<p>Size one</p>'), 'Size extraction one: HTML');
@@ -51,6 +54,8 @@ $(function () {
     // sizes and a fallback
     figureNode = $('.column figure.figuretest')[0];
     figure = new treesaver.layout.Figure(figureNode, 20, indices);
+    ok(figure.zoomable, 'Zoomable flag');
+    ok(!figure.optional, 'Optional flag');
     equals(indices.figureIndex, 2, 'figureIndex incremented');
     equals(indices.index, 4, 'Index incremented three times when fallback has two children');
     if (!treesaver.capabilities.IS_LEGACY) {
