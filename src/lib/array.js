@@ -21,8 +21,8 @@ if (!Array.isArray) {
   /**
    * Test Array-ness.
    *
-   * @param {*} value Test if value is an array.
-   * @return {boolean} True if the given value is an array, false otherwise.
+   * @param {!Object} value Test if value is an array.
+   * @return {!boolean} True if the given value is an array, false otherwise.
    */
   Array.isArray = function(value) {
     return Object.prototype.toString.apply(value) === '[object Array]';
