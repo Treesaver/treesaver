@@ -44,7 +44,7 @@ article {
   line-height: 20px;
 }
 
-.chrome, .viewer {
+.chrome, .viewer, .lightbox {
   position: absolute;
   top: 0;
   left: 0;
@@ -85,6 +85,18 @@ article {
   bottom: 20px;
   left: 20px;
   width: 300px;
+}
+
+.lightbox {
+  background: #666;
+  background: rgba(0, 0, 0, .5);
+}
+
+.lightbox .container {
+  border: 20px solid #fff;
+  background: #fff;
+  width: auto;
+  right: 20px;
 }
 
 .container.cols-2 {
