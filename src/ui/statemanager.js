@@ -67,7 +67,11 @@ treesaver.ui.StateManager.load = function() {
   }
 
   // Hide the address bar on iPhone
-  treesaver.scheduler.queue(window.scrollTo, [0, 1]);
+  treesaver.scheduler.queue(function() {
+    // IE's window.scrollTo is some kind of weird function without an apply()
+    // so we have to wrap this call within a wrapper to avoid nasty errors
+    window.scrollTo(0, 1);
+  });
 
   return true;
 };
@@ -213,7 +217,7 @@ treesaver.ui.StateManager.getAvailableSize_ = function() {
   }
 
   // IE9+ and all other browsers
-  if (SUPPORT_IE || 'innerWidth' in window) {
+  if (!SUPPORT_IE || 'innerWidth' in window) {
     return {
       w: window.innerWidth,
       h: window.innerHeight
