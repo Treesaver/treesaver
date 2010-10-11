@@ -415,7 +415,10 @@ treesaver.layout.Figure.templateRegex = new RegExp("{{([^}]+)}}", 'g');
 treesaver.layout.Figure.applyTemplate = function applyTemplate(template, values) {
   // Replace {{ name }} with appropriate value (or blank if not found)
   return template.replace(treesaver.layout.Figure.templateRegex, function () {
-    return values[arguments[1].toLowerCase().trim()] || '';
+    var name = arguments[1].trim();
+
+    // Protect against case-sensitivity errors
+    return values[name] || values[name.toLowerCase()] || '';
   });
 };
 
