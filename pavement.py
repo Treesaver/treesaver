@@ -77,8 +77,6 @@ def default(args = []):
     js_files = options.src_dir.files('*.js')
 
     output_mode = 'deps'
-    if '--list' in args:
-        output_mode = 'list'
 
     sh('python %s -i %s -p % s -d %s -o %s --output_file %s' % (
         options.calcdeps,
@@ -88,6 +86,28 @@ def default(args = []):
         output_mode,
         options.test_dir / 'deps.js'
     ))
+
+@task
+@consume_args
+def debug(args):
+    """Create debug versions for testing"""
+    output_mode = 'script'
+
+    for jsfile in options.src_dir.files('*.js'):
+        outfile = options.build_dir / jsfile.basename()
+        js = sh('python %s -i %s -p % s -p %s -o %s --output_file %s' % (
+            options.calcdeps,
+            jsfile,
+            options.src_dir,
+            options.closure_library_dir,
+            output_mode,
+            outfile
+        ), capture=True)
+
+        # Need to modify the output in order to set COMPILED to true, since
+        # this normally happens via the compiler
+        contents = outfile.text().replace('COMPILED = false', 'COMPILED = true', 1)
+        outfile.write_text(contents)
 
 @task
 def lint():
@@ -176,12 +196,9 @@ def compile(args):
         compiler_flags.append('--debug=true')
         compiler_flags.append('--formatting=PRETTY_PRINT')
         compiler_flags.append('--formatting=PRINT_INPUT_DELIMITER')
-    elif '--pretty' in args:
-        compiler_flags[0] = '--compilation_level=WHITESPACE_ONLY'
-        compiler_flags.append('--formatting=PRETTY_PRINT')
-        compiler_flags.append('--formatting=PRINT_INPUT_DELIMITER')
     else:
         # Let code know modules are not being used
+        # Not sure why this doesn't happen by default
         compiler_flags.append('--define="goog.DEBUG=false"')
 
     # Externs definitions
