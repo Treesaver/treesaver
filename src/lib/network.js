@@ -70,9 +70,12 @@ treesaver.network.load = function() {
     treesaver.network.watchedEvents_.forEach(function (evt) {
       treesaver.events.addListener(document, evt, treesaver.network);
     });
-    treesaver.network.watchedCacheEvents_.forEach(function (evt) {
-      treesaver.events.addListener(window.applicationCache, evt, treesaver.network);
-    });
+
+    if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE) {
+      treesaver.network.watchedCacheEvents_.forEach(function (evt) {
+        treesaver.events.addListener(window.applicationCache, evt, treesaver.network);
+      });
+    }
   }
 };
 

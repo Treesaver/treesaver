@@ -124,6 +124,13 @@ treesaver.scheduler.addTask_ =
       // Re-use previous task if it exists
       task = name ? treesaver.scheduler.namedTasks_[name] : null;
 
+  if (goog.DEBUG) {
+    if (!fun.apply) {
+      treesaver.debug.error('Function without apply() not added to the scheduler');
+      return;
+    }
+  }
+
   if (!task) {
     // Create a new task object
     task = {
