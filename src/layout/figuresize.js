@@ -60,9 +60,13 @@ treesaver.layout.FigureSize.prototype.meetsRequirements = function() {
 /**
  * Apply the figure size to the element
  * @param {!Element} container
+ * @param {string=} name
  */
 treesaver.layout.FigureSize.prototype.applySize = function(container, name) {
-  treesaver.dom.addClass(container, name);
+  if (name) {
+    treesaver.dom.addClass(container, name);
+  }
+
   // Will we ever do something more complex here?
   container.innerHTML = this.html;
 };

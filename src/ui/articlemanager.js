@@ -764,6 +764,25 @@ treesaver.ui.ArticleManager.getCurrentTransitionDirection = function() {
 };
 
 /**
+ * Get the figure that corresponds to the given element in the current
+ * article
+ *
+ * @param {!Element} el
+ * @return {?treesaver.layout.Figure}
+ */
+treesaver.ui.ArticleManager.getFigure = function(el) {
+  var figureIndex = parseInt(el.getAttribute('data-figureindex'), 10);
+
+  if (isNaN(figureIndex)) {
+    return null;
+  }
+
+  // TODO: Refactor this
+  return treesaver.ui.ArticleManager.currentArticle.content.figures[figureIndex];
+};
+
+
+/**
  * @private
  * @param {!string} url
  * @param {boolean=} fwd

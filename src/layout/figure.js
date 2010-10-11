@@ -239,6 +239,47 @@ treesaver.layout.Figure.prototype.getSize = function(size) {
 };
 
 /**
+ * Retrieve the largest figureSize that fits within the allotted space
+ *
+ * @param {!treesaver.dimensions.Size} maxSize
+ * @return {?{name: string, figureSize: treesaver.layout.FigureSize}} Null if none fit
+ */
+treesaver.layout.Figure.prototype.getLargestSize = function(maxSize) {
+  var maxW = -Infinity,
+      maxH = -Infinity,
+      max,
+      current;
+
+  for (current in this.sizes) {
+    this.sizes[current].forEach(function (figureSize) {
+      if (!figureSize.meetsRequirements()) {
+        // Not eligible
+        return;
+      }
+
+      if ((figureSize.minW && figureSize.minW > maxSize.w) ||
+          (figureSize.minH && figureSize.minH > maxSize.h)) {
+        // Too big
+        return;
+      }
+
+      // TODO: How to estimate dimensions when no info is provided?
+      if ((!figureSize.minW || figureSize.minW >= maxW) &&
+          (!figureSize.minH || figureSize.minH >= maxH)) {
+        maxW = figureSize.minW;
+        maxH = figureSize.minH;
+        max = {
+          name: current,
+          figureSize: figureSize
+        };
+      }
+    });
+  }
+
+  return max;
+};
+
+/**
  * @param {!Array.<string>} sizes
  * @param {!string} html
  * @param {number} minW
@@ -282,8 +323,8 @@ treesaver.layout.Figure.prototype.processScriptTemplate = function processScript
 treesaver.layout.Figure.prototype.processCloaked = function processCloaked(el) {
   var sizes = el.getAttribute('data-sizes').split(' '),
       html = (el.innerText || el.textContent || el.innerHTML).trim(),
-      minW = parseInt(el.getAttribute('data-minWidth'), 10),
-      minH = parseInt(el.getAttribute('data-minHeight'), 10),
+      minW = parseInt(el.getAttribute('data-minwidth'), 10),
+      minH = parseInt(el.getAttribute('data-minheight'), 10),
       requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
         el.getAttribute('data-requires').split(' ') : null;
 
@@ -302,8 +343,8 @@ treesaver.layout.Figure.prototype.processCloaked = function processCloaked(el) {
  */
 treesaver.layout.Figure.prototype.processElement = function processElement(el) {
   var sizes = el.getAttribute('data-sizes'),
-      minW = parseInt(el.getAttribute('data-minWidth'), 10),
-      minH = parseInt(el.getAttribute('data-minHeight'), 10),
+      minW = parseInt(el.getAttribute('data-minwidth'), 10),
+      minH = parseInt(el.getAttribute('data-minheight'), 10),
       requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
         el.getAttribute('data-requires').split(' ') : null,
       html;

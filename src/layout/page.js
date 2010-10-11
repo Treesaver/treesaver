@@ -82,6 +82,7 @@ treesaver.layout.Page = function(content, grids, br) {
 
         // Need to store some extra data when supporting zoom
         if (figure.zoomable) {
+          treesaver.dom.addClass(containerNode, 'zoomable');
           containerNode.setAttribute('data-figureindex', figureIndex);
         }
 

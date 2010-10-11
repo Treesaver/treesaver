@@ -98,6 +98,16 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Array.<treesaver.layout.Page>}
    */
   this.pages = null;
+
+  /**
+   * @type {boolean}
+   */
+  this.lightBoxActive = false;
+
+  /**
+   * @type {?treesaver.ui.LightBox}
+   */
+  this.lightBox = null;
 }
 
 /**
@@ -246,6 +256,13 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
  * @return {boolean} False if event is handled
  */
 treesaver.ui.Chrome.prototype.keyDown = function(e) {
+  // Lightbox active? Hide it
+  if (this.lightBoxActive) {
+    this.hideLightBox();
+    e.preventDefault();
+    return false;
+  }
+
   // Don't override keyboard commands
   if (!e.specialKey) {
     switch (e.key) {
@@ -284,6 +301,13 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.click = function(e) {
+  // Lightbox active? Hide it
+  if (this.lightBoxActive) {
+    this.hideLightBox();
+    e.preventDefault();
+    return false;
+  }
+
   // No real target, leave the event alone
   if (e.el === document.body || e.el === document.documentElement) {
     return;
@@ -292,6 +316,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   var el = e.el,
       url,
       id,
+      parent,
       handled = false;
 
   // Go up the tree and see if there's anything we want to process
@@ -319,9 +344,20 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 
       handled = true;
     }
-    else if ('href' in el) {
+    else if (treesaver.dom.hasClass(el, 'zoomable')) {
+      // Might count as handling the event
+      handled = this.showLightBox(el);
+    }
+    else if (el.href) {
       // TODO: What if it's not in the current page?
       // check element.contains on current page ...
+
+      // TODO: Check for target=lightbox, or something similar?
+      if (el.getAttribute('target') === 'lightbox') {
+        // Skip this element and process the parent zoomable
+        el = el.parentNode;
+        continue;
+      }
 
       url = treesaver.network.absoluteURL(el.href);
       if (!treesaver.ui.ArticleManager.goToArticleByURL(url)) {
@@ -348,6 +384,13 @@ treesaver.ui.Chrome.prototype.click = function(e) {
  * @param {Object} e
  */
 treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
+  // Lightbox active? Hide it
+  if (this.lightBoxActive) {
+    this.hideLightBox();
+    e.preventDefault();
+    return false;
+  }
+
   if (e.delta) {
     if (e.delta > 0) {
       treesaver.ui.ArticleManager.previousPage();
@@ -366,6 +409,13 @@ treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.mouseDown = function(e) {
+  // Lightbox active? Hide it
+  if (this.lightBoxActive) {
+    this.hideLightBox();
+    e.preventDefault();
+    return false;
+  }
+
   // Only support swipe when we're not swiping on a link, or other element
   // that might have some action associated with it
   // TODO: What???
@@ -480,6 +530,46 @@ treesaver.ui.Chrome.prototype.uiActive = function() {
  */
 treesaver.ui.Chrome.prototype.uiIdle = function() {
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
+};
+
+/**
+ * Show lightbox
+ *
+ * @private
+ * @param {!Element} el
+ * @return {boolean} True if content can be shown
+ */
+treesaver.ui.Chrome.prototype.showLightBox = function(el) {
+  var figure = treesaver.ui.ArticleManager.getFigure(el);
+
+  if (!figure) {
+    return false;
+  }
+
+  if (!this.lightBoxActive) {
+    this.lightBoxActive = true;
+    this.lightBox = treesaver.ui.StateManager.getLightBox();
+    this.lightBox.activate();
+    document.body.appendChild(this.lightBox.node);
+  }
+
+  this.lightBox.showFigure(figure);
+
+  return true;
+};
+
+/**
+ * Dismiss lightbox
+ *
+ * @private
+ */
+treesaver.ui.Chrome.prototype.hideLightBox = function() {
+  if (this.lightBoxActive) {
+    this.lightBoxActive = false;
+    document.body.removeChild(this.lightBox.node);
+    this.lightBox.deactivate();
+    this.lightBox = null;
+  }
 };
 
 /**

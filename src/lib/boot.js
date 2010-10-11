@@ -53,7 +53,13 @@ treesaver.boot.load = function() {
     if (!COMPILED) {
       var gr = goog.require;
 
-      gr('treesaver.ui');
+      // Wrap in a try-catch in order to avoid errors
+      try {
+        gr('treesaver.ui');
+      }
+      catch (ex) {
+        // Ignore
+      }
     }
 
     treesaver.scriptloader.load('ui.js', function (name) {

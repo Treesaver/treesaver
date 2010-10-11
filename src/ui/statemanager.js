@@ -10,6 +10,7 @@ goog.require('treesaver.dom');
 goog.require('treesaver.events');
 goog.require('treesaver.resources');
 goog.require('treesaver.ui.Chrome');
+goog.require('treesaver.ui.LightBox');
 
 /**
  * Current state
@@ -44,8 +45,9 @@ treesaver.ui.StateManager.load = function() {
   // Get or install the viewport
   treesaver.ui.StateManager.state_.viewport = treesaver.ui.StateManager.getViewport_();
 
-  // Get the chromes
+  // Get the chromes and lightboxes
   treesaver.ui.StateManager.chromes_ = treesaver.ui.StateManager.getChromes_();
+  treesaver.ui.StateManager.lightboxes_ = treesaver.ui.StateManager.getLightBoxes_();
 
   // Can't do anything without mah chrome
   if (!treesaver.ui.StateManager.chromes_.length) {
@@ -79,6 +81,7 @@ treesaver.ui.StateManager.unload = function() {
   // Lose references
   treesaver.ui.StateManager.state_ = null;
   treesaver.ui.StateManager.chromes_ = null;
+  treesaver.ui.StateManager.lightboxes_ = null;
 };
 
 /**
@@ -134,6 +137,33 @@ treesaver.ui.StateManager.getChromes_ = function() {
   });
 
   return chromes;
+};
+
+/**
+ * @private
+ * @return {!Array.<treesaver.ui.LightBox>}
+ */
+treesaver.ui.StateManager.getLightBoxes_ = function() {
+  var lightboxes = [];
+
+  treesaver.resources.findByClassName('lightbox').forEach(function (node) {
+    var lightbox,
+        requires = node.getAttribute('data-requires');
+
+    if (requires && !treesaver.capabilities.check(requires.split(' '))) {
+      // Doesn't meet our requirements, skip
+      return;
+    }
+
+    treesaver.ui.StateManager.state_.chromeContainer.appendChild(node);
+
+    lightbox = new treesaver.ui.LightBox(node);
+    lightboxes.push(lightbox);
+
+    treesaver.ui.StateManager.state_.chromeContainer.removeChild(node);
+  });
+
+  return lightboxes;
 };
 
 /**
@@ -196,6 +226,17 @@ treesaver.ui.StateManager.getAvailableSize_ = function() {
       h: document.documentElement.clientHeight
     };
   }
+};
+
+/**
+ * Get a lightbox for display
+ *
+ * @return {?treesaver.ui.LightBox}
+ */
+treesaver.ui.StateManager.getLightBox = function() {
+  var availSize = treesaver.ui.StateManager.getAvailableSize_();
+
+  return treesaver.ui.LightBox.select(treesaver.ui.StateManager.lightboxes_, availSize);
 };
 
 /**
