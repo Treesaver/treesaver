@@ -100,6 +100,12 @@ treesaver.ui.Chrome = function(node) {
   this.pages = null;
 
   /**
+   * Cached references to the menu TOC
+   * @type {?Element}
+   */
+  this.menu = null;
+
+  /**
    * @type {boolean}
    */
   this.lightBoxActive = false;
@@ -114,6 +120,10 @@ treesaver.ui.Chrome = function(node) {
  * @return {!Element} The activated node
  */
 treesaver.ui.Chrome.prototype.activate = function() {
+  var toc = [],
+      tocTemplates = [],
+      menus = [];
+
   if (!this.active) {
     this.active = true;
 
@@ -123,6 +133,11 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageNum = treesaver.dom.getElementsByClassName('pagenumber', this.node);
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
+
+    menus = treesaver.dom.getElementsByClassName('menu', this.node);
+    if (menus.length > 0) {
+      this.menu = menus[0];
+    }
 
     this.pages = [];
 
@@ -160,6 +175,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageNum = null;
   this.pageCount = null;
   this.pageWidth = null;
+  this.menu = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -225,6 +241,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     return this.uiActive();
 
   case treesaver.ui.input.events.IDLE:
+    this.menuInactive();
     return this.uiIdle();
 
   case treesaver.ui.input.events.KEYDOWN:
@@ -317,7 +334,8 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       url,
       id,
       parent,
-      handled = false;
+      handled = false,
+      menuActivated = false;
 
   // Go up the tree and see if there's anything we want to process
   while (!handled && el !== document.body) {
@@ -351,6 +369,18 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       // Counts as handling the event only if showing is successful
       handled = this.showLightBox(el);
     }
+    else if (treesaver.dom.hasClass(el, 'menu')) {
+      if (this.menu === el) {
+        if (this.isMenuActive()) {
+          this.menuInactive();
+        }
+        else {
+          this.menuActive();
+          menuActivated = true;
+        }
+        handled = true;
+      }
+    }
     else if (el.href) {
       // TODO: What if it's not in the current page?
       // check element.contains on current page ...
@@ -375,6 +405,10 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     }
 
     el = el.parentNode;
+  }
+
+  if (!menuActivated && this.isMenuActive()) {
+    this.menuInactive();
   }
 
   if (handled) {
@@ -538,6 +572,28 @@ treesaver.ui.Chrome.prototype.uiIdle = function() {
 };
 
 /**
+ * Show menu
+ */
+treesaver.ui.Chrome.prototype.menuActive = function() {
+  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'menu-active');
+};
+
+/**
+ * Hide menu
+ */
+treesaver.ui.Chrome.prototype.menuInactive = function() {
+  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'menu-active');
+};
+
+/**
+ * Returns the current state of the menu.
+ */
+treesaver.ui.Chrome.prototype.isMenuActive = function() {
+  return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'menu-active');
+};
+
+/**
+ * Show sidebars
  * Show lightbox
  *
  * @private
