@@ -3,6 +3,7 @@ goog.require('treesaver.template');
 $(function() {
   module('template');
 
+  // FIXME: Some of these unit tests are failing in some browsers because they do not serialize HTML in the same way using Element.innerHTML.
   test('class to innerHTML', function() {
     var div = document.createElement('div'),
         view = {};
