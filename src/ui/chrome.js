@@ -207,12 +207,15 @@ treesaver.ui.Chrome.optInMouseEvents_ = [
  */
 treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
   switch (e.type) {
+  // Both these events mean that the pages we are displaying
+  // (or trying to display) may have changed. Make sure to
+  // fetch them again
+  // Article changed and TOC changed will affect nav indicators
   case treesaver.ui.ArticleManager.events.PAGESCHANGED:
+    return this.selectPagesDelayed();
+
   case treesaver.ui.ArticleManager.events.TOCUPDATED:
-    // Both these events mean that the pages we are displaying
-    // (or trying to display) may have changed. Make sure to
-    // fetch them again
-    // Article changed and TOC changed will affect nav indicators
+    var toc = treesaver.ui.ArticleManager.getCurrentTOC();
     return this.selectPagesDelayed();
 
   case treesaver.ui.ArticleManager.events.ARTICLECHANGED:
