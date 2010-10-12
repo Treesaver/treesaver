@@ -120,7 +120,7 @@ treesaver.ui.Chrome = function(node) {
    * Cached reference to article url DOM
    * @type {?Array.<Element>}
    */
-  this.articleURL = null;
+  this.currentURL = null;
 }
 
 /**
@@ -140,7 +140,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageNum = treesaver.dom.getElementsByClassName('pagenumber', this.node);
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
-    this.articleURL = treesaver.dom.getElementsByClassName('article-url', this.node);
+    this.currentURL = treesaver.dom.getElementsByClassName('current-url', this.node);
 
     menus = treesaver.dom.getElementsByClassName('menu', this.node);
     if (menus.length > 0) {
@@ -184,7 +184,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageCount = null;
   this.pageWidth = null;
   this.menu = null;
-  this.articleURL = null;
+  this.currentURL = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -724,11 +724,11 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
  * @param {!Object} e The article changed event.
  */
 treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
-  this.articleURL.forEach(function(el) {
+  this.currentURL.forEach(function(el) {
     treesaver.template.expand({
-        'article-url': e.url
+        'current-url': e.url
       }, {
-        'article-url': 'href'
+        'current-url': 'href'
       }, el);
   });
 };
