@@ -255,6 +255,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     return this.selectPagesDelayed();
 
   case treesaver.ui.ArticleManager.events.ARTICLECHANGED:
+    this.updateTOCActive(e);
     return this.updatePageURL(e);
 
   case treesaver.ui.input.events.ACTIVE:
@@ -597,6 +598,21 @@ treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
   });
 };
 
+treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
+  var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
+      tocElements = treesaver.array.toArray(this.toc.childNodes);
+
+  if (tocEntries.length === tocElements.length) {
+    tocEntries.forEach(function(entry, index) {
+      if (entry.url === e.url) {
+        treesaver.dom.addClass(tocElements[index], 'toc-active');
+      } else {
+        treesaver.dom.removeClass(tocElements[index], 'toc-active');
+      }
+    });
+  }
+};
+
 /**
  * Update the text of elements bound to the current page index
  * @private
@@ -695,6 +711,14 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
 
     this.toc.appendChild(el);
   }, this);
+
+  // Update the TOC active item. We do this explicitly here
+  // because we receive the article changed event (which is
+  // normally used to update the active TOC) before the TOC
+  // changed event.
+  this.updateTOCActive({
+    url: treesaver.ui.ArticleManager.currentArticle.url
+  });
 };
 
 /**

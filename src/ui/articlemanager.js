@@ -350,6 +350,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     // such as '/' and '/index.html'
     if (item.hasOwnProperty('self')) {
       url = toc_url;
+      item.url = toc_url;
       foundTOC = true;
     }
     else {
