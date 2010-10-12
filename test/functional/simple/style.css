@@ -29,6 +29,41 @@ body {
   -webkit-transition: opacity .25s linear;
 }
 
+.menu {
+  display: inline;
+  text-align: left;
+}
+
+.menu ul {
+  display: none;
+  position: absolute;
+  bottom: 35px;
+  right: 0;
+  background: #445;
+  border: 1px solid #334;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.menu ul a {
+  color: white;
+  border: 1px solid transparent;
+  border-bottom: 1px solid #334;
+  width: 10em;
+  padding: 0.2em 1em;
+  display: block;
+}
+
+.menu ul a:hover {
+  border: 1px solid white;
+  text-decoration: none;
+}
+
+.menu-active .menu ul {
+  display: inline-block;
+}
+
 .sidebar {
   opacity: 0;
   position: absolute:
