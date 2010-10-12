@@ -16,7 +16,9 @@ if (!Object.keys) {
     }
     return result;
   };
+}
 
+if (!Object.isObject) {
   /**
    * Test whether or not a value is an object.
    *
