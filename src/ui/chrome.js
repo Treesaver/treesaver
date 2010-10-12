@@ -108,12 +108,19 @@ treesaver.ui.Chrome = function(node) {
    * @type {?treesaver.ui.LightBox}
    */
   this.lightBox = null;
+
+  /**
+   * @type {!Element}
+   */
+  this.sidebar = null;
 }
 
 /**
  * @return {!Element} The activated node
  */
 treesaver.ui.Chrome.prototype.activate = function() {
+  var sidebars = [];
+
   if (!this.active) {
     this.active = true;
 
@@ -123,6 +130,11 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageNum = treesaver.dom.getElementsByClassName('pagenumber', this.node);
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
+    sidebars = treesaver.dom.getElementsByClassName('sidebar', this.node);
+
+    if (sidebars.length > 0) {
+      this.sidebar = sidebars[0];
+    }
 
     this.pages = [];
 
@@ -160,6 +172,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageNum = null;
   this.pageCount = null;
   this.pageWidth = null;
+  this.sidebar = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -317,6 +330,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       url,
       id,
       parent,
+      sidebarActivated = false,
       handled = false;
 
   // Go up the tree and see if there's anything we want to process
@@ -351,6 +365,21 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       // Counts as handling the event only if showing is successful
       handled = this.showLightBox(el);
     }
+    else if (treesaver.dom.hasClass(el, 'sidebar')) {
+      if (this.sidebar === el) {
+        if (!this.isSidebarActive()) {
+          this.sidebarActive();
+          sidebarActivated = true;
+        }
+        handled = true;
+      }
+    }
+    else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
+      if (this.isSidebarActive()) {
+        this.sidebarInactive();
+        handled = true;
+      }
+    }
     else if (el.href) {
       // TODO: What if it's not in the current page?
       // check element.contains on current page ...
@@ -375,6 +404,10 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     }
 
     el = el.parentNode;
+  }
+
+  if (!sidebarActivated && this.isSidebarActive() && !handled) {
+    this.sidebarInactive();
   }
 
   if (handled) {
@@ -536,6 +569,30 @@ treesaver.ui.Chrome.prototype.uiActive = function() {
 treesaver.ui.Chrome.prototype.uiIdle = function() {
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
 };
+
+/**
+ * Show sidebar
+ */
+treesaver.ui.Chrome.prototype.sidebarActive = function() {
+  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+};
+
+/**
+ * Hide sidebar
+ */
+treesaver.ui.Chrome.prototype.sidebarInactive = function() {
+  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+};
+
+/**
+ * Determines whether or not the sidebar is active.
+ *
+ * @return {boolean} true if the sidebar is active, false otherwise.
+ */
+treesaver.ui.Chrome.prototype.isSidebarActive = function() {
+  return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+};
+
 
 /**
  * Show lightbox
