@@ -605,9 +605,9 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
   if (tocEntries.length === tocElements.length) {
     tocEntries.forEach(function(entry, index) {
       if (entry.url === e.url) {
-        treesaver.dom.addClass(tocElements[index], 'toc-active');
+        treesaver.dom.addClass(tocElements[index], 'current');
       } else {
-        treesaver.dom.removeClass(tocElements[index], 'toc-active');
+        treesaver.dom.removeClass(tocElements[index], 'current');
       }
     });
   }
