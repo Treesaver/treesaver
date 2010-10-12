@@ -351,7 +351,7 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
           };
 
           // Mark the figure as used
-          br.useFigure(figureIndex);
+          br.useFigure(currentIndex);
 
           // This container is filled, move on to the next container
           break figure_loop;
