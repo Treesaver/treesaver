@@ -187,6 +187,7 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   ////////////
   // HTML
   ////////////
+
   /**
    * HTML for entire element (content and children)
    * @type {!string}
@@ -273,10 +274,24 @@ treesaver.layout.Block.prototype.getNextNonChildBlock = function() {
  */
 treesaver.layout.Block.processChildren =
   function(owner, node, baseLineHeight, indices, isFallback) {
-  var prev, isBlock = owner instanceof treesaver.layout.Block;
+  var prev,
+      isBlock = owner instanceof treesaver.layout.Block,
+      // Is checking 'start' enough here?
+      isList = node.nodeName.toLowerCase() === 'ol' && 'start' in node,
+      listIndex = isList ? node.start : null;
 
   treesaver.array.toArray(node.childNodes).forEach(function(childNode) {
     var child;
+
+    if (isList && childNode.nodeName.toLowerCase() === 'li') {
+      // Zero value is ignored (i.e. you can't have item 0)
+      if (childNode.value) {
+        listIndex = childNode.value;
+      }
+
+      childNode.setAttribute('value', listIndex);
+      listIndex += 1;
+    }
 
     if (treesaver.layout.Figure.isFigure(childNode)) {
       // Want to prevent figures nested within fallbacks (gets confusing)

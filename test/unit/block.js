@@ -261,4 +261,42 @@ $(function () {
 
     // TODO: write tests
   });
+
+  test('list numbering', function () {
+    // Create a temporary dom
+    var $list = $('<ol></ol>').addClass('testonly').appendTo('body'),
+        i, html, block;
+
+    // Add list items
+    for (i = 0; i < 10; i += 1) {
+      $list.append('<li>' + i + '</li>');
+    }
+
+    $list.find('li')[6].setAttribute('value', 10);
+
+    // Sanitize
+    treesaver.layout.Block.sanitizeNode($('.column')[0], 20);
+
+    // Save out the HTML so we can re-use it later
+    listNode = $list[0].cloneNode(true);
+
+    // Process the block
+    block = new treesaver.layout.Block($list[0], 20);
+    $list = $(block.html);
+
+    equals($list[0].childNodes[0].value, 1, 'Standard indexed value');
+    equals($list[0].childNodes[3].value, 4, 'Standard indexed value');
+    equals($list[0].childNodes[6].value, 10, 'Manual value preserved');
+    equals($list[0].childNodes[7].value, 11, 'Correct increment after manual value');
+
+    // Use a new list with a start value
+    $list = $(listNode);
+    $list.attr('start', 10);
+    // Process the block
+    block = new treesaver.layout.Block($list[0], 20);
+    $list = $(block.html);
+
+    equals($list[0].childNodes[0].value, 10, 'Start value used');
+    equals($list[0].childNodes[2].value, 12, 'Start value incremented correctly');
+  });
 });
