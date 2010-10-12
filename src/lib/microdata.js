@@ -245,17 +245,22 @@ if (SUPPORT_MICRODATA) {
       result['id'] = item.itemId;
     }
     item.properties.forEach(function(property) {
-      var value = property.itemValue;
+      var value = property.itemValue,
+          names = [];
 
       // If value is an item (i.e. value has an itemScope attribute)
       if (value.itemScope) {
         value = treesaver.microdata.getObject_(value);
       }
 
-      if (!properties.hasOwnProperty(property.itemProp)) {
-        properties[property.itemProp] = [];
-      }
-      properties[property.itemProp].push(value);
+      names = property.itemProp.split(/\s+/g);
+
+      names.forEach(function(n) {
+        if (!properties.hasOwnProperty(n)) {
+          properties[n] = [];
+        }
+        properties[n].push(value);
+      });
     });
     result['properties'] = properties;
     return result;

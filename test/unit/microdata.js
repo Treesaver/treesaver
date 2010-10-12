@@ -157,14 +157,14 @@ $(function () {
   test('multiple properties from a single itemprop', function () {
     var items = [];
 
-    items = document.getItems('http://www.example.org/ns/#multi-prop');
+    // TODO: We cannot assign multiple properties to the same element because we cannot
+    // use getters and setters. We "fix" this by using the JSON microdata API, which
+    // correctly generates the properties.
+    items = treesaver.microdata.getJSONItems('http://www.example.org/ns/#multi-prop');
 
-    // TODO: figure out what this should do. It is given as an example in the specification,
-    // but shouldn't be supported according to the algorithm in the specification.
     equals(items.length, 1, 'one item returned');
-    equals(items[0].properties.length, 2, 'two properties');
-    equals(items[0].properties[0].itemProp, 'favorite-color', 'fav. color available');
-    equals(items[0].properties[1].itemProp, 'favorite-fruit', 'fav. fruit available');
+    equals(items[0].properties['favorite-color'], 'orange', 'fav. color available');
+    equals(items[0].properties['favorite-fruit'], 'orange', 'fav. fruit available');
   });
 
   test('getJSONItems() simple', function () {
