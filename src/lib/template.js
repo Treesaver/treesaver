@@ -32,7 +32,7 @@ treesaver.template.expand = function(view, mappings, scope) {
  * @param {!Object} mappings An object defining which class
  * names map to attributes. For example: { url: 'href' } would
  * map the 'url' class to the href attribute.
- * @param {!Element} scope The element to use as root for template
+ * @param {!Element|!HTMLDocument} scope The element to use as root for template
  * expansion.
  */
 treesaver.template.expandObject_ = function(view, mappings, scope) {

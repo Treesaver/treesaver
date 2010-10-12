@@ -40,7 +40,7 @@ treesaver.dom.removeClass = function(el, className) {
  * Check if an element has the given class
  * Hat Tip: Dean Edwards http://dean.edwards.name/IE7/caveats/
  *
- * @param {!Element} el
+ * @param {!Element|!HTMLDocument} el
  * @param {!string} className
  * @return {boolean} True if the element has that class.
  */
