@@ -44,7 +44,7 @@ $(function () {
         content = {
       // Doesn't really matter what's in blocks array,
       // as long as something is in there
-      blocks: [0, 1, 2, 3],
+      blocks: [{}, {}, {}, {}],
       // Figures just need to indicate whether they are
       // required
       figures: []
@@ -72,6 +72,17 @@ $(function () {
     // Now use the required figure
     br.useFigure(0);
     ok(br.atEnd(content), 'Blocks done, figures done');
+
+    var new_fig = { optional: true };
+    // Add an optional figure with a fallback at the end
+    content.figures.push(new_fig);
+    content.blocks.push({ isFallback: true, figure: new_fig });
+
+    ok(br.atEnd(content), 'Optional fallback left');
+
+    // Now make it required
+    new_fig.optional = false;
+    ok(!br.atEnd(content), 'Required fallback left');
   });
 
   test('useFigure', function () {

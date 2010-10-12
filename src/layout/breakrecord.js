@@ -104,10 +104,27 @@ treesaver.layout.BreakRecord.prototype.atStart = function() {
  * @return {boolean} True if there is no more content left to show
  */
 treesaver.layout.BreakRecord.prototype.atEnd = function(content) {
-  // If there are still blocks left, then we're definitely not
-  // finished yet
-  if (this.index < content.blocks.length) {
+  if (this.overhang) {
+    // Overhang means we're not finished, no matter what
     return false;
+  }
+
+  var i, len, block;
+
+  // Check if there are any blocks left to layout, not including
+  // fallbacks for optional (or used) figures
+  for (i = this.index, len = content.blocks.length; i < len; i += 1) {
+    block = content.blocks[i];
+
+    if (!block.isFallback) {
+      // We have a non-fallback block left, which means we are not done
+      return false;
+    }
+
+    if (!this.figureUsed(i) && !block.figure.optional) {
+      // Have the unused fallback of a required figure, we are not done
+      return false;
+    }
   }
 
   // No blocks left, check figures
