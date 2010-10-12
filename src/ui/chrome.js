@@ -10,6 +10,7 @@ goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
+goog.require('treesaver.template');
 goog.require('treesaver.ui.input');
 goog.require('treesaver.ui.ArticleManager');
 
@@ -114,6 +115,12 @@ treesaver.ui.Chrome = function(node) {
    * @type {?treesaver.ui.LightBox}
    */
   this.lightBox = null;
+
+  /*
+   * Cached reference to article url DOM
+   * @type {?Array.<Element>}
+   */
+  this.articleURL = null;
 }
 
 /**
@@ -133,6 +140,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageNum = treesaver.dom.getElementsByClassName('pagenumber', this.node);
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
+    this.articleURL = treesaver.dom.getElementsByClassName('article-url', this.node);
 
     menus = treesaver.dom.getElementsByClassName('menu', this.node);
     if (menus.length > 0) {
@@ -176,6 +184,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageCount = null;
   this.pageWidth = null;
   this.menu = null;
+  this.articleURL = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -205,6 +214,7 @@ treesaver.ui.Chrome.events = {
 treesaver.ui.Chrome.watchedEvents = [
   treesaver.ui.ArticleManager.events.TOCUPDATED,
   treesaver.ui.ArticleManager.events.PAGESCHANGED,
+  treesaver.ui.ArticleManager.events.ARTICLECHANGED,
   treesaver.ui.input.events.KEYDOWN,
   treesaver.ui.input.events.CLICK,
   treesaver.ui.input.events.MOUSEWHEEL,
@@ -236,6 +246,9 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     // fetch them again
     // Article changed and TOC changed will affect nav indicators
     return this.selectPagesDelayed();
+
+  case treesaver.ui.ArticleManager.events.ARTICLECHANGED:
+    return this.updatePageURL(e);
 
   case treesaver.ui.input.events.ACTIVE:
     return this.uiActive();
@@ -706,13 +719,30 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
 };
 
 /**
+ * Update any URL bindings to the active article in the Chrome.
+ * @private
+ * @param {!Object} e The article changed event.
+ */
+treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
+  this.articleURL.forEach(function(el) {
+    treesaver.template.expand({
+        'article-url': e.url
+      }, {
+        'article-url': 'href'
+      }, el);
+  });
+};
+
+/**
  * Update the text of elements bound to the current page index
  * @private
  * @param {number} index
  */
 treesaver.ui.Chrome.prototype.updatePageIndex = function(index) {
   this.pageNum.forEach(function(el) {
-    el.firstChild.nodeValue = index;
+    treesaver.template.expand({
+        pagenumber: index
+      }, {}, el);
   });
 };
 
@@ -723,7 +753,9 @@ treesaver.ui.Chrome.prototype.updatePageIndex = function(index) {
  */
 treesaver.ui.Chrome.prototype.updatePageCount = function(count) {
   this.pageCount.forEach(function(el) {
-    el.firstChild.nodeValue = count;
+    treesaver.template.expand({
+      pagecount: count
+    }, {}, el);
   });
 };
 
