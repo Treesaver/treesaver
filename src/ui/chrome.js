@@ -96,6 +96,30 @@ treesaver.ui.Chrome = function(node) {
   this.pageWidth = null;
 
   /**
+   * Cached reference to article url DOM
+   * @type {?Array.<Element>}
+   */
+  this.articleURL = null;
+
+  /**
+   * Cached reference to the sidebar DOM
+   * @type {?Array.<Element>}
+   */
+  this.sidebar = null;
+
+  /**
+   * Cached reference to the TOC DOM
+   * @type {?Element}
+   */
+  this.toc = null;
+
+  /**
+   * Cached reference to the TOC Template DOM
+   * @type {?Element}
+   */
+  this.tocTemplate = null;
+
+  /**
    * @type {?Array.<treesaver.layout.Page>}
    */
   this.pages = null;
@@ -105,6 +129,10 @@ treesaver.ui.Chrome = function(node) {
  * @return {!Element} The activated node
  */
 treesaver.ui.Chrome.prototype.activate = function() {
+  var toc = [],
+      tocTemplates = [],
+      sidebars = [];
+
   if (!this.active) {
     this.active = true;
 
@@ -115,6 +143,20 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
     this.articleURL = treesaver.dom.getElementsByClassName('article-url', this.node);
+    this.sidebar = treesaver.dom.getElementsByClassName('sidebar', this.node);
+
+    toc = treesaver.dom.getElementsByClassName('toc', this.node);
+    // TODO: We might want to do something smarter than just selecting the first
+    // TOC template.
+    if (toc.length === 1) {
+      this.toc = toc[0];
+      tocTemplates = treesaver.dom.getElementsByClassName('template', this.toc);
+      if (tocTemplates.length > 0) {
+        this.tocTemplate = tocTemplates[0];
+      }
+      // Remove anything inside TOC
+      treesaver.dom.clearChildren(this.toc);
+    }
 
     this.pages = [];
 
@@ -153,6 +195,9 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageCount = null;
   this.pageWidth = null;
   this.articleURL = null;
+  this.toc = null;
+  this.tocTemplate = null;
+  this.sidebar = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -215,7 +260,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     return this.selectPagesDelayed();
 
   case treesaver.ui.ArticleManager.events.TOCUPDATED:
-    var toc = treesaver.ui.ArticleManager.getCurrentTOC();
+    this.updateTOCDelayed();
     return this.selectPagesDelayed();
 
   case treesaver.ui.ArticleManager.events.ARTICLECHANGED:
@@ -327,6 +372,15 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     else if (treesaver.dom.hasClass(el, 'nextArticle')) {
       treesaver.ui.ArticleManager.nextArticle();
 
+      handled = true;
+    }
+    else if (treesaver.dom.hasClass(el, 'showSidebar')) {
+      this.showSidebar();
+
+      handled = true;
+    }
+    else if (treesaver.dom.hasClass(el, 'hideSidebar')) {
+      this.hideSidebar();
       handled = true;
     }
     else if ('href' in el) {
@@ -493,6 +547,24 @@ treesaver.ui.Chrome.prototype.uiIdle = function() {
 };
 
 /**
+ * Show sidebars
+ */
+treesaver.ui.Chrome.prototype.showSidebar = function() {
+  this.sidebar.forEach(function(sidebar) {
+    treesaver.dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+  });
+};
+
+/**
+ * Hide sidebars
+ */
+treesaver.ui.Chrome.prototype.hideSidebar = function() {
+  this.sidebar.forEach(function(sidebar) {
+    treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active')
+  });
+};
+
+/**
  * @return {boolean} True if the Chrome meets current browser capabilities
  */
 treesaver.ui.Chrome.prototype.meetsRequirements = function() {
@@ -608,6 +680,14 @@ treesaver.ui.Chrome.prototype.selectPagesDelayed = function() {
 };
 
 /**
+ * Run updateTOC on a delay
+ * @private
+ */
+treesaver.ui.Chrome.prototype.updateTOCDelayed = function() {
+  treesaver.scheduler.queue(this.updateTOC, [], 'updateTOC', this);
+};
+
+/**
  * Manages the page objects needed in order to display content,
  * including DOM insertion
  * @private
@@ -627,6 +707,30 @@ treesaver.ui.Chrome.prototype.selectPages = function() {
 
   // Update our field display in the chrome (page count/index changes)
   this.updateFields();
+};
+
+/**
+ * Manages the TOC.
+ * @private
+ */
+treesaver.ui.Chrome.prototype.updateTOC = function() {
+  // Stop any running TOC updates
+  treesaver.scheduler.clear('updateTOC');
+
+  // clear the current TOC
+  treesaver.dom.clearChildren(this.toc);
+
+  var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC();
+
+  tocEntries.forEach(function(entry) {
+    var el = this.tocTemplate.cloneNode(true);
+
+    treesaver.template.expand(entry, {
+        url: 'href'
+      }, el);
+
+    this.toc.appendChild(el);
+  }, this);
 };
 
 /**
