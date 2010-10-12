@@ -560,7 +560,8 @@ treesaver.ui.Chrome.prototype.showLightBox = function(el) {
 
     this.lightBoxActive = true;
     this.lightBox.activate();
-    document.body.appendChild(this.lightBox.node);
+    // Lightbox is a sibling of the chrome root
+    this.node.parentNode.appendChild(this.lightBox.node);
   }
 
   // Closure compiler cast
@@ -588,7 +589,7 @@ treesaver.ui.Chrome.prototype.showLightBox = function(el) {
 treesaver.ui.Chrome.prototype.hideLightBox = function() {
   if (this.lightBoxActive) {
     this.lightBoxActive = false;
-    document.body.removeChild(this.lightBox.node);
+    this.node.parentNode.removeChild(this.lightBox.node);
     this.lightBox.deactivate();
     this.lightBox = null;
   }
