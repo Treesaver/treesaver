@@ -624,7 +624,7 @@ treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
       article;
 
   if (!index && index !== 0) {
-    return true;
+    return false;
   }
 
   article = treesaver.ui.ArticleManager.articleOrder[index];
