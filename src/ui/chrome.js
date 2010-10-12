@@ -706,7 +706,7 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
     var el = this.tocTemplate.cloneNode(true);
 
     treesaver.template.expand(entry, {
-        url: 'href'
+        'url': 'href'
       }, el);
 
     this.toc.appendChild(el);
