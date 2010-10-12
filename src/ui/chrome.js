@@ -96,28 +96,10 @@ treesaver.ui.Chrome = function(node) {
   this.pageWidth = null;
 
   /**
-   * Cached reference to article url DOM
-   * @type {?Array.<Element>}
-   */
-  this.articleURL = null;
-
-  /**
-   * Cached reference to the sidebar DOM
-   * @type {?Array.<Element>}
-   */
-  this.sidebar = null;
-
-  /**
    * Cached reference to the TOC DOM
    * @type {?Element}
    */
   this.toc = null;
-
-  /**
-   * Cached references to the menu TOC
-   * @type {?Element}
-   */
-  this.menu = null;
 
   /**
    * Cached reference to the TOC Template DOM
@@ -142,9 +124,7 @@ treesaver.ui.Chrome = function(node) {
  */
 treesaver.ui.Chrome.prototype.activate = function() {
   var toc = [],
-      tocTemplates = [],
-      sidebars = [],
-      menus = [];
+      tocTemplates = [];
 
   if (!this.active) {
     this.active = true;
@@ -156,12 +136,6 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
     this.articleURL = treesaver.dom.getElementsByClassName('article-url', this.node);
-    this.sidebar = treesaver.dom.getElementsByClassName('sidebar', this.node);
-
-    menus = treesaver.dom.getElementsByClassName('menu', this.node);
-    if (menus.length > 0) {
-      this.menu = menus[0];
-    }
 
     toc = treesaver.dom.getElementsByClassName('toc', this.node);
     // TODO: We might want to do something smarter than just selecting the first
@@ -215,8 +189,6 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.articleURL = null;
   this.toc = null;
   this.tocTemplate = null;
-  this.sidebar = null;
-  this.menu = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -289,7 +261,6 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     return this.uiActive();
 
   case treesaver.ui.input.events.IDLE:
-    this.menuInactive();
     return this.uiIdle();
 
   case treesaver.ui.input.events.KEYDOWN:
@@ -367,8 +338,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   var el = e.el,
       url,
       id,
-      handled = false,
-      menuActivated = false;
+      handled = false;
 
   // Go up the tree and see if there's anything we want to process
   while (!handled && el !== document.body) {
@@ -395,27 +365,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 
       handled = true;
     }
-    else if (treesaver.dom.hasClass(el, 'showSidebar')) {
-      this.showSidebar();
-
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'hideSidebar')) {
-      this.hideSidebar();
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'menu')) {
-      if (this.menu === el) {
-        if (this.isMenuActive()) {
-          this.menuInactive();
-        }
-        else {
-          this.menuActive();
-          menuActivated = true;
-        }
-        handled = true;
-      }
-    }
     else if ('href' in el) {
       // TODO: What if it's not in the current page?
       // check element.contains on current page ...
@@ -431,10 +380,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     }
 
     el = el.parentNode;
-  }
-
-  if (!menuActivated && this.isMenuActive()) {
-    this.menuInactive();
   }
 
   if (handled) {
@@ -581,45 +526,6 @@ treesaver.ui.Chrome.prototype.uiActive = function() {
  */
 treesaver.ui.Chrome.prototype.uiIdle = function() {
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
-};
-
-/**
- * Show menu
- */
-treesaver.ui.Chrome.prototype.menuActive = function() {
-  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'menu-active');
-};
-
-/**
- * Hide menu
- */
-treesaver.ui.Chrome.prototype.menuInactive = function() {
-  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'menu-active');
-};
-
-/**
- * Returns the current state of the menu.
- */
-treesaver.ui.Chrome.prototype.isMenuActive = function() {
-  return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'menu-active');
-};
-
-/**
- * Show sidebars
- */
-treesaver.ui.Chrome.prototype.showSidebar = function() {
-  this.sidebar.forEach(function(sidebar) {
-    treesaver.dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
-  });
-};
-
-/**
- * Hide sidebars
- */
-treesaver.ui.Chrome.prototype.hideSidebar = function() {
-  this.sidebar.forEach(function(sidebar) {
-    treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active')
-  });
 };
 
 /**
