@@ -99,6 +99,12 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Array.<treesaver.layout.Page>}
    */
   this.pages = null;
+
+  /**
+   * Cached reference to article url DOM
+   * @type {?Array.<Element>}
+   */
+  this.articleURL = null;
 }
 
 /**
