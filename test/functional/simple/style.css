@@ -139,7 +139,7 @@ h2 a:hover {
   text-decoration: underline;
 }
 
-.toc .toc-active {
+.toc .current {
   border: 1px solid red;
 }
 
