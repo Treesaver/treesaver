@@ -741,7 +741,7 @@ treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
 treesaver.ui.Chrome.prototype.updatePageIndex = function(index) {
   this.pageNum.forEach(function(el) {
     treesaver.template.expand({
-        pagenumber: index
+        'pagenumber': index
       }, {}, el);
   });
 };
@@ -754,7 +754,7 @@ treesaver.ui.Chrome.prototype.updatePageIndex = function(index) {
 treesaver.ui.Chrome.prototype.updatePageCount = function(count) {
   this.pageCount.forEach(function(el) {
     treesaver.template.expand({
-      pagecount: count
+      'pagecount': count
     }, {}, el);
   });
 };
