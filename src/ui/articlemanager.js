@@ -345,11 +345,10 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
         article,
         i;
 
-    // rev=self is used by the TOC to indicate its position in the article order
+    // itemprop=self is used by the TOC to indicate its position in the article order
     // make sure to use the TOC url we already computed in order to avoid duplicates
     // such as '/' and '/index.html'
-    // FIXME: implement a better equivalent of rev=self
-    if (item['url toc']) {
+    if (item.hasOwnProperty('self')) {
       url = toc_url;
       foundTOC = true;
     }
