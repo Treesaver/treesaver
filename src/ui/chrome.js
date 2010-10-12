@@ -345,14 +345,19 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       handled = true;
     }
     else if (treesaver.dom.hasClass(el, 'zoomable')) {
-      // Might count as handling the event
+      // TODO: What if it's not in the current page?
+      // check element.contains on current page ...
+
+      // Counts as handling the event only if showing is successful
       handled = this.showLightBox(el);
     }
     else if (el.href) {
       // TODO: What if it's not in the current page?
       // check element.contains on current page ...
 
-      // TODO: Check for target=lightbox, or something similar?
+      // Lightbox-flagged elements are skipped as processing goes up the chain
+      // if a zoomable is found on the way up the tree, it will be handled. If
+      // not, the link is navigated as-is
       if (el.getAttribute('target') === 'lightbox') {
         // Skip this element and process the parent zoomable
         el = el.parentNode;
@@ -547,14 +552,31 @@ treesaver.ui.Chrome.prototype.showLightBox = function(el) {
   }
 
   if (!this.lightBoxActive) {
-    this.lightBoxActive = true;
     this.lightBox = treesaver.ui.StateManager.getLightBox();
+    if (!this.lightBox) {
+      // No lightbox, nothing to show
+      return false;
+    }
+
+    this.lightBoxActive = true;
     this.lightBox.activate();
     document.body.appendChild(this.lightBox.node);
   }
 
-  this.lightBox.showFigure(figure);
+  // Closure compiler cast
+  this.lightBox.node = /** @type {!Element} */ (this.lightBox.node);
 
+  // Cover entire chrome with the lightbox
+  treesaver.dimensions.setCssPx(this.lightBox.node, 'width', this.node.offsetWidth);
+  treesaver.dimensions.setCssPx(this.lightBox.node, 'height', this.node.offsetHeight);
+
+  if (!this.lightBox.showFigure(figure)) {
+    // Showing failed
+    this.hideLightBox();
+    return false;
+  }
+
+  // Successfully showed the figure
   return true;
 };
 

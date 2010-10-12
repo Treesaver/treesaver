@@ -134,6 +134,11 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
     this.container.style.right = 'auto';
     treesaver.dimensions.setCssPx(this.container, 'left', (w - this.container.offsetWidth) / 2);
     treesaver.dimensions.setCssPx(this.container, 'top', (h - this.container.offsetHeight) / 2);
+    // TODO: What if the figure is too large?
+    return true;
+  }
+  else {
+    return false;
   }
 };
 
