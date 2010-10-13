@@ -96,18 +96,6 @@ treesaver.ui.Chrome = function(node) {
   this.pageWidth = null;
 
   /**
-   * Cached reference to article url DOM
-   * @type {?Array.<Element>}
-   */
-  this.articleURL = null;
-
-  /**
-   * Cached reference to the sidebar DOM
-   * @type {?Array.<Element>}
-   */
-  this.sidebar = null;
-
-  /**
    * Cached reference to the TOC DOM
    * @type {?Element}
    */
@@ -154,7 +142,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
   var toc = [],
       tocTemplates = [],
       menus = [],
-      sidebars = [];
+      tocTemplates = [];
 
   if (!this.active) {
     this.active = true;
@@ -172,7 +160,6 @@ treesaver.ui.Chrome.prototype.activate = function() {
       this.menu = menus[0];
     }
     this.articleURL = treesaver.dom.getElementsByClassName('article-url', this.node);
-    this.sidebar = treesaver.dom.getElementsByClassName('sidebar', this.node);
 
     toc = treesaver.dom.getElementsByClassName('toc', this.node);
     // TODO: We might want to do something smarter than just selecting the first
@@ -228,7 +215,6 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.articleURL = null;
   this.toc = null;
   this.tocTemplate = null;
-  this.sidebar = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -295,6 +281,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     return this.selectPagesDelayed();
 
   case treesaver.ui.ArticleManager.events.ARTICLECHANGED:
+    this.updateTOCActive(e);
     return this.updatePageURL(e);
 
   case treesaver.ui.input.events.ACTIVE:
@@ -440,15 +427,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         }
         handled = true;
       }
-    }
-    else if (treesaver.dom.hasClass(el, 'showSidebar')) {
-      this.showSidebar();
-
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'hideSidebar')) {
-      this.hideSidebar();
-      handled = true;
     }
     else if (el.href) {
       // TODO: What if it's not in the current page?
@@ -662,7 +640,6 @@ treesaver.ui.Chrome.prototype.isMenuActive = function() {
 };
 
 /**
- * Show sidebars
  * Show lightbox
  *
  * @private
@@ -718,24 +695,6 @@ treesaver.ui.Chrome.prototype.hideLightBox = function() {
     this.lightBox.deactivate();
     this.lightBox = null;
   }
-};
-
-/**
- * Show sidebars
- */
-treesaver.ui.Chrome.prototype.showSidebar = function() {
-  this.sidebar.forEach(function(sidebar) {
-    treesaver.dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
-  });
-};
-
-/**
- * Hide sidebars
- */
-treesaver.ui.Chrome.prototype.hideSidebar = function() {
-  this.sidebar.forEach(function(sidebar) {
-    treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active')
-  });
 };
 
 /**
@@ -805,6 +764,21 @@ treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
         'current-url': 'href'
       }, el);
   });
+};
+
+treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
+  var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
+      tocElements = treesaver.array.toArray(this.toc.childNodes);
+
+  if (tocEntries.length === tocElements.length) {
+    tocEntries.forEach(function(entry, index) {
+      if (entry.url === e.url) {
+        treesaver.dom.addClass(tocElements[index], 'current');
+      } else {
+        treesaver.dom.removeClass(tocElements[index], 'current');
+      }
+    });
+  }
 };
 
 /**
@@ -900,11 +874,19 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
     var el = this.tocTemplate.cloneNode(true);
 
     treesaver.template.expand(entry, {
-        url: 'href'
+        'url': 'href'
       }, el);
 
     this.toc.appendChild(el);
   }, this);
+
+  // Update the TOC active item. We do this explicitly here
+  // because we receive the article changed event (which is
+  // normally used to update the active TOC) before the TOC
+  // changed event.
+  this.updateTOCActive({
+    url: treesaver.ui.ArticleManager.currentArticle.url
+  });
 };
 
 /**

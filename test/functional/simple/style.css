@@ -64,25 +64,6 @@ body {
   display: inline-block;
 }
 
-.sidebar {
-  opacity: 0;
-  position: absolute:
-  left: 0:
-  top: 0;
-  width: 10em;
-  border-right: 1px solid #445;
-  padding: 5px 10px;
-}
-
-.toc h1 {
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.sidebar.sidebar-active {
-  opacity: 1;
-}
-
 .active .controls {
   /*display: block;*/
   opacity: 1;
@@ -203,6 +184,10 @@ h2 a {
 h2 a:hover {
   color: #33a;
   text-decoration: underline;
+}
+
+.toc .current {
+  border: 1px solid red;
 }
 
 p[itemprop=byline], .toc .byline {
