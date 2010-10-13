@@ -338,7 +338,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
   var unique_urls = [],
       foundTOC = false;
 
-  treesaver.ui.ArticleManager.parseTOC(html);
+  treesaver.ui.ArticleManager.parseTOC(/** @type {!string} */ (html));
 
   treesaver.ui.ArticleManager.toc.forEach(function(item) {
     var url,

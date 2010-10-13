@@ -178,7 +178,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
     // TODO: We might want to do something smarter than just selecting the first
     // TOC template.
     if (toc.length === 1) {
-      this.toc = toc[0];
+      this.toc = /** @type {!Element} */ (toc[0]);
       tocTemplates = treesaver.dom.getElementsByClassName('template', this.toc);
       if (tocTemplates.length > 0) {
         this.tocTemplate = tocTemplates[0];
@@ -892,7 +892,7 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
   treesaver.scheduler.clear('updateTOC');
 
   // clear the current TOC
-  treesaver.dom.clearChildren(this.toc);
+  treesaver.dom.clearChildren(/** @type {!Element} */ (this.toc));
 
   var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC();
 
