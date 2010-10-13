@@ -133,6 +133,11 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Array.<Element>}
    */
   this.currentURL = null;
+
+  /**
+   * @type {?Element}
+   */
+  this.sidebar = null;
 }
 
 /**
@@ -142,7 +147,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
   var toc = [],
       tocTemplates = [],
       menus = [],
-      tocTemplates = [];
+      sidebars = [];
 
   if (!this.active) {
     this.active = true;
@@ -172,6 +177,12 @@ treesaver.ui.Chrome.prototype.activate = function() {
       }
       // Remove anything inside TOC
       treesaver.dom.clearChildren(this.toc);
+    }
+
+    sidebars = treesaver.dom.getElementsByClassName('sidebar', this.node);
+
+    if (sidebars.length > 0) {
+      this.sidebar = sidebars[0];
     }
 
     this.pages = [];
@@ -214,6 +225,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.currentURL = null;
   this.toc = null;
   this.tocTemplate = null;
+  this.sidebar = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -381,6 +393,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       id,
       parent,
       handled = false,
+      sidebarActivated = false,
       menuActivated = false;
 
   // Go up the tree and see if there's anything we want to process
@@ -427,6 +440,21 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         handled = true;
       }
     }
+    else if (treesaver.dom.hasClass(el, 'sidebar')) {
+      if (this.sidebar === el) {
+        if (!this.isSidebarActive()) {
+          this.sidebarActive();
+          sidebarActivated = true;
+        }
+        handled = true;
+      }
+    }
+    else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
+      if (this.isSidebarActive()) {
+        this.sidebarInactive();
+        handled = true;
+      }
+    }
     else if (el.href) {
       // TODO: What if it's not in the current page?
       // check element.contains on current page ...
@@ -455,6 +483,10 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 
   if (!menuActivated && this.isMenuActive()) {
     this.menuInactive();
+  }
+
+  if (!sidebarActivated && this.isSidebarActive() && !handled) {
+    this.sidebarInactive();
   }
 
   if (handled) {
@@ -637,6 +669,30 @@ treesaver.ui.Chrome.prototype.menuInactive = function() {
 treesaver.ui.Chrome.prototype.isMenuActive = function() {
   return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'menu-active');
 };
+
+/**
+ * Show sidebar
+ */
+treesaver.ui.Chrome.prototype.sidebarActive = function() {
+  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+};
+
+/**
+ * Hide sidebar
+ */
+treesaver.ui.Chrome.prototype.sidebarInactive = function() {
+  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+};
+
+/**
+ * Determines whether or not the sidebar is active.
+ *
+ * @return {boolean} true if the sidebar is active, false otherwise.
+ */
+treesaver.ui.Chrome.prototype.isSidebarActive = function() {
+  return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+};
+
 
 /**
  * Show lightbox
