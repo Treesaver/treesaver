@@ -110,7 +110,7 @@ treesaver.ui.Chrome = function(node) {
   this.lightBox = null;
 
   /**
-   * @type {!Element}
+   * @type {?Element}
    */
   this.sidebar = null;
 }
