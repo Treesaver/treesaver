@@ -159,7 +159,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
     if (menus.length > 0) {
       this.menu = menus[0];
     }
-    this.articleURL = treesaver.dom.getElementsByClassName('article-url', this.node);
+    this.currentURL = treesaver.dom.getElementsByClassName('article-url', this.node);
 
     toc = treesaver.dom.getElementsByClassName('toc', this.node);
     // TODO: We might want to do something smarter than just selecting the first
@@ -212,7 +212,6 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageWidth = null;
   this.menu = null;
   this.currentURL = null;
-  this.articleURL = null;
   this.toc = null;
   this.tocTemplate = null;
 
