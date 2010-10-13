@@ -164,7 +164,6 @@ treesaver.ui.Chrome.prototype.activate = function() {
     if (menus.length > 0) {
       this.menu = menus[0];
     }
-    this.currentURL = treesaver.dom.getElementsByClassName('article-url', this.node);
 
     toc = treesaver.dom.getElementsByClassName('toc', this.node);
     // TODO: We might want to do something smarter than just selecting the first
