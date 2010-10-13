@@ -8,6 +8,7 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');
+goog.require('treesaver.microdata');
 goog.require('treesaver.network');
 goog.require('treesaver.resources');
 goog.require('treesaver.storage');
@@ -36,6 +37,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.articleOrder = [];
   treesaver.ui.ArticleManager.articleMap = {};
   treesaver.ui.ArticleManager.articles = {};
+  treesaver.ui.ArticleManager.toc = [];
   /**
    * @private
    */
@@ -161,6 +163,7 @@ treesaver.ui.ArticleManager.unload = function() {
   treesaver.ui.ArticleManager.articleOrder = null;
   treesaver.ui.ArticleManager.articleMap = null;
   treesaver.ui.ArticleManager.articles = null;
+  treesaver.ui.ArticleManager.toc = null;
 
   treesaver.ui.ArticleManager.loadingPageHTML = null;
   treesaver.ui.ArticleManager.loadingPageSize = null;
@@ -332,26 +335,25 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     }
   }
 
-  var container = document.createElement('div'),
-      unique_urls = [],
+  var unique_urls = [],
       foundTOC = false;
 
-  container.innerHTML = html;
+  treesaver.ui.ArticleManager.parseTOC(html);
 
-  treesaver.dom.getElementsByProperty('rev', 'contents', 'a', container).forEach(function(node) {
+  treesaver.ui.ArticleManager.toc.forEach(function(item) {
     var url,
         article,
         i;
 
-    // rev=self is used by the TOC to indicate its position in the article order
+    // itemprop=self is used by the TOC to indicate its position in the article order
     // make sure to use the TOC url we already computed in order to avoid duplicates
     // such as '/' and '/index.html'
-    if (/self/.test(node.getAttribute('rev'))) {
+    if (item.hasOwnProperty('self')) {
       url = toc_url;
       foundTOC = true;
     }
     else {
-      url = treesaver.network.absoluteURL(node.href);
+      url = treesaver.network.absoluteURL(item.url);
     }
 
     article = treesaver.ui.ArticleManager.articles[url];
@@ -360,7 +362,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     // Have we seen this URL before?
     if (!article) {
       // Have not seen the url, create a new article and store
-      article = new treesaver.ui.Article(url, treesaver.dom.innerText(node), treesaver.ui.ArticleManager.grids_);
+      article = new treesaver.ui.Article(url, item.title || '', treesaver.ui.ArticleManager.grids_);
       treesaver.ui.ArticleManager.articles[url] = article;
     }
 
@@ -425,6 +427,34 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
 
   // TODO: Fire an event (let's chrome know it can display)
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.TOCUPDATED);
+};
+
+/**
+ * Parse the TOC using the microdata API. Out of necessity we
+ * append the container node to the document first, and remove
+ * it afterwards.
+ * 
+ * @param {!string} html The string to find TOC content in.
+ * @private
+ */
+treesaver.ui.ArticleManager.parseTOC = function(html) {
+  var container = document.createElement('div'),
+      items = [];
+
+  container.innerHTML = html;
+  container.style.display = 'none';
+  document.body.appendChild(container);
+  items = treesaver.microdata.getJSONItems();
+
+  treesaver.ui.ArticleManager.toc = items.map(function(item) {
+    var keys = Object.keys(item.properties),
+        result = {};
+    keys.forEach(function(key) {
+      result[key] = item.properties[key][0];
+    });
+    return result;
+  });
+  document.body.removeChild(container);
 };
 
 /**
@@ -781,6 +811,15 @@ treesaver.ui.ArticleManager.getFigure = function(el) {
   return treesaver.ui.ArticleManager.currentArticle.content.figures[figureIndex];
 };
 
+
+/**
+ * Get the current TOC.
+ * @return {!Array.<Object>} An array of microdata items
+ * representing the TOC.
+ */
+treesaver.ui.ArticleManager.getCurrentTOC = function() {
+  return treesaver.ui.ArticleManager.toc || [];
+};
 
 /**
  * @private
