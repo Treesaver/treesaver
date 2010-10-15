@@ -190,6 +190,7 @@ def compile(args):
         compiler_flags.append('--define="SUPPORT_IE=false"')
         compiler_flags.append('--define="SUPPORT_LEGACY=false"')
         compiler_flags.append('--define="WITHIN_IOS_WRAPPER=true"')
+        is_single = True
 
     # Make pretty output for debug mode
     if '--debug' in args:
