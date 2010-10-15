@@ -459,6 +459,31 @@ treesaver.ui.ArticleManager.parseTOC = function(html) {
 };
 
 /**
+ * Can the user go to the previous page?
+ *
+ * @return {boolean}
+ */
+treesaver.ui.ArticleManager.canGoToPreviousPage = function() {
+  // Do we know what page we are on?
+  if (treesaver.ui.ArticleManager.currentPageIndex !== -1) {
+    // Page 2 and above can always go one back
+    if (treesaver.ui.ArticleManager.currentPageIndex >= 1) {
+      return true;
+    }
+    else {
+      // If on the first page, depends on whether there's another article
+      return treesaver.ui.ArticleManager.canGoToPreviousArticle();
+    }
+  }
+  else {
+    // Don't know the page number, so can only go back a page if we're
+    // on the first page
+    return !treesaver.ui.ArticleManager.currentPosition &&
+            treesaver.ui.ArticleManager.canGoToPreviousArticle();
+  }
+};
+
+/**
  * Go to the previous page in the current article. If we are at
  * the first page of the article, go to the last page of the previous
  * article
@@ -472,6 +497,7 @@ treesaver.ui.ArticleManager.previousPage = function() {
     }
   }
 
+  // TODO: Try to re-use logic from canGoToPreviousPage
   if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
     if (!treesaver.ui.ArticleManager.currentPosition) {
       if (treesaver.ui.ArticleManager.previousArticle(true)) {
@@ -510,6 +536,36 @@ treesaver.ui.ArticleManager.previousPage = function() {
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
 
   return true;
+};
+
+/**
+ * Can the user go to the next page?
+ *
+ * @return {boolean}
+ */
+treesaver.ui.ArticleManager.canGoToNextPage = function() {
+  // Do we know what page we are on?
+  if (treesaver.ui.ArticleManager.currentPageIndex !== -1) {
+    // Do we know there are more pages left?
+    if (treesaver.ui.ArticleManager.currentPageIndex <
+        treesaver.ui.ArticleManager.currentArticle.pageCount - 1) {
+      return true;
+    }
+    else {
+      return treesaver.ui.ArticleManager.currentArticle.paginationComplete &&
+             treesaver.ui.ArticleManager.canGoToNextArticle();
+    }
+  }
+  else {
+    // Perhaps we're on the last page of the article?
+    if (treesaver.ui.ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
+      return treesaver.ui.ArticleManager.canGoToNextArticle();
+    }
+    else {
+      // We have no idea what page we are on, so we don't know if we can advance
+      return false;
+    }
+  }
 };
 
 /**
@@ -575,13 +631,22 @@ treesaver.ui.ArticleManager.nextPage = function() {
 };
 
 /**
+ * Is there a previous article to go to?
+ *
+ * @return {boolean}
+ */
+treesaver.ui.ArticleManager.canGoToPreviousArticle = function() {
+  return !!treesaver.ui.ArticleManager.currentArticleIndex;
+}
+
+/**
  * Go to the beginning of previous article in the flow
  * @param {boolean=} end Go to the end of the article
  * @param {boolean=} fetch Only return the article, don't move
  * @return {treesaver.ui.Article} False if there is no next article
  */
 treesaver.ui.ArticleManager.previousArticle = function(end, fetch) {
-  if (!treesaver.ui.ArticleManager.currentArticleIndex) {
+  if (!treesaver.ui.ArticleManager.canGoToPreviousArticle()) {
     return null;
   }
 
@@ -593,15 +658,24 @@ treesaver.ui.ArticleManager.previousArticle = function(end, fetch) {
 };
 
 /**
+ * Is there a next article to go to?
+ *
+ * @return {boolean}
+ */
+treesaver.ui.ArticleManager.canGoToNextArticle = function() {
+  return !!((treesaver.ui.ArticleManager.currentArticleIndex ||
+          treesaver.ui.ArticleManager.currentArticleIndex === 0) &&
+          treesaver.ui.ArticleManager.currentArticleIndex <
+          treesaver.ui.ArticleManager.articleOrder.length - 1);
+};
+
+/**
  * Go to the beginning of next article in the flow
  * @param {boolean=} fetch Only return the article, don't move
  * @return {treesaver.ui.Article} The next article
  */
 treesaver.ui.ArticleManager.nextArticle = function(fetch) {
-  if (!treesaver.ui.ArticleManager.currentArticleIndex &&
-      treesaver.ui.ArticleManager.currentArticleIndex !== 0 &&
-      treesaver.ui.ArticleManager.currentArticleIndex <
-        treesaver.ui.ArticleManager.articleOrder.length) {
+  if (!treesaver.ui.ArticleManager.canGoToNextArticle()) {
     return null;
   }
 
@@ -760,6 +834,14 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   }
 
   return pages;
+};
+
+/**
+ * Return the URL to the current article
+ * @return {string}
+ */
+treesaver.ui.ArticleManager.getCurrentUrl = function() {
+  return treesaver.ui.ArticleManager.currentArticle.url;
 };
 
 /**
