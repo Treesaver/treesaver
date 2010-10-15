@@ -1143,3 +1143,19 @@ treesaver.ui.ArticleManager._createErrorPage = function() {
     size: treesaver.ui.ArticleManager.errorPageSize
   });
 };
+
+// Expose functions when hosted within iOS wrapper
+if (WITHIN_IOS_WRAPPER) {
+  goog.exportSymbol('treesaver.canGoToNextPage', treesaver.ui.ArticleManager.canGoToNextPage);
+  goog.exportSymbol('treesaver.canGoToPreviousPage', treesaver.ui.ArticleManager.canGoToPreviousPage);
+  goog.exportSymbol('treesaver.canGoToNextArticle', treesaver.ui.ArticleManager.canGoToNextArticle);
+  goog.exportSymbol('treesaver.canGoToPreviousArticle', treesaver.ui.ArticleManager.canGoToPreviousArticle);
+  goog.exportSymbol('treesaver.nextPage', treesaver.ui.ArticleManager.nextPage);
+  goog.exportSymbol('treesaver.previousPage', treesaver.ui.ArticleManager.previousPage);
+  goog.exportSymbol('treesaver.nextArticle', treesaver.ui.ArticleManager.nextArticle);
+  goog.exportSymbol('treesaver.previousArticle', treesaver.ui.ArticleManager.previousArticle);
+  goog.exportSymbol('treesaver.getCurrentUrl', treesaver.ui.ArticleManager.getCurrentUrl);
+  goog.exportSymbol('treesaver.getCurrentPageNumber', treesaver.ui.ArticleManager.getCurrentPageNumber);
+  goog.exportSymbol('treesaver.getCurrentPageCount', treesaver.ui.ArticleManager.getCurrentPageCount);
+  goog.exportSymbol('treesaver.goToArticleByURL', treesaver.ui.ArticleManager.goToArticleByURL);
+}
