@@ -821,17 +821,19 @@ treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
 };
 
 treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
-  var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
-      tocElements = treesaver.array.toArray(this.toc.childNodes);
+  if (this.toc) {
+    var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
+        tocElements = treesaver.array.toArray(this.toc.childNodes);
 
-  if (tocEntries.length === tocElements.length) {
-    tocEntries.forEach(function(entry, index) {
-      if (entry.url === e.url) {
-        treesaver.dom.addClass(tocElements[index], 'current');
-      } else {
-        treesaver.dom.removeClass(tocElements[index], 'current');
-      }
-    });
+    if (tocEntries.length === tocElements.length) {
+      tocEntries.forEach(function(entry, index) {
+        if (entry.url === e.url) {
+          treesaver.dom.addClass(tocElements[index], 'current');
+        } else {
+          treesaver.dom.removeClass(tocElements[index], 'current');
+        }
+      });
+    }
   }
 };
 
@@ -919,28 +921,30 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
   // Stop any running TOC updates
   treesaver.scheduler.clear('updateTOC');
 
-  // clear the current TOC
-  treesaver.dom.clearChildren(/** @type {!Element} */ (this.toc));
+  if (this.toc) {
+    // clear the current TOC
+    treesaver.dom.clearChildren(/** @type {!Element} */ (this.toc));
 
-  var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC();
+    var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC();
 
-  tocEntries.forEach(function(entry) {
-    var el = this.tocTemplate.cloneNode(true);
+    tocEntries.forEach(function(entry) {
+      var el = this.tocTemplate.cloneNode(true);
 
-    treesaver.template.expand(entry, {
-        'url': 'href'
-      }, el);
+      treesaver.template.expand(entry, {
+          'url': 'href'
+        }, el);
 
-    this.toc.appendChild(el);
-  }, this);
+      this.toc.appendChild(el);
+    }, this);
 
-  // Update the TOC active item. We do this explicitly here
-  // because we receive the article changed event (which is
-  // normally used to update the active TOC) before the TOC
-  // changed event.
-  this.updateTOCActive({
-    url: treesaver.ui.ArticleManager.currentArticle.url
-  });
+    // Update the TOC active item. We do this explicitly here
+    // because we receive the article changed event (which is
+    // normally used to update the active TOC) before the TOC
+    // changed event.
+    this.updateTOCActive({
+      url: treesaver.ui.ArticleManager.currentArticle.url
+    });
+  }
 };
 
 /**
