@@ -123,6 +123,10 @@ def lint():
     lint_flag.touch()
 
     for file in options.src_dir.walkfiles('*.js'):
+        # Skip extern files
+        if file.parent == options.externs_dir:
+            continue
+
         if not last_run or (last_run < file.mtime):
             sh('%s %s' % (
                 options.closure_lint,
