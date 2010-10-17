@@ -175,9 +175,11 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
    * given in the argument, if any are listed.
    *
    * @param {string=} types A space-separated list of types.
+   * @param {HTMLDocument|Element=} root The root element to use as
+   * context.
    * @return {!Array} A non-live Array of elements.
    */
-  function getItems(types) {
+  function getItems(types, root) {
     var items = [];
 
     if (types && /\S/.test(types)) {
@@ -187,7 +189,7 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
     }
 
     // Retrieve all microdata items
-    items = treesaver.dom.getElementsByProperty('itemscope');
+    items = treesaver.dom.getElementsByProperty('itemscope', null, null, root);
 
     // Filter out top level items, and optionally items that match
     // the given types.
@@ -267,6 +269,44 @@ if (SUPPORT_MICRODATA) {
   };
 
   /**
+   * Returns an Array of the elements in the document or descendants of
+   * the root node that create items, that are not part of other items,
+   * and that are of one of the types given in the argument, if any are
+   * listed.
+   *
+   * @param {string=} types A space-separated list of types.
+   * @param {HTMLDocument|Element=} root The root element to use as
+   * context.
+   * @return {!Array} A non-live Array of elements.
+   */
+  treesaver.microdata.getItems = function(types, context) {
+    if (treesaver.capabilities.SUPPORTS_MICRODATA) {
+      // Fake the root parameter by filtering out microdata items
+      // based on their ancestors.
+      var items = treesaver.array.toArray(document.getItems(types));
+
+      if (!context) {
+        return items;
+      }
+
+      return items.filter(function(item) {
+        var parent = item;
+
+        while ((parent = parent.parentNode) !== null && parent.nodeType === 1) {
+          if (parent === context) {
+            return true;
+          }
+        }
+        return false;
+      });
+    } else {
+      // We are using our own microdata implementation,
+      // which supports the context parameter.
+      return document.getItems(types, context);
+    }
+  };
+
+  /**
    * Returns a JSON representation of the microdata items
    * that match the given types.
    *
@@ -274,8 +314,8 @@ if (SUPPORT_MICRODATA) {
    * @return {!Array} A Array of Objects representing micro-
    * data items.
    */
-  treesaver.microdata.getJSONItems = function(types) {
-    var items = document.getItems(types);
+  treesaver.microdata.getJSONItems = function(types, context) {
+    var items = treesaver.microdata.getItems(types, context);
     return items.map(function(item) {
       return treesaver.microdata.getObject_(item);
     });
