@@ -1037,7 +1037,9 @@ treesaver.ui.ArticleManager._setArticle = function(article, pos, index, noHistor
     // TODO: What if it's an index change? User clicks on same
     // article that is later in index? How would UI show that?
     // Or perhaps, same article repeated ...
-    return false;
+
+    // Still counts as a success
+    return true;
   }
 
   // Change the window/tab title
