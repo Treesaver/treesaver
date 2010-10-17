@@ -17,7 +17,6 @@ goog.require('treesaver.string');
  * expansion. Defaults to document if not specified explicitly.
  */
 treesaver.template.expand = function(view, mappings, scope) {
-  var buffer = [];
   if (!scope) {
     scope = document;
   }
