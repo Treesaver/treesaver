@@ -110,7 +110,8 @@ def debug(args):
         outfile.write_text(contents)
 
 @task
-def lint():
+@consume_args
+def lint(args):
     """Run Google's style checker on source files"""
     if not options.tmp_dir.isdir():
         options.tmp_dir.makedirs()
@@ -120,18 +121,19 @@ def lint():
     if lint_flag.exists():
         last_run = (options.tmp_dir / 'lint').mtime
 
-    lint_flag.touch()
-
     for file in options.src_dir.walkfiles('*.js'):
         # Skip extern files
         if file.parent == options.externs_dir:
             continue
 
-        if not last_run or (last_run < file.mtime):
+        if '--force' in args or not last_run or (last_run < file.mtime):
             sh('%s %s' % (
                 options.closure_lint,
                 file
             ))
+
+    # Only update the lint flag on success
+    lint_flag.touch()
 
 @task
 def fix_lint():
