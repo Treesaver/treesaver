@@ -27,7 +27,7 @@ treesaver.json.stringify = function(val) {
   return window.JSON.stringify(val);
 };
 
-if (SUPPORT_LEGACY && !'JSON' in window) {
+if (SUPPORT_LEGACY && !('JSON' in window)) {
   treesaver.debug.info("Non-native JSON implementation");
 
   // TODO: Consider a secure implementation
