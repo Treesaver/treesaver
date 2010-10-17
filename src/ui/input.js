@@ -155,7 +155,7 @@ treesaver.ui.input.mouseDown = function(e) {
   else {
     // Ignore if not done with a modifier key
     if (!treesaver.ui.input.specialKeyPressed_(e)) {
-      treesaver.debug.info('Mousedown ignored due to modifier key');
+      treesaver.debug.info('Mousedown ignored due to lack of modifier key');
 
       return;
     }
