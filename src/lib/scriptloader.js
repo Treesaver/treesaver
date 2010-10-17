@@ -1,5 +1,5 @@
 /**
- * @fileoverview Async loading of JavaScript files
+ * @fileoverview Async loading of JavaScript files.
  */
 
 goog.provide('treesaver.scriptloader');
@@ -24,7 +24,7 @@ treesaver.scriptloader.load = function(name, callback) {
   // Insert into tree
   document.documentElement.appendChild(s);
   // Setup callback
-  s.onload = s.onreadystatechange = function (e) {
+  s.onload = s.onreadystatechange = function(e) {
     if (!e) {
       e = window.event;
     }
@@ -56,7 +56,7 @@ treesaver.scriptloader.load = function(name, callback) {
  *
  * @private
  * @param {!string} name
- * @return {!string} Full url to the file
+ * @return {!string} Full url to the file.
  */
 treesaver.scriptloader.getUrlFromName_ = function(name) {
   // Leave absolute paths alone, including ones that go to other servers
@@ -98,7 +98,7 @@ treesaver.scriptloader.getScriptPath_ = function() {
         scripts = document.getElementsByTagName('script');
 
     // Search through scripts to find our base URL
-    treesaver.array.toArray(scripts).forEach(function (script) {
+    treesaver.array.toArray(scripts).forEach(function(script) {
       // TODO: Make this better
       if (!path && script.src.indexOf(treesaver.scriptloader.BASE_FILENAME) !== -1) {
         path = script.getAttribute('src');
@@ -124,7 +124,7 @@ treesaver.scriptloader.getScriptPath_ = function() {
  *
  * @private
  * @param {!string} path
- * @return {!string} Directory name
+ * @return {!string} Directory name.
  */
 treesaver.scriptloader.getDirectoryName_ = function(path) {
   var lastSlash = path.lastIndexOf('/');

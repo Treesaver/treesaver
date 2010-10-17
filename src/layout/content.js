@@ -1,5 +1,5 @@
 /**
- * @fileoverview The Content class
+ * @fileoverview The Content class.
  */
 
 goog.provide('treesaver.layout.Content');
@@ -13,7 +13,7 @@ goog.require('treesaver.layout.Block');
  * A chunk of content
  *
  * @constructor
- * @param {!Element} el HTML node which contains all content
+ * @param {!Element} el HTML node which contains all content.
  */
 treesaver.layout.Content = function(el) {
   var indices = {
@@ -82,10 +82,10 @@ treesaver.layout.Content = function(el) {
       treesaver.debug.error('Data field without itemprop name: ' + dataNode);
     }
   }, this);
-}
+};
 
 if (goog.DEBUG) {
   treesaver.layout.Content.prototype.toString = function() {
-    return "[Content]";
+    return '[Content]';
   };
 }

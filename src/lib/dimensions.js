@@ -1,5 +1,5 @@
 /**
- * @fileoverview Helpers for measuring elements
+ * @fileoverview Helpers for measuring elements.
  */
 
 goog.provide('treesaver.dimensions');
@@ -23,14 +23,14 @@ treesaver.dimensions.SizeRange;
  *
  * @param {treesaver.dimensions.SizeRange} range
  * @param {treesaver.dimensions.Size} size
- * @return {boolean} True if both dimensions are within the min and max
+ * @return {boolean} True if both dimensions are within the min and max.
  */
 treesaver.dimensions.inSizeRange = function(range, size) {
   if (!range) {
     return false;
   }
 
-  return size.w >= range.minW &&size.h >= range.minH &&
+  return size.w >= range.minW && size.h >= range.minH &&
     // If Max isn't set, assume Infinity
     (!range.maxW || size.w <= range.maxW) &&
     (!range.maxH || size.h <= range.maxH);
@@ -66,7 +66,7 @@ treesaver.dimensions.mergeSizeRange = function(a, b, outer) {
  * Convert a string value to pixels
  *
  * @param {?string} val
- * @return {?number} Value in pixels
+ * @return {?number} Value in pixels.
  */
 treesaver.dimensions.toPixels = function(val) {
   if (val && val.indexOf('px') !== -1) {
@@ -101,7 +101,7 @@ if (SUPPORT_IE &&
  * @param {!Element} el
  * @param {!string} propName
  * @param {!number} val
- * @return {!number} The value supplied
+ * @return {!number} The value supplied.
  */
 treesaver.dimensions.setCssPx = function(el, propName, val) {
   el.style[propName] = val + 'px';
@@ -115,7 +115,7 @@ treesaver.dimensions.setCssPx = function(el, propName, val) {
  *
  * @param {!number} number
  * @param {!number} base
- * @return {number} A multiple of the base number
+ * @return {number} A multiple of the base number.
  */
 treesaver.dimensions.roundUp = function(number, base) {
   return Math.ceil(number) + base - (number % base);
@@ -227,6 +227,6 @@ treesaver.dimensions.Metrics.prototype.clone = function() {
 
 if (goog.DEBUG) {
   treesaver.dimensions.Metrics.prototype.toString = function() {
-    return "[Metrics: " + this.width + "x" + this.height + "]";
+    return '[Metrics: ' + this.width + 'x' + this.height + ']';
   };
 }

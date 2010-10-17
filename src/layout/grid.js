@@ -1,5 +1,5 @@
 /**
- * @fileoverview A skeleton of page, later filled with content
+ * @fileoverview A skeleton of page, later filled with content.
  */
 
 goog.provide('treesaver.layout.Grid');
@@ -18,7 +18,7 @@ goog.require('treesaver.layout.Figure');
 /**
  * Grid class
  * @constructor
- * @param {!Element} node HTML root for grid
+ * @param {!Element} node HTML root for grid.
  */
 treesaver.layout.Grid = function(node) {
   if (goog.DEBUG) {
@@ -131,7 +131,7 @@ treesaver.layout.Grid = function(node) {
 
   // Remove the child
   document.body.removeChild(node);
-}
+};
 
 treesaver.layout.Grid.knownFlags = {
   'onlypage': true,
@@ -169,7 +169,7 @@ treesaver.layout.Grid.findScoringFlags = function(classes) {
 /**
  * Stretch the height of a grid
  * @param {number} totalHeight The maximum possible height (including margin,
- *                             border, and padding) of the grid
+ *                             border, and padding) of the grid.
  */
 treesaver.layout.Grid.prototype.stretch = function(totalHeight) {
   if (!this.flexible) {

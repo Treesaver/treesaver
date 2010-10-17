@@ -1,5 +1,5 @@
 /**
- * @fileoverview Fire an event when the dom is ready
+ * @fileoverview Fire an event when the dom is ready.
  */
 
 goog.provide('treesaver.domready');
@@ -19,7 +19,7 @@ treesaver.domready.events = {
 
 /**
  * Whether the DOM is ready
- * @return {boolean} True if ready
+ * @return {boolean} True if ready.
  */
 treesaver.domready.ready = function() {
   return treesaver.domready.documentReady_;
@@ -27,7 +27,7 @@ treesaver.domready.ready = function() {
 
 /**
  * Whether the document is fully loaded
- * @return {boolean} True if ready
+ * @return {boolean} True if ready.
  */
 treesaver.domready.loaded = function() {
   return treesaver.domready.documentLoaded_;
@@ -89,7 +89,7 @@ treesaver.domready.ready_ = function() {
   delete treesaver.domready.elementCount_;
 
   // Fire event
-  treesaver.events.fireEvent(document, treesaver.domready.events.READY)
+  treesaver.events.fireEvent(document, treesaver.domready.events.READY);
 };
 
 /**

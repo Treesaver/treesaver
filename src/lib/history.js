@@ -5,10 +5,10 @@
 
 goog.provide('treesaver.history');
 
-goog.require('treesaver.debug');
 goog.require('treesaver.capabilities');
-goog.require('treesaver.storage');
+goog.require('treesaver.debug');
 goog.require('treesaver.scheduler');
+goog.require('treesaver.storage');
 
 /**
  * Milliseconds between checks for hash changes on browsers that don't
@@ -68,7 +68,7 @@ if (document.location.hash) {
   * @param {!string} title
   * @param {!string} url
   */
-treesaver.history.pushState = function (data, title, url) {
+treesaver.history.pushState = function(data, title, url) {
   window.history['pushState'](data, title, url);
 };
 
@@ -79,7 +79,7 @@ treesaver.history.pushState = function (data, title, url) {
   * @param {!string} title
   * @param {!string} url
   */
-treesaver.history.replaceState = function (data, title, url) {
+treesaver.history.replaceState = function(data, title, url) {
   window.history['replaceState'](data, title, url);
 };
 
@@ -89,10 +89,10 @@ if (!treesaver.history.NATIVE_SUPPORT) {
   treesaver.debug.info('Using non-native history implementation');
 
   // Override functions for browsers with non-native support
-  treesaver.history.pushState = function (data, title, url) {
+  treesaver.history.pushState = function(data, title, url) {
     treesaver.history._changeState(data, title, url, false);
   };
-  treesaver.history.replaceState = function (data, title, url) {
+  treesaver.history.replaceState = function(data, title, url) {
     treesaver.history._changeState(data, title, url, true);
   };
 
@@ -101,7 +101,7 @@ if (!treesaver.history.NATIVE_SUPPORT) {
    *
    * @private
    * @param {!string} url
-   * @return {string} String that can be safely used as hash
+   * @return {string} String that can be safely used as hash.
    */
   treesaver.history.createHash_ = function(url) {
     // Always add delimiter and escape the URL
@@ -122,7 +122,7 @@ if (!treesaver.history.NATIVE_SUPPORT) {
    *
    * @private
    * @param {!string} key
-   * @return {string} String that can be safely used as storage key
+   * @return {string} String that can be safely used as storage key.
    */
   treesaver.history.createStorageKey_ = function(key) {
     return treesaver.history.STORAGE_PREFIX + key;
@@ -205,12 +205,12 @@ if (!treesaver.history.NATIVE_SUPPORT) {
   else {
     // TODO:
     // IE6 & 7 don't create history items if the hash doesn't match an
-    // element's ID so we need to create an iframe which we'll use 
+    // element's ID so we need to create an iframe which we'll use
 
     treesaver.debug.info('Using manual hash change detection');
 
     // Need to check hash state manually
-    treesaver.scheduler.repeat(function () {
+    treesaver.scheduler.repeat(function() {
       var hash = treesaver.history.getNormalizedHash_();
       if (hash !== treesaver.history.hash) {
         treesaver.history.hashChange_();

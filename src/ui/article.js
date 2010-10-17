@@ -1,5 +1,5 @@
 /**
- * @fileoverview Article class
+ * @fileoverview Article class.
  */
 
 goog.provide('treesaver.ui.Article');
@@ -9,13 +9,13 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');
-goog.require('treesaver.network');
-goog.require('treesaver.scheduler');
 goog.require('treesaver.layout.BreakRecord');
-goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Content');
 goog.require('treesaver.layout.ContentPosition');
+goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Page');
+goog.require('treesaver.network');
+goog.require('treesaver.scheduler');
 
 /**
  * A chunk of content
@@ -121,7 +121,7 @@ treesaver.ui.Article = function(url, title, grids, html) {
   if (html) {
     this.processHTML(html);
   }
-}
+};
 
 /**
  * Names of events fired by this class
@@ -142,7 +142,7 @@ treesaver.ui.Article.titleRegExp = /<title>\s*(.+?)\s*<\/title>/i;
 /**
  * Find and return any text within a <title>
  * @param {?string} html
- * @return {string|null}
+ * @return {?string}
  */
 treesaver.ui.Article.extractTitle = function(html) {
   var res = treesaver.ui.Article.titleRegExp.exec(html);
@@ -154,7 +154,7 @@ treesaver.ui.Article.extractTitle = function(html) {
 
 /**
  * @param {?string} html  HTML for the article. May be just the
- *                        <article> node, or an entire .html page
+ *                        <article> node, or an entire .html page.
  */
 treesaver.ui.Article.prototype.processHTML = function(html) {
   // Content is here, so we're loaded
@@ -275,7 +275,7 @@ treesaver.ui.Article.prototype.stretchGrids = function(size) {
 /**
  * Set the maximum size pages in this article are allowed to be
  * @param {{ w: number, h: number }} size
- * @return {boolean} True if a re-layout will be required at this size
+ * @return {boolean} True if a re-layout will be required at this size.
  */
 treesaver.ui.Article.prototype.setMaxPageSize = function(size) {
   if (!this.maxPageSize ||
@@ -318,9 +318,9 @@ treesaver.ui.Article.prototype.resetPagination = function() {
 
 /**
  * Paginate the article asynchronously
- * @param {boolean} bg Paginate remainder of article in background
- * @param {number} index Paginate synchronously until this index
- * @param {?treesaver.layout.ContentPosition|number} pos Paginate synchronously until this position
+ * @param {boolean} bg Paginate remainder of article in background.
+ * @param {number} index Paginate synchronously until this index.
+ * @param {?treesaver.layout.ContentPosition|number} pos Paginate synchronously until this position.
  * @private
  */
 treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
@@ -434,7 +434,7 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
 
 /**
  * Start asynchronous pagination
- * @param {Array} args Arguments array to pass to the paginate function
+ * @param {Array} args Arguments array to pass to the paginate function.
  */
 treesaver.ui.Article.prototype.paginateAsync = function(args) {
   treesaver.scheduler.delay(treesaver.ui.Article.prototype.paginate,
@@ -464,8 +464,8 @@ treesaver.ui.Article.prototype.getPageWidth = function() {
  * requested, but the article only has 3 pages, then an array with 3 items
  * will be returned)
  *
- * @param {number} start  If negative, counts from end of document
- * @param {number} count  Number of pages requested
+ * @param {number} start  If negative, counts from end of document.
+ * @param {number} count  Number of pages requested.
  * @return {Array.<treesaver.layout.Page>}
  */
 treesaver.ui.Article.prototype.getPages = function(start, count) {
@@ -538,7 +538,7 @@ treesaver.ui.Article.prototype.getPages = function(start, count) {
  * @param {?treesaver.layout.ContentPosition} position
  * @return {number} Index of the page with that position, -1 if it is
  *                  currently unknown because the content hasn't paginated
- *                  that far yet
+ *                  that far yet.
  */
 treesaver.ui.Article.prototype.getPageIndex = function(position) {
   if (!this.content) {
@@ -592,6 +592,6 @@ treesaver.ui.Article.prototype.getPageIndex = function(position) {
 
 if (goog.DEBUG) {
   treesaver.ui.Article.prototype.toString = function() {
-    return "[treesaver.ui.Article]";
+    return '[treesaver.ui.Article]';
   };
 }

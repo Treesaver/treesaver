@@ -1,18 +1,18 @@
 /**
  * @fileoverview Initializes the framework, loading required files and
- * resources
+ * resources.
  */
 
 goog.provide('treesaver.boot');
 
+goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
+goog.require('treesaver.dom');
+goog.require('treesaver.domready');
+goog.require('treesaver.events');
 goog.require('treesaver.resources');
 goog.require('treesaver.scheduler');
-goog.require('treesaver.capabilities');
 goog.require('treesaver.scriptloader');
-goog.require('treesaver.events');
-goog.require('treesaver.domready');
-goog.require('treesaver.dom');
 
 /**
  * @const
@@ -62,7 +62,7 @@ treesaver.boot.load = function() {
       }
     }
 
-    treesaver.scriptloader.load('ui.js', function (name) {
+    treesaver.scriptloader.load('ui.js', function(name) {
       treesaver.boot.uiLoaded_ = true;
       treesaver.boot.loadProgress_();
     });

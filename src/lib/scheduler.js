@@ -50,7 +50,7 @@ treesaver.scheduler.tickID_;
  * Master callback for task execution
  * @private
  */
-treesaver.scheduler.tick_ = function () {
+treesaver.scheduler.tick_ = function() {
   var now = goog.now();
 
   treesaver.scheduler.tasks_.forEach(function(task, i) {
@@ -245,8 +245,8 @@ treesaver.scheduler.limit = function(fun, interval, args, name, obj) {
 /**
  * Pause all tasks except those named in the whitelist
  *
- * @param {Array.<string>} whitelist Names of tasks that can still execute
- * @param {?number} timeout Timeout before auto-resume
+ * @param {Array.<string>} whitelist Names of tasks that can still execute.
+ * @param {?number} timeout Timeout before auto-resume.
  */
 treesaver.scheduler.pause = function(whitelist, timeout) {
   treesaver.scheduler.taskWhitelist_ = whitelist;
@@ -264,7 +264,7 @@ treesaver.scheduler.resume = function() {
 
 /**
  * Remove a task from the execution queue
- * @param {!string} name Task name
+ * @param {!string} name Task name.
  */
 treesaver.scheduler.clear = function(name) {
   delete treesaver.scheduler.namedTasks_[name];

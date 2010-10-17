@@ -1,5 +1,5 @@
 /**
- * @fileoverview Logging functions for use while debugging
+ * @fileoverview Logging functions for use while debugging.
  */
 
 goog.provide('treesaver.debug');

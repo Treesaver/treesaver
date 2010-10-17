@@ -1,5 +1,5 @@
 /**
- * @fileoverview BreakRecord class
+ * @fileoverview BreakRecord class.
  */
 
 goog.provide('treesaver.layout.BreakRecord');
@@ -39,12 +39,12 @@ treesaver.layout.BreakRecord = function() {
    * @type {number}
    */
   this.pageNumber = 0;
-}
+};
 
 /**
  * Create a new copy, and return
  *
- * @return {!treesaver.layout.BreakRecord} A deep clone of the original breakRecord
+ * @return {!treesaver.layout.BreakRecord} A deep clone of the original breakRecord.
  */
 treesaver.layout.BreakRecord.prototype.clone = function() {
   var clone = new this.constructor();
@@ -62,8 +62,8 @@ treesaver.layout.BreakRecord.prototype.clone = function() {
 /**
  * Check for effective equality
  *
- * @param {treesaver.layout.BreakRecord} other Object to check for equality
- * @return {boolean} True if the breakRecord is equivalent
+ * @param {treesaver.layout.BreakRecord} other Object to check for equality.
+ * @return {boolean} True if the breakRecord is equivalent.
  */
 treesaver.layout.BreakRecord.prototype.equals = function(other) {
   return !!other &&
@@ -91,7 +91,7 @@ treesaver.layout.BreakRecord.prototype.getPosition = function() {
  * Is the break record at the beginning of content?
  *
  * @return {boolean} True if this breakRecord is at the start
- *                   of content
+ *                   of content.
  */
 treesaver.layout.BreakRecord.prototype.atStart = function() {
   return !this.index && !this.figureIndex && !this.overhang;
@@ -100,8 +100,8 @@ treesaver.layout.BreakRecord.prototype.atStart = function() {
 /**
  * Is the break record at the end of the content?
  *
- * @param {!treesaver.layout.Content} content The content for this breakRecord
- * @return {boolean} True if there is no more content left to show
+ * @param {!treesaver.layout.Content} content The content for this breakRecord.
+ * @return {boolean} True if there is no more content left to show.
  */
 treesaver.layout.BreakRecord.prototype.atEnd = function(content) {
   if (this.overhang) {
@@ -166,7 +166,7 @@ treesaver.layout.BreakRecord.prototype.atEnd = function(content) {
  * Update the breakRecord after using a figure. Make sure to update
  * delayed array, etc
  *
- * @param {!number} figureIndex The index of the figure just used
+ * @param {!number} figureIndex The index of the figure just used.
  */
 treesaver.layout.BreakRecord.prototype.useFigure = function(figureIndex) {
   var delayedIndex;
@@ -208,7 +208,7 @@ treesaver.layout.BreakRecord.prototype.useFigure = function(figureIndex) {
  * Check if the given figure index has been used
  *
  * @param {!number} figureIndex
- * @return {boolean} True if the figure index has been used
+ * @return {boolean} True if the figure index has been used.
  */
 treesaver.layout.BreakRecord.prototype.figureUsed = function(figureIndex) {
   if (this.figureIndex <= figureIndex) {
@@ -229,7 +229,7 @@ treesaver.layout.BreakRecord.prototype.figureUsed = function(figureIndex) {
 /**
  * Update the breakRecord after trying to use a figure, but failing.
  *
- * @param {!number} figureIndex The index of the figure just used
+ * @param {!number} figureIndex The index of the figure just used.
  */
 treesaver.layout.BreakRecord.prototype.failedFigure = function(figureIndex) {
   // Pretend like we used the figure
@@ -241,6 +241,6 @@ treesaver.layout.BreakRecord.prototype.failedFigure = function(figureIndex) {
 
 if (goog.DEBUG) {
   treesaver.layout.BreakRecord.prototype.toString = function() {
-    return "[BreakRecord " + this.index + "/" + this.figureIndex + "]";
+    return '[BreakRecord ' + this.index + '/' + this.figureIndex + ']';
   };
 }

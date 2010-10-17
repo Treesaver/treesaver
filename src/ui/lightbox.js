@@ -1,5 +1,5 @@
 /**
- * @fileoverview The lightbox class
+ * @fileoverview The lightbox class.
  */
 
 goog.provide('treesaver.ui.LightBox');
@@ -15,7 +15,7 @@ goog.require('treesaver.ui.input');
 /**
  * Lightbox
  *
- * @param {!Element} node HTML node
+ * @param {!Element} node HTML node.
  * @constructor
  */
 treesaver.ui.LightBox = function(node) {
@@ -69,7 +69,7 @@ treesaver.ui.LightBox = function(node) {
 };
 
 /**
- * @return {!Element} The activated node
+ * @return {!Element} The activated node.
  */
 treesaver.ui.LightBox.prototype.activate = function() {
   if (!this.active) {
@@ -144,14 +144,14 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
 
 /**
  * @param {treesaver.dimensions.Size} availSize
- * @return {boolean} True if fits
+ * @return {boolean} True if fits.
  */
 treesaver.ui.LightBox.prototype.fits = function(availSize) {
   return treesaver.dimensions.inSizeRange(this.size, availSize);
 };
 
 /**
- * @return {boolean} True if the LightBox meets current browser capabilities
+ * @return {boolean} True if the LightBox meets current browser capabilities.
  */
 treesaver.ui.LightBox.prototype.meetsRequirements = function() {
   if (!this.requirements) {
@@ -166,7 +166,7 @@ treesaver.ui.LightBox.prototype.meetsRequirements = function() {
  *
  * @param {Array.<treesaver.ui.LightBox>} lightboxes
  * @param {treesaver.dimensions.Size} availSize
- * @return {treesaver.ui.LightBox|null} A suitable LightBox, if one was found
+ * @return {?treesaver.ui.LightBox} A suitable LightBox, if one was found.
  */
 treesaver.ui.LightBox.select = function(lightboxes, availSize) {
   // Cycle through lightboxes

@@ -1,11 +1,11 @@
 /**
- * @fileoverview JSON wrapper methods for older browsers
+ * @fileoverview JSON wrapper methods for older browsers.
  */
 
 goog.provide('treesaver.json');
 
-goog.require('treesaver.debug');
 goog.require('treesaver.capabilities');
+goog.require('treesaver.debug');
 
 /**
  * Parse JSON and return the object
@@ -28,7 +28,7 @@ treesaver.json.stringify = function(val) {
 };
 
 if (SUPPORT_LEGACY && !('JSON' in window)) {
-  treesaver.debug.info("Non-native JSON implementation");
+  treesaver.debug.info('Non-native JSON implementation');
 
   // TODO: Consider a secure implementation
   treesaver.json.parse = function(str) {
@@ -48,5 +48,5 @@ if (SUPPORT_LEGACY && !('JSON' in window)) {
   // support, so we don't need to support this manually
   treesaver.json.stringify = function(val) {
     return '';
-  }
+  };
 }

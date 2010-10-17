@@ -1,5 +1,5 @@
 /**
- * @fileoverview The chrome class
+ * @fileoverview The chrome class.
  */
 
 goog.provide('treesaver.ui.Chrome');
@@ -11,12 +11,12 @@ goog.require('treesaver.dom');
 goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.template');
-goog.require('treesaver.ui.input');
 goog.require('treesaver.ui.ArticleManager');
+goog.require('treesaver.ui.input');
 
 /**
  * Chrome
- * @param {!Element} node HTML node
+ * @param {!Element} node HTML node.
  * @constructor
  */
 treesaver.ui.Chrome = function(node) {
@@ -138,10 +138,10 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Element}
    */
   this.sidebar = null;
-}
+};
 
 /**
- * @return {!Element} The activated node
+ * @return {!Element} The activated node.
  */
 treesaver.ui.Chrome.prototype.activate = function() {
   var toc = [],
@@ -327,7 +327,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
 /**
  * Handle keyboard events
  * @param {!Object} e
- * @return {boolean} False if event is handled
+ * @return {boolean} False if event is handled.
  */
 treesaver.ui.Chrome.prototype.keyDown = function(e) {
   // Lightbox active? Hide it
@@ -698,7 +698,7 @@ treesaver.ui.Chrome.prototype.isSidebarActive = function() {
  *
  * @private
  * @param {!Element} el
- * @return {boolean} True if content can be shown
+ * @return {boolean} True if content can be shown.
  */
 treesaver.ui.Chrome.prototype.showLightBox = function(el) {
   var figure = treesaver.ui.ArticleManager.getFigure(el);
@@ -752,7 +752,7 @@ treesaver.ui.Chrome.prototype.hideLightBox = function() {
 };
 
 /**
- * @return {boolean} True if the Chrome meets current browser capabilities
+ * @return {boolean} True if the Chrome meets current browser capabilities.
  */
 treesaver.ui.Chrome.prototype.meetsRequirements = function() {
   if (!this.requirements) {
@@ -764,7 +764,7 @@ treesaver.ui.Chrome.prototype.meetsRequirements = function() {
 
 /**
  * @param {treesaver.dimensions.Size} availSize
- * @return {boolean} True if fits
+ * @return {boolean} True if fits.
  */
 treesaver.ui.Chrome.prototype.fits = function(availSize) {
   return treesaver.dimensions.inSizeRange(this.size, availSize);
@@ -810,7 +810,7 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
  * @private
  * @param {!Object} e The article changed event.
  */
-treesaver.ui.Chrome.prototype.updatePageURL = function (e) {
+treesaver.ui.Chrome.prototype.updatePageURL = function(e) {
   this.currentURL.forEach(function(el) {
     treesaver.template.expand({
         'current-url': e.url
@@ -952,7 +952,7 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
  * Populates the pages array for layout
  *
  * @private
- * @param {number} direction The direction to animate any transition
+ * @param {number} direction The direction to animate any transition.
  */
 treesaver.ui.Chrome.prototype.populatePages = function(direction) {
   var old_pages = this.pages;
@@ -982,7 +982,7 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
 
 /**
  * Positions the current visible pages
- * @param {number} direction The direction to animate any transition
+ * @param {number} direction The direction to animate any transition.
  */
 treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
   // For now, hard coded to show up to three pages, in the prev/current/next
@@ -1139,7 +1139,7 @@ treesaver.ui.Chrome.prototype.updateFields = function() {
  *
  * @param {Array.<treesaver.ui.Chrome>} chromes
  * @param {treesaver.dimensions.Size} availSize
- * @return {treesaver.ui.Chrome|null} A suitable Chrome, if one was found
+ * @return {?treesaver.ui.Chrome} A suitable Chrome, if one was found.
  */
 treesaver.ui.Chrome.select = function(chromes, availSize) {
   // Cycle through chromes
@@ -1163,6 +1163,6 @@ treesaver.ui.Chrome.select = function(chromes, availSize) {
 if (goog.DEBUG) {
   // Expose for testing
   treesaver.ui.Chrome.prototype.toString = function() {
-    return "[Chrome: ]";
+    return '[Chrome: ]';
   };
 }

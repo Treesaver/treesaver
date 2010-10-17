@@ -1,5 +1,5 @@
 /**
- * @fileoverview Container data structure
+ * @fileoverview Container data structure.
  */
 
 goog.provide('treesaver.layout.Container');
@@ -11,8 +11,8 @@ goog.require('treesaver.dom');
  * A column within a grid
  *
  * @constructor
- * @param {!Element} el         HTML element
- * @param {number}   gridHeight The height of the grid that contains this container
+ * @param {!Element} el         HTML element.
+ * @param {number}   gridHeight The height of the grid that contains this container.
  */
 treesaver.layout.Container = function(el, gridHeight) {
   /**
@@ -49,11 +49,11 @@ treesaver.layout.Container = function(el, gridHeight) {
    * @type {!Array.<string>}
    */
   this.sizes = sizesProperty ? sizesProperty.split(' ') : [];
-}
+};
 
 /**
  * @param {number} gridHeight
- * @return {!treesaver.layout.Container} Returns self for chaining support
+ * @return {!treesaver.layout.Container} Returns self for chaining support.
  */
 treesaver.layout.Container.prototype.stretch = function stretchContainer(gridHeight) {
   if (!this.flexible) {
@@ -67,6 +67,6 @@ treesaver.layout.Container.prototype.stretch = function stretchContainer(gridHei
 
 if (goog.DEBUG) {
   treesaver.layout.Container.prototype.toString = function toString() {
-    return "[Container " + this.height + '/' + this.delta + "]";
+    return '[Container ' + this.height + '/' + this.delta + ']';
   };
 }

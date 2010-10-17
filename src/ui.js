@@ -1,15 +1,15 @@
 /**
- * @fileoverview Reading UI
+ * @fileoverview Reading UI.
  */
 
 goog.provide('treesaver.ui');
 
 goog.require('treesaver.debug');
-goog.require('treesaver.ui.input');
 goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.ArticleManager');
 goog.require('treesaver.ui.Chrome');
 goog.require('treesaver.ui.StateManager');
+goog.require('treesaver.ui.input');
 
 /**
  * Load the UI

@@ -1,5 +1,5 @@
 /**
- * @fileoverview HTML and other information about a figure's content payload
+ * @fileoverview HTML and other information about a figure's content payload.
  */
 
 goog.provide('treesaver.layout.FigureSize');
@@ -8,7 +8,7 @@ goog.require('treesaver.dom');
 
 /**
  * HTML and other information about a figure content payload
- * @param {string} html Content payload
+ * @param {string} html Content payload.
  * @param {number|string} minW
  * @param {number|string} minH
  * @param {?Array.<string>} requirements
@@ -44,10 +44,10 @@ treesaver.layout.FigureSize = function(html, minW, minH, requirements) {
    * @type {?Array.<string>}
    */
   this.requirements = requirements;
-}
+};
 
 /**
- * @return {boolean} True if the figureSize meets current browser capabilities
+ * @return {boolean} True if the figureSize meets current browser capabilities.
  */
 treesaver.layout.FigureSize.prototype.meetsRequirements = function() {
   if (!this.requirements) {
@@ -86,6 +86,6 @@ treesaver.layout.FigureSize.prototype.revertSize = function(container, name) {
 if (goog.DEBUG) {
   // Expose for testing
   treesaver.layout.FigureSize.prototype.toString = function() {
-    return "[FigureSize: " + this.index + "/" + this.html + "]";
+    return '[FigureSize: ' + this.index + '/' + this.html + ']';
   };
 }

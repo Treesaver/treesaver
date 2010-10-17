@@ -1,5 +1,5 @@
 /**
- * @fileoverview Extract resources defined in an external HTML file
+ * @fileoverview Extract resources defined in an external HTML file.
  */
 
 goog.provide('treesaver.resources');
@@ -106,7 +106,7 @@ treesaver.resources.loadComplete_ = function() {
   treesaver.resources.callbacks_ = [];
 
   // Do callbacks
-  callbacks.forEach(function (callback) {
+  callbacks.forEach(function(callback) {
     callback();
   });
 };
@@ -115,7 +115,7 @@ treesaver.resources.loadComplete_ = function() {
  * Return resources based on class name
  *
  * @param {!string} className
- * @return {!Array.<Element>} Array of matching resource elements
+ * @return {!Array.<Element>} Array of matching resource elements.
  */
 treesaver.resources.findByClassName = function(className) {
   // TODO: Restrict only to top-level children?
@@ -138,7 +138,7 @@ treesaver.resources.unload = function() {
  * element with rel=resources
  *
  * @private
- * @return {?string} The url, if one was found
+ * @return {?string} The url, if one was found.
  */
 treesaver.resources.getResourcesLinkUrl_ = function() {
   var links = document.getElementsByTagName('link'),

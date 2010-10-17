@@ -1,5 +1,5 @@
 /**
- * @fileoverview Definition of constants
+ * @fileoverview Definition of constants.
  */
 
 goog.provide('treesaver.constants');

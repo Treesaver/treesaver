@@ -1,5 +1,5 @@
 /**
- * @fileoverview Column data structure
+ * @fileoverview Column data structure.
  */
 
 goog.provide('treesaver.layout.Column');
@@ -11,8 +11,8 @@ goog.require('treesaver.dom');
  * A column within a grid
  *
  * @constructor
- * @param {!Element} el         HTML element
- * @param {number}   gridHeight The height of the grid that contains this column
+ * @param {!Element} el         HTML element.
+ * @param {number}   gridHeight The height of the grid that contains this column.
  */
 treesaver.layout.Column = function(el, gridHeight) {
   /**
@@ -42,11 +42,11 @@ treesaver.layout.Column = function(el, gridHeight) {
    * @type {number}
    */
   this.delta = Math.max(0, gridHeight - this.height);
-}
+};
 
 /**
  * @param {number} gridHeight
- * @return {!treesaver.layout.Column} Returns self for chaining support
+ * @return {!treesaver.layout.Column} Returns self for chaining support.
  */
 treesaver.layout.Column.prototype.stretch = function stretchColumn(gridHeight) {
   if (!this.flexible) {
@@ -60,6 +60,6 @@ treesaver.layout.Column.prototype.stretch = function stretchColumn(gridHeight) {
 
 if (goog.DEBUG) {
   treesaver.layout.Column.prototype.toString = function toString() {
-    return "[Column " + this.height + '/' + this.delta + "]";
+    return '[Column ' + this.height + '/' + this.delta + ']';
   };
 }

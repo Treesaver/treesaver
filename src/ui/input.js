@@ -1,5 +1,5 @@
 /**
- * @fileoverview User input helpers
+ * @fileoverview User input helpers.
  */
 
 goog.provide('treesaver.ui.input');
@@ -270,7 +270,7 @@ treesaver.ui.input.removeMouseHandlers_ = function() {
 
   // Clear mouse data
   treesaver.ui.input.mouseData_ = null;
-}
+};
 
 /**
  *
@@ -336,7 +336,7 @@ treesaver.ui.input.mouseData_;
  * @param {boolean} isTouch
  * @return {Object}
  */
-treesaver.ui.input.getMouseData_ = function (e, isTouch) {
+treesaver.ui.input.getMouseData_ = function(e, isTouch) {
   var posX, posY;
 
   if (isTouch && e.touches[0]) {
@@ -401,7 +401,7 @@ treesaver.ui.input.findTarget_ = function(node) {
  *
  * @private
  * @param {!Event} e
- * @return {boolean} True if at least one of those keys was pressed
+ * @return {boolean} True if at least one of those keys was pressed.
  */
 treesaver.ui.input.specialKeyPressed_ = function _specialKeyPressed(e) {
   return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;

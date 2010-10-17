@@ -1,13 +1,13 @@
 /**
- * @fileoverview Retrieve files via XMLHttpRequest
+ * @fileoverview Retrieve files via XMLHttpRequest.
  */
 
 goog.provide('treesaver.network');
 
 goog.require('treesaver.array'); // forEach
-goog.require('treesaver.scheduler'); // delay
+goog.require('treesaver.capabilities'); // delay
 goog.require('treesaver.debug');
-goog.require('treesaver.capabilities');
+goog.require('treesaver.scheduler');
 
 /**
  * @private
@@ -67,12 +67,12 @@ treesaver.network.load = function() {
     treesaver.network.isLoaded_ = true;
 
     // Hook up event handlers
-    treesaver.network.watchedEvents_.forEach(function (evt) {
+    treesaver.network.watchedEvents_.forEach(function(evt) {
       treesaver.events.addListener(document, evt, treesaver.network);
     });
 
     if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE) {
-      treesaver.network.watchedCacheEvents_.forEach(function (evt) {
+      treesaver.network.watchedCacheEvents_.forEach(function(evt) {
         treesaver.events.addListener(window.applicationCache, evt, treesaver.network);
       });
     }
@@ -87,10 +87,10 @@ treesaver.network.unload = function() {
     treesaver.network.isLoaded_ = false;
 
     // Unhook event handlers
-    treesaver.network.watchedEvents_.forEach(function (evt) {
+    treesaver.network.watchedEvents_.forEach(function(evt) {
       treesaver.events.removeListener(window, evt, treesaver.network);
     });
-    treesaver.network.watchedCacheEvents_.forEach(function (evt) {
+    treesaver.network.watchedCacheEvents_.forEach(function(evt) {
       treesaver.events.removeListener(window.applicationCache, evt, treesaver.network);
     });
 
@@ -99,7 +99,7 @@ treesaver.network.unload = function() {
 };
 
 /**
- * @return {boolean} True if browser has an internet connection
+ * @return {boolean} True if browser has an internet connection.
  */
 treesaver.network.isOnline = function() {
   if ('onLine' in window.navigator) {
@@ -121,7 +121,7 @@ treesaver.network.loadedFromCache_ =
   !!window.applicationCache.status;
 
 /**
- * @return {boolean} True if the browser cache was active during boot
+ * @return {boolean} True if the browser cache was active during boot.
  */
 treesaver.network.loadedFromCache = function() {
   return treesaver.network.loadedFromCache_;
@@ -173,7 +173,7 @@ treesaver.network['handleEvent'] = function(e) {
 
 /**
  * @param {!string} url
- * @return {!string} path
+ * @return {!string} path.
  */
 treesaver.network.urlToPath = function(url) {
   var a = document.createElement('a'),
@@ -207,7 +207,7 @@ treesaver.network.urlToPath = function(url) {
 
 /**
  * @param {!string} url
- * @return {!string} The url without the hash
+ * @return {!string} The url without the hash.
  */
 treesaver.network.stripHash = function(url) {
   var hash_index = url.indexOf('#');
@@ -229,7 +229,7 @@ treesaver.network.protocolRegex_ = /^https?:\/\//i;
 
 /**
  * @param {!string} rel_path
- * @return {!string} An absolute URL
+ * @return {!string} An absolute URL.
  */
 treesaver.network.absoluteURL = function(rel_path) {
   // Shortcut anything that starts with slash
@@ -276,7 +276,7 @@ treesaver.network.get = function get(url, callback, timeout) {
   };
 
   treesaver.scheduler.delay(
-    function () {
+    function() {
       treesaver.network.requestTimeout_(request);
     },
     timeout || treesaver.network.DEFAULT_TIMEOUT,
@@ -311,7 +311,7 @@ treesaver.network.makeRequestId_ = function(request) {
  * @private
  */
 treesaver.network.createHandler_ = function createHandler_(request) {
-  return function () {
+  return function() {
     if (request.xhr.readyState === 4) {
       // The hosted UIWebView gives us a status of 0 for some reason
       if ((WITHIN_IOS_WRAPPER && request.xhr.status === 0) ||

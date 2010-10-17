@@ -1,5 +1,5 @@
 /**
- * @fileoverview Article manager class
+ * @fileoverview Article manager class.
  */
 
 goog.provide('treesaver.ui.ArticleManager');
@@ -234,7 +234,7 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
 };
 
 /**
- * @param {!Event} e  Event with e.state for state storage
+ * @param {!Event} e  Event with e.state for state storage.
  */
 treesaver.ui.ArticleManager.onPopState = function(e) {
   if (e['state']) {
@@ -303,8 +303,8 @@ treesaver.ui.ArticleManager.generateTOC = function() {
  * contents. Then update the internal TOC storage
  *
  * @private
- * @param {?string} html String of HTML which may contain links
- * @param {string} toc_url URL of the TOC
+ * @param {?string} html String of HTML which may contain links.
+ * @param {string} toc_url URL of the TOC.
  */
 treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
   var initialArticleIsTOC = (toc_url === treesaver.ui.ArticleManager.initialUrl);
@@ -417,7 +417,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     // we have to push everything else back
     for (var key in treesaver.ui.ArticleManager.articleMap) {
       // Add one to every entry
-      treesaver.ui.ArticleManager.articleMap[key] = treesaver.ui.ArticleManager.articleMap[key].map(function (val) {
+      treesaver.ui.ArticleManager.articleMap[key] = treesaver.ui.ArticleManager.articleMap[key].map(function(val) {
         return val + 1;
       });
     }
@@ -434,7 +434,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
  * Parse the TOC using the microdata API. Out of necessity we
  * append the container node to the document first, and remove
  * it afterwards.
- * 
+ *
  * @param {!string} html The string to find TOC content in.
  * @private
  */
@@ -487,7 +487,7 @@ treesaver.ui.ArticleManager.canGoToPreviousPage = function() {
  * Go to the previous page in the current article. If we are at
  * the first page of the article, go to the last page of the previous
  * article
- * @return {boolean} False if there is no previous page or article
+ * @return {boolean} False if there is no previous page or article.
  */
 treesaver.ui.ArticleManager.previousPage = function() {
   if (goog.DEBUG) {
@@ -572,7 +572,7 @@ treesaver.ui.ArticleManager.canGoToNextPage = function() {
  * Go to the next page in the current article. If we are at
  * the last page of the article, go to the first page of the next
  * article
- * @return {boolean} False if there is no previous page or article
+ * @return {boolean} False if there is no previous page or article.
  */
 treesaver.ui.ArticleManager.nextPage = function() {
   if (goog.DEBUG) {
@@ -637,13 +637,13 @@ treesaver.ui.ArticleManager.nextPage = function() {
  */
 treesaver.ui.ArticleManager.canGoToPreviousArticle = function() {
   return !!treesaver.ui.ArticleManager.currentArticleIndex;
-}
+};
 
 /**
  * Go to the beginning of previous article in the flow
- * @param {boolean=} end Go to the end of the article
- * @param {boolean=} fetch Only return the article, don't move
- * @return {treesaver.ui.Article} False if there is no next article
+ * @param {boolean=} end Go to the end of the article.
+ * @param {boolean=} fetch Only return the article, don't move.
+ * @return {treesaver.ui.Article} False if there is no next article.
  */
 treesaver.ui.ArticleManager.previousArticle = function(end, fetch) {
   if (!treesaver.ui.ArticleManager.canGoToPreviousArticle()) {
@@ -671,8 +671,8 @@ treesaver.ui.ArticleManager.canGoToNextArticle = function() {
 
 /**
  * Go to the beginning of next article in the flow
- * @param {boolean=} fetch Only return the article, don't move
- * @return {treesaver.ui.Article} The next article
+ * @param {boolean=} fetch Only return the article, don't move.
+ * @return {treesaver.ui.Article} The next article.
  */
 treesaver.ui.ArticleManager.nextArticle = function(fetch) {
   if (!treesaver.ui.ArticleManager.canGoToNextArticle()) {
@@ -692,7 +692,7 @@ treesaver.ui.ArticleManager.nextArticle = function(fetch) {
  *
  * @param {!string} url
  * @param {treesaver.layout.ContentPosition=} pos
- * @return {boolean} True if successful
+ * @return {boolean} True if successful.
  */
 treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
   var index = treesaver.ui.ArticleManager._getArticleIndex(url),
@@ -709,10 +709,10 @@ treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
 /**
  * Retrieve an array of pages around the current reading position
  *
- * @param {!treesaver.dimensions.Size} maxSize Maximum allowed size of a page
+ * @param {!treesaver.dimensions.Size} maxSize Maximum allowed size of a page.
  * @param {number}                     buffer  Number of pages on each side of
- *                                             page to retrieve
- * @returns {Array.<?treesaver.layout.Page>} Array of pages, some may be null
+ *                                             page to retrieve.
+ * @return {Array.<?treesaver.layout.Page>} Array of pages, some may be null.
  */
 treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   // Fetching pages resets our transition direction
@@ -908,7 +908,7 @@ treesaver.ui.ArticleManager.getCurrentTOC = function() {
  * @private
  * @param {!string} url
  * @param {boolean=} fwd
- * @return {number|null}
+ * @return {?number}
  */
 treesaver.ui.ArticleManager._getArticleIndex = function(url, fwd) {
   var locations = treesaver.ui.ArticleManager.articleMap[url],
@@ -971,7 +971,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
   article.loading = true;
 
   var cached_text =
-    /** @type {string|null} */
+    /** @type {?string} */
     (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
 
   if (cached_text) {
@@ -1024,7 +1024,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
  * @param {treesaver.layout.ContentPosition} pos
  * @param {number=} index
  * @param {boolean=} noHistory
- * @return {boolean} True if successful
+ * @return {boolean} True if successful.
  */
 treesaver.ui.ArticleManager._setArticle = function(article, pos, index, noHistory) {
   // TODO: Assert not null

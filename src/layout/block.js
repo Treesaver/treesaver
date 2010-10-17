@@ -1,22 +1,22 @@
 /**
- * @fileoverview A block element
+ * @fileoverview A block element.
  */
 
 goog.provide('treesaver.layout.Block');
 
-goog.require('treesaver.layout.Figure');
+goog.require('treesaver.array');
 goog.require('treesaver.debug');
-goog.require('treesaver.array'); // forEach
+goog.require('treesaver.dimensions'); // forEach
 goog.require('treesaver.dom');
-goog.require('treesaver.dimensions');
+goog.require('treesaver.layout.Figure');
 
 /**
  * A block element. Includes paragraphs, images, lists, etc.
- * @param {!Node} node HTML node
+ * @param {!Node} node HTML node.
  * @param {!number} baseLineHeight The normal line height used across
- *                                 the article content (in pixels)
- * @param {!Object} indices Current block and figure index
- * @param {?boolean} isFallback Whether child figures should be ignored
+ *                                 the article content (in pixels).
+ * @param {!Object} indices Current block and figure index.
+ * @param {?boolean} isFallback Whether child figures should be ignored.
  * @constructor
  */
 treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
@@ -29,7 +29,7 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
 
   if (goog.DEBUG) {
     if (!indices) {
-      treesaver.debug.warn('Auto-generating indices. Will not work in production!');
+      treesaver.debug.warn('Autogen indices. Will not work in production!');
       indices = {
         index: 0,
         figureIndex: 0
@@ -40,7 +40,7 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   // Is this an HTML element?
   // TODO: Remove this check?
   if (node.nodeType !== 1) {
-    treesaver.debug.error('Non-element node sent into Block constructor: ' + node);
+    treesaver.debug.error('Non-element sent into Block constructor: ' + node);
 
     // Ignore whitespace, comments, etc
     this.ignore = true;
@@ -57,7 +57,8 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   indices.index += 1;
 
   /** @type {boolean} */
-  this.hasBlockChildren = !isReplacedElement && treesaver.layout.Block.hasBlockChildren(node);
+  this.hasBlockChildren = !isReplacedElement &&
+    treesaver.layout.Block.hasBlockChildren(node);
 
   ///////////////
   // Hierarchy
@@ -84,7 +85,8 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   hasFigures = false;
   if (this.hasBlockChildren && !treesaver.dom.hasClass(node, 'keeptogether')) {
     // Extract child blocks and figures
-    treesaver.layout.Block.processChildren(this, node, baseLineHeight, indices, isFallback);
+    treesaver.layout.Block.
+      processChildren(this, node, baseLineHeight, indices, isFallback);
 
     // TODO: Collapse if there is only one child element
 
@@ -151,7 +153,8 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   // Check if the entire element is a single line, if so then we need to
   // mark keeptogether
   if (!this.keeptogether) {
-    this.keeptogether = (this.metrics.bpHeight + this.metrics.lineHeight) === this.metrics.outerH;
+    this.keeptogether =
+      (this.metrics.bpHeight + this.metrics.lineHeight) === this.metrics.outerH;
   }
 
   /**
@@ -248,7 +251,9 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
 
 /**
  * Find the next block, never going to children
- * @return {?treesaver.layout.Block}
+ *
+ * @return {?treesaver.layout.Block} The next block in content that is not
+ *                                   contained within this block
  */
 treesaver.layout.Block.prototype.getNextNonChildBlock = function() {
   if (this.nextSibling) {
@@ -268,8 +273,8 @@ treesaver.layout.Block.prototype.getNextNonChildBlock = function() {
  * @param {!treesaver.layout.Block|treesaver.layout.Content} owner
  * @param {!Element} node
  * @param {!number} baseLineHeight
- * @param {!Object} indices Current block and figure index
- * @param {?boolean=} isFallback Whether child figures should be ignored
+ * @param {!Object} indices Current block and figure index.
+ * @param {?boolean=} isFallback Whether child figures should be ignored.
  * @return {{blocks: Array.<treesaver.layout.Block>, figures: Array.<treesaver.layout.Figure>}}
  */
 treesaver.layout.Block.processChildren =
@@ -340,7 +345,7 @@ treesaver.layout.Block.processChildren =
 
 /**
  * @param {?boolean} useZero Whether the open tags should be the
- *                          zero-margin versions
+ *                          zero-margin versions.
  * @return {string}
  */
 treesaver.layout.Block.prototype.openAllTags = function(useZero) {
@@ -394,7 +399,7 @@ treesaver.layout.Block.prototype.totalBpBottom = function() {
  *   - If the element is not in either of those, then we test manually
  *
  * @param {!Element} node
- * @return {boolean} True if the node has children that are blocks
+ * @return {boolean} True if the node has children that are blocks.
  */
 treesaver.layout.Block.hasBlockChildren = function(node) {
   // Assume paragraph nodes are never block parents
@@ -455,7 +460,7 @@ treesaver.layout.Block.replaced_elements = ['img', 'video', 'object', 'embed',
 
 /**
  * @param {!Node} el
- * @return {boolean} True if the element is a replaced element
+ * @return {boolean} True if the element is a replaced element.
  */
 treesaver.layout.Block.isReplacedElement = function(el) {
   var nodeName = el.nodeName.toLowerCase();
@@ -470,7 +475,7 @@ treesaver.layout.Block.inline_containers = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', '
 
 /**
  * @param {!Element} el
- * @return {boolean} True if the element is a replaced element
+ * @return {boolean} True if the element is a replaced element.
  */
 treesaver.layout.Block.isInlineContainer = function(el) {
   var nodeName = el.nodeName.toLowerCase();
@@ -485,7 +490,7 @@ treesaver.layout.Block.block_containers = ['div', 'article', 'ul', 'ol', 'figure
 
 /**
  * @param {!Element} el
- * @return {boolean} True if the element is a replaced element
+ * @return {boolean} True if the element is a replaced element.
  */
 treesaver.layout.Block.isBlockContainer = function(el) {
   var nodeName = el.nodeName.toLowerCase();
@@ -498,7 +503,7 @@ treesaver.layout.Block.isBlockContainer = function(el) {
  *
  * @param {!Element} node
  * @param {!number} baseLineHeight
- * @return {Element} The same node passed in (for chaining)
+ * @return {Element} The same node passed in (for chaining).
  */
 treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
   // Should never get text & comment nodes
@@ -634,7 +639,7 @@ treesaver.layout.Block.normalizeMetrics_ = function(node, baseLineHeight) {
 
 if (goog.DEBUG) {
   treesaver.layout.Block.prototype.toString = function() {
-    return "[Block: " + this.metrics.outerH + "/" +
-      this.metrics.lineHeight + "]";
+    return '[Block: ' + this.metrics.outerH + '/' +
+      this.metrics.lineHeight + ']';
   };
 }

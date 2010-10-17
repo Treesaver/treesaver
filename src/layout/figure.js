@@ -5,16 +5,16 @@ goog.require('treesaver.capabilities');
 goog.require('treesaver.dom');
 // Block requires Figure, so avoid a circular dependency
 //goog.require('treesaver.layout.Block');
-goog.require('treesaver.layout.FigureSize');
-goog.require('treesaver.string'); // trim
 goog.require('treesaver.json');
+goog.require('treesaver.layout.FigureSize'); // trim
+goog.require('treesaver.string');
 
 /**
  * A figure element
- * @param {!Element} el HTML element
+ * @param {!Element} el HTML element.
  * @param {!number} baseLineHeight The normal line height used across
- *                                 the article content (in pixels)
- * @param {?Object} indices Current block and figure index
+ *                                 the article content (in pixels).
+ * @param {?Object} indices Current block and figure index.
  * @constructor
  */
 treesaver.layout.Figure = function(el, baseLineHeight, indices) {
@@ -49,7 +49,7 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   this.templates = [];
 
   // Go through and process our sizes
-  treesaver.array.toArray(el.childNodes).forEach(function (childNode) {
+  treesaver.array.toArray(el.childNodes).forEach(function(childNode) {
     if (childNode.nodeType !== 1) {
       // TODO: What if content is just a ext node? (take parent?)
       if (childNode.data && childNode.data.trim()) {
@@ -74,14 +74,14 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
 
   // No longer needed
   delete this.templates;
-}
+};
 
 /**
  * @param {!string} html
- * @param {!Node} node HTML node
+ * @param {!Node} node HTML node.
  * @param {!number} baseLineHeight The normal line height used across
- *                                 the article content (in pixels)
- * @param {!Object} indices Current block and figure index
+ *                                 the article content (in pixels).
+ * @param {!Object} indices Current block and figure index.
  */
 treesaver.layout.Figure.prototype.processFallback = function processFallback(html,
     node, baseLineHeight, indices) {
@@ -182,8 +182,8 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
  *
  * @param {!Element} childNode
  * @param {!number} baseLineHeight The normal line height used across
- *                                 the article content (in pixels)
- * @param {?Object} indices Current block and figure index
+ *                                 the article content (in pixels).
+ * @param {?Object} indices Current block and figure index.
  */
 treesaver.layout.Figure.prototype.processChildNode =
   function processChildNode(childNode, baseLineHeight, indices) {
@@ -221,7 +221,7 @@ treesaver.layout.Figure.prototype.processChildNode =
  * Retrieve a qualifying figureSize for the given size name
  *
  * @param {!string} size
- * @return {?treesaver.layout.FigureSize} Null if not found
+ * @return {?treesaver.layout.FigureSize} Null if not found.
  */
 treesaver.layout.Figure.prototype.getSize = function(size) {
   var i, len;
@@ -231,7 +231,7 @@ treesaver.layout.Figure.prototype.getSize = function(size) {
       if (this.sizes[size][i].meetsRequirements()) {
         return this.sizes[size][i];
       }
-    };
+    }
   }
 
   // None found
@@ -251,7 +251,7 @@ treesaver.layout.Figure.prototype.getLargestSize = function(maxSize) {
       current;
 
   for (current in this.sizes) {
-    this.sizes[current].forEach(function (figureSize) {
+    this.sizes[current].forEach(function(figureSize) {
       if (!figureSize.meetsRequirements()) {
         // Not eligible
         return;
@@ -290,7 +290,7 @@ treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, mi
   // First, create the FigureSize
   var figureSize = new treesaver.layout.FigureSize(html, minW, minH, requirements);
 
-  sizes.forEach(function (size) {
+  sizes.forEach(function(size) {
     if (this.sizes[size]) {
       this.sizes[size].push(figureSize);
     }
@@ -388,7 +388,7 @@ treesaver.layout.Figure.prototype.processTemplateValues = function processTempla
     // checks here, so let's just check for forEach
     if (values.forEach) {
       // Process each size
-      values.forEach(function (val) {
+      values.forEach(function(val) {
         this.processValue(val, template_name);
       }, this);
     }
@@ -447,7 +447,7 @@ treesaver.layout.Figure.prototype.processValue = function processValue(value, de
 /**
  * @type {!RegExp}
  */
-treesaver.layout.Figure.templateRegex = new RegExp("{{([^}]+)}}", 'g');
+treesaver.layout.Figure.templateRegex = new RegExp('{{([^}]+)}}', 'g');
 
 /**
  * @param {!string} template
@@ -455,7 +455,7 @@ treesaver.layout.Figure.templateRegex = new RegExp("{{([^}]+)}}", 'g');
  */
 treesaver.layout.Figure.applyTemplate = function applyTemplate(template, values) {
   // Replace {{ name }} with appropriate value (or blank if not found)
-  return template.replace(treesaver.layout.Figure.templateRegex, function () {
+  return template.replace(treesaver.layout.Figure.templateRegex, function() {
     var name = arguments[1].trim();
 
     // Protect against case-sensitivity errors
@@ -465,7 +465,7 @@ treesaver.layout.Figure.applyTemplate = function applyTemplate(template, values)
 
 /**
  * @param {!Element} el
- * @return {boolean} True if the element is a figure
+ * @return {boolean} True if the element is a figure.
  */
 treesaver.layout.Figure.isFigure = function isFigure(el) {
   var nodeName = el.nodeName.toLowerCase();
@@ -475,6 +475,6 @@ treesaver.layout.Figure.isFigure = function isFigure(el) {
 if (goog.DEBUG) {
   // Expose for testing
   treesaver.layout.Figure.prototype.toString = function toString() {
-    return "[Figure: " + this.index + "/" + this.figureIndex + "]";
+    return '[Figure: ' + this.index + '/' + this.figureIndex + ']';
   };
 }

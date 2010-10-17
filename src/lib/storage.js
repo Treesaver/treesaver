@@ -1,5 +1,5 @@
 /**
- * @fileoverview Simple online/offline storage system
+ * @fileoverview Simple online/offline storage system.
  */
 
 goog.provide('treesaver.storage');
@@ -32,7 +32,7 @@ treesaver.storage.set = function set(key, value, persist) {
 
 /**
  * @param {!string} key
- * @return {*} Previously stored value, if any
+ * @return {*} Previously stored value, if any.
  */
 treesaver.storage.get = function set(key) {
   // Session take precedence over local
@@ -43,7 +43,7 @@ treesaver.storage.get = function set(key) {
   }
   else {
     return null;
-  };
+  }
 };
 
 /**
@@ -93,7 +93,7 @@ treesaver.storage.getKeys_ = function(prefix) {
  */
 treesaver.storage.clean = function clean(prefix, whitelist) {
   var blacklist = [];
-  treesaver.storage.getKeys_(prefix).forEach(function (key) {
+  treesaver.storage.getKeys_(prefix).forEach(function(key) {
     if (!whitelist || whitelist.indexOf(key) === -1) {
       treesaver.storage.clear(key);
     }

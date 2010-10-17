@@ -1,5 +1,5 @@
 /**
- * @fileoverview Responsible for managing the application state. Should really be called ChromeManager
+ * @fileoverview Responsible for managing the application state. Should really be called ChromeManager.
  */
 
 goog.provide('treesaver.ui.StateManager');
@@ -123,7 +123,7 @@ treesaver.ui.StateManager.getViewport_ = function() {
 treesaver.ui.StateManager.getChromes_ = function() {
   var chromes = [];
 
-  treesaver.resources.findByClassName('chrome').forEach(function (node) {
+  treesaver.resources.findByClassName('chrome').forEach(function(node) {
     var chrome,
         requires = node.getAttribute('data-requires');
 
@@ -150,7 +150,7 @@ treesaver.ui.StateManager.getChromes_ = function() {
 treesaver.ui.StateManager.getLightBoxes_ = function() {
   var lightboxes = [];
 
-  treesaver.resources.findByClassName('lightbox').forEach(function (node) {
+  treesaver.resources.findByClassName('lightbox').forEach(function(node) {
     var lightbox,
         requires = node.getAttribute('data-requires');
 

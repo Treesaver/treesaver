@@ -1,5 +1,5 @@
 /**
- * @fileoverview Capability testing and tracking library
+ * @fileoverview Capability testing and tracking library.
  *
  */
 
@@ -100,7 +100,7 @@ treesaver.capabilities.IS_SMALL_SCREEN =
  * @const
  * @type {string}
  */
-treesaver.capabilities.BROWSER_NAME = (function () {
+treesaver.capabilities.BROWSER_NAME = (function() {
   if (WITHIN_IOS_WRAPPER) {
     return 'safari';
   }
@@ -177,11 +177,11 @@ treesaver.capabilities.SUPPORTS_FLASH = (function() {
     return !!window.navigator.plugins['Shockwave Flash'];
   }
   else if (SUPPORT_IE && 'ActiveXObject' in window) {
-    treesaver.debug.warn("Using ActiveX detection for Flash");
+    treesaver.debug.warn('Using ActiveX detection for Flash');
 
     try {
       // Throws exception if not in registry
-      return !!(new window.ActiveXObject("ShockwaveFlash.ShockwaveFlash.7"));
+      return !!(new window.ActiveXObject('ShockwaveFlash.ShockwaveFlash.7'));
     }
     catch (e) {
       treesaver.debug.warn('ActiveX Flash detection failed with exception:' + e);
@@ -295,7 +295,7 @@ treesaver.capabilities.transientCaps_;
  *
  * @private
  * @param {!boolean} val
- * @return {!string} 'no-' if val is false, '' otherwise
+ * @return {!string} 'no-' if val is false, '' otherwise.
  */
 treesaver.capabilities.doPrefix_ = function(val) {
   return val ? '' : 'no-';
@@ -413,8 +413,8 @@ treesaver.capabilities.transientCapabilityList_ = [
  * @private
  * @type {!RegExp}
  */
-treesaver.capabilities.transientCapabilityRegex_ = (function () {
-  var terms = treesaver.capabilities.transientCapabilityList_.map(function (term) {
+treesaver.capabilities.transientCapabilityRegex_ = (function() {
+  var terms = treesaver.capabilities.transientCapabilityList_.map(function(term) {
     return '((no-)?' + term + ')';
   });
 
@@ -424,10 +424,10 @@ treesaver.capabilities.transientCapabilityRegex_ = (function () {
 /**
  * Check if a set of requirements are met by the current browser state
  *
- * @param {!Array.<string>} required Required capabilities
+ * @param {!Array.<string>} required Required capabilities.
  * @param {boolean=} useTransient Whether transient capabilities should be
- *                                checked as well
- * @return {boolean} True if requirements are met
+ *                                checked as well.
+ * @return {boolean} True if requirements are met.
  */
 treesaver.capabilities.check = function checkCapabilities(required, useTransient) {
   if (!required.length) {
@@ -435,7 +435,7 @@ treesaver.capabilities.check = function checkCapabilities(required, useTransient
   }
 
   // Requirements are in the form of 'flash', 'offline', or 'no-orientation'
-  return required.every(function (req) {
+  return required.every(function(req) {
     var isNegation = req.substr(0, 3) === 'no-',
         rootReq = isNegation ? req.substr(3) : req,
         allCaps = treesaver.capabilities.caps_.concat(

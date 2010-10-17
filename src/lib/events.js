@@ -1,11 +1,11 @@
 /**
- * @fileoverview Event helper functions
+ * @fileoverview Event helper functions.
  */
 
 goog.provide('treesaver.events');
 
-goog.require('treesaver.debug');
-goog.require('treesaver.array'); // forEach
+goog.require('treesaver.array');
+goog.require('treesaver.debug'); // forEach
 
 /**
  * Create an event and fire it
@@ -73,28 +73,28 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
    * @type {Array.<string>}
    */
   var IE_NATIVE_EVENTS = [
-    "abort", "activate", "afterprint", "afterupdate",
-    "beforeactivate", "beforecopy", "beforecut",
-    "beforedeactivate", "beforeeditfocus", "beforepaste",
-    "beforeprint", "beforeunload", "beforeupdate", "blur",
-    "bounce", "cellchange", "change", "click",
-    "contextmenu", "controlselect", "copy", "cut",
-    "dataavailable", "datasetchanged", "datasetcomplete",
-    "dblclick", "deactivate", "drag", "dragend",
-    "dragenter", "dragleave", "dragover", "dragstart",
-    "drop", "error", "error", "errorupdate", "filterchange",
-    "finish", "focus", "focusin", "focusout", "hashchange",
-    "help", "keydown", "keypress", "keyup", "layoutcomplete",
-    "load", "losecapture", "message", "mousedown",
-    "mouseenter", "mouseleave", "mousemove", "mouseout",
-    "mouseover", "mouseup", "mousewheel", "move",
-    "moveend", "movestart", "offline", "online", "page",
-    "paste", "progress", "propertychange", "readystatechange",
-    "readystatechange", "reset", "resize", "resizeend",
-    "resizestart", "rowenter", "rowexit", "rowsdelete",
-    "rowsinserted", "scroll", "select", "selectionchange",
-    "selectstart", "start", "stop", "storage",
-    "storagecommit", "submit", "timeout", "unload"
+    'abort', 'activate', 'afterprint', 'afterupdate',
+    'beforeactivate', 'beforecopy', 'beforecut',
+    'beforedeactivate', 'beforeeditfocus', 'beforepaste',
+    'beforeprint', 'beforeunload', 'beforeupdate', 'blur',
+    'bounce', 'cellchange', 'change', 'click',
+    'contextmenu', 'controlselect', 'copy', 'cut',
+    'dataavailable', 'datasetchanged', 'datasetcomplete',
+    'dblclick', 'deactivate', 'drag', 'dragend',
+    'dragenter', 'dragleave', 'dragover', 'dragstart',
+    'drop', 'error', 'error', 'errorupdate', 'filterchange',
+    'finish', 'focus', 'focusin', 'focusout', 'hashchange',
+    'help', 'keydown', 'keypress', 'keyup', 'layoutcomplete',
+    'load', 'losecapture', 'message', 'mousedown',
+    'mouseenter', 'mouseleave', 'mousemove', 'mouseout',
+    'mouseover', 'mouseup', 'mousewheel', 'move',
+    'moveend', 'movestart', 'offline', 'online', 'page',
+    'paste', 'progress', 'propertychange', 'readystatechange',
+    'readystatechange', 'reset', 'resize', 'resizeend',
+    'resizestart', 'rowenter', 'rowexit', 'rowsdelete',
+    'rowsinserted', 'scroll', 'select', 'selectionchange',
+    'selectstart', 'start', 'stop', 'storage',
+    'storagecommit', 'submit', 'timeout', 'unload'
   ];
 
   /**
@@ -155,7 +155,7 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
    * @return {!function()}
    */
   treesaver.events.createMasterHandler_ = function(obj, type) {
-    return function (e) {
+    return function(e) {
       // IE doesn't pass the event as a parameter :(
       e = e || window.event;
 
@@ -166,7 +166,7 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
       e.preventDefault = treesaver.events.preventDefault;
 
       // Call each handler
-      obj.custom_handlers[type].handlers.forEach(function (fun) {
+      obj.custom_handlers[type].handlers.forEach(function(fun) {
         // For now, wrap handlers in try/catch
         // TODO: Use a better callback model
         // Hat tip to Dean Edwards for the inspiration

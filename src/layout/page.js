@@ -12,7 +12,7 @@ goog.require('treesaver.layout.Block');
   * @constructor
   * @param {!treesaver.layout.Content} content
   * @param {!Array.<treesaver.layout.Grid>} grids
-  * @param {!treesaver.layout.BreakRecord} br The current breakRecord
+  * @param {!treesaver.layout.BreakRecord} br The current breakRecord.
   */
 treesaver.layout.Page = function(content, grids, br) {
   var best = treesaver.layout.Grid.best(content, grids, br),
@@ -52,7 +52,7 @@ treesaver.layout.Page = function(content, grids, br) {
   document.body.appendChild(host);
   host.innerHTML = best.grid.html;
   /**
-   * @type {Element|null}
+   * @type {?Element}
    */
   this.node = /** @type {Element} */ host.firstChild;
 
@@ -149,14 +149,14 @@ treesaver.layout.Page = function(content, grids, br) {
   this.node = null;
   document.body.removeChild(host);
   host = null;
-}
+};
 
 /**
  * @param {!Element} container
  * @param {!treesaver.layout.Figure} figure
  * @param {!treesaver.layout.Grid.ContainerMap} map
  * @param {?number} lineHeight
- * @return {boolean} True if the figure fit within the container
+ * @return {boolean} True if the figure fit within the container.
  */
 treesaver.layout.Page.fillContainer = function(container, figure, map,
     lineHeight) {
@@ -204,7 +204,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
   // Did not fit :(
   // TODO: Use something better than parent height
   if (containerHeight > maxContainerHeight) {
-    treesaver.debug.info("Container failure: " + containerHeight + ':' +  maxContainerHeight);
+    treesaver.debug.info('Container failure: ' + containerHeight + ':' + maxContainerHeight);
 
     if (goog.DEBUG) {
       container.setAttribute('data-containerHeight', containerHeight);
@@ -277,7 +277,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
   * @param {!treesaver.layout.BreakRecord} br
   * @param {!Element} node
   * @param {number} maxColHeight
-  * @param {number} minH Minimum height of the column
+  * @param {number} minH Minimum height of the column.
   */
 treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, minH) {
   var colHeight = node.offsetHeight,
@@ -315,7 +315,7 @@ treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, min
 
   // Can we fit any content within this column?
   if (!colHeight || colHeight < minH) {
-    treesaver.debug.info("Column below minHeight: " + block + ':' +  colHeight);
+    treesaver.debug.info('Column below minHeight: ' + block + ':' + colHeight);
 
     // No height, we are done here
     // TODO: Remove column element altogether?
