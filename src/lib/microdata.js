@@ -290,14 +290,7 @@ if (SUPPORT_MICRODATA) {
       }
 
       return items.filter(function(item) {
-        var parent = item;
-
-        while ((parent = parent.parentNode) !== null && parent.nodeType === 1) {
-          if (parent === root) {
-            return true;
-          }
-        }
-        return false;
+        return root.contains(item);
       });
     } else {
       // We are using our own microdata implementation,
