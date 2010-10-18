@@ -61,8 +61,11 @@ treesaver.layout.Page = function(content, grids, br) {
   this.node.style.height = this.size.height + 'px';
 
   // Fill in fields
-  treesaver.dom.getElementsByTagName('output', this.node).forEach(function(node) {
-    treesaver.layout.Page.fillField(node, content.fields);
+  // FIXME: Perhaps Object.keys should take null?
+  Object.keys(content.fields || {}).forEach(function(key) {
+    treesaver.dom.getElementsByClassName(key, this.node).forEach(function(node) {
+      treesaver.layout.Page.fillField(node, content.fields);
+    });
   });
 
   // Containers
@@ -865,20 +868,7 @@ treesaver.layout.Page.computeOverhang = function(br, lastBlock, colHeight, heigh
  */
 treesaver.layout.Page.fillField = function(node, fields) {
   // The field name to put in this element
-  var fieldName = node.getAttribute('name').toLowerCase();
-  if (fieldName && fields[fieldName]) {
-    treesaver.debug.info('Grid field: ' + fieldName);
-
-    node.innerHTML = fields[fieldName];
-  }
-  else {
-    if (!fieldName) {
-      treesaver.debug.warn('Output element without name: ' + node);
-    }
-    else {
-      treesaver.debug.warn('Output element with unknown name: ' + fieldName);
-    }
-  }
+  treesaver.template.expand(fields, {}, node);
 };
 
 /**
