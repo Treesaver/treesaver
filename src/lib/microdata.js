@@ -174,7 +174,7 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
    * that are not part of other items, and that are of one of the types
    * given in the argument, if any are listed.
    *
-   * @param {string=} types A space-separated list of types.
+   * @param {?string=} types A space-separated list of types.
    * @param {HTMLDocument|Element=} root The root element to use as
    * context.
    * @return {!Array} A non-live Array of elements.
@@ -274,7 +274,7 @@ if (SUPPORT_MICRODATA) {
    * and that are of one of the types given in the argument, if any are
    * listed.
    *
-   * @param {string=} types A space-separated list of types.
+   * @param {?string=} types A space-separated list of types.
    * @param {HTMLDocument|Element=} root The root element to use as
    * context.
    * @return {!Array} A non-live Array of elements.
@@ -303,7 +303,7 @@ if (SUPPORT_MICRODATA) {
    * Returns a JSON representation of the microdata items
    * that match the given types.
    *
-   * @param {string=} types A space-separated list of types.
+   * @param {?string=} types A space-separated list of types.
    * @param {HTMLDocument|Element=} root The root element to use as
    * context.
    * @return {!Array} A Array of Objects representing micro-
