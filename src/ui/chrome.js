@@ -389,94 +389,104 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 
   var el = e.el,
       url,
-      id,
-      parent,
+      withinCurrentPage = false,
       handled = false,
       sidebarActivated = false,
       menuActivated = false;
 
-  // Go up the tree and see if there's anything we want to process
-  while (!handled && el !== document.body) {
-    id = el.getAttribute('id');
+  // Check if the target is within one of the visible pages
+  // TODO: Once we have variable numbers of pages, this code will
+  // need to change
+  if (this.pages[0] && this.pages[0].node.contains(el)) {
+    treesaver.ui.ArticleManager.previousPage();
 
-    // Detect chrome buttons for prev/next, etc
-    if (treesaver.dom.hasClass(el, 'prev') || id && id === 'previousPage') {
-      treesaver.ui.ArticleManager.previousPage();
+    handled = true;
+  }
+  else if (this.pages[2] && this.pages[2].node.contains(el)) {
+    treesaver.ui.ArticleManager.nextPage();
 
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'next') || id && id === 'nextPage') {
-      treesaver.ui.ArticleManager.nextPage();
+    handled = true;
+  }
+  else {
+    withinCurrentPage = this.pages[1] && this.pages[1].node.contains(el);
 
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'prevArticle')) {
-      treesaver.ui.ArticleManager.previousArticle();
+    // Go up the tree and see if there's anything we want to process
+    while (!handled && el !== document.body) {
+      if (!withinCurrentPage) {
+        if (treesaver.dom.hasClass(el, 'prev')) {
+          treesaver.ui.ArticleManager.previousPage();
 
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'nextArticle')) {
-      treesaver.ui.ArticleManager.nextArticle();
-
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'zoomable')) {
-      // TODO: What if it's not in the current page?
-      // check element.contains on current page ...
-
-      // Counts as handling the event only if showing is successful
-      handled = this.showLightBox(el);
-    }
-    else if (treesaver.dom.hasClass(el, 'menu')) {
-      if (this.menu === el) {
-        if (this.isMenuActive()) {
-          this.menuInactive();
+          handled = true;
         }
-        else {
-          this.menuActive();
-          menuActivated = true;
+        else if (treesaver.dom.hasClass(el, 'next')) {
+          treesaver.ui.ArticleManager.nextPage();
+
+          handled = true;
         }
+        else if (treesaver.dom.hasClass(el, 'prevArticle')) {
+          treesaver.ui.ArticleManager.previousArticle();
+
+          handled = true;
+        }
+        else if (treesaver.dom.hasClass(el, 'nextArticle')) {
+          treesaver.ui.ArticleManager.nextArticle();
+
+          handled = true;
+        }
+        else if (treesaver.dom.hasClass(el, 'menu')) {
+          if (this.isMenuActive()) {
+            this.menuInactive();
+          }
+          else {
+            this.menuActive();
+            menuActivated = true;
+          }
+          handled = true;
+        }
+        else if (treesaver.dom.hasClass(el, 'sidebar') ||
+                treesaver.dom.hasClass(el, 'open-sidebar')) {
+          if (!this.isSidebarActive()) {
+            this.sidebarActive();
+            sidebarActivated = true;
+          }
+          handled = true;
+        }
+        else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
+          if (this.isSidebarActive()) {
+            this.sidebarInactive();
+            handled = true;
+          }
+        }
+      }
+      else if (treesaver.dom.hasClass(el, 'zoomable')) {
+        // Counts as handling the event only if showing is successful
+        handled = this.showLightBox(el);
+      }
+
+      // Check links last since they may be used as UI commands as well
+      // Links can occur in-page or in the chrome
+      if (!handled && el.href) {
+        // Lightbox-flagged elements are skipped as processing goes up the chain
+        // if a zoomable is found on the way up the tree, it will be handled. If
+        // not, the link is navigated as-is
+        if (el.getAttribute('target') === 'lightbox') {
+          // Skip this element and process the parent zoomable
+          el = el.parentNode;
+          continue;
+        }
+
+        url = treesaver.network.absoluteURL(el.href);
+        if (!treesaver.ui.ArticleManager.goToArticleByURL(url)) {
+          // The URL is not an article, let the navigation happen normally
+          handled = false;
+          return;
+        }
+
         handled = true;
       }
-    }
-    else if (treesaver.dom.hasClass(el, 'sidebar') ||
-             treesaver.dom.hasClass(el, 'open-sidebar')) {
-      if (!this.isSidebarActive()) {
-        this.sidebarActive();
-        sidebarActivated = true;
-      }
-      handled = true;
-    }
-    else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
-      if (this.isSidebarActive()) {
-        this.sidebarInactive();
-        handled = true;
-      }
-    }
-    else if (el.href) {
-      // TODO: What if it's not in the current page?
-      // check element.contains on current page ...
 
-      // Lightbox-flagged elements are skipped as processing goes up the chain
-      // if a zoomable is found on the way up the tree, it will be handled. If
-      // not, the link is navigated as-is
-      if (el.getAttribute('target') === 'lightbox') {
-        // Skip this element and process the parent zoomable
-        el = el.parentNode;
-        continue;
-      }
-
-      url = treesaver.network.absoluteURL(el.href);
-      if (!treesaver.ui.ArticleManager.goToArticleByURL(url)) {
-        // The URL is not an article, let the navigation happen normally
-        handled = false;
-        return;
-      }
-
-      handled = true;
+      el = el.parentNode;
     }
-
-    el = el.parentNode;
   }
 
   if (!menuActivated && this.isMenuActive()) {
