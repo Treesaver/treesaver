@@ -439,14 +439,13 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         handled = true;
       }
     }
-    else if (treesaver.dom.hasClass(el, 'sidebar')) {
-      if (this.sidebar === el) {
-        if (!this.isSidebarActive()) {
-          this.sidebarActive();
-          sidebarActivated = true;
-        }
-        handled = true;
+    else if (treesaver.dom.hasClass(el, 'sidebar') ||
+             treesaver.dom.hasClass(el, 'open-sidebar')) {
+      if (!this.isSidebarActive()) {
+        this.sidebarActive();
+        sidebarActivated = true;
       }
+      handled = true;
     }
     else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
       if (this.isSidebarActive()) {
