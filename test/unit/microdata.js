@@ -194,4 +194,18 @@ $(function () {
     ok(data[0].properties.test2[0].properties, 'nested scope has properties');
     ok(data[0].properties.test2[0].properties.url, 'nested scope has url property.');
   });
+
+  test('root parameter', function() {
+    var data = treesaver.microdata.getItems('root');
+
+    equals(data.length, 2, 'two items without root context');
+   
+    data = treesaver.microdata.getItems('root', document.getElementById('one'));
+
+    equals(data.length, 1, 'one item returned for first context');
+
+    data = treesaver.microdata.getItems('root', document.getElementById('two'));
+
+    equals(data.length, 1, 'one item returned for second context');
+  });
 });
