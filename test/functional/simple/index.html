@@ -20,22 +20,22 @@
   <body>
     <article>
       <figure>
-        <h1 data-sizes="title fallback">Table of Contents</h1>
+        <div data-sizes="title fallback" itemscope>
+          <h1 itemprop="title"><a href="index.html" itemprop="url self">Table of contents</a></h1>
+        </div>
       </figure>
+
 
       <div itemscope>
         <h2 itemprop="title"><a href="one.html" itemprop="url">Article One</a></h2>
+        <p><img itemprop="thumb" src="openroad-thumb.jpg"/></p>
         <p itemprop="byline">John Doe</p>
         <p itemprop="abstract">Lorem ipsum dolor sit amet, consequeter adipiscing elit.</p>
-        <img itemprop="thumb" src="openroad-thumb.jpg"/>
-      </div>
-
-      <div itemscope>
-        <h2 itemprop="title"><a href="index.html" itemprop="url self">Table of contents</a></h2>
       </div>
 
       <div itemscope>
         <h2 itemprop="title"><a href="two.html" itemprop="url">Article Two</a></h2>
+        <p><img itemprop="thumb" src="river-thumb.jpg"/></p>
         <p itemprop="byline">Jane Doe</p>
         <p itemprop="abstract">Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus.</p>
       </div>

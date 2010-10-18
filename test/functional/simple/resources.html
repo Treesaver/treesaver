@@ -6,6 +6,11 @@
       </div>
 
       <div class="controls">
+        <div class="sidebar-controls">
+          <button class="hide close-sidebar">hide &lt;&lt;</button>
+          <button class="show open-sidebar">show &gt;&gt;</button>
+        </div>
+
         <span>Page <span class="pagenumber">0</span> of <span class="pagecount">0</span></span>
         <button class="prev">Previous</button>
         <button class="next">Next</button>
@@ -21,37 +26,33 @@
           </ul>
         </div>
       </div>
-  
-      <div class="toc">
-        <div class="template">
-          <h2><a class="url title">Article Title</a></h2>
-          <p class="byline"></p>
-          <p class="abstract">Abstract</p>
-          <img class="thumb"/>
-        </div>
-      </div>
 
       <div class="sidebar">
-          <button class="hide close-sidebar">hide &lt;&lt;</button><button class="show">show &gt;&gt;</button>
-          <h2>Sidebar</h2>
+        <div class="toc">
+          <div class="article template">
+            <img class="thumb"/>
+            <h3><a class="url title">Article Title</a></h3>
+            <p class="byline"></p>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="grid">
-      <div class="container" data-sizes="title"></div>
+      <div class="container title" data-sizes="title"></div>
       <div class="container cols-3 bottom" data-sizes="one"></div>
       <div class="column"></div>
     </div>
 
     <div class="grid cols-2">
-      <div class="container cols-2" data-sizes="title"></div>
+      <div class="container title cols-2" data-sizes="title"></div>
       <div class="container cols-3 bottom" data-sizes="two"></div>
       <div class="column"></div>
       <div class="column col-2"></div>
     </div>
 
     <div class="grid cols-3">
-      <div class="container cols-3" data-sizes="title"></div>
+      <div class="container title cols-3" data-sizes="title"></div>
       <div class="container cols-3 bottom" data-sizes="three"></div>
       <div class="column"></div>
       <div class="column col-2"></div>
