@@ -54,6 +54,11 @@ treesaver.layout.Grid = function(node) {
    */
   this.scoringFlags = treesaver.layout.Grid.findScoringFlags(this.classes);
 
+  /**
+   * @type {?Object.<number, boolean>}
+   */
+  this.pageNumberFlags = treesaver.layout.Grid.findPageNumberFlags(this.classes);
+
   // Sizing
   // Flex grids get stretched later
   this.stretchedSize = this.size = new treesaver.dimensions.Metrics(node);
@@ -135,7 +140,6 @@ treesaver.layout.Grid = function(node) {
 
 treesaver.layout.Grid.knownFlags = {
   'onlypage': true,
-  'firstpage': true,
   'odd': true,
   'even': true,
   'sizeToContainer': true
@@ -155,15 +159,30 @@ treesaver.layout.Grid.findScoringFlags = function(classes) {
     if (className in treesaver.layout.Grid.knownFlags) {
       flags[className] = true;
     }
-    else {
-      var match = treesaver.layout.Grid.pageFlagRegex.exec(className);
-      if (match) {
-        flags[parseInt(match[1], 10)] = true;
-      }
-    }
   });
 
   return flags;
+};
+
+/**
+ * Find any page number flags specified in the grid classes
+ *
+ * @param {Array.<string>} classes
+ * @return {?Object.<number, boolean>}
+ */
+treesaver.layout.Grid.findPageNumberFlags = function(classes) {
+  var flags = {},
+      found = false;
+
+  classes.forEach(function(className) {
+    var match = treesaver.layout.Grid.pageFlagRegex.exec(className);
+    if (match) {
+      flags[parseInt(match[1], 10)] = true;
+      found = true;
+    }
+  });
+
+  return found ? flags : null;
 };
 
 /**
@@ -256,15 +275,14 @@ treesaver.layout.Grid.prototype.score = function(content, breakRecord) {
       treesaver.layout.Grid.SCORING.ONLY_PAGE;
   }
 
-  if (this.scoringFlags['firstpage']) {
-    // TODO: Use different values for penalties and bonuses
-    score += breakRecord.pageNumber ? -treesaver.layout.Grid.SCORING.NON_FIRST_PAGE :
-      treesaver.layout.Grid.SCORING.FIRST_PAGE;
-  }
-
   // Check general page number flag
-  if (this.scoringFlags[humanPageNum]) {
-    score += treesaver.layout.Grid.SCORING.PAGE_NUMBER;
+  if (this.pageNumberFlags) {
+    if (this.pageNumberFlags[humanPageNum]) {
+      score += treesaver.layout.Grid.SCORING.PAGE_NUMBER;
+    }
+    else {
+      score -= treesaver.layout.Grid.SCORING.NON_PAGE_NUMBER;
+    }
   }
 
   if (humanPageNum % 2) {
@@ -417,12 +435,11 @@ treesaver.layout.Grid.SCORING = {
   REQUIRED_BLOCK_BONUS: 4000,
   PAGE_NUMBER: 12000,
   ONLY_PAGE: 4000,
-  FIRST_PAGE: 4000,
   ODD_PAGE: 2000,
   EVEN_PAGE: 2000,
   NON_EVEN_ODD: Infinity,
   NON_ONLY_PAGE: Infinity,
-  NON_FIRST_PAGE: Infinity
+  NON_PAGE_NUMBER: Infinity
 };
 
 /**
