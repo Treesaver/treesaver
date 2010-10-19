@@ -138,6 +138,30 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Element}
    */
   this.sidebar = null;
+
+  /**
+   * Cached reference to the next page DOM
+   * @type {?Array.<Element>}
+   */
+  this.nextPage = null;
+
+  /**
+   * Cached reference to the next article DOM
+   * @type {?Array.<Element>}
+   */
+  this.nextArticle = null;
+
+  /**
+   * Cached reference to the previous page DOM
+   * @type {?Array.<Element>}
+   */
+  this.prevPage = null;
+
+  /**
+   * Cached reference to the previous article DOM
+   * @type {?Array.<Element>}
+   */
+  this.prevArticle = null;
 };
 
 /**
@@ -159,6 +183,10 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageCount = treesaver.dom.getElementsByClassName('pagecount', this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
     this.currentURL = treesaver.dom.getElementsByClassName('current-url', this.node);
+    this.nextPage = treesaver.dom.getElementsByClassName('next', this.node);
+    this.nextArticle = treesaver.dom.getElementsByClassName('nextArticle', this.node);
+    this.prevPage = treesaver.dom.getElementsByClassName('prev', this.node);
+    this.prevArticle = treesaver.dom.getElementsByClassName('prevArticle', this.node);
 
     menus = treesaver.dom.getElementsByClassName('menu', this.node);
     if (menus.length > 0) {
@@ -225,6 +253,10 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.toc = null;
   this.tocTemplate = null;
   this.sidebar = null;
+  this.nextPage = null;
+  this.nextArticle = null;
+  this.prevPage = null;
+  this.prevArticle = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -885,6 +917,85 @@ treesaver.ui.Chrome.prototype.updatePageWidth = function(width) {
 };
 
 /**
+ * Set the element state to enabled or disabled. If the element
+ * is a button its disabled attribute will be set to true. Otherwise
+ * the element will receive a class="disabled".
+ *
+ * @private
+ * @param {!Element} el The element to set the state for.
+ * @param {!boolean} enable True to enable the element, false to disable it.
+ */
+treesaver.ui.Chrome.prototype.setElementState = function(el, enable) {
+  if (el.nodeName === 'BUTTON') {
+    el.disabled = !enable;
+  }
+  else {
+    if (enable) {
+      treesaver.dom.removeClass(el, 'disabled');
+    }
+    else {
+      treesaver.dom.addClass(el, 'disabled');
+    }
+  }
+};
+
+/**
+ * Update the state of the next page elements.
+ * @private
+ */
+treesaver.ui.Chrome.prototype.updateNextPageState = function() {
+  if (this.nextPage) {
+    var canGoToNextPage = treesaver.ui.ArticleManager.canGoToNextPage();
+
+    this.nextPage.forEach(function(el) {
+      this.setElementState(el, canGoToNextPage);
+    }, this);
+  }
+};
+
+/**
+ * Update the state of the next article elements.
+ * @private
+ */
+treesaver.ui.Chrome.prototype.updateNextArticleState = function() {
+  if (this.nextArticle) {  
+    var canGoToNextArticle = treesaver.ui.ArticleManager.canGoToNextArticle();
+
+    this.nextArticle.forEach(function(el) {
+      this.setElementState(el, canGoToNextArticle);
+    }, this);
+  }
+};
+
+/**
+ * Update the state of the previous page elements.
+ * @private
+ */
+treesaver.ui.Chrome.prototype.updatePreviousPageState = function() {
+  if (this.prevPage) {
+    var canGoToPreviousPage = treesaver.ui.ArticleManager.canGoToPreviousPage();
+
+    this.prevPage.forEach(function(el) {
+      this.setElementState(el, canGoToPreviousPage);
+    }, this);
+  }
+};
+
+/**
+ * Update the state of the previous article elements.
+ * @private
+ */
+treesaver.ui.Chrome.prototype.updatePreviousArticleState = function() {
+  if (this.prevArticle) {
+    var canGoToPreviousArticle = treesaver.ui.ArticleManager.canGoToPreviousArticle();
+
+    this.prevArticle.forEach(function(el) {
+      this.setElementState(el, canGoToPreviousArticle);
+    }, this);
+  }
+};
+
+/**
  * Run selectPages on a delay
  * @private
  */
@@ -920,6 +1031,12 @@ treesaver.ui.Chrome.prototype.selectPages = function() {
 
   // Update our field display in the chrome (page count/index changes)
   this.updateFields();
+
+  // Update the previous/next buttons depending on the current state
+  this.updateNextPageState();
+  this.updateNextArticleState();
+  this.updatePreviousPageState();
+  this.updatePreviousArticleState();
 };
 
 /**
