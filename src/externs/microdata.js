@@ -23,7 +23,9 @@ Element.prototype.itemValue;
 Element.prototype.itemProp;
 
 /**
- * @param {string=} types A space-separated list of types.
+ * @param {?string=} types A space-separated list of types.
+ * @param {HTMLDocument|Element=} root The root element to use as
+ * context.
  * @return {!Array} A non-live Array of elements.
  */
-document.getItems = function(types) { };
+document.getItems = function(types, root) { };

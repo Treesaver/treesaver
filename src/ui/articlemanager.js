@@ -443,9 +443,7 @@ treesaver.ui.ArticleManager.parseTOC = function(html) {
       items = [];
 
   container.innerHTML = html;
-  container.style.display = 'none';
-  document.body.appendChild(container);
-  items = treesaver.microdata.getJSONItems();
+  items = treesaver.microdata.getJSONItems(null, container);
 
   treesaver.ui.ArticleManager.toc = items.map(function(item) {
     var keys = Object.keys(item.properties),
@@ -455,7 +453,6 @@ treesaver.ui.ArticleManager.parseTOC = function(html) {
     });
     return result;
   });
-  document.body.removeChild(container);
 };
 
 /**
