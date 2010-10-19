@@ -331,6 +331,7 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.IS_MOBILE) + 'mobile',
       p(treesaver.capabilities.IS_SMALL_SCREEN) + 'smallscreen',
       p(treesaver.network.loadedFromCache()) + 'cached',
+      p(WITHIN_IOS_WRAPPER) + 'nativeapp',
       // Browser/platform info
       'browser-' + treesaver.capabilities.BROWSER_NAME,
       'os-' + treesaver.capabilities.BROWSER_OS
