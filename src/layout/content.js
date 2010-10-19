@@ -25,7 +25,7 @@ treesaver.layout.normalizeItem = function (obj) {
   if (obj.properties) {
     keys = Object.keys(obj.properties);
     keys.forEach(function(key) {
-      var v = obj.properties[key].pop();
+      var v = obj.properties[key][0];
 
       if (Object.isObject(v)) {
         v = treesaver.layout.normalizeItem(v);
@@ -99,8 +99,10 @@ treesaver.layout.Content = function(el) {
         keys = Object.keys(scope);
 
     keys.forEach(function(key) {
-      this.fields[key] = scope[key];
-      treesaver.debug.info('Field found --- ' + key + ': ' + scope[key].toString());
+      if (!this.fields.hasOwnProperty(key)) {
+        this.fields[key] = scope[key];
+        treesaver.debug.info('Field found --- ' + key + ': ' + scope[key].toString());
+      }
     }, this);
   }, this);
 };
