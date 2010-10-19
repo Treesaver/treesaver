@@ -30,10 +30,10 @@ $(function () {
 
     ok(!!empty_grid, 'Empty grid: Created');
     ok(empty_grid.flexible, 'Empty grid: Default flexible');
-    ok(!empty_grid.scoringFlags.firstpage, 'Empty grid: Default firstpage');
     ok(!empty_grid.scoringFlags.nonfirst, 'Empty grid: Default nonfirst');
     ok(!empty_grid.scoringFlags.odd, 'Empty grid: Default odd');
     ok(!empty_grid.scoringFlags.even, 'Empty grid: Default even');
+    ok(!empty_grid.pageNumberFlags, 'Empty grid: No page number flags');
     ok(!empty_grid.textHeight, 'Empty grid: Text Height');
     equals(empty_grid.classes.length, 2, 'Empty grid: Class count');
     equals(empty_grid.cols.length, 0, 'Empty grid: Column count');
@@ -41,9 +41,10 @@ $(function () {
     equals(empty_grid.lineHeight, 20, 'LineHeight extraction');
 
     ok(!classy_grid.flexible, 'Classy grid: Default flexible');
-    ok(classy_grid.scoringFlags.firstpage, 'Classy grid: Default firstpage');
     ok(classy_grid.scoringFlags.odd, 'Classy grid: Default odd');
     ok(classy_grid.scoringFlags.even, 'Classy grid: Default even');
+    ok(classy_grid.pageNumberFlags[1], 'Classy grid: Page number flag');
+    ok(classy_grid.pageNumberFlags[5], 'Classy grid: Page number flag');
 
     equals(fiver_grid.containers.length, 5, 'Fiver grid: Container count');
     equals(fiver_grid.cols.length, 5, 'Fiver grid: Column count');
@@ -84,24 +85,28 @@ $(function () {
           // figureIndex
           // fallback
           optional: true,
+          getSize: function(name) { return this.sizes[name]; },
           sizes: {
             one: {}
           }
         },
         { // Should match final container
           optional: false,
+          getSize: function(name) { return this.sizes[name]; },
           sizes: {
             five: {}
           }
         },
         { // Can't match any container (uses bogus size)
           optional: false,
+          getSize: function(name) { return this.sizes[name]; },
           sizes: {
             bogus: {}
           }
         },
         { // Has multiple sizes, but should give preference to largest
           optional: false,
+          getSize: function(name) { return this.sizes[name]; },
           sizes: {
             one: { },
             two: { },
