@@ -5,6 +5,8 @@
 
 goog.provide('treesaver.html5');
 
+goog.require('treesaver.constants');
+
 // Use eval because Closure Compiler strips out comments
 if (SUPPORT_IE && eval('/*@cc_on!@*/0')) {
   (function() {

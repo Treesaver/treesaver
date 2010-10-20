@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.ui.input');
 
+goog.require('treesaver.constants');
 goog.require('treesaver.events');
 goog.require('treesaver.scheduler');
 

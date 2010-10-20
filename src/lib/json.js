@@ -5,6 +5,7 @@
 goog.provide('treesaver.json');
 
 goog.require('treesaver.capabilities');
+goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 
 /**

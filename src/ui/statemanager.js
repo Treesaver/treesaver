@@ -5,6 +5,7 @@
 goog.provide('treesaver.ui.StateManager');
 
 goog.require('treesaver.capabilities');
+goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');

@@ -6,6 +6,7 @@ goog.provide('treesaver.network');
 
 goog.require('treesaver.array'); // forEach
 goog.require('treesaver.capabilities'); // delay
+goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 goog.require('treesaver.scheduler');
 

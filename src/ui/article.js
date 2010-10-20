@@ -6,6 +6,7 @@ goog.provide('treesaver.ui.Article');
 
 goog.require('treesaver.array');
 goog.require('treesaver.debug');
+goog.require('treesaver.constants');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');

@@ -4,6 +4,8 @@
 
 goog.provide('treesaver.array');
 
+goog.require('treesaver.constants');
+
 // IE has no Array.indexOf (why?)
 if (SUPPORT_IE && !Array.prototype.indexOf) {
   Array.prototype.indexOf = function(obj, start) {

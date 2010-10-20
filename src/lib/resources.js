@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.resources');
 
+goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.network');

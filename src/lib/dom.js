@@ -5,6 +5,7 @@
 goog.provide('treesaver.dom');
 
 goog.require('treesaver.array');
+goog.require('treesaver.constants');
 
 /**
  * Add a CSS class to an element
