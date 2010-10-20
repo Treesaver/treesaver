@@ -11,12 +11,12 @@
 
 goog.provide('treesaver');
 
-goog.require('treesaver.boot');
-goog.require('treesaver.capabilities');
 goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 goog.require('treesaver.history');
 goog.require('treesaver.html5');
+goog.require('treesaver.boot');
+goog.require('treesaver.capabilities');
 
 // Begin loading
 treesaver.boot.load();
