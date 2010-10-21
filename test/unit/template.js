@@ -73,29 +73,29 @@ $(function() {
     }
   };
 
-  test('class to innerHTML', function() {
+  test('class to innerText', function() {
     var div = document.createElement('div'),
         view = {};
 
-    div.innerHTML = '<div class="text">...</div>';
+    div.innerHTML = '<div data-bind="text">...</div>';
     view = { text: 'hello world' };
 
-    treesaver.template.expand(view, {}, div);
-    ok(htmlEquals(div.innerHTML, '<div class="text">hello world</div>'), 'simple replacement');
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<div data-bind="text">hello world</div>'), 'simple replacement');
 
-    div.innerHTML = '<div class="text">I say: {{text}}</div>';
+    div.innerHTML = '<div data-bind="text">I say: {{text}}</div>';
     view = { text: 'hello world' };
 
-    treesaver.template.expand(view, {}, div);
+    treesaver.template.expand(view, div);
 
-    ok(htmlEquals(div.innerHTML, '<div class="text">I say: hello world</div>'), 'replacement with placeholder');
+    ok(htmlEquals(div.innerHTML, '<div data-bind="text">I say: hello world</div>'), 'replacement with placeholder');
 
-    div.innerHTML = '<div class="text name">{{text}}, nice to meet you, {{name}}</div>';
+    div.innerHTML = '<div data-bind="text name">{{text}}, nice to meet you, {{name}}</div>';
     view = { text: 'hello', name: 'world'};
 
-    treesaver.template.expand(view, {}, div);
+    treesaver.template.expand(view, div);
 
-    ok(htmlEquals(div.innerHTML, '<div class="text name">hello, nice to meet you, world</div>'));
+    ok(htmlEquals(div.innerHTML, '<div data-bind="text name">hello, nice to meet you, world</div>'), 'multiple replacements');
   });
 
   test('nested identical classes', function() {
@@ -104,13 +104,29 @@ $(function() {
 
     view = { test: 'hello world' };
 
-    div.innerHTML = '<div class="test"><span class="test">...</span></div>';
+    div.innerHTML = '<div data-bind="test"><span data-bind="test">...</span></div>';
 
-    treesaver.template.expand(view, {}, div);
-    // Is this correct? Will result in div[class].innerHTML = 'hello world'
-    // and span[class].innerHTML = 'hello world', effectively ignoring the
+    treesaver.template.expand(view, div);
+    // Is this correct? Will result in div[data-bind].innerText = 'hello world'
+    // and span[data-bind].innerText = 'hello world', effectively ignoring the
     // second replacement.
-    ok(htmlEquals(div.innerHTML, '<div class="test">hello world</div>'));
+    ok(htmlEquals(div.innerHTML, '<div data-bind="test">hello world</div>'));
+  });
+
+  test('innerText and attribute', function() {
+    var div = document.createElement('div'),
+        view = {};
+
+    view = {
+      url: 'http://www.example.org/',
+      title: 'example'
+    };
+
+    div.innerHTML = '<a data-bind="url:href title"></a>';
+
+    treesaver.template.expand(view, div);
+
+    ok(htmlEquals(div.innerHTML, '<a data-bind="url:href title" href="http://www.example.org/">example</a>'));
   });
 
   test('nested data', function() {
@@ -130,57 +146,57 @@ $(function() {
       }
     };
 
-    div.innerHTML = '<div class="article">' +
-                      '<h1><a class="url title">...</a></h1>' +
-                      '<div class="data">' +
-                        '<p>Total pages: <span class="numpages">0</span>, total images: <span class="numimages">0</span>, at <a class="url title">...</a></p>' +
+    div.innerHTML = '<div data-bind="article">' +
+                      '<h1><a data-bind="url:href title">...</a></h1>' +
+                      '<div data-bind="data">' +
+                        '<p>Total pages: <span data-bind="numpages">0</span>, total images: <span data-bind="numimages">0</span>, at <a data-bind="url:href title">...</a></p>' +
                       '</div>' +
                     '</div>';
 
-    treesaver.template.expand(view, { url: 'href' }, div);
+    treesaver.template.expand(view, div);
 
-    ok(htmlEquals(div.innerHTML, '<div class="article"><h1><a href="http://www.example.org/" class="url title">Something</a></h1><div class="data"><p>Total pages: <span class="numpages">22</span>, total images: <span class="numimages">8</span>, at <a href="http://www.example.org/2/" class="url title">Other</a></p></div></div>'));
+    ok(htmlEquals(div.innerHTML, '<div data-bind="article"><h1><a href="http://www.example.org/" data-bind="url:href title">Something</a></h1><div data-bind="data"><p>Total pages: <span data-bind="numpages">22</span>, total images: <span data-bind="numimages">8</span>, at <a href="http://www.example.org/2/" data-bind="url:href title">Other</a></p></div></div>'));
   });
 
   test('class to known attribute', function() {
     var div = document.createElement('div'),
         view = {};
 
-    div.innerHTML = '<a class="url">some link</a>';
+    div.innerHTML = '<a data-bind="url:href">some link</a>';
     view = { url: 'http://www.example.org' };
 
-    treesaver.template.expand(view, {url: 'href'}, div);
-    ok(htmlEquals(div.innerHTML, '<a href="http://www.example.org" class="url">some link</a>'));
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<a href="http://www.example.org" data-bind="url:href">some link</a>'));
 
-    div.innerHTML = '<a class="url" data-href="http://www.twitter.com/?status={{url}}">Tweet this</a>';
+    div.innerHTML = '<a data-bind="url:href" data-href="http://www.twitter.com/?status={{url}}">Tweet this</a>';
     view = { url: 'http://www.example.org' };
-    treesaver.template.expand(view, { url: 'href'}, div);
+    treesaver.template.expand(view, div);
 
-    ok(htmlEquals(div.innerHTML, '<a href="http://www.twitter.com/?status=http%3A%2F%2Fwww.example.org" class="url" data-href="http://www.twitter.com/?status={{url}}">Tweet this</a>'));
+    ok(htmlEquals(div.innerHTML, '<a href="http://www.twitter.com/?status=http%3A%2F%2Fwww.example.org" data-bind="url:href" data-href="http://www.twitter.com/?status={{url}}">Tweet this</a>'));
   });
 
   test('multiple class names', function() {
     var div = document.createElement('div'),
         view = {};
 
-    div.innerHTML = '<a class="url title">...</a>';
+    div.innerHTML = '<a data-bind="url:href title">...</a>';
     view = { url: 'http://www.example.org', title: 'Click here' };
 
-    treesaver.template.expand(view, { url: 'href' }, div);
+    treesaver.template.expand(view, div);
 
-    ok(htmlEquals(div.innerHTML, '<a href="http://www.example.org" class="url title">Click here</a>'), 'url and innerText expanded correctly.');
+    ok(htmlEquals(div.innerHTML, '<a href="http://www.example.org" data-bind="url:href title">Click here</a>'), 'url and innerText expanded correctly.');
   });
 
   test('template class to array of objects of the same type', function() {
     var div = document.createElement('div'),
         view = {};
 
-    div.innerHTML = '<div class="toc"><div class="template"><h1 class="title">...</h1><p class="byline">...</p></div></div>';
+    div.innerHTML = '<div data-bind="toc"><div><h1 data-bind="title">...</h1><p data-bind="byline">...</p></div></div>';
     view = { toc: [ { title: 'First article', byline: '1' }, { title: 'Second article', byline: '2' } ] };
     
-    treesaver.template.expand(view, {}, div);
+    treesaver.template.expand(view, div);
 
-    ok(htmlEquals(div.innerHTML, '<div class="toc"><div class="template"><h1 class="title">First article</h1><p class="byline">1</p></div><div class="template"><h1 class="title">Second article</h1><p class="byline">2</p></div></div>'));
+    ok(htmlEquals(div.innerHTML, '<div data-bind="toc"><div><h1 data-bind="title">First article</h1><p data-bind="byline">1</p></div><div><h1 data-bind="title">Second article</h1><p data-bind="byline">2</p></div></div>'));
   });
 
 
@@ -195,28 +211,28 @@ $(function() {
           url: 'http://www.example.org/some file?="something"'
         };
 
-    div.innerHTML = '<span class="html">{{html}}</span>';
-    treesaver.template.expand(view, {}, div);
-    ok(htmlEquals(div.innerHTML, '<span class="html">&lt;&gt;</span>'), 'common characters escaped properly');
+    div.innerHTML = '<span data-bind="html">{{html}}</span>';
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<span data-bind="html">&lt;&gt;</span>'), 'common characters escaped properly');
 
-    div.innerHTML = '<span class="amp">{{amp}}</span>';
-    treesaver.template.expand(view, {}, div);
-    ok(htmlEquals(div.innerHTML, '<span class="amp">&amp;</span>'), 'ampersand is escaped properly');
+    div.innerHTML = '<span data-bind="amp">{{amp}}</span>';
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<span data-bind="amp">&amp;</span>'), 'ampersand is escaped properly');
 
-    div.innerHTML = '<span class="damp">{{damp}}</span>';
-    treesaver.template.expand(view, {}, div);
-    ok(htmlEquals(div.innerHTML, '<span class="damp">&amp;</span>'), 'entities are not escaped twice');
+    div.innerHTML = '<span data-bind="damp">{{damp}}</span>';
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<span data-bind="damp">&amp;</span>'), 'entities are not escaped twice');
 
-    div.innerHTML = '<span class="dquote squote" test="{{squote}}{{dquote}}">hello world</span>';
-    treesaver.template.expand(view, { dquote: 'test', squote: 'test' }, div);
-    ok(htmlEquals(div.innerHTML, '<span class="dquote squote" test="\'&quot;">hello world</span>'), 'non mapped attribute values are escaped properly');
+    div.innerHTML = '<span data-bind="dquote:test squote:test" test="{{squote}}{{dquote}}">hello world</span>';
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<span data-bind="dquote:test squote:test" test="\'&quot;">hello world</span>'), 'non mapped attribute values are escaped properly');
 
-    div.innerHTML = '<a data-href="http://www.twitter.com/?status={{url}}" class="url">click here</a>';
-    treesaver.template.expand(view, { url: 'href' }, div);
-    ok(htmlEquals(div.innerHTML, '<a href="http://www.twitter.com/?status=http%3A%2F%2Fwww.example.org%2Fsome%20file%3F%3D%22something%22" data-href="http://www.twitter.com/?status={{url}}" class="url">click here</a>'), 'mapped templated attribute values are escaped properly');
+    div.innerHTML = '<a data-href="http://www.twitter.com/?status={{url}}" data-bind="url:href">click here</a>';
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<a href="http://www.twitter.com/?status=http%3A%2F%2Fwww.example.org%2Fsome%20file%3F%3D%22something%22" data-href="http://www.twitter.com/?status={{url}}" data-bind="url:href">click here</a>'), 'mapped templated attribute values are escaped properly');
 
-    div.innerHTML = '<a class="url" title="{{url}}">click here</a>';
-    treesaver.template.expand(view, { url: 'title' }, div);
-    ok(htmlEquals(div.innerHTML, '<a class="url" title="http://www.example.org/some file?=&quot;something&quot;">click here</a>'), 'mapped attribute values are escaped properly');
+    div.innerHTML = '<a data-bind="url:title">click here</a>';
+    treesaver.template.expand(view, div);
+    ok(htmlEquals(div.innerHTML, '<a data-bind="url:title" title="http://www.example.org/some file?=&quot;something&quot;">click here</a>'), 'mapped attribute values are escaped properly');
   });
 });
