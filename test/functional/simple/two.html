@@ -54,16 +54,8 @@
       </ol>
 
       <figure class="zoomable">
-        <div data-sizes="one" data-minHeight="220" data-minWidth="300">
-          <img src="river-small.jpg" />
-          <p class="caption">Hui Xian, China</p>
-        </div>
-        <div data-sizes="two" data-minHeight="400" data-minWidth="620">
-          <img src="river-medium.jpg" />
-          <p class="caption">Hui Xian, China</p>
-        </div>
-        <div data-sizes="three" data-minHeight="580" data-minWidth="940">
-          <img src="river-large.jpg" />
+        <div data-bind="minWidth:minWidth minHeight:minHeight sizes:data-sizes" data-name="photo">
+          <img data-bind="src:src"/>
           <p class="caption">Hui Xian, China</p>
         </div>
         <div class="image-preview keeptogether">
@@ -74,8 +66,14 @@
             Hui Xian, China
           </p>
         </div>
+        <script type="application/json" data-template="photo">
+          [
+              { "sizes": "one", "minHeight": 220, "minWidth": 300, "src": "river-small.jpg" },
+              { "sizes": "two", "minHeight": 400, "minWidth": 620, "src": "river-medium.jpg" },
+              { "sizes": "three", "minHeight": 580, "minWidth": 940, "src": "river-large.jpg" }
+          ]
+        </script>
       </figure>
-
     </article>
   </body>
 </html>

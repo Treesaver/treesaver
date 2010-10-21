@@ -8,6 +8,7 @@ goog.require('treesaver.dom');
 goog.require('treesaver.json');
 goog.require('treesaver.layout.FigureSize'); // trim
 goog.require('treesaver.string');
+goog.require('treesaver.template');
 
 /**
  * A figure element
@@ -44,7 +45,7 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   /**
    * Temporarily holds any content templates
    * @private
-   * @type {Array.<string>}
+   * @type {Array.<!Element>}
    */
   this.templates = [];
 
@@ -198,9 +199,6 @@ treesaver.layout.Figure.prototype.processChildNode =
       if (treesaver.dom.hasAttr(childNode, 'data-sizes')) {
         this.processCloaked(childNode);
       }
-      else {
-        this.processScriptTemplate(childNode);
-      }
       return;
     }
     else if (type === 'application/json') {
@@ -210,6 +208,9 @@ treesaver.layout.Figure.prototype.processChildNode =
 
     // What to do with unknown types?
     treesaver.debug.warn('Unknown script type: ' + type);
+  }
+  else if (treesaver.dom.hasAttr(childNode, 'data-name')) {
+    this.processTemplate(childNode);
   }
   else {
     // Element payload
@@ -303,18 +304,10 @@ treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, mi
 /**
  * @param {!Element} el
  */
-treesaver.layout.Figure.prototype.processScriptTemplate = function processScriptTemplate(el) {
-  var name = el.getAttribute('data-name') || '_default',
-      // Extract the HTML template
-      payload = treesaver.dom.innerText(el) || el.innerHTML;
+treesaver.layout.Figure.prototype.processTemplate = function(el) {
+  var name = el.getAttribute('data-name') || '_default';
 
-  // Only save if we have content
-  if (payload) {
-    this.templates[name] = payload.trim();
-  }
-  else {
-    treesaver.debug.warn('Empty figure template: ' + name);
-  }
+  this.templates[name] = el;
 };
 
 /**
@@ -436,31 +429,18 @@ treesaver.layout.Figure.prototype.processValue = function processValue(value, de
     return;
   }
 
+  template = /** @type {!Element} */ (template.cloneNode(true));
+
   // Apply the template
-  html = treesaver.layout.Figure.applyTemplate(template, value);
+  treesaver.template.expand(value, template);  
+
+  // TODO: Fix this so we don't need outerHTML but can just pass
+  // the node around.
+  html = treesaver.dom.outerHTML(template);
 
   // Save the sizes
   this.saveSizes(value['sizes'].split(' '), html, value['minWidth'],
     value['minHeight'], requirements);
-};
-
-/**
- * @type {!RegExp}
- */
-treesaver.layout.Figure.templateRegex = new RegExp('{{([^}]+)}}', 'g');
-
-/**
- * @param {!string} template
- * @param {!Object} values
- */
-treesaver.layout.Figure.applyTemplate = function applyTemplate(template, values) {
-  // Replace {{ name }} with appropriate value (or blank if not found)
-  return template.replace(treesaver.layout.Figure.templateRegex, function() {
-    var name = arguments[1].trim();
-
-    // Protect against case-sensitivity errors
-    return values[name] || values[name.toLowerCase()] || '';
-  });
 };
 
 /**
