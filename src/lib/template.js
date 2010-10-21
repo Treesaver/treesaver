@@ -10,13 +10,10 @@ goog.require('treesaver.string');
  * class to attribute mappings.
  *
  * @param {!Object} view The object to expand the template with.
- * @param {?Element} scope The element to use as root for template
- * expansion. Defaults to document if not specified explicitly.
+ * @param {!Element} scope The element to use as root for template
+ * expansion.
  */
 treesaver.template.expand = function(view, scope) {
-  if (!scope) {
-    scope = document;
-  }
   treesaver.template.expandObject_(view, scope);
 };
 
@@ -25,7 +22,7 @@ treesaver.template.expand = function(view, scope) {
  *
  * @private
  * @param {!Object} view The object to expand the template with.
- * @param {!Element|!HTMLDocument} scope The element to use as root for template
+ * @param {!Element} scope The element to use as root for template
  * expansion.
  */
 treesaver.template.expandObject_ = function(view, scope) {
@@ -87,7 +84,9 @@ treesaver.template.expandObject_ = function(view, scope) {
           value.forEach(function(item) {
             children.forEach(function(child) {
               var clone = child.cloneNode(true);
-              treesaver.template.expand(item, clone);
+              if (clone.nodeType === 1) {
+                treesaver.template.expand(item, clone);
+              }
               el.appendChild(clone);
             });
           });
@@ -99,7 +98,9 @@ treesaver.template.expandObject_ = function(view, scope) {
         else if (Object.isObject(value)) {
           children = treesaver.array.toArray(el.childNodes);
           children.forEach(function(child) {
-            treesaver.template.expand(value, child);
+            if (child.nodeType === 1) {
+              treesaver.template.expand(value, child);
+            }
           });
         }
         else {
@@ -147,6 +148,27 @@ treesaver.template.expandObject_ = function(view, scope) {
         }
       }
     });
+  });
+};
+
+treesaver.template.hasBindName = function(el, bindName) {
+  var names = el.getAttribute('data-bind').split(/\s+/);
+  return names.some(function(n) {
+    var mapIndex = n.indexOf(':');
+    if (mapIndex !== -1) {
+      return n.substring(0, mapIndex) === bindName;
+    }
+    else {
+      return n === bindName;
+    }
+  });
+};
+
+treesaver.template.getElementsByBindName = function(propName, tagName, root) {
+  var candidates = treesaver.dom.getElementsByProperty('data-bind', null, tagName, root);
+
+  return candidates.filter(function(candidate) {
+    return treesaver.template.hasBindName(candidate, propName);
   });
 };
 
