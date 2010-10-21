@@ -151,6 +151,13 @@ treesaver.template.expandObject_ = function(view, scope) {
   });
 };
 
+/**
+ * Check if an element has the given data-bind name.
+ *
+ * @param {!Element|!HTMLDocument} el The element to check.
+ * @param {!string} bindName The name to check for.
+ * @return {boolean} True if the element has that bind name.
+ */
 treesaver.template.hasBindName = function(el, bindName) {
   var names = el.getAttribute('data-bind').split(/\s+/);
   return names.some(function(n) {
@@ -164,11 +171,18 @@ treesaver.template.hasBindName = function(el, bindName) {
   });
 };
 
-treesaver.template.getElementsByBindName = function(propName, tagName, root) {
+/**
+ * Return elements by bind name (i.e. data-bind="...").
+ *
+ * @param {!string} bindName Bind name.
+ * @param {?string=} tagName Tag name (optional).
+ * @param {HTMLDocument|Element=} root    Element root (optional).
+ */
+treesaver.template.getElementsByBindName = function(bindName, tagName, root) {
   var candidates = treesaver.dom.getElementsByProperty('data-bind', null, tagName, root);
 
   return candidates.filter(function(candidate) {
-    return treesaver.template.hasBindName(candidate, propName);
+    return treesaver.template.hasBindName(candidate, bindName);
   });
 };
 
