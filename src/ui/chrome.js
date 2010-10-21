@@ -1056,13 +1056,13 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
     // Format the TOC entries to fit our TOC template format.
     tocEntries = tocEntries.map(function(entry) {
       return {
-        article: entry
+        'article': entry
       };
     });
 
     // Expand the template using the cloned template.
     treesaver.template.expand({
-      toc: tocEntries
+      'toc': tocEntries
     }, newToc);
 
     // And finally replace the old TOC with the new one.
