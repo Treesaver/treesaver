@@ -71,7 +71,7 @@ treesaver.layout.Page = function(content, grids, br) {
 
       treesaver.layout.Page.fillField(node, view);
     });
-  });
+  }, this);
 
   // Containers
   treesaver.dom.getElementsByClassName('container', this.node).forEach(function(containerNode, i) {
