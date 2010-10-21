@@ -61,10 +61,15 @@ treesaver.layout.Page = function(content, grids, br) {
   this.node.style.height = this.size.height + 'px';
 
   // Fill in fields
-  // FIXME: Perhaps Object.keys should take null?
   Object.keys(content.fields || {}).forEach(function(key) {
-    treesaver.dom.getElementsByClassName(key, this.node).forEach(function(node) {
-      treesaver.layout.Page.fillField(node, content.fields);
+    var fields = treesaver.template.getElementsByBindName(key, null, this.node);
+
+    fields.forEach(function(node) {
+      var view = {};
+
+      view[key] = content.fields[key];
+
+      treesaver.layout.Page.fillField(node, view);
     });
   });
 
@@ -868,7 +873,7 @@ treesaver.layout.Page.computeOverhang = function(br, lastBlock, colHeight, heigh
  */
 treesaver.layout.Page.fillField = function(node, fields) {
   // The field name to put in this element
-  treesaver.template.expand(fields, {}, node);
+  treesaver.template.expand(fields, node);
 };
 
 /**
