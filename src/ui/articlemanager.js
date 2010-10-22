@@ -124,13 +124,16 @@ treesaver.ui.ArticleManager.getGrids_ = function() {
 treesaver.ui.ArticleManager.initLoadingPage = function() {
   var el = treesaver.resources.findByClassName('loading')[0];
 
-  if (el) {
-    treesaver.ui.ArticleManager.loadingPageHTML = treesaver.dom.outerHTML(el);
-    el = /** @type {!Element} */ (el.cloneNode(true));
-    document.body.appendChild(el);
-    treesaver.ui.ArticleManager.loadingPageSize = new treesaver.dimensions.Metrics(el);
-    document.body.removeChild(el);
+  // Craft a dummy page if none is there
+  if (!el) {
+    el = document.createElement('div');
   }
+
+  treesaver.ui.ArticleManager.loadingPageHTML = treesaver.dom.outerHTML(el);
+  el = /** @type {!Element} */ (el.cloneNode(true));
+  document.body.appendChild(el);
+  treesaver.ui.ArticleManager.loadingPageSize = new treesaver.dimensions.Metrics(el);
+  document.body.removeChild(el);
 };
 
 /**
@@ -139,13 +142,16 @@ treesaver.ui.ArticleManager.initLoadingPage = function() {
 treesaver.ui.ArticleManager.initErrorPage = function() {
   var el = treesaver.resources.findByClassName('error')[0];
 
-  if (el) {
-    treesaver.ui.ArticleManager.errorPageHTML = treesaver.dom.outerHTML(el);
-    el = /** @type {!Element} */ (el.cloneNode(true));
-    document.body.appendChild(el);
-    treesaver.ui.ArticleManager.errorPageSize = new treesaver.dimensions.Metrics(el);
-    document.body.removeChild(el);
+  // Craft a dummy page if none is there
+  if (!el) {
+    el = document.createElement('div');
   }
+
+  treesaver.ui.ArticleManager.errorPageHTML = treesaver.dom.outerHTML(el);
+  el = /** @type {!Element} */ (el.cloneNode(true));
+  document.body.appendChild(el);
+  treesaver.ui.ArticleManager.errorPageSize = new treesaver.dimensions.Metrics(el);
+  document.body.removeChild(el);
 };
 
 /**
