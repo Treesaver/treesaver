@@ -4,6 +4,7 @@
 goog.provide('treesaver.microdata');
 
 goog.require('treesaver.array');
+goog.require('treesaver.constants');
 goog.require('treesaver.dom');
 goog.require('treesaver.string');
 

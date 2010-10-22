@@ -4,6 +4,8 @@
 
 goog.provide('treesaver.scriptloader');
 
+goog.require('treesaver.constants');
+
 /**
  * @define {string}
  */

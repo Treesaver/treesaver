@@ -4,6 +4,8 @@
 
 goog.provide('treesaver.dimensions');
 
+goog.require('treesaver.constants');
+
 /**
  * Alias for Size type
  *

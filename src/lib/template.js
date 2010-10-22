@@ -10,17 +10,11 @@ goog.require('treesaver.string');
  * class to attribute mappings.
  *
  * @param {!Object} view The object to expand the template with.
- * @param {!Object} mappings An object defining which class
- * names map to attributes. For example: { url: 'href' } would
- * map the 'url' class to the href attribute.
- * @param {?Element} scope The element to use as root for template
- * expansion. Defaults to document if not specified explicitly.
+ * @param {!Element} scope The element to use as root for template
+ * expansion.
  */
-treesaver.template.expand = function(view, mappings, scope) {
-  if (!scope) {
-    scope = document;
-  }
-  treesaver.template.expandObject_(view, mappings, scope);
+treesaver.template.expand = function(view, scope) {
+  treesaver.template.expandObject_(view, scope);
 };
 
 /**
@@ -28,148 +22,178 @@ treesaver.template.expand = function(view, mappings, scope) {
  *
  * @private
  * @param {!Object} view The object to expand the template with.
- * @param {!Object} mappings An object defining which class
- * names map to attributes. For example: { url: 'href' } would
- * map the 'url' class to the href attribute.
- * @param {!Element|!HTMLDocument} scope The element to use as root for template
+ * @param {!Element} scope The element to use as root for template
  * expansion.
  */
-treesaver.template.expandObject_ = function(view, mappings, scope) {
-  var keys = Object.keys(view),
-      matches = {};
+treesaver.template.expandObject_ = function(view, scope) {
+  var matches = {},
+      elements = [],
+      topLevelElements = [],
+      i, j, len, contains;
 
-  keys.forEach(function(key) {
-    var elements = [], text;
+  // Get all the elements with a data-bind attribute. Unfortunately because of the
+  // way we handle key => attribute mappings we can't use the fast querySelectorAll
+  // (for example *[data-bind ~= "url"] won't match data-bind="url:href")
+  elements = treesaver.dom.getElementsByProperty('data-bind', null, null, scope);
 
-    if (matches[key]) {
-      return;
+  // Only keep the element if it is not contained in any other element. As soon
+  // as we find one element that contains this element we can stop.
+  for (i = 0, len = elements.length; i < len; i += 1) {
+    contains = false;
+    for (j = 0; j < len; j += 1) {
+      if (elements[i] !== elements[j] && elements[j].contains(elements[i])) {
+        contains = true;
+        break;
+      }
     }
-
-    elements = treesaver.dom.getElementsByClassName(key, scope);
-
-    if (treesaver.dom.hasClass(scope, key)) {
-      elements.push(scope);
+    if (!contains) {
+      topLevelElements.push(elements[i]);
     }
+  }
 
-    elements.forEach(function(e) {
-      if (Array.isArray(view[key])) {
-        if (!mappings[key]) {
-          elements = treesaver.dom.getElementsByClassName(key, scope);
+  if (treesaver.dom.hasAttr(scope, 'data-bind')) {
+    topLevelElements.push(scope);
+  }
 
-          elements.forEach(function(e) {
-            var template, parent;
+  topLevelElements.forEach(function(el) {
+    // Split the data-bind value into keys.
+    var keys = el.getAttribute('data-bind').split(/\s+/);
 
-            // Find the first element that has a template attribute
-            treesaver.array.toArray(e.childNodes).every(function(node) {
-              if (treesaver.dom.hasClass(node, 'template')) {
-                template = node;
-                return false;
+    keys.forEach(function(key) {
+      var mapIndex = key.indexOf(':'),
+          keyName = null,
+          mapName = null,
+          value = null,
+          children = [],
+          parent = null,
+          text = '';
+
+      if (mapIndex !== -1) {
+        keyName = key.substring(0, mapIndex);
+        mapName = key.substring(mapIndex + 1);
+      }
+      else {
+        keyName = key;
+      }
+
+      if (view.hasOwnProperty(keyName)) {
+        value = view[keyName];
+
+        if (Array.isArray(value)) {
+          children = treesaver.array.toArray(el.childNodes);
+          value.forEach(function(item) {
+            children.forEach(function(child) {
+              var clone = child.cloneNode(true);
+              if (clone.nodeType === 1) {
+                treesaver.template.expand(item, clone);
               }
+              el.appendChild(clone);
             });
-
-            parent = template.parentNode;
-
-            view[key].forEach(function(item) {
-              var node = template.cloneNode(true);
-              treesaver.template.expandObject_(item, mappings, node);
-              parent.appendChild(node);
-            });
-
-            parent.removeChild(template);
           });
-        } else {
-          treesaver.debug.error(
-            'treesaver.template: You can not map an array to an attribute.'
-          );
-        }
-      } else if (Object.isObject(view[key])) {
-        if (!mappings[key]) {
-          elements = treesaver.dom.getElementsByClassName(key, scope);
 
-          // TODO: remove duplicates and non top-level children
-          elements.forEach(function(e) {
-            treesaver.template.expandObject_(view[key], mappings, e);
+          children.forEach(function(child) {
+            el.removeChild(child);
           });
-        } else {
-          treesaver.debug.error(
-            'treesaver.template: You can not map an object to an attribute.'
-          );
         }
-      } else {
-        // If we have a custom mapping from class name to attribute
-        if (mappings[key]) {
-          text = (treesaver.template.escapeURL_[mappings[key]] ? decodeURI(e.getAttribute('data-' + mappings[key])) : e.getAttribute(mappings[key]));
-        } else {
-          text = e.innerHTML;
-        }
-
-        // Are we dealing with an inline template or can we simply
-        // replace the whole innerHTML.
-        if (treesaver.template.regex_.test(text)) {
-          text = text.replace(treesaver.template.regex_, function() {
-            var templateKey = arguments[1].toLowerCase().trim();
-            if (view[templateKey]) {
-              matches[templateKey] = true;
-              return treesaver.template.escape_(
-                view[templateKey],
-                false,
-                mappings[key]
-              );
-            } else {
-              matches[templateKey] = false;
-              return '';
+        else if (Object.isObject(value)) {
+          children = treesaver.array.toArray(el.childNodes);
+          children.forEach(function(child) {
+            if (child.nodeType === 1) {
+              treesaver.template.expand(value, child);
             }
           });
-        } else {
-          text = treesaver.template.escape_(view[key], true, mappings[key]);
         }
+        else {
+          if (mapName !== null) {
+            if ((mapName === 'href' || mapName === 'src') && treesaver.dom.hasAttr(el, 'data-' + mapName)) {
+              text = el.getAttribute('data-' + mapName);
+            }
+            else {
+              text = el.getAttribute(mapName);
+            }
+          }
+          else {
+            text = el.innerHTML;
+          }
 
-        if (mappings[key]) {
-          e.setAttribute(mappings[key], text);
-        } else {
-          e.innerHTML = text;
+          if (!value) {
+            value = '';
+          }
+          value = value.toString();
+
+          if (text && /{{[^}]+}}/.test(text)) {
+            if (mapName !== null && (mapName === 'href' || mapName === 'src')) {
+              // Template in 'href' or 'src'
+              text = text.replace('{{' + keyName + '}}', encodeURIComponent(value));
+            }
+            else if (mapName) {
+              // Template in normal attribute (setAttribute will take care of encoding)
+              text = text.replace('{{' + keyName + '}}', value);
+            }
+            else {
+              // Template in normal text (escape HTML characters)
+              text = text.replace('{{' + keyName + '}}', treesaver.template.escapeHTML(value));
+            }
+          }
+          else {
+            text = treesaver.template.escapeHTML(value);
+          }
+
+          if (mapName) {
+            el.setAttribute(mapName, text);
+          }
+          else {
+            el.innerHTML = text;
+          }
         }
       }
     });
   });
-
-  if (goog.DEBUG) {
-    Object.keys(matches).forEach(function(key) {
-      if (!matches[key]) {
-        treesaver.debug.warn(
-          'treesaver.template: Did not match "' + key + '".'
-        );
-      }
-    });
-  }
 };
 
 /**
- * Escapes a string for use in attributes, URLs or innerHTML.
+ * Check if an element has the given data-bind name.
+ *
+ * @param {!Element|!HTMLDocument} el The element to check.
+ * @param {!string} bindName The name to check for.
+ * @return {boolean} True if the element has that bind name.
+ */
+treesaver.template.hasBindName = function(el, bindName) {
+  var names = el.getAttribute('data-bind').split(/\s+/);
+  return names.some(function(n) {
+    var mapIndex = n.indexOf(':');
+    if (mapIndex !== -1) {
+      return n.substring(0, mapIndex) === bindName;
+    }
+    else {
+      return n === bindName;
+    }
+  });
+};
+
+/**
+ * Return elements by bind name (i.e. data-bind="...").
+ *
+ * @param {!string} bindName Bind name.
+ * @param {?string=} tagName Tag name (optional).
+ * @param {HTMLDocument|Element=} root    Element root (optional).
+ */
+treesaver.template.getElementsByBindName = function(bindName, tagName, root) {
+  var candidates = treesaver.dom.getElementsByProperty('data-bind', null, tagName, root);
+
+  return candidates.filter(function(candidate) {
+    return treesaver.template.hasBindName(candidate, bindName);
+  });
+};
+
+/**
+ * Escapes a string for use in innerHTML.
  *
  * @private
  * @param {string} str The string to escape.
- * @param {!boolean} subpart Whether the string is substring of another
- * string.
- * @param {?string} attributeName Optional attribute name to look up in
- * the treesaver.template.escapeURL object.
  * @return {!string} The escaped string.
  */
-treesaver.template.escape_ = function(str, subpart, attributeName) {
-  if (!str) {
-    return '';
-  }
-
-  str = str.toString();
-
-  if (!subpart && attributeName &&
-        treesaver.template.escapeURL_[attributeName]) {
-    return encodeURIComponent(str);
-  } else if (attributeName) {
-    // Since we're using setAttribute we don't need to do any custom escaping.
-    return str;
-  }
-
+treesaver.template.escapeHTML = function(str) {
   return str.replace(/&(?!\w+;)|[<>]/g, function(s) {
     switch (s) {
       case '&': return '&amp;';
@@ -178,22 +202,4 @@ treesaver.template.escape_ = function(str, subpart, attributeName) {
       default: return s;
     }
   });
-};
-
-/**
- * Regular expression to match template substitutions.
- * @private
- * @type {!RegExp}
- */
-treesaver.template.regex_ = new RegExp('{{([^}]+)}}', 'g');
-
-/**
- * A lookup table for attributes that need to be escaped as URL,
- * or as URL components.
- * @private
- * @type {!Object}
- */
-treesaver.template.escapeURL_ = {
-  href: true,
-  src: true
 };

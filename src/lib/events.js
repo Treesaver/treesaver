@@ -5,6 +5,7 @@
 goog.provide('treesaver.events');
 
 goog.require('treesaver.array');
+goog.require('treesaver.constants');
 goog.require('treesaver.debug'); // forEach
 
 /**
