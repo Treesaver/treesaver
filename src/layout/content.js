@@ -38,6 +38,16 @@ treesaver.layout.Content = function(el) {
    */
   this.colWidth = el.offsetWidth;
 
+  // In order to properly measure the dimensions of all the content,
+  // we need to hide all figures to prevent them from being laid out
+  // This causes no harm, since the actual <figure> element is always
+  // stripped out of the content
+  // TODO: Even without doing harm, this is a silly hack and it'd be
+  // better to find a good way to deal with this situation.
+  treesaver.dom.getElementsByTagName('figure', el).forEach(function(figure) {
+    figure.style.display = 'none';
+  });
+
   // Before we go through and construct our data objects, it really
   // pays off to sanitize all the content, correcting for invalid
   // line height, margins, etc, etc

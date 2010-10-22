@@ -627,8 +627,7 @@ treesaver.layout.Block.normalizeMetrics_ = function(node, baseLineHeight) {
     // sync. Use padding bottom to fix it up
     treesaver.debug.info('Forcing padding due to mismatch: ' + node);
 
-    metrics.paddingBottom +=
-      treesaver.dimensions.roundUp(metrics.outerH, baseLineHeight);
+    metrics.paddingBottom += baseLineHeight - metrics.outerH % baseLineHeight;
 
     // Now re-set the paddingBottom
     treesaver.dimensions.setCssPx(node, 'paddingBottom', metrics.paddingBottom);
