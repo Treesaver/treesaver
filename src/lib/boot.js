@@ -113,6 +113,10 @@ treesaver.boot.unload = function() {
   treesaver.resources.unload();
   treesaver.network.unload();
 
+  // Setup classes
+  treesaver.dom.removeClass(document.documentElement, 'treesaver');
+  treesaver.dom.addClass(document.documentElement, 'no-treesaver');
+
   // Show content again
   document.documentElement.style.display = 'block';
 };

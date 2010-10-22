@@ -374,8 +374,7 @@ treesaver.capabilities.updateClasses = function() {
 
     if (className) {
       // First time through, remove no-js and no-treesaver flags, if present
-      treesaver.dom.removeClass(document.documentElement, 'no-js');
-      treesaver.dom.removeClass(document.documentElement, 'no-treesaver');
+      className = className.replace(/no-js|no-treesaver/g, '');
     }
     else {
       // Class was blank, give an initial value
@@ -383,7 +382,7 @@ treesaver.capabilities.updateClasses = function() {
     }
 
     // Add the non-transient capabilities on the body
-    className += treesaver.capabilities.caps_.join(' ');
+    className += ' ' + treesaver.capabilities.caps_.join(' ');
   }
 
   // Now, remove values of transient capabilities
