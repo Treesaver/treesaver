@@ -183,6 +183,7 @@ $(function () {
     this.hasTheme = function () { return hasTheme; };
     this.sizeFilter = function () { return sizeFilter; };
     this.stretch = function () {};
+    this.capabilityFilter = function () { return true; };
   };
 
   test('Grid Management', function () {
