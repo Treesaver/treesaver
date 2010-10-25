@@ -748,7 +748,7 @@ treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, min
   node.innerHTML = blockStrings.join("");
 
   // Apply overhang to the first block
-  if (node.firstChild) {
+  if (firstBlock && node.firstChild) {
     node.firstChild.style.marginTop = -initMarginTop + 'px';
 
     if (firstBlock.parent && !initMarginTop) {
