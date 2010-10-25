@@ -33,29 +33,53 @@ $(function () {
           index: 0,
           figureIndex: 0
         },
-        figure;
+        figure,
+        f = document.createElement('figure'),
+        p = document.createElement('div');
+
+    p.appendChild(f);
+
+    // TODO: split these out into separate tests
+    f.innerHTML =
+        '<p data-sizes="one">Size one</p>' +
+        '<p>Paragraph within figure within container</p>';
 
     // Figure with one script block and a fallback paragraph
-    figure = new treesaver.layout.Figure(figureNode, 20, indices);
+    figure = new treesaver.layout.Figure(f, 20, indices);
     // First, make sure that the indices were updated
     equals(indices.figureIndex, 1, 'figureIndex incremented');
     equals(indices.index, 1, 'Index incremented');
-    // Check flags
-    ok(!figure.zoomable, 'Zoomable flag');
-    ok(figure.optional, 'Optional flag');
+
     // Check for our size payload
     ok(figure.sizes['one'], 'Size extraction one');
-    equals(escapeHTML(figure.sizes['one'][0].html), escapeHTML('<p>Size one</p>'), 'Size extraction one: HTML');
+    equals(escapeHTML(figure.sizes['one'][0].html), escapeHTML('<p data-sizes="one">Size one</p>'), 'Size extraction one: HTML');
     // Now, check the fallback
     ok(figure.fallback, 'Fallback extraction');
     equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Paragraph within figure within container'), 'Fallback extraction: HTML');
 
+
+    figureNode = $('.column figure.figuretest')[0];
+
+    f.innerHTML = 
+      '<div data-minheight="40" data-requires="no-legacy" data-sizes="two">' +
+        '<p>Requires</p>' +
+      '</div>' +
+      '<div data-requires="bogus" data-sizes="three">' +
+        '<p>Bogus</p>' +
+       '</div>' +
+      '<div data-minwidth="100" data-sizes="one two three fallback">' +
+        '<p>All</p><p>sizes</p>' +
+      '</div>' +
+      '<div data-requires="offline" data-sizes="four">' +
+        '<p>Offline-only</p>' +
+      '</div>' +
+      '<div data-requires="no-offline" data-sizes="four">' +
+        '<p>Online-only</p>' +
+      '</div>';
+
     // Figure with multiple divs. One has a real requirement, one bogus, and the other has multiple
     // sizes and a fallback
-    figureNode = $('.column figure.figuretest')[0];
-    figure = new treesaver.layout.Figure(figureNode, 20, indices);
-    ok(figure.zoomable, 'Zoomable flag');
-    ok(!figure.optional, 'Optional flag');
+    figure = new treesaver.layout.Figure(f, 20, indices);
     equals(indices.figureIndex, 2, 'figureIndex incremented');
     equals(indices.index, 4, 'Index incremented three times when fallback has two children');
     if (!treesaver.capabilities.IS_LEGACY) {
@@ -75,36 +99,59 @@ $(function () {
       ok(figure.sizes['two'][0] === figure.sizes['one'][0], 'Data-requires failure on no legacy');
     }
     equals(figure.sizes['four'].length, 2, 'Transient capability figureSizes preserved');
-
-    // A figure without a fallback, and with tempalted payloads
-    figureNode = $('.column figure.nofallback')[0];
-    figure = new treesaver.layout.Figure(figureNode, 20, indices);
-    equals(indices.figureIndex, 3, 'No fallback: figureIndex incremented');
-    equals(indices.index, 4, 'No fallback: Index not incremented');
-    ok(!figure.fallback, 'No fallback: Fallback not generated');
-    ok(figure.sizes['three'], 'No fallback: Templated size generated (three)');
-    equals(escapeHTML(figure.sizes['three'][0].html), escapeHTML('<p>Templated: 3</p>'), 'Templated applied correctly');
-    ok(figure.sizes['four'], 'No fallback: Templated size generated (four)');
-    equals(figure.sizes['four'][0].minH, 300, 'No fallback: MinHeight extraction');
   });
 
-  test('Figure - applyTemplate', function () {
-    var value = {
-      one: '1',
-      two: 2
-    },
-        template = "<a>{{ one }}</a><em>{{ TwO }}</em><strong>{{ bogus }}</strong>",
-        result = treesaver.layout.Figure.applyTemplate(template, value),
-        $result = $(result);
+  test('flags', function() {
+    var f = document.createElement('figure'),
+        figure,
+        indices = {
+          index: 0,
+          figureIndex: 0
+        };
+        
+    figure = new treesaver.layout.Figure(f, 20, indices);
 
-    ok(result, 'String returned from templating');
-    equals($result.length, 3, 'Elements preserved');
-    equals(escapeHTML(result), escapeHTML('<a>1</a><em>2</em><strong></strong>'), 'HTML output');
+    ok(!figure.zoomable, 'zoomable is not set');
+    ok(figure.optional, 'figure is optional');
+
+    treesaver.dom.addClass(f, 'zoomable');
+
+    figure = new treesaver.layout.Figure(f, 20, indices);
+
+    ok(figure.zoomable, 'figure is zoomable');
+
+    treesaver.dom.addClass(f, 'required');
+
+    figure = new treesaver.layout.Figure(f, 20, indices);
+
+    ok(!figure.optional, 'figure is required');
   });
 
-  test('Figure - Templated', function () {
-  });
+  test('fallback', function() {
+    var f = document.createElement('figure'),
+        parent = document.createElement('div'),
+        figure,
+        indices = {
+          index: 0,
+          figureIndex: 0
+        };
 
+    // FIXME: Is this really necessary?
+    parent.appendChild(f);
+
+    figure = new treesaver.layout.Figure(f, 20, indices);
+    ok(!figure.fallback, 'No fallback');
+
+    f.innerHTML = '<p>Fallback</p>';
+    figure = new treesaver.layout.Figure(f, 20, indices);
+    ok(figure.fallback, 'Default fallback');
+    equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Fallback'), 'Default fallback is correct');
+
+    f.innerHTML = '<p data-sizes="fallback">Data sizes fallback</p>';
+    figure = new treesaver.layout.Figure(f, 20, indices);
+    ok(figure.fallback, 'Data sizes fallback is correctly extracted');
+    equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Data sizes fallback'), 'Data sizes fallback is correct');
+  });
 
   // TODO: Make these tests more betterer
   test('getSize', function() {

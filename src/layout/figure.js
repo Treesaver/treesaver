@@ -8,6 +8,7 @@ goog.require('treesaver.dom');
 goog.require('treesaver.json');
 goog.require('treesaver.layout.FigureSize'); // trim
 goog.require('treesaver.string');
+goog.require('treesaver.template');
 
 /**
  * A figure element
@@ -44,7 +45,7 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   /**
    * Temporarily holds any content templates
    * @private
-   * @type {Array.<string>}
+   * @type {Array.<!Element>}
    */
   this.templates = [];
 
@@ -128,57 +129,8 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
 };
 
 /**
- * There are multiple formats for figure content payloads:
- *
- *   1. Normal
- *   2. Cloaked
- *   3. Templated
- *
- * Normal:
- * These are just element nodes in the tree, nothing special about
- * them, just extract the HTML.
- *
- * <figure>
- *   <p data-sizes="pullquote fallback">Hello, I said!</p>
- * </figure>
- *
- * Cloaked:
- * Figure content is hidden within a script tag, to prevent non-JS
- * clients from seeing the content.
- *
- * <figure>
- *   <script type="text/html" data-sizes="onecolumn">
- *     <img src="image.jpg" />
- *   </script>
- *   <div data-sizes="fallback">
- *     Fallback content.
- *   </div>
- * </figure>
- *
- * Templated:
- * Figure content is generated from an HTML template plus a set of
- * JSON values
- *
- * <figure>
- *   <script type="text/html" data-name="imagetemplate">
- *     <img src="{{ src }}" />
- *   </script>
- *   <script type="application/json" data-template="imagetemplate">
- *     [
- *       {
- *         'sizes': 'onecolumn',
- *         'src': 'image.jpg'
- *       },
- *       {
- *         'sizes: 'twocolumn',
- *         'src': 'image2.jpg'
- *       }
- *     ]
- *   </script>
- *   <div data-sizes="fallback">
- *     Fallback content.
- *   </div>
- * </figure>
+ * To cloak a figure content payload, use the `data-src` attribute on
+ * the `img` or `object` element instead of the `src` attribute.
  *
  * @param {!Element} childNode
  * @param {!number} baseLineHeight The normal line height used across
@@ -187,34 +139,9 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
  */
 treesaver.layout.Figure.prototype.processChildNode =
   function processChildNode(childNode, baseLineHeight, indices) {
-  var type;
 
-  // Script payload?
-  if (childNode.nodeName.toLowerCase() === 'script') {
-    type = childNode.getAttribute('type');
-
-    if (type === 'text/html') {
-      // Template or cloaked? Cloaked elements have a data-size property
-      if (treesaver.dom.hasAttr(childNode, 'data-sizes')) {
-        this.processCloaked(childNode);
-      }
-      else {
-        this.processScriptTemplate(childNode);
-      }
-      return;
-    }
-    else if (type === 'application/json') {
-      this.processTemplateValues(childNode);
-      return;
-    }
-
-    // What to do with unknown types?
-    treesaver.debug.warn('Unknown script type: ' + type);
-  }
-  else {
-    // Element payload
-    this.processElement(childNode);
-  }
+  // Element payload
+  this.processElement(childNode);
 };
 
 /**
@@ -303,51 +230,14 @@ treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, mi
 /**
  * @param {!Element} el
  */
-treesaver.layout.Figure.prototype.processScriptTemplate = function processScriptTemplate(el) {
-  var name = el.getAttribute('data-name') || '_default',
-      // Extract the HTML template
-      payload = treesaver.dom.innerText(el) || el.innerHTML;
-
-  // Only save if we have content
-  if (payload) {
-    this.templates[name] = payload.trim();
-  }
-  else {
-    treesaver.debug.warn('Empty figure template: ' + name);
-  }
-};
-
-/**
- * @param {!Element} el
- */
-treesaver.layout.Figure.prototype.processCloaked = function processCloaked(el) {
-  var sizes = el.getAttribute('data-sizes').split(' '),
-      html = (el.innerText || el.textContent || el.innerHTML).trim(),
-      minW = parseInt(el.getAttribute('data-minwidth'), 10),
-      minH = parseInt(el.getAttribute('data-minheight'), 10),
-      requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
-        el.getAttribute('data-requires').split(' ') : null;
-
-  if (requirements) {
-    if (!treesaver.capabilities.check(requirements)) {
-      // Does not meet requirements, skip
-      return;
-    }
-  }
-
-  this.saveSizes(sizes, html, minW, minH, requirements);
-};
-
-/**
- * @param {!Element} el
- */
 treesaver.layout.Figure.prototype.processElement = function processElement(el) {
   var sizes = el.getAttribute('data-sizes'),
       minW = parseInt(el.getAttribute('data-minwidth'), 10),
       minH = parseInt(el.getAttribute('data-minheight'), 10),
       requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
         el.getAttribute('data-requires').split(' ') : null,
-      html;
+      html,
+      cloaked = treesaver.dom.getElementsByProperty('data-src', null, 'img', el);
 
   if (requirements) {
     if (!treesaver.capabilities.check(requirements)) {
@@ -355,6 +245,10 @@ treesaver.layout.Figure.prototype.processElement = function processElement(el) {
       return;
     }
   }
+
+  cloaked.forEach(function(e) {
+    e.setAttribute('src', e.getAttribute('data-src'));
+  });
 
   // TODO: Remove properties we don't need to store (data-*)
 
@@ -369,98 +263,6 @@ treesaver.layout.Figure.prototype.processElement = function processElement(el) {
   }
 
   this.saveSizes(sizes, html, minW, minH, requirements);
-};
-
-/**
- * @param {!Element} el
- */
-treesaver.layout.Figure.prototype.processTemplateValues = function processTemplateValues(el) {
-  var template_name = el.getAttribute('data-template') || '_default',
-      // Extract the JSON
-      payload = (el.innerText || el.textContent || el.innerHTML),
-      values;
-
-  if (payload) {
-    // Parse the JSON
-    values = treesaver.json.parse(payload);
-
-    // Values must be an Array. It's not really worth doing any sophisticated
-    // checks here, so let's just check for forEach
-    if (values.forEach) {
-      // Process each size
-      values.forEach(function(val) {
-        this.processValue(val, template_name);
-      }, this);
-    }
-    else {
-      treesaver.debug.error('Non-array passed as template values: ' + values);
-
-      // Ignore
-      return;
-    }
-  }
-  else {
-    treesaver.debug.warn('Empty figure template values');
-  }
-};
-
-/**
- * @param {!Object} value
- * @param {string} default_template
- */
-treesaver.layout.Figure.prototype.processValue = function processValue(value, default_template) {
-  if (!value['sizes']) {
-    treesaver.debug.error('No sizes parameter in template value');
-
-    // Ignore
-    return;
-  }
-
-  // Find the appropriate template
-  var template = this.templates[value['template'] || default_template],
-      html,
-      requirements = value['requires'] ? value['requires'].split(' ') : null;
-
-  if (requirements) {
-    if (!treesaver.capabilities.check(requirements)) {
-      // Does not meet requirements, skip
-      return;
-    }
-  }
-
-  if (!template) {
-    treesaver.debug.error('Unknown template name for value: ' +
-        value['template'] || default_template);
-
-    // Ignore
-    return;
-  }
-
-  // Apply the template
-  html = treesaver.layout.Figure.applyTemplate(template, value);
-
-  // Save the sizes
-  this.saveSizes(value['sizes'].split(' '), html, value['minWidth'],
-    value['minHeight'], requirements);
-};
-
-/**
- * @type {!RegExp}
- */
-treesaver.layout.Figure.templateRegex = new RegExp('{{([^}]+)}}', 'g');
-
-/**
- * @param {!string} template
- * @param {!Object} values
- */
-treesaver.layout.Figure.applyTemplate = function applyTemplate(template, values) {
-  // Replace {{ name }} with appropriate value (or blank if not found)
-  return template.replace(treesaver.layout.Figure.templateRegex, function() {
-    var name = arguments[1].trim();
-
-    // Protect against case-sensitivity errors
-    return values[name] || values[name.toLowerCase()] || '';
-  });
 };
 
 /**
