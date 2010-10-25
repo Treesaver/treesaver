@@ -42,7 +42,7 @@ treesaver.layout.Grid = function(node) {
   /**
    * @type {Array.<string>}
    */
-  this.classes = treesaver.dom.classes(node);
+  this.classes = treesaver.dom.classes(node, true);
 
   /**
    * @type {boolean}
@@ -142,7 +142,7 @@ treesaver.layout.Grid.knownFlags = {
   'onlypage': true,
   'odd': true,
   'even': true,
-  'sizeToContainer': true
+  'sizetocontainer': true
 };
 
 treesaver.layout.Grid.pageFlagRegex = /^page-(\d*)$/;
@@ -224,7 +224,7 @@ treesaver.layout.Grid.prototype.stretch = function(totalHeight) {
   this.stretchedSize.outerH = finalHeight + this.size.bpHeight;
 
   // Max
-  if (!this.scoringFlags['sizeToContainer']) {
+  if (!this.scoringFlags['sizetocontainer']) {
     this.stretchedSize.maxH =
       Math.min(this.size.maxH, finalHeight + this.lineHeight * 3);
   }

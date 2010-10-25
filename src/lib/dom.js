@@ -52,11 +52,17 @@ treesaver.dom.hasClass = function(el, className) {
 
 /**
  * @param {!Element} el
+ * @param {boolean=} forceLowerCase
  * @return {!Array.<string>} Array of all the element's classes.
  */
-treesaver.dom.classes = function(el) {
-  return el.className && el.className.split ?
-    el.className.split(/\s+/) : [];
+treesaver.dom.classes = function(el, forceLowerCase) {
+  if (!el.className) {
+    return [];
+  }
+
+  var className = forceLowerCase ? el.className.toLowerCase() : el.className;
+
+  return className.split(/\s+/);
 };
 
 /**

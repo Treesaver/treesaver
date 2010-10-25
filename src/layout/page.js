@@ -95,7 +95,7 @@ treesaver.layout.Page = function(content, grids, br) {
         }
 
         // Size to the container
-        if (i === 0 && best.grid.sizeToContainer) {
+        if (i === 0 && best.grid.scoringFlags['sizetocontainer']) {
           this.size.height = containerNode.offsetHeight +
             best.grid.containers[0].delta;
           this.size.outerH = this.size.height + this.size.bpHeight;
