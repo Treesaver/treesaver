@@ -199,6 +199,25 @@ $(function() {
     ok(htmlEquals(div.innerHTML, '<div data-bind="toc"><div><h1 data-bind="title">First article</h1><p data-bind="byline">1</p></div><div><h1 data-bind="title">Second article</h1><p data-bind="byline">2</p></div></div>'));
   });
 
+  test('whitespace', function() {
+    var div = document.createElement('div'),
+        view = {};
+
+    view = {
+      'test': 'hello world'
+    };
+    div.innerHTML = '<div data-bind="test">{{ test }}</div>';
+
+    treesaver.template.expand(view, div);
+
+    ok(htmlEquals(div.innerHTML, '<div data-bind="test">hello world</div>'), 'white space in innerText template name is ignored.');
+
+    div.innerHTML = '<a data-href="index.html#{{ test }}" data-bind="test:href">test</a>';
+
+    treesaver.template.expand(view, div);
+
+    ok(htmlEquals(div.innerHTML, '<a href="index.html#hello%20world" data-href="index.html#{{ test }}" data-bind="test:href">test</a>'), 'white space in attribute template name is ignored.');
+  });
 
   test('escaping', function() {
     var div = document.createElement('div'),
