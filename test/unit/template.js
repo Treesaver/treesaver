@@ -212,11 +212,11 @@ $(function() {
 
     ok(htmlEquals(div.innerHTML, '<div data-bind="test">hello world</div>'), 'white space in innerText template name is ignored.');
 
-    div.innerHTML = '<a href="#{{ test:src }}" data-bind="test:src">test</a>';
+    div.innerHTML = '<a data-href="index.html#{{ test }}" data-bind="test:href">test</a>';
 
     treesaver.template.expand(view, div);
 
-    ok(htmlEquals(div.innerHTML, '<a href="#hello%20world">test</a>'), 'white space in attribute template name is ignored.');
+    ok(htmlEquals(div.innerHTML, '<a href="index.html#hello%20world" data-href="index.html#{{ test }}" data-bind="test:href">test</a>'), 'white space in attribute template name is ignored.');
   });
 
   test('escaping', function() {

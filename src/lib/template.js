@@ -122,18 +122,24 @@ treesaver.template.expandObject_ = function(view, scope) {
           value = value.toString();
 
           if (text && /{{[^}]+}}/.test(text)) {
-            if (mapName !== null && (mapName === 'href' || mapName === 'src')) {
-              // Template in 'href' or 'src'
-              text = text.replace('{{' + keyName + '}}', encodeURIComponent(value));
-            }
-            else if (mapName) {
-              // Template in normal attribute (setAttribute will take care of encoding)
-              text = text.replace('{{' + keyName + '}}', value);
-            }
-            else {
-              // Template in normal text (escape HTML characters)
-              text = text.replace('{{' + keyName + '}}', treesaver.template.escapeHTML(value));
-            }
+            text = text.replace(/{{([^}]+)}}/g, function(m, n) {
+              n = n.trim();
+              if (n === keyName) {
+                if (mapName !== null && (mapName === 'href' || mapName === 'src')) {
+                  return encodeURIComponent(value);
+                }
+                else if (mapName) {
+                  return value;
+                }
+                else {
+                  // Template in normal text (escape HTML characters)
+                  return treesaver.template.escapeHTML(value);
+                }
+              }
+              else {
+                return '{{' + n + '}}';
+              }
+            });
           }
           else {
             text = treesaver.template.escapeHTML(value);
