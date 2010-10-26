@@ -60,7 +60,7 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
       return;
     }
 
-    this.processChildNode(childNode, baseLineHeight, indices);
+    this.processElement(childNode);
   }, this);
 
   // Now check for a fallback, and process separately
@@ -126,22 +126,6 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
   parent.removeChild(fallbackNode);
 
   // Done
-};
-
-/**
- * To cloak a figure content payload, use the `data-src` attribute on
- * the `img` or `object` element instead of the `src` attribute.
- *
- * @param {!Element} childNode
- * @param {!number} baseLineHeight The normal line height used across
- *                                 the article content (in pixels).
- * @param {?Object} indices Current block and figure index.
- */
-treesaver.layout.Figure.prototype.processChildNode =
-  function processChildNode(childNode, baseLineHeight, indices) {
-
-  // Element payload
-  this.processElement(childNode);
 };
 
 /**
@@ -245,6 +229,10 @@ treesaver.layout.Figure.prototype.processElement = function processElement(el) {
       return;
     }
   }
+
+  // Remove class=hidden or hidden attribute in case used for display cloaking
+  el.removeAttribute('hidden');
+  treesaver.dom.removeClass(el, 'hidden');
 
   cloaked.forEach(function(e) {
     e.setAttribute('src', e.getAttribute('data-src'));
