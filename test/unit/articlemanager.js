@@ -55,7 +55,11 @@ $(function () {
 
     html = '<h1>Fake document title</h1><a href="http://invalid.com/">Non-TOC link</a>.';
     $(urls).each(function () {
-      $('<a rev="contents">').attr('href', this).appendTo(div);
+      var p = $('<div itemscope></div>');
+          a = $('<a itemprop="url">').attr('href', this);
+
+      a.appendTo(p);
+      p.appendTo(div);
     });
     html += $(div).html();
 
@@ -99,11 +103,16 @@ $(function () {
 
     html = '<h1>Fake document title</h1><a href="http://invalid.com/">Non-TOC link</a>.';
     $(urls).each(function () {
-      $('<a rev="contents">').attr('href', this).appendTo(div);
+      var p = $('<div itemscope></div>');
+          a = $('<a itemprop="url">').attr('href', this);
+
+      a.appendTo(p);
+      p.appendTo(div);
     });
     html += $(div).html();
 
     treesaver.ui.ArticleManager.load('<article><p>hi</p></article>');
+
     treesaver.ui.ArticleManager.findTOCLinks(html);
 
     articles = urls.map(function (url, i) {

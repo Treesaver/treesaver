@@ -394,41 +394,6 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     treesaver.ui.ArticleManager.articleOrder.push(article);
   });
 
-  // Did the TOC provide its own position in the article list?
-  if (!foundTOC) {
-    // Make sure we have an object for the article
-    var article = treesaver.ui.ArticleManager.articles[toc_url];
-
-    if (!article) {
-      // TODO: What to use as the title here? Document title will be processed later ...
-      article = new treesaver.ui.Article(toc_url, 'TOC', treesaver.ui.ArticleManager.grids_);
-      treesaver.ui.ArticleManager.articles[toc_url] = article;
-    }
-
-    // Insert the TOC into the first position
-    treesaver.ui.ArticleManager.articleMap[toc_url] = [-1]; // Will be incremented
-    unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
-    treesaver.ui.ArticleManager.articleOrder.unshift(article);
-
-    // The TOC is the current article if that's what was loaded originally
-    if (initialArticleIsTOC) {
-      treesaver.ui.ArticleManager.currentArticleIndex = 0;
-    }
-    else {
-      // Need to increment the article index, since we are offsetting by one
-      treesaver.ui.ArticleManager.currentArticleIndex += 1;
-    }
-
-    // Since the current article is being inserted at the zeroth position,
-    // we have to push everything else back
-    for (var key in treesaver.ui.ArticleManager.articleMap) {
-      // Add one to every entry
-      treesaver.ui.ArticleManager.articleMap[key] = treesaver.ui.ArticleManager.articleMap[key].map(function(val) {
-        return val + 1;
-      });
-    }
-  }
-
   // Clear out old article storage
   treesaver.storage.clean(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX, unique_urls);
 
