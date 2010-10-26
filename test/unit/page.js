@@ -66,7 +66,6 @@ $(function () {
         $container = $('<div class="container testonly"></div>').appendTo($page).css({ top: 0, bottom: 0 }),
         figure = {
           sizes: {
-            size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
             bogus: {
               applySize: function () { },
               revertSize: function () { }
@@ -75,6 +74,7 @@ $(function () {
         },
         map = {
           size: 'size',
+          figureSize: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
           flexible: true
         },
         success;
@@ -126,6 +126,7 @@ $(function () {
         },
         map = {
           size: 'size',
+          figureSize: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
           flexible: true
         },
         success,
@@ -201,11 +202,11 @@ $(function () {
         }).appendTo($page),
         figure = {
           sizes: {
-            size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0]))
           }
         },
         map = {
           size: 'size',
+          figureSize: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
           flexible: true
         },
         $col;
