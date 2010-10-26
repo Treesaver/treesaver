@@ -28,7 +28,7 @@ $(function() {
 
     // Sanity check for now, will fill in real tests later
     ok(lb, 'Object created');
-    ok(lb.container, 'Container extracted');
+    ok(!lb.container, 'Container is not yet extracted');
     ok(lb.fits({ w: Infinity, h: Infinity}), 'Fits');
     ok(lb.meetsRequirements(), 'Requirements');
   });
