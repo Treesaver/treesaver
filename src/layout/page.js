@@ -795,6 +795,12 @@ treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, min
       }
     }
   }
+  else {
+    treesaver.debug.warn('Clearing column contents since no block was added');
+
+    // Clear out column contents, since no block was added
+    treesaver.dom.clearChildren(node);
+  }
 };
 
 /**

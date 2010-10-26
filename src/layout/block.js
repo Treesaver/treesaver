@@ -49,6 +49,18 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
 
   node = /** @type {!Element} */ (node);
 
+  // Quick check in case the element is display none and should be ignored
+  if (!node.offsetHeight) {
+    // TODO: Check display: none / visibility: collapse
+    // This is a very defensive move, since a display: none item that
+    // is made visible when in a specific column or grid can really mess up a
+    // layout
+    treesaver.debug.warn('Zero-height block ignored');
+
+    this.ignore = true;
+    return;
+  }
+
   /**
   * Index of this block within the article
   * @type {!number}
@@ -145,6 +157,7 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
    * @type {!treesaver.dimensions.Metrics}
    */
   this.metrics = new treesaver.dimensions.Metrics(node);
+
   // Correct line height in case there's a funky non-pixel value
   if (!this.metrics.lineHeight) {
     this.metrics.lineHeight = baseLineHeight;
