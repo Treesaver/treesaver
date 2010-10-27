@@ -21,6 +21,7 @@ $(function () {
     },
     teardown: function () {
       $('.testonly').remove();
+      treesaver.ui.ArticleManager.unload();
     }
   });
 

@@ -50,14 +50,14 @@ $(function () {
           unused: 'This is not used'
         };
 
-    $(field_grid_node).find('output').each(function () {
+    $(field_grid_node).find('[data-bind]').each(function () {
       treesaver.layout.Page.fillField(this, fields);
     })
 
-    equals($(field_grid_node).find('output').length, 3, 'Output nodes preserved');
-    equals($(field_grid_node).find('output[name=title]').html(), fields.title, 'Title field');
-    equals($(field_grid_node).find('output[name=byline]').children().length, 1, 'Byline has element');
-    equals($(field_grid_node).find('output[name=bogus]').html(), '', 'Bogus field unchanged');
+    equals($(field_grid_node).find('[data-bind]').length, 3, 'Output nodes preserved');
+    equals($(field_grid_node).find('[data-bind=title]').html(), fields.title, 'Title field');
+    equals($(field_grid_node).find('[data-bind=byline]').html(), '&lt;a href="#"&gt;Author Name&lt;/a&gt;', 'Byline innerText is escaped.');
+    equals($(field_grid_node).find('[data-bind=bogus]').html(), '', 'Bogus field unchanged');
   });
 
   // TODO: fillContainers
@@ -66,7 +66,6 @@ $(function () {
         $container = $('<div class="container testonly"></div>').appendTo($page).css({ top: 0, bottom: 0 }),
         figure = {
           sizes: {
-            size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
             bogus: {
               applySize: function () { },
               revertSize: function () { }
@@ -75,6 +74,7 @@ $(function () {
         },
         map = {
           size: 'size',
+          figureSize: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
           flexible: true
         },
         success;
@@ -126,6 +126,7 @@ $(function () {
         },
         map = {
           size: 'size',
+          figureSize: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
           flexible: true
         },
         success,
@@ -201,11 +202,11 @@ $(function () {
         }).appendTo($page),
         figure = {
           sizes: {
-            size: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0]))
           }
         },
         map = {
           size: 'size',
+          figureSize: new treesaver.layout.FigureSize(treesaver.dom.outerHTML($('<div />').height(200)[0])),
           flexible: true
         },
         $col;

@@ -262,7 +262,7 @@ $(function () {
 
     handler3 = function handler3(e) {
       if (e.completed) {
-        treesaver.events.removeListener(document, treesaver.ui.Article.events.paginationProgress, handler3);
+        treesaver.events.removeListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler3);
 
         ok(true, 'Pagination completed received after negative start');
         ok(article.br.finished, 'Article pagination completed');
@@ -277,7 +277,7 @@ $(function () {
 
     handler2 = function handler2() {
       ok(true, 'Second pagination event received');
-      treesaver.events.removeListener(document, treesaver.ui.Article.events.paginationProgress, handler2);
+      treesaver.events.removeListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler2);
 
       // Just get the newly generated page
       var new_pages = article.getPages(2, 1);
@@ -285,7 +285,7 @@ $(function () {
       ok(new_pages[0], 'Page 3 exists');
 
       // Now fetch from the back
-      treesaver.events.addListener(document, treesaver.ui.Article.events.paginationProgress, handler3);
+      treesaver.events.addListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler3);
 
       new_pages = article.getPages(-1, 100);
       ok(!article.br.finished, 'Article pagination not completed');
@@ -304,8 +304,8 @@ $(function () {
       equals(new_pages.length, 2, 'Two pages returned');
       ok(new_pages[0], 'Page one populated');
       ok(new_pages[1], 'Page two populated');
-      treesaver.events.removeListener(document, treesaver.ui.Article.events.paginationProgress, handler);
-      treesaver.events.addListener(document, treesaver.ui.Article.events.paginationProgress, handler2);
+      treesaver.events.removeListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler);
+      treesaver.events.addListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler2);
 
       // OK, now fetch three pages, forcing the next page to paginate, while
       // the first two are returned normally
@@ -315,7 +315,7 @@ $(function () {
       ok(!new_pages[2], 'Page 3 empty on second call');
     };
 
-    treesaver.events.addListener(document, treesaver.ui.Article.events.paginationProgress, handler);
+    treesaver.events.addListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler);
 
     // Grab the first two pages
     pages = article.getPages(0, 2);
@@ -346,7 +346,7 @@ $(function () {
 
   test('getPageIndex', function () {
     var $content = $('.testonly.content'),
-        article = new treesaver.ui.Article('/path', 'Article Title', [], $content.html()),
+        article = new treesaver.ui.Article('/path', 'Article Title', []),
         grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
         tests = [],
         pos,
@@ -363,14 +363,14 @@ $(function () {
         current.f.apply(null, eval(current.args));
 
         if (current.start) {
-          treesaver.events.removeListener(document, treesaver.ui.Article.events.paginationProgress, handler);
+          treesaver.events.removeListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler);
           start();
         }
       }
     };
-    treesaver.events.addListener(document, treesaver.ui.Article.events.paginationProgress, handler);
+    treesaver.events.addListener(document, treesaver.ui.Article.events.PAGINATIONPROGRESS, handler);
 
-    stop(2000);
+    //stop(2000);
 
     // Start with the beginning of the content
     tests.push({
@@ -385,6 +385,8 @@ $(function () {
     });
     pos = new treesaver.layout.BreakRecord().getPosition();
     equals(article.getPageIndex(pos), -1, 'Negative one returned before conten paginated');
+
+    article.processHTML($content.html());
 
     //equals();
     //ok(article.pages.length > 0, 'At least first page paginated after getPageIndex query');

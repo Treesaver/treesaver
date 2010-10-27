@@ -839,8 +839,10 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
   // Update to our new page area
   this.calculatePageArea();
 
-  // Re-query for pages later
-  this.selectPagesDelayed();
+  if (treesaver.ui.ArticleManager.currentArticle) {
+    // Re-query for pages later
+    this.selectPagesDelayed();
+  }
 };
 
 /**
@@ -1089,7 +1091,6 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
   var old_pages = this.pages;
 
   // TODO: Master page width?
-
   this.pages = treesaver.ui.ArticleManager.getPages(/** @type {!treesaver.dimensions.Size} */ (this.pageArea), 1);
 
   treesaver.dom.clearChildren(/** @type {!Element} */ (this.viewer));
