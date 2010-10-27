@@ -298,12 +298,18 @@ treesaver.layout.Block.processChildren =
       isList = node.nodeName.toLowerCase() === 'ol' && 'start' in node,
       listIndex = isList ? node.start : null;
 
+  // This fix is specifically for Firefox which returns -1 when the
+  // `start` or `value` attribute is not set.
+  if (listIndex === -1) {
+    listIndex = 1;
+  }
+
   treesaver.array.toArray(node.childNodes).forEach(function(childNode) {
     var child;
 
     if (isList && childNode.nodeName.toLowerCase() === 'li') {
       // Zero value is ignored (i.e. you can't have item 0)
-      if (childNode.value) {
+      if (childNode.value && childNode.value !== -1) {
         listIndex = childNode.value;
       }
 

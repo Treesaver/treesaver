@@ -845,6 +845,7 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
   if (treesaver.ui.ArticleManager.currentArticle) {
     // Re-query for pages later
     this.selectPagesDelayed();
+    this.updateTOCDelayed();
   }
 };
 
