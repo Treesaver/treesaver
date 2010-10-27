@@ -111,11 +111,14 @@ treesaver.layout.Page = function(content, grids, br) {
 
         // TODO: Note more info about failure?
         br.failedFigure(figureIndex);
-        // TODO: Remove node
+
+        // Remove node for easier styling
+        containerNode.parentNode.removeChild(containerNode);
       }
     }
     else {
-      // No node, remove?
+      // No node, remove
+      containerNode.parentNode.removeChild(containerNode);
     }
   }, this);
 

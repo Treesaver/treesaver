@@ -430,7 +430,8 @@ treesaver.layout.Grid.SCORING = {
   EMPTY_CONTAINER_PENALTY: 5000,
   DIFFERENT_LINEHEIGHT: 2000,
   DIFFERENT_COLWIDTH: Infinity,
-  CONTAINER_BONUS: 1000,
+  CONTAINER_BONUS: 2000,
+  CONTAINER_AREA_BONUS: 5,
   BLOCK_DELAY_PENALTY: 100,
   REQUIRED_BLOCK_BONUS: 4000,
   PAGE_NUMBER: 12000,
@@ -495,7 +496,9 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
       if (mapped_container) {
         figure = content.figures[mapped_container.figureIndex];
 
-        score += treesaver.layout.Grid.SCORING.CONTAINER_BONUS;
+        score += treesaver.layout.Grid.SCORING.CONTAINER_BONUS +
+          (mapped_container.figureSize.minH) *
+          treesaver.layout.Grid.SCORING.CONTAINER_AREA_BONUS;
 
         if (!figure.optional) {
           score += treesaver.layout.Grid.SCORING.REQUIRED_BLOCK_BONUS;
