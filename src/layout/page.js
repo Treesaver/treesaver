@@ -270,7 +270,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
         // Since items are always absolutely positioned, we can
         // adjust the position of the column directly based on it's
         // offsets
-        if (anchoredTop || treesaver.dom.hasClass(sibling, 'bottom')) {
+        if (anchoredTop) {
           treesaver.dimensions.setCssPx(sibling, 'top',
             sibling.offsetTop + containerHeight);
         }
