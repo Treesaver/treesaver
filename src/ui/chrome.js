@@ -745,6 +745,9 @@ treesaver.ui.Chrome.prototype.showLightBox = function(el) {
     return false;
   }
 
+  // Hide toolbars, etc when showing lightbox
+  this.uiIdle();
+
   if (!this.lightBoxActive) {
     this.lightBox = treesaver.ui.StateManager.getLightBox();
     if (!this.lightBox) {
@@ -1150,7 +1153,7 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
   }
 
   if (nextPage) {
-    this.pagePositions[2] = rightMarginEdge;
+    this.pagePositions[2] = rightMarginEdge - nextPage.size.marginLeft;
     nextPage.node.setAttribute('id', 'nextPage');
   }
 
