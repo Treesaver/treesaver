@@ -92,6 +92,10 @@ treesaver.layout.Page = function(content, grids, br) {
         if (figure.zoomable) {
           treesaver.dom.addClass(containerNode, 'zoomable');
           containerNode.setAttribute('data-figureindex', figureIndex);
+          if (WITHIN_IOS_WRAPPER || treesaver.capabilities.SUPPORTS_TOUCH) {
+            // Need dummy handler in order to get bubbled events
+            containerNode.setAttribute('onclick', 'void(0)');
+          }
         }
 
         // Size to the container

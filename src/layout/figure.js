@@ -113,6 +113,10 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
   if (this.zoomable) {
     treesaver.dom.addClass(fallbackNode, 'zoomable');
     fallbackNode.setAttribute('data-figureindex', this.figureIndex);
+    if (WITHIN_IOS_WRAPPER || treesaver.capabilities.SUPPORTS_TOUCH) {
+      // Need dummy handler in order to get bubbled events
+      fallbackNode.setAttribute('onclick', 'void(0)');
+    }
   }
 
   // Figures are skipped during sanitization, so must do it manually here
