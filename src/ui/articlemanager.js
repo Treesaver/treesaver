@@ -129,6 +129,12 @@ treesaver.ui.ArticleManager.initLoadingPage = function() {
     el = document.createElement('div');
   }
 
+  // Needed for correct positioning in chrome
+  document.body.appendChild(el);
+  el.style.top = '50%';
+  treesaver.dimensions.setCssPx(el, 'margin-top', el.offsetHeight / 2);
+  document.body.removeChild(el);
+
   treesaver.ui.ArticleManager.loadingPageHTML = treesaver.dom.outerHTML(el);
   el = /** @type {!Element} */ (el.cloneNode(true));
   document.body.appendChild(el);
@@ -146,6 +152,12 @@ treesaver.ui.ArticleManager.initErrorPage = function() {
   if (!el) {
     el = document.createElement('div');
   }
+
+  // Needed for correct positioning in chrome
+  document.body.appendChild(el);
+  el.style.top = '50%';
+  treesaver.dimensions.setCssPx(el, 'margin-top', el.offsetHeight / 2);
+  document.body.removeChild(el);
 
   treesaver.ui.ArticleManager.errorPageHTML = treesaver.dom.outerHTML(el);
   el = /** @type {!Element} */ (el.cloneNode(true));
