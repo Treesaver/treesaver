@@ -413,6 +413,12 @@ treesaver.ui.ArticleManager.parseTOC = function(html) {
   var container = document.createElement('div'),
       items = [];
 
+  // Must have container connected to tree for HTML5 parsing in IE
+  if (SUPPORT_IE) {
+    container.className = 'offscreen';
+    document.body.appendChild(container);
+  }
+
   container.innerHTML = html;
   items = treesaver.microdata.getJSONItems(null, container);
 
@@ -424,6 +430,11 @@ treesaver.ui.ArticleManager.parseTOC = function(html) {
     });
     return result;
   });
+
+  // Remove from tree if using HTML5 shiv
+  if (SUPPORT_IE) {
+    document.body.removeChild(container);
+  }
 };
 
 /**
