@@ -268,17 +268,17 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
       }
       else {
         // Since items are always absolutely positioned, we can
-        // adjust the position of the column directly, based on it's
+        // adjust the position of the column directly based on it's
         // offsets
         if (anchoredTop || treesaver.dom.hasClass(sibling, 'bottom')) {
-          sibling.style.top =
-            (sibling.offsetTop + containerHeight) + 'px';
+          treesaver.dimensions.setCssPx(sibling, 'top',
+            sibling.offsetTop + containerHeight);
         }
         else {
-          // Top takes priority over bottom, so we can just
-          // set the height here
-          sibling.style.height =
-            sibling.offsetHeight - containerHeight + 'px';
+          // Compute the current 'bottom' value by using the parent's offsetHeight
+          treesaver.dimensions.setCssPx(sibling, 'bottom',
+            sibling.offsetParent.offsetHeight -
+            (sibling.offsetTop + sibling.offsetHeight) + containerHeight);
         }
       }
     }
