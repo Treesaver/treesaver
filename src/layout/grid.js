@@ -427,6 +427,7 @@ treesaver.layout.Grid.SCORING = {
   FINISH_ALL: 2000,
   FIXED_CONTAINER: 5000,
   COLUMN: 50,
+  EMPTINESS_PENALTY: 2000,
   EMPTY_CONTAINER_PENALTY: 5000,
   DIFFERENT_LINEHEIGHT: 2000,
   DIFFERENT_COLWIDTH: Infinity,
@@ -434,7 +435,7 @@ treesaver.layout.Grid.SCORING = {
   CONTAINER_AREA_BONUS: 5,
   BLOCK_DELAY_PENALTY: 100,
   REQUIRED_BLOCK_BONUS: 4000,
-  PAGE_NUMBER: 12000,
+  PAGE_NUMBER: 3000,
   ONLY_PAGE: 4000,
   ODD_PAGE: 2000,
   EVEN_PAGE: 2000,
@@ -459,6 +460,7 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
 
   var best = null,
       highScore = -Infinity,
+      percentEmpty,
       containerMap,
       // Content block loop
       blockCount = content.blocks.length,
@@ -563,6 +565,16 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
       // Avoid completely empty grids (will cause loops?)
       score = -Infinity;
     }
+    else if (remaining_height > 0) {
+      // Penalize for emptiness, based on percentage
+      percentEmpty = remaining_height / cur.textHeight;
+
+      if (percentEmpty > .33) {
+        score -= remaining_height;
+        score -= percentEmpty * percentEmpty *
+          treesaver.layout.Grid.SCORING.EMPTINESS_PENALTY;
+      }
+    }
 
     if (score > highScore) {
       highScore = score;
@@ -573,7 +585,6 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
     }
   } // grid_loop
 
-  // DelayedBlocks
   return best;
 };
 
