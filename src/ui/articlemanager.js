@@ -1000,14 +1000,17 @@ treesaver.ui.ArticleManager._setArticle = function(article, pos, index, noHistor
     return false;
   }
 
-  // Do nothing if it's the same as the current article
+  // Check if it's the same as the current article
   if (treesaver.ui.ArticleManager.currentArticle === article) {
-    // TODO: What if it's an index change? User clicks on same
-    // article that is later in index? How would UI show that?
-    // Or perhaps, same article repeated ...
-
-    // Still counts as a success
-    return true;
+    // Might be an index change, in which case we should still update
+    // the index
+    if (index === treesaver.ui.ArticleManager.currentArticleIndex) {
+      // Same article and index, nothing to do but still counts as a success
+      return true;
+    }
+    else {
+      // TODO: What should UI do with an index change?
+    }
   }
 
   // Change the window/tab title
