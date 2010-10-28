@@ -78,6 +78,14 @@ treesaver.resources.processResourceFile = function(html) {
     treesaver.array.toArray(div.childNodes).forEach(function(child) {
       if (child.nodeType === 1 && child.nodeName.toLowerCase() === 'div') {
         treesaver.resources.container_.appendChild(child);
+      } else if (child.nodeType === 1 && child.nodeName.toLowerCase() === 'body') {
+        // FIXME: Find a better way to deal with the inconsistencies between browsers
+        // when appending a document to an element.
+        treesaver.array.toArray(child.childNodes).forEach(function(bodyChild) {
+          if (bodyChild.nodeType === 1 && bodyChild.nodeName.toLowerCase() === 'div') {
+            treesaver.resources.container_.appendChild(bodyChild);
+          }
+        });
       }
     });
 
