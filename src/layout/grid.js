@@ -468,13 +468,14 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
       // Grid loop
       i, len, cur, br, score, height, remaining_height,
       // Container loop
-      j, jlen, container, mapped_container, containerFilled, blockAdded;
+      j, jlen, container, mapped_container, filledContainerCount, blockAdded;
 
   // Loop through each grid
   grid_loop:
   for (i = 0, len = grids.length; i < len; i += 1) {
     cur = grids[i];
-    containerFilled = blockAdded = false;
+    filledContainerCount = 0;
+    blockAdded = false;
     br = breakRecord.clone();
     height = br.overhang;
     remaining_height = cur.textHeight - height;
@@ -511,7 +512,7 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
           score += treesaver.layout.Grid.SCORING.FIXED_CONTAINER;
         }
 
-        containerFilled = true;
+        filledContainerCount += 1;
       }
       else if (!container.flexible) {
         score -= treesaver.layout.Grid.SCORING.EMPTY_CONTAINER_PENALTY;
@@ -561,7 +562,7 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
     } // block_loop
 
     // Check for forward progress
-    if (!blockAdded && !containerFilled) {
+    if (!blockAdded && !filledContainerCount) {
       // Avoid completely empty grids (will cause loops?)
       score = -Infinity;
     }
@@ -569,7 +570,12 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
       // Penalize for emptiness, based on percentage
       percentEmpty = remaining_height / cur.textHeight;
 
+      // Filled containers make it hard to estimate how full the page really
+      // is, so give a 20% bonus per container
+      percentEmpty -= filledContainerCount * .2;
+
       if (percentEmpty > .33) {
+        treesaver.debug.info('Grid penalized for emptiness percentage: ' + percentEmpty * 100);
         score -= remaining_height;
         score -= percentEmpty * percentEmpty *
           treesaver.layout.Grid.SCORING.EMPTINESS_PENALTY;
