@@ -224,8 +224,7 @@ treesaver.layout.Figure.prototype.processElement = function processElement(el) {
       minH = parseInt(el.getAttribute('data-minheight'), 10),
       requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
         el.getAttribute('data-requires').split(' ') : null,
-      html,
-      cloaked = treesaver.dom.getElementsByProperty('data-src', null, 'img', el);
+      html;
 
   if (requirements) {
     if (!treesaver.capabilities.check(requirements)) {
@@ -237,10 +236,6 @@ treesaver.layout.Figure.prototype.processElement = function processElement(el) {
   // Remove class=hidden or hidden attribute in case used for display cloaking
   el.removeAttribute('hidden');
   treesaver.dom.removeClass(el, 'hidden');
-
-  cloaked.forEach(function(e) {
-    e.setAttribute('src', e.getAttribute('data-src'));
-  });
 
   // TODO: Remove properties we don't need to store (data-*)
 

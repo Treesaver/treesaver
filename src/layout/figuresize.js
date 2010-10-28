@@ -67,8 +67,13 @@ treesaver.layout.FigureSize.prototype.applySize = function(container, name) {
     treesaver.dom.addClass(container, name);
   }
 
-  // Will we ever do something more complex here?
   container.innerHTML = this.html;
+
+  // Find any cloaked images
+  treesaver.dom.getElementsByProperty('data-src', null, 'img', container).
+    forEach(function(e) {
+      e.setAttribute('src', e.getAttribute('data-src'));
+  });
 };
 
 /**
