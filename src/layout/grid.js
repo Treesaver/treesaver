@@ -376,6 +376,16 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
         }
       } // size_loop
 
+      // Required figures must occur in-order
+      if (!figure.optional) {
+        // Can't move on to the next figure since it might cause
+        // incorrect order
+        // TODO: See if this figure could fit in other containers
+        // Or perhaps flip order around to look at figures first, then
+        // containers
+        break;
+      }
+
       // Try the next figure
       if (!usingDelayed) {
         figureIndex += 1;

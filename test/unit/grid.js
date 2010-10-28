@@ -91,14 +91,14 @@ $(function () {
           }
         },
         { // Should match final container
-          optional: false,
+          optional: true,
           getSize: function(name) { return this.sizes[name]; },
           sizes: {
             five: {}
           }
         },
         { // Can't match any container (uses bogus size)
-          optional: false,
+          optional: true,
           getSize: function(name) { return this.sizes[name]; },
           sizes: {
             bogus: {}
@@ -121,14 +121,14 @@ $(function () {
 
     // First container matches to first figure
     ok(map[0], 'First container matched');
-    equals(map[0].figureIndex, 0, 'First container figureIndex');
-    equals(map[0].size, 'one', 'First container size name');
+    equals(map[0] && map[0].figureIndex, 0, 'First container figureIndex');
+    equals(map[0] && map[0].size, 'one', 'First container size name');
 
     // Second container matches to fourth figure, largest size for both
     // This isn't ideal, perhaps ...
     ok(map[1], 'Second container matched');
-    equals(map[1].figureIndex, 3, 'Second container figureIndex');
-    equals(map[1].size, 'two', 'Second container size name');
+    equals(map[1] && map[1].figureIndex, 3, 'Second container figureIndex');
+    equals(map[1] && map[1].size, 'two', 'Second container size name');
 
     // Third & fourth figures remain unmatched
     ok(!map[2], 'Third container unfilled');
@@ -136,8 +136,8 @@ $(function () {
 
     // Fifth container matches second figure, which was delayed
     ok(map[4], 'Last container matched');
-    equals(map[4].figureIndex, 1, 'Last container figureIndex');
-    equals(map[4].size, 'five', 'Last container size name');
+    equals(map[4] && map[4].figureIndex, 1, 'Last container figureIndex');
+    equals(map[4] && map[4].size, 'five', 'Last container size name');
   });
 
   test('grid: Best', function () {
