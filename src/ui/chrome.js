@@ -1132,16 +1132,17 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
       nextPage = this.pages[2],
       leftMarginEdge,
       rightMarginEdge,
+      leftMargin = Math.max(currentPage.size.marginRight, nextPage ? nextPage.size.marginLeft : 0),
+      rightMargin = Math.max(currentPage.size.marginLeft, prevPage ? prevPage.size.marginRight : 0),
       oldOffset = this.pageOffset;
+
 
   // Mark the master page
   currentPage.node.setAttribute('id', 'currentPage');
 
   // Center the first page
-  leftMarginEdge = (this.pageArea.w -
-      currentPage.size.outerW) / 2 - currentPage.size.marginLeft;
-  rightMarginEdge = leftMarginEdge + currentPage.size.outerW +
-    currentPage.size.marginWidth;
+  leftMarginEdge = (this.pageArea.w - currentPage.size.outerW) / 2 - leftMargin;
+  rightMarginEdge = leftMarginEdge + currentPage.size.outerW + leftMargin + rightMargin;
 
   // Register the positions of each page
   this.pagePositions = [];
