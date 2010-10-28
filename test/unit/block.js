@@ -290,7 +290,7 @@ $(function () {
     equals($list[0].childNodes[7].value, 11, 'Correct increment after manual value');
 
     // Use a new list with a start value
-    $list = $(listNode);
+    $list = $(listNode).addClass('testonly').appendTo('body');
     $list.attr('start', 10);
     // Process the block
     block = new treesaver.layout.Block($list[0], 20);
