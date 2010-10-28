@@ -28,45 +28,46 @@ $(function () {
   });
 
   test('Figure - Construction', function () {
-    var figureNode = $('.column .doublecontainer figure')[0],
-        indices = {
+    var indices = {
           index: 0,
           figureIndex: 0
         },
         figure,
-        f = document.createElement('figure'),
-        p = document.createElement('div');
-
-    p.appendChild(f);
+        f = $('<figure></figure>').addClass('testonly').appendTo('body');
 
     // TODO: split these out into separate tests
-    f.innerHTML =
-        '<p data-sizes="one">Size one</p>' +
-        '<p>Paragraph within figure within container</p>';
+    f.html('<p data-sizes="one">Size one</p>' +
+        '<p>Paragraph within figure within container</p>');
 
     // Figure with one script block and a fallback paragraph
-    figure = new treesaver.layout.Figure(f, 20, indices);
+    figure = new treesaver.layout.Figure(f[0], 20, indices);
     // First, make sure that the indices were updated
     equals(indices.figureIndex, 1, 'figureIndex incremented');
     equals(indices.index, 1, 'Index incremented');
 
     // Check for our size payload
     ok(figure.sizes['one'], 'Size extraction one');
-    equals(escapeHTML(figure.sizes['one'][0].html), escapeHTML('<p data-sizes="one">Size one</p>'), 'Size extraction one: HTML');
+    equals(escapeHTML($(figure.sizes['one'][0].html).text()), escapeHTML('Size one'), 'Size extraction one: HTML');
     // Now, check the fallback
     ok(figure.fallback, 'Fallback extraction');
     equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Paragraph within figure within container'), 'Fallback extraction: HTML');
+  });
 
+  test('Figure - Construction - Multiple sizes', function() {
+    var indices = {
+          index: 0,
+          figureIndex: 0
+        },
+        figure,
+        f = $('<figure></figure>').addClass('testonly').appendTo('body');
 
-    figureNode = $('.column figure.figuretest')[0];
-
-    f.innerHTML = 
+   f.html(
       '<div data-minheight="40" data-requires="no-legacy" data-sizes="two">' +
         '<p>Requires</p>' +
       '</div>' +
       '<div data-requires="bogus" data-sizes="three">' +
         '<p>Bogus</p>' +
-       '</div>' +
+      '</div>' +
       '<div data-minwidth="100" data-sizes="one two three fallback">' +
         '<p>All</p><p>sizes</p>' +
       '</div>' +
@@ -75,13 +76,14 @@ $(function () {
       '</div>' +
       '<div data-requires="no-offline" data-sizes="four">' +
         '<p>Online-only</p>' +
-      '</div>';
+      '</div>');
 
     // Figure with multiple divs. One has a real requirement, one bogus, and the other has multiple
     // sizes and a fallback
-    figure = new treesaver.layout.Figure(f, 20, indices);
-    equals(indices.figureIndex, 2, 'figureIndex incremented');
-    equals(indices.index, 4, 'Index incremented three times when fallback has two children');
+    figure = new treesaver.layout.Figure(f[0], 20, indices);
+
+    equals(indices.figureIndex, 1, 'figureIndex incremented');
+    equals(indices.index, 3, 'Index incremented three times when fallback has two children');
     if (!treesaver.capabilities.IS_LEGACY) {
       equals(figure.sizes['two'][0].minH, 40, 'minHeight extraction');
       ok(!figure.sizes['two'][0].minW, 'No phantom minWidth extraction');
@@ -101,7 +103,7 @@ $(function () {
     equals(figure.sizes['four'].length, 2, 'Transient capability figureSizes preserved');
   });
 
-  test('flags', function() {
+  test('Figure - Flags', function() {
     var f = document.createElement('figure'),
         figure,
         indices = {
@@ -127,34 +129,30 @@ $(function () {
     ok(!figure.optional, 'figure is required');
   });
 
-  test('fallback', function() {
-    var f = document.createElement('figure'),
-        parent = document.createElement('div'),
+  test('Figure - fallback', function() {
+    var f = $('<figure></figure>').addClass('testonly').appendTo('body'),
         figure,
         indices = {
           index: 0,
           figureIndex: 0
         };
 
-    // FIXME: Is this really necessary?
-    parent.appendChild(f);
-
-    figure = new treesaver.layout.Figure(f, 20, indices);
+    figure = new treesaver.layout.Figure(f[0], 20, indices);
     ok(!figure.fallback, 'No fallback');
 
-    f.innerHTML = '<p>Fallback</p>';
-    figure = new treesaver.layout.Figure(f, 20, indices);
+    f.html('<p>Fallback</p>');
+    figure = new treesaver.layout.Figure(f[0], 20, indices);
     ok(figure.fallback, 'Default fallback');
     equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Fallback'), 'Default fallback is correct');
 
-    f.innerHTML = '<p data-sizes="fallback">Data sizes fallback</p>';
-    figure = new treesaver.layout.Figure(f, 20, indices);
+    f.html('<p data-sizes="fallback">Data sizes fallback</p>');
+    figure = new treesaver.layout.Figure(f[0], 20, indices);
     ok(figure.fallback, 'Data sizes fallback is correctly extracted');
     equals(escapeHTML($(figure.fallback.html).text()), escapeHTML('Data sizes fallback'), 'Data sizes fallback is correct');
   });
 
   // TODO: Make these tests more betterer
-  test('getSize', function() {
+  test('Figure - getSize', function() {
     var indices = {
           index: 0,
           figureIndex: 0
