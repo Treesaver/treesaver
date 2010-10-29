@@ -323,6 +323,7 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_VIDEO) + 'video',
       p(treesaver.capabilities.SUPPORTS_APPLICATIONCACHE) + 'applicationcache',
       p(treesaver.capabilities.SUPPORTS_FONTFACE) + 'fontface',
+      p(treesaver.capabilities.SUPPORTS_TOUCH) + 'touch',
       // Not in modernizr
       p(treesaver.capabilities.SUPPORTS_MICRODATA) + 'microdata',
       p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
