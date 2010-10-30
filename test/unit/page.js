@@ -558,16 +558,31 @@ $(function () {
 
   test('fillColumn - Pathological Nesting', function () {
     // We use this column to test the various configurations
-    var $col = $('<div></div>').addClass('column testonly').height(320).appendTo('body'),
+    var $col = $('<div></div>').addClass('testonly').height(320).appendTo('body'),
+        $nesting = $('<div></div>').addClass('annoying-nesting'),
         br = new treesaver.layout.BreakRecord(),
-        content = {
-          blocks: (new treesaver.layout.Block($('.content.column')[0], 20, { index: 0, figureIndex: 0 })).blocks,
-          lineHeight: 20
-        },
-        block,
-        parentBlock = content.blocks[0].parent,
-        maxColHeight = 200,
-        i, len;
+        content = {}, i, len, parentBlock,
+        maxColHeight = 200;
+
+    $nesting.html(
+      '<div class="annoying-nesting">' +
+        '<div class="annoying-nesting">' +
+          '<h3 class="keeptogether keepwithnext">Title</h3>' +
+          '<p class="intro">' +
+          '</p>' +
+        '</div>' +
+      '</div>');
+
+    $nesting.clone().appendTo($col);
+    $nesting.clone().appendTo($col);
+    $nesting.clone().appendTo($col);
+
+    content = {
+      blocks: (new treesaver.layout.Block($col[0], 20, { index: 0, figureIndex: 0 })).blocks,
+      lineHeight: 20
+    };
+
+    parentBlock = content.blocks[0].parent;
 
     for (i = 0, len = content.blocks.length; i < len; i += 1) {
       block = content.blocks[i];
@@ -578,8 +593,6 @@ $(function () {
         block.parent = null;
       }
     }
-
-    br.index = 70;
 
     // We have the following, repeated twice
     // <div> - 20px padding / 320px total height
@@ -592,7 +605,7 @@ $(function () {
     // correctly, and we maintain our metrics
     treesaver.layout.Page.fillColumn(content, br, $col[0], maxColHeight);
 
-    equals(br.index, 75, 'full fit: br.index');
+    equals(br.index, 5, 'full fit: br.index');
     equals(br.overhang, 0, 'full fit: br.overhang');
     equals($col.find('*').length, 5, 'full fit: total element count');
     equals($col.find('*').eq(0).css('padding-top'), '20px', 'full fit: First nesting padding-top');
@@ -600,11 +613,11 @@ $(function () {
     equals($col.find('*').eq(2).css('padding-top'), '20px', 'full fit: Third nesting padding-top');
 
     // Great, that worked fine. Now let's rewind and make only the h3 fit
-    br.index = 70;
+    br.index = 0;
     $col.html('').height(120);
     treesaver.layout.Page.fillColumn(content, br, $col[0], 120);
 
-    equals(br.index, 74, 'h3 full fit: br.index');
+    equals(br.index, 4, 'h3 full fit: br.index');
     equals(br.overhang, 0, 'h3 full fit: br.overhang');
     equals($col.find('*').length, 4, 'h3 full fit: total element count');
     equals($col.find('*').eq(0).css('padding-top'), '20px', 'h3 full fit: First nesting padding-top');
@@ -616,7 +629,7 @@ $(function () {
     // gets zeroed out here
     $col.html('').height(180);
     treesaver.layout.Page.fillColumn(content, br, $col[0], 180);
-    equals(br.index, 75, 'leftover p full fit: br.index');
+    equals(br.index, 5, 'leftover p full fit: br.index');
     equals(br.overhang, 0, 'leftover p full fit: br.overhang');
     equals($col.find('*').length, 4, 'leftover p full fit: total element count');
     equals($col.find('*').eq(0).css('padding-top'), '0px', 'leftover p full fit: First nesting padding-top');
@@ -624,11 +637,11 @@ $(function () {
     equals($col.find('*').eq(2).css('padding-top'), '0px', 'leftover p full fit: Third nesting padding-top');
 
     // Now, let's rewind and make the <p> overflow
-    br.index = 70;
+    br.index = 0;
     $col.html('').height(160);
     treesaver.layout.Page.fillColumn(content, br, $col[0], 140);
 
-    equals(br.index, 74, 'p partial fit: br.index');
+    equals(br.index, 4, 'p partial fit: br.index');
     equals(br.overhang, 100, 'p partial fit: br.overhang');
     equals($col.find('*').length, 5, 'p partial fit: total element count');
     equals($col.find('*').eq(0).css('padding-top'), '20px', 'p partial fit: First nesting padding-top');
@@ -640,7 +653,7 @@ $(function () {
     $col.html('').height(280);
     treesaver.layout.Page.fillColumn(content, br, $col[0], 140);
 
-    equals(br.index, 75, 'p finish plus next h3 keepwithnext fail: br.index');
+    equals(br.index, 5, 'p finish plus next h3 keepwithnext fail: br.index');
     equals(br.overhang, 0, 'p finish plus next h3 keepwithnext fail: br.overhang');
     equals($col.find('*').length, 4, 'p finish plus next h3 keepwithnext fail: total element count');
     equals($col.find('*').eq(0).css('padding-top'), '0px', 'p finish plus next h3 keepwithnext fail: First nesting padding-top');
@@ -650,10 +663,10 @@ $(function () {
 
     // OK, rewind and let's try that one again, but this time let a bit of the paragraph in
     $col.html('').height(320);
-    br.index = 74; br.overhang = 100;
+    br.index = 4;
+    br.overhang = 100;
     treesaver.layout.Page.fillColumn(content, br, $col[0], 140);
-
-    equals(br.index, 79, 'p finish plus next h3 and part of p: br.index');
+    equals(br.index, 9, 'p finish plus next h3 and part of p: br.index');
     equals(br.overhang, 100, 'p finish plus next h3 and part of p: br.overhang');
     equals($col.find('*').length, 9, 'p finish plus next h3 and part of p: total element count');
     equals($col.find('div').length, 6, 'p finish plus next h3 and part of p: div count');
@@ -671,7 +684,7 @@ $(function () {
     $col.html('').height(420);
     treesaver.layout.Page.fillColumn(content, br, $col[0], 140);
 
-    equals(br.index, 85, 'p finish plus next h3 and part of p: br.index');
+    equals(br.index, 15, 'p finish plus next h3 and part of p: br.index');
     equals(br.overhang, 0, 'p finish plus next h3 and part of p: br.overhang');
     equals($col.find('*').length, 9, 'p finish plus next h3 and part of p: total element count');
     equals($col.find('div').length, 6, 'p finish plus next h3 and part of p: div count');
@@ -683,7 +696,5 @@ $(function () {
     equals($col.find('*').eq(5).css('padding-top'), '20px', 'p finish plus next h3 and part of p: Second nesting padding-top (second round)');
     equals($col.find('*').eq(6).css('padding-top'), '20px', 'p finish plus next h3 and part of p: Third nesting padding-top (second round)');
     equals($col.find('*').eq(7)[0].nodeName.toLowerCase(), 'h3', 'p finish plus next h3 and part of p (second set): Confirm h3 in right spot');
-
-
   });
 });
