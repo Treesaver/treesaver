@@ -137,7 +137,8 @@ treesaver.dimensions.Metrics = function(el) {
 
   var style = treesaver.dimensions.getStyleObject(el),
       oldPosition = el.style.position,
-      oldStyleAttribute = el.getAttribute('style');
+      oldStyleAttribute = el.getAttribute('style'),
+      tmp;
 
   this.display = style.display;
   this.position = style.position;
@@ -191,9 +192,14 @@ treesaver.dimensions.Metrics = function(el) {
 
   // Min & Max : Width & Height
   this.minW = treesaver.dimensions.toPixels(style.minWidth) || 0;
-  this.maxW = treesaver.dimensions.toPixels(style.maxWidth) || Infinity;
   this.minH = treesaver.dimensions.toPixels(style.minHeight) || 0;
-  this.maxH = treesaver.dimensions.toPixels(style.maxHeight) || Infinity;
+
+  // Opera returns -1 for a max-width or max-height that is not set.
+  tmp = treesaver.dimensions.toPixels(style.maxWidth);
+  this.maxW = (!tmp || tmp === -1) ? Infinity : tmp;
+
+  tmp = treesaver.dimensions.toPixels(style.maxHeight);
+  this.maxH = (!tmp || tmp === -1) ? Infinity : tmp;
 
   // Line height
   this.lineHeight = treesaver.dimensions.toPixels(style.lineHeight) || null;

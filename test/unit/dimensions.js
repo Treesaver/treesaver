@@ -21,6 +21,7 @@ $(function() {
     },
     teardown: function () {
       $('#tmpContainer').remove();
+      $('.testonly').remove();
     }
   });
 
@@ -64,6 +65,36 @@ $(function() {
       //maxHeight: 400
     //}, 'Default values');
   //});
+
+  test('minimax', function() {
+    var e = $('<div></div>').addClass('testonly').appendTo('body'),
+        size = new treesaver.dimensions.Metrics(e[0]);
+
+    equals(size.minW, 0, 'min-width is 0');
+    equals(size.minH, 0, 'min-height is 0');
+    equals(size.maxW, Infinity, 'max-width is set to Infinity');
+    equals(size.maxH, Infinity, 'max-height is set to Infinity');
+
+    e.css({
+      minWidth: 400,
+      minHeight: 200
+    });
+
+    size = new treesaver.dimensions.Metrics(e[0]);
+
+    equals(size.minW, 400, 'min-width is 400');
+    equals(size.minH, 200, 'min-height is 200');
+
+    e.css({
+      maxWidth: 800,
+      maxHeight: 400
+    });
+
+    size = new treesaver.dimensions.Metrics(e[0]);
+
+    equals(size.maxW, 800, 'max-width is set to 800');
+    equals(size.maxH, 400, 'max-height is set to 400');
+  });
 
   test('helpers', function () {
     var range = {
