@@ -195,9 +195,7 @@
 <div class="doublecontainer">
   <div class="transparent">
     <figure>
-      <script type="text/html" data-sizes="one">
-        <p>Size one</p>
-      </script>
+      <p data-sizes="one">Size one</p>
       <p>Paragraph within figure within container</p>
     </figure>
     <p>Child Paragraph Element</p>
@@ -221,12 +219,8 @@
 </canvas>
 <figure class="nofallback">
   <p class="caption" data-sizes="one two">This is a caption in a figure</p>
-  <script type="text/html">
-    <p>Templated: {{ val }}</p>
-  </script>
-  <script type="application/json">
-    [{ "sizes": "three", "val": 3}, { "sizes": "four", "val": 4, "minHeight": 300 }]
-  </script>
+  <p data-sizes="three">Templated: 3</p>
+  <p data-sizes="four" data-minHeight="300">Templated: 4</p>
 </figure>
 <p class="keeptogether abnormal">
   One line<br />
