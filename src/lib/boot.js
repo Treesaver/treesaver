@@ -162,7 +162,7 @@ treesaver.boot.domReady = function(e) {
 
   if (!goog.DEBUG || !window.TREESAVER_NO_AUTOLOAD) {
     // Place a loading message
-    document.body.innerHTML = 'Loading ' + document.title + '...';
+    document.body.innerHTML = '<div id="loading">Loading ' + document.title + '...</div>';
     // Re-enable content display
     document.documentElement.style.display = 'block';
   }

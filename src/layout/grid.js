@@ -584,7 +584,7 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
       // is, so give a 20% bonus per container
       percentEmpty -= filledContainerCount * .2;
 
-      if (percentEmpty > .33) {
+      if (percentEmpty > .5) {
         treesaver.debug.info('Grid penalized for emptiness percentage: ' + percentEmpty * 100);
         score -= remaining_height;
         score -= percentEmpty * percentEmpty *
