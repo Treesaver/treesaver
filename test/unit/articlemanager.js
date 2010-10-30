@@ -56,7 +56,7 @@ $(function () {
     html = '<h1>Fake document title</h1><a href="http://invalid.com/">Non-TOC link</a>.';
     $(urls).each(function () {
       var p = $('<div itemscope></div>');
-          a = $('<a itemprop="url">').attr('href', this);
+          a = $('<a itemprop="url">test</a>').attr('href', this);
 
       a.appendTo(p);
       p.appendTo(div);
@@ -104,7 +104,7 @@ $(function () {
     html = '<h1>Fake document title</h1><a href="http://invalid.com/">Non-TOC link</a>.';
     $(urls).each(function () {
       var p = $('<div itemscope></div>');
-          a = $('<a itemprop="url">').attr('href', this);
+          a = $('<a itemprop="url">test</a>').attr('href', this);
 
       a.appendTo(p);
       p.appendTo(div);
