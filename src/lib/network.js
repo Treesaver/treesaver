@@ -199,7 +199,7 @@ treesaver.network.urlToPath = function(url) {
   }
 
   // IE & Opera sometimes don't prefix the path with '/'
-  if (path[0] !== '/') {
+  if (path.charAt(0) !== '/') {
     path = '/' + path;
   }
 
