@@ -42,7 +42,7 @@ treesaver.history.NATIVE_SUPPORT = 'pushState' in window.history;
  */
 treesaver.history.getNormalizedHash_ = function() {
   var hash = document.location.hash;
-  return hash[0] === '#' ? hash.substring(1) : hash;
+  return hash.charAt(0) === '#' ? hash.substring(1) : hash;
 };
 
 // Even if the client has a native implementation of the API, we have to check
@@ -53,7 +53,7 @@ if (document.location.hash) {
 
   // Our hashes always start with the delimiter and have at least another
   // character there
-  if (current_hash[0] === treesaver.history.DELIMITER &&
+  if (current_hash.charAt(0) === treesaver.history.DELIMITER &&
       current_hash.length >= 2) {
     // Redirect, stripping the intial delimiter
     // TODO: Will this break the back button?
