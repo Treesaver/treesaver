@@ -494,7 +494,8 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 
       // Check links last since they may be used as UI commands as well
       // Links can occur in-page or in the chrome
-      if (!handled && el.href) {
+      // IE aliases the src property to read-only href on images
+      if (!handled && el.href && el.nodeName.toLowerCase() !== 'img') {
         // Lightbox-flagged elements are skipped as processing goes up the chain
         // if a zoomable is found on the way up the tree, it will be handled. If
         // not, the link is navigated as-is
