@@ -404,6 +404,14 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.click = function(e) {
+  var el = e.el,
+      url,
+      withinCurrentPage = false,
+      handled = false,
+      parent = el,
+      withinSidebar = false,
+      withinMenu = false;
+
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
@@ -411,17 +419,37 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     return false;
   }
 
-  // No real target, leave the event alone
-  if (e.el === document.body || e.el === document.documentElement) {
-    return;
+  if (this.isMenuActive()) {
+    while ((parent !== null && parent.nodeType === 1)) {
+      if (parent === this.menu) {
+        withinMenu = true;
+        break;
+      }
+      parent = parent.parentNode;
+    }
+    this.menuInactive();
   }
 
-  var el = e.el,
-      url,
-      withinCurrentPage = false,
-      handled = false,
-      sidebarActivated = false,
-      menuActivated = false;
+  parent = el;
+
+  if (this.isSidebarActive()) {
+    while ((parent !== null && parent.nodeType === 1)) {
+      if (parent === this.sidebar) {
+        withinSidebar = true;
+        break;
+      }
+      parent = parent.parentNode;
+    }
+
+    if (!withinSidebar) {
+      this.sidebarInactive();
+    }
+  }
+
+  // No real target, leave the event alone
+  if (el === document.body || el === document.documentElement) {
+    return;
+  }
 
   // Check if the target is within one of the visible pages
   // TODO: Once we have variable numbers of pages, this code will
@@ -463,12 +491,8 @@ treesaver.ui.Chrome.prototype.click = function(e) {
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'menu')) {
-          if (this.isMenuActive()) {
-            this.menuInactive();
-          }
-          else {
+          if (!withinMenu) {
             this.menuActive();
-            menuActivated = true;
           }
           handled = true;
         }
@@ -476,7 +500,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
                 treesaver.dom.hasClass(el, 'open-sidebar')) {
           if (!this.isSidebarActive()) {
             this.sidebarActive();
-            sidebarActivated = true;
           }
           handled = true;
         }
@@ -517,14 +540,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 
       el = el.parentNode;
     }
-  }
-
-  if (!menuActivated && this.isMenuActive()) {
-    this.menuInactive();
-  }
-
-  if (!sidebarActivated && this.isSidebarActive() && !handled) {
-    this.sidebarInactive();
   }
 
   if (handled) {
