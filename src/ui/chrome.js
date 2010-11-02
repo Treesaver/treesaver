@@ -594,6 +594,12 @@ treesaver.ui.Chrome.prototype.mouseDown = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.mouseMove = function(e) {
+  // Don't try to track swiping when within the iOS app
+  if (WITHIN_IOS_WRAPPER && window.SLOW_DEVICE) {
+    // Return early so we don't use up cycles
+    return;
+  }
+
   if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
     // Update offset
     this.pageOffset = e.deltaX;
@@ -1127,7 +1133,6 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
   //
   // Note, that a page may be null, and won't have a corresponding DOM entry
   // (later, it might have a loading/placeholder page)
-  //
   var prevPage = this.pages[0],
       currentPage = this.pages[1],
       nextPage = this.pages[2],
@@ -1205,7 +1210,7 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
 
   // Pause tasks to keep animation smooth
   if (!preventAnimation) {
-    treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
+    treesaver.scheduler.pause(['animatePages'], 3 * MAX_ANIMATION_DURATION);
   }
 
   var now = goog.now(),
