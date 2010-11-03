@@ -408,7 +408,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       url,
       withinCurrentPage = false,
       handled = false,
-      parent = el,
       withinSidebar = false,
       withinMenu = false;
 
@@ -420,26 +419,12 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   }
 
   if (this.isMenuActive()) {
-    while ((parent !== null && parent.nodeType === 1)) {
-      if (parent === this.menu) {
-        withinMenu = true;
-        break;
-      }
-      parent = parent.parentNode;
-    }
+    withinMenu = this.menu.contains(el);
     this.menuInactive();
   }
 
-  parent = el;
-
   if (this.isSidebarActive()) {
-    while ((parent !== null && parent.nodeType === 1)) {
-      if (parent === this.sidebar) {
-        withinSidebar = true;
-        break;
-      }
-      parent = parent.parentNode;
-    }
+    withinSidebar = this.sidebar.contains(el);
 
     if (!withinSidebar) {
       this.sidebarInactive();
