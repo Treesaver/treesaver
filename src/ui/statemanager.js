@@ -83,6 +83,11 @@ treesaver.ui.StateManager.unload = function() {
     treesaver.events.removeListener(window, 'orientationchange', treesaver.ui.StateManager.onOrientationChange);
   }
 
+  // Deactive any active chrome
+  if (treesaver.ui.StateManager.state_.chrome) {
+    treesaver.ui.StateManager.state_.chrome.deactivate();
+  }
+
   // Lose references
   treesaver.ui.StateManager.state_ = null;
   treesaver.ui.StateManager.chromes_ = null;
