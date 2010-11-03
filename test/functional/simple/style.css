@@ -28,9 +28,8 @@ body {
   background: #445;
   padding: 5px 10px;
   text-align: right;
-  opacity: 0;
-  -webkit-transition: opacity .25s linear;
   z-index: 20;
+  display: none;
 }
 
 .controls .sidebar-controls {
@@ -40,8 +39,7 @@ body {
 }
 
 .active .controls {
-  /*display: block;*/
-  opacity: 1;
+  display: block;
 }
 
 /**
