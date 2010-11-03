@@ -13,7 +13,6 @@ goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.template');
 goog.require('treesaver.ui.ArticleManager');
-goog.require('treesaver.ui.input');
 
 /**
  * Chrome
@@ -112,6 +111,12 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Array.<treesaver.layout.Page>}
    */
   this.pages = null;
+
+  /**
+   * Whether the UI is current in active state
+   * @type {boolean}
+   */
+  this.uiActive = false;
 
   /**
    * Cached references to the menu TOC
@@ -217,7 +222,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
     }, this);
 
     // Mark the UI as active to show the user controls?
-    this.uiActive();
+    this.setUiActive_();
   }
 
   return /** @type {!Element} */ (this.node);
@@ -238,6 +243,9 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   treesaver.ui.Chrome.watchedEvents.forEach(function(evt) {
     treesaver.events.removeListener(document, evt, this);
   }, this);
+
+  // Remove any stray mouse handlers as well
+  this.removeMouseHandlers_();
 
   // Make sure to drop references
   this.node = null;
@@ -274,7 +282,15 @@ treesaver.ui.Chrome.prototype.stopDelayedFunctions = function() {
   treesaver.scheduler.clear('animatePages');
 };
 
+/**
+ * Events fired by Chrome objects
+ *
+ * @const
+ * @type {!Object.<string, string>}
+ */
 treesaver.ui.Chrome.events = {
+  ACTIVE: 'treesaver.active',
+  IDLE: 'treesaver.idle'
 };
 
 /**
@@ -284,12 +300,13 @@ treesaver.ui.Chrome.watchedEvents = [
   treesaver.ui.ArticleManager.events.TOCUPDATED,
   treesaver.ui.ArticleManager.events.PAGESCHANGED,
   treesaver.ui.ArticleManager.events.ARTICLECHANGED,
-  treesaver.ui.input.events.KEYDOWN,
-  treesaver.ui.input.events.CLICK,
-  treesaver.ui.input.events.MOUSEWHEEL,
-  treesaver.ui.input.events.MOUSEDOWN,
-  treesaver.ui.input.events.ACTIVE,
-  treesaver.ui.input.events.IDLE
+  'keydown',
+  'click',
+  'mousewheel',
+  'DOMMouseScroll',
+  'mousedown',
+  'touchstart',
+  'mouseover'
 ];
 
 /**
@@ -297,9 +314,11 @@ treesaver.ui.Chrome.watchedEvents = [
  * @type {Array.<string>}
  */
 treesaver.ui.Chrome.optInMouseEvents_ = [
-  treesaver.ui.input.events.MOUSEMOVE,
-  treesaver.ui.input.events.MOUSEUP,
-  treesaver.ui.input.events.MOUSECANCEL
+  'mousemove',
+  'mouseup',
+  'touchmove',
+  'touchend',
+  'touchcancel'
 ];
 
 /**
@@ -323,34 +342,46 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     this.updateTOCActive(e);
     return this.updatePageURL(e);
 
-  case treesaver.ui.input.events.ACTIVE:
-    return this.uiActive();
+  case 'mouseover':
+    return this.mouseOver(e);
 
-  case treesaver.ui.input.events.IDLE:
-    this.menuInactive();
-    return this.uiIdle();
-
-  case treesaver.ui.input.events.KEYDOWN:
-    return this.keyDown(e);
-
-  case treesaver.ui.input.events.CLICK:
-    return this.click(e);
-
-  case treesaver.ui.input.events.MOUSEWHEEL:
-    return this.mouseWheel(e);
-
-  case treesaver.ui.input.events.MOUSEDOWN:
+  case 'mousedown':
+  case 'touchstart':
     return this.mouseDown(e);
 
-  case treesaver.ui.input.events.MOUSEMOVE:
+  case 'mousemove':
+  case 'touchmove':
     return this.mouseMove(e);
 
-  case treesaver.ui.input.events.MOUSEUP:
+  case 'mouseup':
+  case 'touchend':
     return this.mouseUp(e);
 
-  case treesaver.ui.input.events.MOUSECANCEL:
+  case 'keydown':
+    return this.keyDown(e);
+
+  case 'click':
+    return this.click(e);
+
+  case 'mousewheel':
+  case 'DOMMouseScroll':
+    return this.mouseWheel(e);
+
+  case 'touchcancel':
     return this.mouseCancel(e);
   }
+};
+
+/**
+ * Whether one of the control/shift/alt/etc keys were pressed at the time
+ * of the event
+ *
+ * @private
+ * @param {!Event} e
+ * @return {boolean} True if at least one of those keys was pressed.
+ */
+treesaver.ui.Chrome.specialKeyPressed_ = function(e) {
+  return e.ctrlKey || e.shiftKey || e.altKey || e.metaKey;
 };
 
 /**
@@ -362,13 +393,15 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
+
+    // Stop default actions and return early
     e.preventDefault();
-    return false;
+    return;
   }
 
   // Don't override keyboard commands
-  if (!e.specialKey) {
-    switch (e.key) {
+  if (!treesaver.ui.Chrome.specialKeyPressed_(e)) {
+    switch (e.keyCode) {
     case 34: // PageUp
     case 39: // Right && down
     case 40:
@@ -383,20 +416,15 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
       break;
 
     default: // Let the event through if not handled
-      return true;
+      return;
     }
 
-    // Cancel bubbling
-    if (e.preventDefault) {
-      e.preventDefault();
-    }
-    else {
-      e.returnValue = false;
-    }
-    return false;
+    // Handled key always causes UI idle
+    this.setUiIdle_();
+
+    // Key handled, don't want any default actions
+    e.preventDefault();
   }
-
-  return true;
 };
 
 /**
@@ -404,20 +432,32 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.click = function(e) {
-  var el = e.el,
-      url,
-      withinCurrentPage = false,
-      handled = false,
-      parent = el,
-      withinSidebar = false,
-      withinMenu = false;
-
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
     e.preventDefault();
     return false;
   }
+
+  // Ignore if done with a modifier key (could be opening in new tab, etc)
+  if (treesaver.ui.Chrome.specialKeyPressed_(e)) {
+    return true;
+  }
+
+  // Ignore if it's not a left-click
+  if ('which' in e && e.which !== 1 || e.button) {
+    treesaver.debug.info('Click ignored due to non-left click');
+
+    return;
+  }
+
+  var el = treesaver.ui.Chrome.findTarget_(e.target),
+      url,
+      withinCurrentPage = false,
+      handled = false,
+      parent = el,
+      withinSidebar = false,
+      withinMenu = false;
 
   if (this.isMenuActive()) {
     while ((parent !== null && parent.nodeType === 1)) {
@@ -550,28 +590,131 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 };
 
 /**
+ * The last time a mousewheel event was received
+ *
+ * @private
+ * @type {number}
+ */
+treesaver.ui.Chrome.prototype.lastMouseWheel_;
+
+/**
  * Handle the mousewheel event
  * @param {Object} e
  */
 treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
+  if (treesaver.ui.Chrome.specialKeyPressed_(e)) {
+    // Ignore if special key is down (user could be zooming)
+    return true;
+  }
+
+  var now = goog.now();
+
+  if (this.lastMouseWheel_ &&
+      (now - this.lastMouseWheel_ < MOUSE_WHEEL_INTERVAL)) {
+    // Ignore if too frequent (magic mouse)
+    return true;
+  }
+
+  this.lastMouseWheel_ = now;
+
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
     e.preventDefault();
-    return false;
+    return;
   }
 
-  if (e.delta) {
-    if (e.delta > 0) {
+  // Firefox handles this differently than others
+  // http://adomas.org/javascript-mouse-wheel/
+  var delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0;
+
+  if (delta) {
+    if (delta > 0) {
       treesaver.ui.ArticleManager.previousPage();
     }
     else {
       treesaver.ui.ArticleManager.nextPage();
     }
 
+    // Mousewheel always deactivates UI
+    this.setUiIdle_();
+
     e.preventDefault();
-    return false;
+    return;
   }
+};
+
+/**
+ * Sanitize the event target, which can be a textNode in Safari
+ *
+ * @private
+ * @param {?EventTarget} node
+ * @return {!Element}
+ */
+treesaver.ui.Chrome.findTarget_ = function(node) {
+  if (!node) {
+    node = document.body;
+  }
+  else if (node.nodeType !== 1 && node.parentNode) {
+    // Safari Bug that gives you textNode on events
+    node = node.parentNode || document.body;
+  }
+
+  // Cast for compiler
+  return /** @type {!Element} */ (node);
+};
+
+/**
+ * @private
+ * @type {Object}
+ */
+treesaver.ui.Chrome.prototype.mouseData_;
+
+/**
+ * Helper for collecting mouse/touch positional data from events
+ *
+ * @private
+ * @param {!Event} e
+ * @param {boolean} isTouch
+ * @return {Object}
+ */
+treesaver.ui.Chrome.prototype.getMouseData_ = function(e, isTouch) {
+  var posX, posY;
+
+  if (isTouch && e.touches[0]) {
+    posX = e.touches[0].pageX;
+    posY = e.touches[0].pageY;
+  }
+  else {
+    posX = e.pageX;
+    posY = e.pageY;
+  }
+
+  if (!this.mouseData_ || /touchstart|mousedown/.test(e.type)) {
+    this.mouseData_ = {
+      startX: posX,
+      startY: posY,
+      startTime: goog.now(),
+      target: treesaver.ui.Chrome.findTarget_(e.target),
+      move: false,
+      isTouch: isTouch
+    };
+  }
+  else if (/touchmove|mousemove/.test(e.type)) {
+    this.mouseData_.move = true;
+    this.mouseData_.deltaX = posX - this.mouseData_.startX;
+    this.mouseData_.deltaY = posY - this.mouseData_.startY;
+    this.mouseData_.deltaTime = goog.now() - this.mouseData_.startTime;
+  }
+  else {
+    if (posX && posY) {
+      this.mouseData_.deltaX = posX - this.mouseData_.startX;
+      this.mouseData_.deltaY = posY - this.mouseData_.startY;
+    }
+    this.mouseData_.deltaTime = goog.now() - this.mouseData_.startTime;
+  }
+
+  return this.mouseData_;
 };
 
 /**
@@ -586,22 +729,55 @@ treesaver.ui.Chrome.prototype.mouseDown = function(e) {
     return false;
   }
 
-  // Only support swipe when we're not swiping on a link, or other element
-  // that might have some action associated with it
-  // TODO: What???
+  var isTouch = !!e.touches,
+      retVal,
+      mouseData,
+      withinViewer = this.viewer.contains(e.target);
 
-  // Only listen to events within the viewer, don't want errant swipes
-  if (this.viewer.contains(e.el)) {
-    // Start listening to relevant events
-    treesaver.ui.Chrome.optInMouseEvents_.forEach(function(evt) {
-      treesaver.events.addListener(document, evt, this);
-    }, this);
-
-    // Hm, preventing default seems to kill iPhone link following.
-    // Don't do anything for now ...
-    //e.preventDefault();
-    //return false;
+  // Ignore any event even not within the viewer
+  if (!withinViewer) {
+    return;
   }
+
+  // Collect mouse data
+  this.getMouseData_(e, isTouch);
+
+  if (isTouch) {
+    // Ignore multitouch
+    if (e.touches.length > 1) {
+      treesaver.debug.info('Multi-touch ignored');
+
+      return;
+    }
+
+    // Listen for touch events
+    treesaver.events.addListener(document, 'touchmove', this);
+    treesaver.events.addListener(document, 'touchend', this);
+    treesaver.events.addListener(document, 'touchcancel', this);
+  }
+  else {
+    // Ignore if not done with a modifier key
+    if (!treesaver.ui.Chrome.specialKeyPressed_(e)) {
+      treesaver.debug.info('Mousedown ignored due to lack of modifier key');
+
+      return;
+    }
+
+    // Ignore if it's not a left-click
+    if ('which' in e && e.which !== 1 || e.button) {
+      treesaver.debug.info('Click ignored due to non-left click');
+
+      return;
+    }
+
+    // Listen for mouse events
+    treesaver.events.addListener(document, 'mousemove', this);
+    treesaver.events.addListener(document, 'mouseup', this);
+  }
+
+  // Preventing default seems to kill iPhone link following.
+  // Don't do anything for now ...
+  // e.preventDefault();
 };
 
 /**
@@ -615,9 +791,13 @@ treesaver.ui.Chrome.prototype.mouseMove = function(e) {
     return;
   }
 
-  if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+  // Collect mouse data
+  this.getMouseData_(e, !!e.touches);
+
+  if (Math.abs(this.mouseData_.deltaX) >
+      Math.abs(this.mouseData_.deltaY)) {
     // Update offset
-    this.pageOffset = e.deltaX;
+    this.pageOffset = this.mouseData_.deltaX;
     this._updatePagePositions(true);
     e.preventDefault();
     return false;
@@ -634,17 +814,21 @@ treesaver.ui.Chrome.prototype.mouseMove = function(e) {
  * @param {!Object} e
  */
 treesaver.ui.Chrome.prototype.mouseUp = function(e) {
-  var pageChanged = false;
+  // Collect mouse data
+  var md = this.getMouseData_(e, !!e.touches);
 
   // Stop listening to events
   this.removeMouseHandlers_();
 
-  if ((Math.abs(e.deltaX) > Math.abs(e.deltaY)) &&
-      (Math.abs(e.deltaX) > SWIPE_THRESHOLD) &&
-      e.deltaTime < SWIPE_TIME_LIMIT) {
+  var pageChanged = false;
+
+  if ((Math.abs(md.deltaX) >
+       Math.abs(md.deltaY)) &&
+      (Math.abs(md.deltaX) > SWIPE_THRESHOLD) &&
+      md.deltaTime < SWIPE_TIME_LIMIT) {
     // A swipe, but we have to check and see if it actually
     // caused a page change
-    if (e.deltaX < 0) {
+    if (md.deltaX < 0) {
       pageChanged = treesaver.ui.ArticleManager.nextPage();
     }
     else {
@@ -653,12 +837,29 @@ treesaver.ui.Chrome.prototype.mouseUp = function(e) {
   }
 
   if (pageChanged) {
+    // Swiping always deactivates
+    this.setUiIdle_();
+
     // Page swiped and animation will occur. preventDefault in order to avoid
     // activating links, etc
     e.preventDefault();
-    return false;
+
+    return;
   }
   else {
+    // If it's a tap, then we toggle the active state
+    if (!md.move) {
+      // TODO: This can cause issues with trying to click a link in touch safari
+      // Need to either:
+      //   1. Set a timer and watch for a click event right after this event.
+      //      if none comes, toggle
+      //   2. Prevent iPhone from firing click events altogether, and fire the
+      //      click event manually. Note that the event must be fired in case
+      //      another element (e.g. video) wishes to handle it
+      //   3. ???
+      this.toggleUiActive_();
+    }
+
     // Not a swipe, animate back to the initial position
     // and let the event process
     this.animationStart = goog.now();
@@ -692,20 +893,71 @@ treesaver.ui.Chrome.prototype.removeMouseHandlers_ = function() {
   treesaver.ui.Chrome.optInMouseEvents_.forEach(function(evt) {
     treesaver.events.removeListener(document, evt, this);
   }, this);
+
+  // Clear mouse data
+  this.mouseData_ = null;
+};
+
+/**
+ * Desktop-only handler to make sure we don't hide UI when the user is trying
+ * to use it
+ * @param {!Event} e
+ */
+treesaver.ui.Chrome.prototype.mouseOver = function(e) {
+  // Don't do anything on touch devices
+  if (!e.touches) {
+    // Need to make sure UI is visible if a user is trying to click on it
+    this.setUiActive_();
+  }
 };
 
 /**
  * Show hidden UI controls
+ * @private
  */
-treesaver.ui.Chrome.prototype.uiActive = function() {
+treesaver.ui.Chrome.prototype.setUiActive_ = function() {
+  this.uiActive = true;
   treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
+
+  treesaver.events.fireEvent(document, treesaver.ui.Chrome.ACTIVE);
+
+  // Fire the idle event on a timer using debouncing, which delays
+  // the function when receiving multiple calls
+  treesaver.scheduler.debounce(
+    this.setUiIdle_,
+    UI_IDLE_INTERVAL,
+    null,
+    false,
+    'idletimer',
+    this
+  );
 };
 
 /**
  * Hide UI controls
+ * @private
  */
-treesaver.ui.Chrome.prototype.uiIdle = function() {
+treesaver.ui.Chrome.prototype.setUiIdle_ = function() {
+  this.uiActive = false;
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
+
+  treesaver.events.fireEvent(document, treesaver.ui.Chrome.IDLE);
+
+  // Clear anything that might debounce
+  treesaver.scheduler.clear('idletimer');
+};
+
+/**
+ * Toggle Active state
+ * @private
+ */
+treesaver.ui.Chrome.prototype.toggleUiActive_ = function() {
+  if (!this.uiActive) {
+    this.setUiActive_();
+  }
+  else {
+    this.setUiIdle_();
+  }
 };
 
 /**
@@ -768,7 +1020,7 @@ treesaver.ui.Chrome.prototype.showLightBox = function(el) {
   }
 
   // Hide toolbars, etc when showing lightbox
-  this.uiIdle();
+  this.setUiIdle_();
 
   if (!this.lightBoxActive) {
     this.lightBox = treesaver.ui.StateManager.getLightBox();
