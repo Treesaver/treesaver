@@ -10,7 +10,6 @@ goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.layout.Container');
 goog.require('treesaver.layout.Figure');
-goog.require('treesaver.ui.input');
 
 /**
  * Lightbox

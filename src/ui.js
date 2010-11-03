@@ -9,7 +9,6 @@ goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.ArticleManager');
 goog.require('treesaver.ui.Chrome');
 goog.require('treesaver.ui.StateManager');
-goog.require('treesaver.ui.input');
 
 /**
  * Load the UI
@@ -27,9 +26,6 @@ treesaver.ui.load = function(originalHTML) {
 
   // Make sure we clean up when leaving the page
   treesaver.events.addListener(window, 'unload', treesaver.ui.unload);
-
-  // Setup input handlers
-  treesaver.ui.input.load();
 
   // Kick off boot process, but back up if any single item fails
   if (treesaver.ui.StateManager.load() &&
@@ -51,7 +47,6 @@ treesaver.ui.unload = function() {
 
   treesaver.events.removeListener(window, 'unload', treesaver.ui.unload);
 
-  treesaver.ui.input.unload();
   treesaver.ui.ArticleManager.unload();
   treesaver.ui.StateManager.unload();
 
