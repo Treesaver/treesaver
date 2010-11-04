@@ -4,6 +4,9 @@ $(function() {
   module('capabilities');
 
   test('checkCapabilities', function() {
+    var oldCaps = treesaver.capabilities.caps_,
+        oldTransientCaps = treesaver.capabilities.transientCaps_;
+
     // Mock out the capabilities arrays for easy testing
     treesaver.capabilities.caps_ = ['flash', 'browser-mac', 'no-fontface'];
     treesaver.capabilities.transientCaps_ = ['no-offline', 'orientation-horizontal'];
@@ -20,6 +23,10 @@ $(function() {
     ok(!treesaver.capabilities.check(['orientation-vertical'], true), 'Failed transient');
 
     ok(treesaver.capabilities.check(['orientation-horizontal', 'flash', 'browser-mac', 'no-fontface'], true), 'Kitchen sink');
+
+    // Restore Mocks
+    treesaver.capabilities.caps_ = oldCaps;
+    treesaver.capabilities.transientCaps_ = oldTransientCaps;
   });
 
   test('transientCapabilityRegex', function () {
