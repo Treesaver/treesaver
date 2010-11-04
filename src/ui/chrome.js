@@ -386,8 +386,7 @@ treesaver.ui.Chrome.specialKeyPressed_ = function(e) {
 
 /**
  * Handle keyboard events
- * @param {!Object} e
- * @return {boolean} False if event is handled.
+ * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.keyDown = function(e) {
   // Lightbox active? Hide it
@@ -429,7 +428,7 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
 
 /**
  * Handle click event
- * @param {!Object} e
+ * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.click = function(e) {
   // Lightbox active? Hide it
@@ -475,6 +474,9 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   if (el === document.body || el === document.documentElement) {
     return;
   }
+
+  // Compiler cast
+  el = /** @type {!Element} */ (el);
 
   // Check if the target is within one of the visible pages
   // TODO: Once we have variable numbers of pages, this code will
@@ -549,7 +551,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         // not, the link is navigated as-is
         if (el.getAttribute('target') === 'lightbox') {
           // Skip this element and process the parent zoomable
-          el = el.parentNode;
+          el = /** @type {!Element} */ (el.parentNode);
           continue;
         }
 
@@ -563,7 +565,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         handled = true;
       }
 
-      el = el.parentNode;
+      el = /** @type {!Element} */ (el.parentNode);
     }
   }
 
@@ -584,7 +586,7 @@ treesaver.ui.Chrome.prototype.lastMouseWheel_;
 
 /**
  * Handle the mousewheel event
- * @param {Object} e
+ * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
   if (treesaver.ui.Chrome.specialKeyPressed_(e)) {
@@ -704,7 +706,7 @@ treesaver.ui.Chrome.prototype.getMouseData_ = function(e, isTouch) {
 
 /**
  * Handle the mousedown event
- * @param {!Object} e
+ * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.mouseDown = function(e) {
   // Lightbox active? Hide it
@@ -717,7 +719,7 @@ treesaver.ui.Chrome.prototype.mouseDown = function(e) {
   var isTouch = !!e.touches,
       retVal,
       mouseData,
-      withinViewer = this.viewer.contains(e.target);
+      withinViewer = this.viewer.contains(treesaver.ui.Chrome.findTarget_(e.target));
 
   // Ignore any event even not within the viewer
   if (!withinViewer) {
@@ -767,7 +769,7 @@ treesaver.ui.Chrome.prototype.mouseDown = function(e) {
 
 /**
  * Handle the mousemove event
- * @param {!Object} e
+ * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.mouseMove = function(e) {
   // Don't try to track swiping when within the iOS app
@@ -796,7 +798,7 @@ treesaver.ui.Chrome.prototype.mouseMove = function(e) {
 
 /**
  * Handle the mouseup event
- * @param {!Object} e
+ * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.mouseUp = function(e) {
   // Collect mouse data
@@ -856,7 +858,7 @@ treesaver.ui.Chrome.prototype.mouseUp = function(e) {
 
 /**
  * Handle the mousecancel event
- * @param {!Object} e
+ * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.mouseCancel = function(e) {
   // This event can be tough to duplicate on touch devices, but need to make
@@ -904,7 +906,7 @@ treesaver.ui.Chrome.prototype.setUiActive_ = function() {
   this.uiActive = true;
   treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
 
-  treesaver.events.fireEvent(document, treesaver.ui.Chrome.ACTIVE);
+  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.ACTIVE);
 
   // Fire the idle event on a timer using debouncing, which delays
   // the function when receiving multiple calls
@@ -926,7 +928,7 @@ treesaver.ui.Chrome.prototype.setUiIdle_ = function() {
   this.uiActive = false;
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
 
-  treesaver.events.fireEvent(document, treesaver.ui.Chrome.IDLE);
+  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.IDLE);
 
   // Clear anything that might debounce
   treesaver.scheduler.clear('idletimer');
@@ -1111,7 +1113,7 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
 /**
  * Update any URL bindings to the active article in the Chrome.
  * @private
- * @param {!Object} e The article changed event.
+ * @param {!Event} e The article changed event.
  */
 treesaver.ui.Chrome.prototype.updatePageURL = function(e) {
   this.currentURL.forEach(function(el) {
@@ -1125,7 +1127,7 @@ treesaver.ui.Chrome.prototype.updatePageURL = function(e) {
  * Update the TOC's 'current' class.
  *
  * @private
- * @param {!Object} e The TOC update event.
+ * @param {!{ url: string }} e The TOC update event.
  */
 treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
   if (this.toc) {
