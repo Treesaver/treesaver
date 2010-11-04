@@ -96,6 +96,22 @@ $(function() {
     equals(size.maxH, 400, 'max-height is set to 400');
   });
 
+  test('units', function () {
+    var e = $('<div></div>').addClass('testonly').appendTo('body').css({
+          display: 'block',
+          position: 'absolute',
+          fontSize: '1em',
+          margin: '1em',
+          padding: '2em'
+        }),
+        d = new treesaver.dimensions.Metrics(e[0]);
+
+    equals(d.marginTop, 16);
+    equals(d.marginBottom, 16);
+    equals(d.paddingTop, 32);
+    equals(d.paddingBottom, 32);
+  });
+
   test('helpers', function () {
     var range = {
       minW: 100,
@@ -109,7 +125,7 @@ $(function() {
     ok(!treesaver.dimensions.inSizeRange(range, { w: 20, h: 400 }), "withinSizeRange: Under width");
     ok(!treesaver.dimensions.inSizeRange(range, { w: 200, h: 4000}), "withinSizeRange: Over height");
 
-    equals(treesaver.dimensions.toPixels('40px'), 40, 'toPixels');
+    equals(treesaver.dimensions.toPixels(null, '40px'), 40, 'toPixels');
     ok(!treesaver.dimensions.toPixels('1em'), 'toPixels: Non-px value');
   });
 });

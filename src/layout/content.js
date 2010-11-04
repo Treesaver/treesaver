@@ -54,7 +54,7 @@ treesaver.layout.Content = function(el) {
    *
    * @type {number}
    */
-  this.lineHeight = treesaver.dimensions.toPixels(
+  this.lineHeight = treesaver.dimensions.toPixels(el,
     treesaver.dimensions.getStyleObject(el).lineHeight
   ) || 1;
 
