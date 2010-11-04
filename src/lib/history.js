@@ -56,8 +56,9 @@ if (document.location.hash) {
   if (current_hash.charAt(0) === treesaver.history.DELIMITER &&
       current_hash.length >= 2) {
     // Redirect, stripping the intial delimiter
-    // TODO: Will this break the back button?
-    document.location = current_hash.substr(1);
+    // Use location.replace instead of setting document.location to avoid
+    // breaking the back button
+    document.location.replace(current_hash.substr(1));
   }
 }
 
