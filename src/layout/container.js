@@ -15,6 +15,8 @@ goog.require('treesaver.dom');
  * @param {number}   gridHeight The height of the grid that contains this container.
  */
 treesaver.layout.Container = function(el, gridHeight) {
+  var d = new treesaver.dimensions.Metrics(el);
+
   /**
    * @type {boolean}
    */
@@ -23,9 +25,7 @@ treesaver.layout.Container = function(el, gridHeight) {
   /**
    * @type {number}
    */
-  this.minH = treesaver.dimensions.toPixels(
-    treesaver.dimensions.getStyleObject(el).minHeight
-  ) || 0;
+  this.minH = d.minH;
 
   // Need to clear the minHeight, if there is one, in order to get an accurate
   // delta reading
@@ -36,7 +36,7 @@ treesaver.layout.Container = function(el, gridHeight) {
   /**
    * @type {number}
    */
-  this.height = el.offsetHeight;
+  this.height = d.outerH;
 
   /**
    * @type {number}

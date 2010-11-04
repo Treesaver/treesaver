@@ -21,6 +21,19 @@ treesaver.dimensions.Size;
 treesaver.dimensions.SizeRange;
 
 /**
+ * Regex to determine whether a value is a pixel value.
+ * @private
+ */
+treesaver.dimensions.pixel = /^-?\d+(?:px)?$/i;
+
+
+/**
+ * Regex to determine whether a value contains a number.
+ * @private
+ */
+treesaver.dimensions.number = /^-?\d/;
+
+/**
  * Whether the given size fits within the bounds set by the range
  *
  * @param {treesaver.dimensions.SizeRange} range
@@ -67,16 +80,19 @@ treesaver.dimensions.mergeSizeRange = function(a, b, outer) {
 /**
  * Convert a string value to pixels
  *
+ * @param {!Element} el
  * @param {?string} val
  * @return {?number} Value in pixels.
  */
-treesaver.dimensions.toPixels = function(val) {
-  if (val && val.indexOf('px') !== -1) {
+treesaver.dimensions.toPixels = function(el, val) {
+  if (val && treesaver.dimensions.pixel.test(val)) {
     return parseFloat(val);
   }
 
   return null;
 };
+
+
 
 /**
  * Return the computedStyle object, which varies based on
@@ -94,6 +110,28 @@ if (SUPPORT_IE &&
   // Patch to use MSIE API
   treesaver.dimensions.getStyleObject = function(el) {
     return el.currentStyle;
+  };
+
+  // If we are dealing with IE and the value contains some sort
+  // of number we try Dean Edward's hack:
+  // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
+  treesaver.dimensions.toPixels = function(el, val) {
+    var style, runtimeStyle, value;
+
+    if (val && treesaver.dimensions.pixel.test(val)) {
+      return parseFloat(val);
+    }
+    else if (val && treesaver.dimensions.number.test(val)) {
+      style = el.style.left;
+      runtimeStyle = el.runtimeStyle.left;
+      el.runtimeStyle.left = el.currentStyle.left;
+      el.style.left = val || 0;
+      value = el.style.pixelLeft;
+      el.style.left = style;
+      el.runtimeStyle.left = runtimeStyle;
+      return value;
+    }
+    return null;
   };
 }
 
@@ -154,25 +192,25 @@ treesaver.dimensions.Metrics = function(el) {
   // styling -- may affect the measurements anyway
 
   // Margin
-  this.marginTop = treesaver.dimensions.toPixels(style.marginTop) || 0;
-  this.marginBottom = treesaver.dimensions.toPixels(style.marginBottom) || 0;
-  this.marginLeft = treesaver.dimensions.toPixels(style.marginLeft) || 0;
-  this.marginRight = treesaver.dimensions.toPixels(style.marginRight) || 0;
+  this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop) || 0;
+  this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom) || 0;
+  this.marginLeft = treesaver.dimensions.toPixels(el, style.marginLeft) || 0;
+  this.marginRight = treesaver.dimensions.toPixels(el, style.marginRight) || 0;
   // Summed totals
   this.marginHeight = this.marginTop + this.marginBottom;
   this.marginWidth = this.marginLeft + this.marginRight;
 
   // Border
-  this.borderTop = treesaver.dimensions.toPixels(style.borderTopWidth) || 0;
-  this.borderBottom = treesaver.dimensions.toPixels(style.borderBottomWidth) || 0;
-  this.borderLeft = treesaver.dimensions.toPixels(style.borderLeftWidth) || 0;
-  this.borderRight = treesaver.dimensions.toPixels(style.borderRightWidth) || 0;
+  this.borderTop = treesaver.dimensions.toPixels(el, style.borderTopWidth) || 0;
+  this.borderBottom = treesaver.dimensions.toPixels(el, style.borderBottomWidth) || 0;
+  this.borderLeft = treesaver.dimensions.toPixels(el, style.borderLeftWidth) || 0;
+  this.borderRight = treesaver.dimensions.toPixels(el, style.borderRightWidth) || 0;
 
   // Padding
-  this.paddingTop = treesaver.dimensions.toPixels(style.paddingTop) || 0;
-  this.paddingBottom = treesaver.dimensions.toPixels(style.paddingBottom) || 0;
-  this.paddingLeft = treesaver.dimensions.toPixels(style.paddingLeft) || 0;
-  this.paddingRight = treesaver.dimensions.toPixels(style.paddingRight) || 0;
+  this.paddingTop = treesaver.dimensions.toPixels(el, style.paddingTop) || 0;
+  this.paddingBottom = treesaver.dimensions.toPixels(el, style.paddingBottom) || 0;
+  this.paddingLeft = treesaver.dimensions.toPixels(el, style.paddingLeft) || 0;
+  this.paddingRight = treesaver.dimensions.toPixels(el, style.paddingRight) || 0;
 
   // Summed totals for border & padding
   this.bpTop = this.borderTop + this.paddingTop;
@@ -191,18 +229,18 @@ treesaver.dimensions.Metrics = function(el) {
   this.height = this.outerH - this.bpHeight;
 
   // Min & Max : Width & Height
-  this.minW = treesaver.dimensions.toPixels(style.minWidth) || 0;
-  this.minH = treesaver.dimensions.toPixels(style.minHeight) || 0;
+  this.minW = treesaver.dimensions.toPixels(el, style.minWidth) || 0;
+  this.minH = treesaver.dimensions.toPixels(el, style.minHeight) || 0;
 
   // Opera returns -1 for a max-width or max-height that is not set.
-  tmp = treesaver.dimensions.toPixels(style.maxWidth);
+  tmp = treesaver.dimensions.toPixels(el, style.maxWidth);
   this.maxW = (!tmp || tmp === -1) ? Infinity : tmp;
 
-  tmp = treesaver.dimensions.toPixels(style.maxHeight);
+  tmp = treesaver.dimensions.toPixels(el, style.maxHeight);
   this.maxH = (!tmp || tmp === -1) ? Infinity : tmp;
 
   // Line height
-  this.lineHeight = treesaver.dimensions.toPixels(style.lineHeight) || null;
+  this.lineHeight = treesaver.dimensions.toPixels(el, style.lineHeight) || null;
 
   // Restore the original position property on style
   //if (this.position !== 'absolute') {
