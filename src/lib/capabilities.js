@@ -398,6 +398,13 @@ treesaver.capabilities.updateClasses = function() {
 };
 
 /**
+ * Reset the classes on the documentElement to a non-treesaver
+ */
+treesaver.capabilities.resetClasses = function() {
+  document.documentElement.className = 'js no-treesaver';
+};
+
+/**
  * Array with all the transient capability names
  *
  * @private

@@ -19,4 +19,6 @@ goog.require('treesaver.history');
 goog.require('treesaver.html5');
 
 // Begin loading
-treesaver.boot.load();
+if (treesaver.capabilities.SUPPORTS_TREESAVER) {
+  treesaver.boot.load();
+}

@@ -100,7 +100,7 @@ treesaver.boot.unload = function() {
   treesaver.debug.info('Treesaver unbooting');
 
   // Restore HTML
-  if (treesaver.boot.domReady_) {
+  if (treesaver.boot.originalHtml_) {
     document.body.innerHTML = treesaver.boot.originalHtml_;
   }
 
@@ -115,8 +115,7 @@ treesaver.boot.unload = function() {
   treesaver.network.unload();
 
   // Setup classes
-  treesaver.dom.removeClass(document.documentElement, 'treesaver');
-  treesaver.dom.addClass(document.documentElement, 'no-treesaver');
+  treesaver.capabilities.resetClasses();
 
   // Show content again
   document.documentElement.style.display = 'block';
