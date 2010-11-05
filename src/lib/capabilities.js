@@ -59,8 +59,9 @@ treesaver.capabilities.SUPPORTS_TREESAVER = !SUPPORT_LEGACY || (
   !!(document.addEventListener || document.attachEvent) &&
   // Runtime styles (needed for measuring, should be everywhere)
   !!(document.documentElement.currentStyle || window.getComputedStyle) &&
-  // The only legacy browser allowed is IE7 (this eliminates Firefox pre 3.5)
-  (!treesaver.capabilities.IS_LEGACY || (SUPPORT_IE && document.documentMode >= 7))
+  // Require querySelectorAll in order to exclude Firefox 3.0,
+  // but allow IE7 by checking for their non-W3C event model
+  ('querySelectorAll' in document || (SUPPORT_IE && 'attachEvent' in document))
 );
 
 /**

@@ -22,3 +22,6 @@ goog.require('treesaver.html5');
 if (treesaver.capabilities.SUPPORTS_TREESAVER) {
   treesaver.boot.load();
 }
+else {
+  treesaver.debug.warn('Treesaver not supported');
+}
