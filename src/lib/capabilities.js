@@ -28,7 +28,11 @@ treesaver.capabilities.ua_ = window.navigator.userAgent.toLowerCase();
  * @private
  * @type {string}
  */
-treesaver.capabilities.platform_ = window.navigator.platform.toLowerCase();
+treesaver.capabilities.platform_ =
+  // Android 1.6 doesn't have a value for navigator.platform
+  !SUPPORT_LEGACY || window.navigator.platform ?
+  window.navigator.platform.toLowerCase() :
+  /android/.test(treesaver.capabilities.ua_) ? 'android' : 'unknown';
 
 /**
  * Is this an older browser that requires some patching for key functionality
@@ -389,6 +393,8 @@ treesaver.capabilities.updateClasses = function() {
 
     // Add the non-transient capabilities on the body
     className += ' ' + treesaver.capabilities.caps_.join(' ');
+
+    treesaver.debug.info('Capability classes: ' + className);
   }
 
   // Now, remove values of transient capabilities
