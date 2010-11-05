@@ -31,6 +31,20 @@ treesaver.capabilities.ua_ = window.navigator.userAgent.toLowerCase();
 treesaver.capabilities.platform_ = window.navigator.platform.toLowerCase();
 
 /**
+ * Is this an older browser that requires some patching for key functionality
+ * like querySelectorAll
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.IS_LEGACY = SUPPORT_LEGACY && !(
+  // Storage
+  'localStorage' in window &&
+  'querySelectorAll' in document &&
+  'JSON' in window
+);
+
+/**
  * Does the current browser meet the Treesaver requirements
  *
  * @const
@@ -44,21 +58,9 @@ treesaver.capabilities.SUPPORTS_TREESAVER = !SUPPORT_LEGACY || (
   // W3C or IE Event model (should be everywhere)
   !!(document.addEventListener || document.attachEvent) &&
   // Runtime styles (needed for measuring, should be everywhere)
-  !!(document.documentElement.currentStyle || window.getComputedStyle)
-);
-
-/**
- * Does the current browser require extra libraries in order to meet
- * treesaver requirements (such as support for querySelectorAll)
- *
- * @const
- * @type {boolean}
- */
-treesaver.capabilities.IS_LEGACY = SUPPORT_LEGACY && !(
-  // Storage
-  'localStorage' in window &&
-  'querySelectorAll' in document &&
-  'JSON' in window
+  !!(document.documentElement.currentStyle || window.getComputedStyle) &&
+  // The only legacy browser allowed is IE7 (this eliminates Firefox pre 3.5)
+  (!treesaver.capabilities.IS_LEGACY || (SUPPORT_IE && document.documentMode >= 7))
 );
 
 /**
