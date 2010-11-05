@@ -52,6 +52,9 @@ $(function () {
     ok(node === chrome.activate({}), 'Multiple activation keeps same node');
     chrome.deactivate();
     ok(node !== chrome.activate({}), 'New activation makes new node');
+
+    // Remove handlers, etc
+    chrome.deactivate();
   });
 
   // Fits?
@@ -80,6 +83,9 @@ $(function () {
     equals($(node).width(), 400, 'Width applied');
     equals($(node).height(), 600, 'Width applied');
     same(chrome.pageArea, { w: 400, h: 600 }, 'Full pageArea on minimal chrome');
+
+    // Remove handlers, etc
+    chrome.deactivate();
   });
 
   test('Event handling', function () {
