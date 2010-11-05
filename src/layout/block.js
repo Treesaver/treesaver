@@ -569,9 +569,6 @@ treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
   if (!window.TREESAVER_NO_AUTOMETRICS) {
     treesaver.layout.Block.normalizeMetrics_(node, baseLineHeight);
   }
-  else {
-    treesaver.debug.warn('Auto-metrics correction stopped');
-  }
 
   return node;
 };
