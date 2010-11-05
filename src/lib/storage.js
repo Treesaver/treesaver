@@ -19,7 +19,13 @@ treesaver.storage.set = function set(key, value, persist) {
   // iPad throws QUOTA_EXCEEDED_ERR frequently here, even though we're not
   // using that much storage
   // Clear the storage first in order to avoid this error
-  store.removeItem(key);
+
+  // IE9 throws if you remove an item that does not exist
+  // TODO: Clean this once IE fixes the bug
+  // Ref: https://connect.microsoft.com/IE/feedback/details/613497/web-storage-remove-method-not-working-according-to-the-spec#
+  if (!SUPPORT_IE || store.getItem(key)) {
+    store.removeItem(key);
+  }
 
   try {
     store.setItem(key, treesaver.json.stringify(value));
@@ -50,8 +56,14 @@ treesaver.storage.get = function set(key) {
  * @param {!string} key
  */
 treesaver.storage.clear = function set(key) {
-  window.sessionStorage.removeItem(key);
-  window.localStorage.removeItem(key);
+  // IE9 goes against spec here and throws an exception
+  // if the key doesn't exist. Be defensive
+  if (!SUPPORT_IE || window.sessionStorage.getItem(key)) {
+    window.sessionStorage.removeItem(key);
+  }
+  if (!SUPPORT_IE || window.localStorage.getItem(key)) {
+    window.localStorage.removeItem(key);
+  }
 };
 
 /**
