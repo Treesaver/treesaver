@@ -65,8 +65,15 @@ treesaver.capabilities.SUPPORTS_TREESAVER = !SUPPORT_LEGACY || (
   !!(document.documentElement.currentStyle || window.getComputedStyle) &&
   // Require querySelectorAll in order to exclude Firefox 3.0,
   // but allow IE7 by checking for their non-W3C event model
-  ('querySelectorAll' in document || (SUPPORT_IE && 'attachEvent' in document))
+  ('querySelectorAll' in document ||
+    // Opera 9.64 passes as SUPPORT_LEGACY, does not have querySelectorAll,
+    // and has both attachEvent and addEventListener. We exclude it here
+    // by narrowing down the scope to browsers that do not have querySelectorAll,
+    // do have attachEvent but do not have addEventListener. Hopefully that only
+    // matches IE7.
+    (SUPPORT_IE && 'attachEvent' in document && !('addEventListener' in document)))
 );
+
 
 /**
  * Is this browser IE8 running in IE7 compat mode?
