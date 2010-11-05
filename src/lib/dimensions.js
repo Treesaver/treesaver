@@ -191,6 +191,11 @@ treesaver.dimensions.Metrics = function(el) {
   // Also: Getting computed style is kinda silly if we change the
   // styling -- may affect the measurements anyway
 
+  // Force hasLayout on IE7 so we get accurate measurements.
+  if (SUPPORT_IE && SUPPORT_LEGACY) {
+    el.style.zoom = 1;
+  }
+
   // Margin
   this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop) || 0;
   this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom) || 0;
@@ -248,6 +253,12 @@ treesaver.dimensions.Metrics = function(el) {
     //if (!el.getAttribute('style')) {
       //el.removeAttribute('style');
     //}
+  //}
+
+  // Not sure if resetting hasLayout is the right thing to do
+  // here, as it might affect the measurements we just did.
+  //if (SUPPORT_IE && SUPPORT_LEGACY) {
+  //  el.style.zoom = 'normal';
   //}
 };
 

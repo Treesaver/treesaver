@@ -112,6 +112,21 @@ $(function() {
     equals(d.paddingBottom, 32);
   });
 
+  test('offsetHeight', function() {
+    var e = $('<div></div>').addClass('testonly').appendTo('body').css({
+          fontSize: '14px',
+          lineHeight: '20px'
+        }),
+        h = $('<h2>Hello World</h2>').appendTo(e).css({
+          margin: 0,
+          padding: 0,
+          fontSize: '20px'
+        }),
+        d = new treesaver.dimensions.Metrics(e[0]);
+
+    equals(d.outerH, 20);
+  });
+
   test('helpers', function () {
     var range = {
       minW: 100,
