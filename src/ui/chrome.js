@@ -708,6 +708,12 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     Math.abs(this.touchData_.deltaX) < Math.abs(this.touchData_.deltaY) ? 0 :
     this.touchData_.deltaX < 0 ? -1 : 1;
 
+  // Don't follow finger when a native app in a older model
+  if (WITHIN_IOS_WRAPPER && window.SLOW_DEVICE) {
+    // Nothing left to do but eye candy
+    return;
+  }
+
   if (this.touchData_.swipe) {
     this.pageOffset = this.touchData_.deltaX;
     this._updatePagePositions(true);
@@ -734,6 +740,9 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
       var target = treesaver.ui.Chrome.findTarget_(e.target),
           withinViewer = this.lightBoxActive || this.viewer.contains(target);
 
+      // TODO: Currently this code is OK since the IE browsers don't support
+      // touch. However, perhaps Windows Phone 7 will and needs a fix with
+      // IE7? Need to integrate this into treesaver.events
       var evt = document.createEvent('MouseEvents');
       evt.initMouseEvent('click', true, true, e.view, 1,
           e.changedTouches[0].screenX, e.changedTouches[0].screenY,
