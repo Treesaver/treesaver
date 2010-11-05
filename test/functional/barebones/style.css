@@ -32,13 +32,13 @@ article {
 
 .grid {
   position: absolute;
-  width: 320px;
+  width: 220px;
   line-height: 20px;
 }
 
 .column {
   position: absolute;
-  width: 300px;
+  width: 200px;
   top: 0;
   bottom: 0;
   left: 10px;
