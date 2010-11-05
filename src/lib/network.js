@@ -72,7 +72,10 @@ treesaver.network.load = function() {
       treesaver.events.addListener(document, evt, treesaver.network);
     });
 
-    if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE) {
+    if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE &&
+        // FF3.5 gets nasty if you try to add event handlers to an uncached page
+        // (specifically, it won't let you add event handlers to the cache obj)
+        treesaver.network.loadedFromCache_) {
       treesaver.network.watchedCacheEvents_.forEach(function(evt) {
         treesaver.events.addListener(window.applicationCache, evt, treesaver.network);
       });

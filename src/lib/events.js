@@ -40,7 +40,20 @@ treesaver.events.fireEvent = function(obj, type, data) {
  * @param {!function()|Object} fn
  */
 treesaver.events.addListener = function(obj, type, fn) {
-  obj.addEventListener(type, fn, false);
+  // Help out while debugging, but don't pay the performance hit
+  // for a try/catch in production
+  if (goog.DEBUG) {
+    try {
+      obj.addEventListener(type, fn, false);
+    }
+    catch(ex) {
+      treesaver.debug.error('Could not add ' + type + ' listener to: ' + obj);
+      treesaver.debug.error('Exception ' + ex);
+    }
+  }
+  else {
+    obj.addEventListener(type, fn, false);
+  }
 };
 
 /**
@@ -186,7 +199,7 @@ if (SUPPORT_IE && !('addEventListener' in document)) {
         }
         catch (ex) {
           // Some failure
-          treesaver.debug.error('Exception during handler: ' + ex);
+          treesaver.debug.error('Exception during ' + type + ' handler: ' + ex);
         }
       });
     };
