@@ -184,18 +184,24 @@ treesaver.network['handleEvent'] = function(e) {
  * @return {!string} path.
  */
 treesaver.network.urlToPath = function(url) {
-  var a = document.createElement('a'),
+  var a,
       div,
       path;
 
   if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
-    // IE7 requires this to be in the tree in order to get an accurate value
+    // IE7 has buggy behavior here if you set the href property,
+    // so we have to use innerHTML to get the real absolute URL
     div = document.createElement('div');
+    div.style.display = 'none';
     document.body.appendChild(div);
-    div.appendChild(a);
+    div.innerHTML = '<a href="' + url + '"></a>';
+    a = /** @type {!Element} */ (div.firstChild);
+  }
+  else {
+    a = document.createElement('a');
+    a.href = url;
   }
 
-  a.href = url;
   // TODO: Verify that pathname is supported everywhere
   path = a['pathname'];
 
