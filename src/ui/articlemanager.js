@@ -254,6 +254,9 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
  * @param {!Event} e  Event with e.state for state storage.
  */
 treesaver.ui.ArticleManager.onPopState = function(e) {
+  treesaver.debug.info('onPopState event received: ' +
+      (e['state'] ? e['state'].url : 'No URL'));
+
   if (e['state']) {
     var index = e['state'].index;
 
@@ -1075,6 +1078,13 @@ treesaver.ui.ArticleManager._setArticle = function(article, pos, index, noHistor
   // Update the browser URL, but only if we are supposed to
   if (!noHistory) {
     treesaver.history.pushState({
+      index: index,
+      url: article.url,
+      position: pos
+    }, article.title, article.path);
+  }
+  else {
+    treesaver.history.replaceState({
       index: index,
       url: article.url,
       position: pos

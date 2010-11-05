@@ -41,8 +41,13 @@ treesaver.history.NATIVE_SUPPORT = 'pushState' in window.history;
  * @return {string} The normalized hash value.
  */
 treesaver.history.getNormalizedHash_ = function() {
-  var hash = document.location.hash;
-  return hash.charAt(0) === '#' ? hash.substring(1) : hash;
+  // IE7 does funky things with the location.hash property when the URL contains a
+  // query string. Firefox 3.5 has quirks around escaping hash values ( hat tip: blixt
+  // https://github.com/blixt/js-hash/ )
+  //
+  // Therefore, use location.href instead of location.hash, as blixt did (MIT license)
+  var index = document.location.href.indexOf('#');
+  return index === -1 ? '' : document.location.href.substr(index + 1);
 };
 
 // Even if the client has a native implementation of the API, we have to check
@@ -63,23 +68,23 @@ if (document.location.hash) {
 }
 
 /**
-  * Proxy function for window.history.pushState
-  *
-  * @param {!Object} data
-  * @param {!string} title
-  * @param {!string} url
-  */
+ * Proxy function for window.history.pushState
+ *
+ * @param {!Object} data
+ * @param {!string} title
+ * @param {!string} url
+ */
 treesaver.history.pushState = function(data, title, url) {
   window.history['pushState'](data, title, url);
 };
 
 /**
-  * Proxy function for window.history.replaceState
-  *
-  * @param {!Object} data
-  * @param {!string} title
-  * @param {!string} url
-  */
+ * Proxy function for window.history.replaceState
+ *
+ * @param {!Object} data
+ * @param {!string} title
+ * @param {!string} url
+ */
 treesaver.history.replaceState = function(data, title, url) {
   window.history['replaceState'](data, title, url);
 };
@@ -107,6 +112,27 @@ if (!treesaver.history.NATIVE_SUPPORT) {
   treesaver.history.createHash_ = function(url) {
     // Always add delimiter and escape the URL
     return treesaver.history.DELIMITER + window.escape(url);
+  };
+
+  /**
+   * Set the browser hash. Necessary in order to override behavior when
+   * using IFrame for IE7
+   *
+   * @private
+   * @param {!string} hash
+   */
+  treesaver.history.setLocationHash_ = function(hash) {
+    document.location.hash = '#' + hash;
+  };
+
+  /**
+   * Set the browser hash without adding a history entry
+   *
+   * @private
+   * @param {!string} hash
+   */
+  treesaver.history.replaceLocationHash_ = function(hash) {
+    document.location.replace('#' + hash);
   };
 
   /**
@@ -152,17 +178,14 @@ if (!treesaver.history.NATIVE_SUPPORT) {
 
     // HTML5 implementation only calls popstate as a result of a user action,
     // store the hash so we don't trigger a false event
-    treesaver.history.hash = hash_url;
+    treesaver.history.hash_ = hash_url;
 
     // Use the URL as a hash
     if (replace) {
-      document.location.replace('#' + hash_url);
+      treesaver.history.replaceLocationHash_(hash_url);
     }
     else {
-      // TODO: IE 6 & 7 need to use iFrame for back button support
-
-      // Place the hash normally
-      document.location.hash = '#' + hash_url;
+      treesaver.history.setLocationHash_(hash_url);
     }
   };
 
@@ -176,16 +199,16 @@ if (!treesaver.history.NATIVE_SUPPORT) {
         data;
 
     // False alarm, ignore
-    if (new_hash === treesaver.history.hash) {
+    if (new_hash === treesaver.history.hash_) {
       return;
     }
 
-    treesaver.history.hash = new_hash;
-    data = treesaver.history.hash ?
+    treesaver.history.hash_ = new_hash;
+    data = treesaver.history.hash_ ?
       treesaver.storage.get(treesaver.history.createStorageKey_(new_hash)) :
       {};
 
-    treesaver.debug.info('New hash: ' + treesaver.history.hash);
+    treesaver.debug.info('New hash: ' + treesaver.history.hash_);
 
     // Now, fire onpopstate with the state object
     if ('onpopstate' in window &&
@@ -197,6 +220,13 @@ if (!treesaver.history.NATIVE_SUPPORT) {
     }
   };
 
+  /**
+   * @return {boolean} True if the hash has changed
+   */
+  treesaver.history.hasHashChanged_ = function() {
+    return treesaver.history.getNormalizedHash_() !== treesaver.history.hash_;
+  };
+
   // IE8 in IE7 mode defines onhashchange, but never fires it
   if ('onhashchange' in window && !treesaver.capabilities.IS_IE8INIE7) {
     treesaver.debug.info('Browser has native onHashChange');
@@ -204,18 +234,61 @@ if (!treesaver.history.NATIVE_SUPPORT) {
     window['onhashchange'] = treesaver.history.hashChange_;
   }
   else {
-    // TODO:
-    // IE6 & 7 don't create history items if the hash doesn't match an
-    // element's ID so we need to create an iframe which we'll use
-
     treesaver.debug.info('Using manual hash change detection');
 
     // Need to check hash state manually
     treesaver.scheduler.repeat(function() {
-      var hash = treesaver.history.getNormalizedHash_();
-      if (hash !== treesaver.history.hash) {
+      if (treesaver.history.hasHashChanged_()) {
         treesaver.history.hashChange_();
       }
     }, treesaver.history.HASH_INTERVAL, Infinity);
+
+    // IE6 & 7 don't create history items if the hash doesn't match an
+    // element's ID so we need to create an iframe which we'll use
+    if (SUPPORT_IE && treesaver.capabilities.BROWSER_NAME === 'msie') {
+      treesaver.debug.info('Using iFrame history for IE7');
+
+      /**
+       * iFrame used for supporting the back button in IE7
+       * @private
+       * @type {Element}
+       */
+      treesaver.history.dummyIFrame_ = document.createElement('iframe');
+
+      // Add the iFrame to the document
+      document.documentElement.appendChild(treesaver.history.dummyIFrame_);
+
+      // Redefine the hasHashChanged_ function to ensure check the iFrame
+      // contents
+      treesaver.history.hasHashChanged_ = function() {
+        var hash = treesaver.history.dummyIFrame_.contentWindow.document.body.innerHTML;
+
+        if (hash !== treesaver.history.hash_) {
+          // Set the hash in case a user copies and pastes or shares the URL
+          document.location.hash = '#' + (hash || '');
+          return true;
+        }
+      };
+
+      // Redefine replaceLocationHash_ to change contents of dummy iframe w/o history
+      // entry
+      treesaver.history.replaceLocationHash_ = function(hash) {
+        var iDoc = treesaver.history.dummyIFrame_.contentWindow.document;
+        if (hash !== iDoc.body.innerHTML) {
+          iDoc.body.innerHTML = hash;
+        }
+        document.location.replace('#' + hash);
+      }
+
+      // Redefine setLocationHash_ to change the contents of the dummy iframe
+      // and create a new history entry
+      treesaver.history.setLocationHash_ = function(hash) {
+        var iDoc = treesaver.history.dummyIFrame_.contentWindow.document;
+        iDoc.open();
+        iDoc.write('<html><body>' + hash + '</body></html>');
+        iDoc.close();
+        document.location.hash = '#' + hash;
+      };
+    }
   }
 }
