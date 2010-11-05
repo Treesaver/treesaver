@@ -94,9 +94,13 @@ treesaver.network.unload = function() {
     treesaver.network.watchedEvents_.forEach(function(evt) {
       treesaver.events.removeListener(window, evt, treesaver.network);
     });
-    treesaver.network.watchedCacheEvents_.forEach(function(evt) {
-      treesaver.events.removeListener(window.applicationCache, evt, treesaver.network);
-    });
+    // Unhook cache handlers only if they were set (avoid FF3.5 bug from above)
+    if (treesaver.capabilities.SUPPORTS_APPLICATIONCACHE &&
+        treesaver.network.loadedFromCache_) {
+      treesaver.network.watchedCacheEvents_.forEach(function(evt) {
+        treesaver.events.removeListener(window.applicationCache, evt, treesaver.network);
+      });
+    }
 
     // TODO: Cancel outstanding requests
   }

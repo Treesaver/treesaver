@@ -64,7 +64,19 @@ treesaver.events.addListener = function(obj, type, fn) {
  * @param {!function()|Object} fn
  */
 treesaver.events.removeListener = function(obj, type, fn) {
-  obj.removeEventListener(type, fn, false);
+  // Help out with debugging, but only in debug
+  if (goog.DEBUG) {
+    try {
+      obj.removeEventListener(type, fn, false);
+    }
+    catch (ex) {
+      treesaver.debug.error('Could not remove ' + type + ' listener from: ' + obj);
+      treesaver.debug.error('Exception ' + ex);
+    }
+  }
+  else {
+    obj.removeEventListener(type, fn, false);
+  }
 };
 
 // Need to patch functions for IE
