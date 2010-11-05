@@ -138,7 +138,9 @@ treesaver.boot.cleanup_ = function() {
 
   // Kill loading flags
   delete treesaver.boot.resourcesLoaded_;
-  delete treesaver.boot.uiLoaded_;
+  if (USE_MODULES) {
+    delete treesaver.boot.uiLoaded_;
+  }
   delete treesaver.boot.domReady_;
 
   // Kill other data storage
