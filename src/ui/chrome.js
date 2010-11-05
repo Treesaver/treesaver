@@ -221,8 +221,8 @@ treesaver.ui.Chrome.prototype.activate = function() {
       treesaver.events.addListener(document, evt, this);
     }, this);
 
-    // Mark the UI as active to show the user controls?
-    this.setUiActive_();
+    // Always start off idle
+    this.setUiIdle_();
   }
 
   return /** @type {!Element} */ (this.node);
@@ -243,9 +243,6 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   treesaver.ui.Chrome.watchedEvents.forEach(function(evt) {
     treesaver.events.removeListener(document, evt, this);
   }, this);
-
-  // Remove any stray mouse handlers as well
-  this.removeMouseHandlers_();
 
   // Make sure to drop references
   this.node = null;
@@ -303,23 +300,22 @@ treesaver.ui.Chrome.watchedEvents = [
   'keydown',
   'click',
   'mousewheel',
-  'DOMMouseScroll',
-  'mousedown',
-  'touchstart',
-  'mouseover'
+  'DOMMouseScroll'
 ];
 
-/**
- * @private
- * @type {Array.<string>}
- */
-treesaver.ui.Chrome.optInMouseEvents_ = [
-  'mousemove',
-  'mouseup',
-  'touchmove',
-  'touchend',
-  'touchcancel'
-];
+// Add touch events only if the browser supports touch
+if (treesaver.capabilities.SUPPORTS_TOUCH) {
+  // Note that we hook up all the event handlers immediately,
+  // instead of waiting to do so during touchstart. This is
+  // because removing the touch handlers causes Android 2.1
+  // to stop sending all touch events
+  treesaver.ui.Chrome.watchedEvents.push('touchstart', 'touchmove', 'touchend', 'touchcancel');
+}
+else {
+  // Used for activity detection
+  treesaver.ui.Chrome.watchedEvents.push('mouseover');
+  // TODO: Move mousewheel in here as well?
+}
 
 /**
  * Event dispatcher for all events
@@ -345,17 +341,17 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
   case 'mouseover':
     return this.mouseOver(e);
 
-  case 'mousedown':
   case 'touchstart':
-    return this.mouseDown(e);
+    return this.touchStart(e);
 
-  case 'mousemove':
   case 'touchmove':
-    return this.mouseMove(e);
+    return this.touchMove(e);
 
-  case 'mouseup':
   case 'touchend':
-    return this.mouseUp(e);
+    return this.touchEnd(e);
+
+  case 'touchcancel':
+    return this.touchCancel(e);
 
   case 'keydown':
     return this.keyDown(e);
@@ -366,9 +362,6 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
   case 'mousewheel':
   case 'DOMMouseScroll':
     return this.mouseWheel(e);
-
-  case 'touchcancel':
-    return this.mouseCancel(e);
   }
 };
 
@@ -434,8 +427,9 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
+    e.stopPropagation();
     e.preventDefault();
-    return false;
+    return;
   }
 
   // Ignore if done with a modifier key (could be opening in new tab, etc)
@@ -558,7 +552,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         url = treesaver.network.absoluteURL(el.href);
         if (!treesaver.ui.ArticleManager.goToArticleByURL(url)) {
           // The URL is not an article, let the navigation happen normally
-          handled = false;
           return;
         }
 
@@ -570,10 +563,9 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   }
 
   if (handled) {
+    e.stopPropagation();
     e.preventDefault();
   }
-
-  return (e.returnValue = !handled);
 };
 
 /**
@@ -655,234 +647,153 @@ treesaver.ui.Chrome.findTarget_ = function(node) {
  * @private
  * @type {Object}
  */
-treesaver.ui.Chrome.prototype.mouseData_;
+treesaver.ui.Chrome.prototype.touchData_;
 
 /**
- * Helper for collecting mouse/touch positional data from events
- *
- * @private
- * @param {!Event} e
- * @param {boolean} isTouch
- * @return {Object}
- */
-treesaver.ui.Chrome.prototype.getMouseData_ = function(e, isTouch) {
-  var posX, posY;
-
-  if (isTouch && e.touches[0]) {
-    posX = e.touches[0].pageX;
-    posY = e.touches[0].pageY;
-  }
-  else {
-    posX = e.pageX;
-    posY = e.pageY;
-  }
-
-  if (!this.mouseData_ || /touchstart|mousedown/.test(e.type)) {
-    this.mouseData_ = {
-      startX: posX,
-      startY: posY,
-      startTime: goog.now(),
-      target: treesaver.ui.Chrome.findTarget_(e.target),
-      move: false,
-      isTouch: isTouch
-    };
-  }
-  else if (/touchmove|mousemove/.test(e.type)) {
-    this.mouseData_.move = true;
-    this.mouseData_.deltaX = posX - this.mouseData_.startX;
-    this.mouseData_.deltaY = posY - this.mouseData_.startY;
-    this.mouseData_.deltaTime = goog.now() - this.mouseData_.startTime;
-  }
-  else {
-    if (posX && posY) {
-      this.mouseData_.deltaX = posX - this.mouseData_.startX;
-      this.mouseData_.deltaY = posY - this.mouseData_.startY;
-    }
-    this.mouseData_.deltaTime = goog.now() - this.mouseData_.startTime;
-  }
-
-  return this.mouseData_;
-};
-
-/**
- * Handle the mousedown event
+ * Handle the touchstart event
  * @param {!Event} e
  */
-treesaver.ui.Chrome.prototype.mouseDown = function(e) {
+treesaver.ui.Chrome.prototype.touchStart = function(e) {
+  // Do all the handling ourselves
+  e.stopPropagation();
+  e.preventDefault();
+
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
-    e.preventDefault();
-    return false;
-  }
-
-  var isTouch = !!e.touches,
-      retVal,
-      mouseData,
-      withinViewer = this.viewer.contains(treesaver.ui.Chrome.findTarget_(e.target));
-
-  // Ignore any event even not within the viewer
-  if (!withinViewer) {
     return;
   }
 
-  // Collect mouse data
-  this.getMouseData_(e, isTouch);
 
-  if (isTouch) {
-    // Ignore multitouch
-    if (e.touches.length > 1) {
-      treesaver.debug.info('Multi-touch ignored');
+  this.touchData_ = {
+    move: false,
+    startTime: goog.now(),
+    deltaTime: 0,
+    startX: e.touches[0].pageX,
+    startY: e.touches[0].pageY,
+    deltaX: 0,
+    deltaY: 0,
+    touchCount: e.touches.length,
+    swipe: 0
+  };
 
-      return;
-    }
-
-    // Listen for touch events
-    treesaver.events.addListener(document, 'touchmove', this);
-    treesaver.events.addListener(document, 'touchend', this);
-    treesaver.events.addListener(document, 'touchcancel', this);
-  }
-  else {
-    // Ignore if not done with a modifier key
-    if (!treesaver.ui.Chrome.specialKeyPressed_(e)) {
-      treesaver.debug.info('Mousedown ignored due to lack of modifier key');
-
-      return;
-    }
-
-    // Ignore if it's not a left-click
-    if ('which' in e && e.which !== 1 || e.button) {
-      treesaver.debug.info('Click ignored due to non-left click');
-
-      return;
-    }
-
-    // Listen for mouse events
-    treesaver.events.addListener(document, 'mousemove', this);
-    treesaver.events.addListener(document, 'mouseup', this);
-  }
-
-  // Preventing default seems to kill iPhone link following.
-  // Don't do anything for now ...
-  // e.preventDefault();
+  // Start listening to the other events
+  treesaver.events.addListener(document, 'touchmove', this);
+  treesaver.events.addListener(document, 'touchend', this);
+  treesaver.events.addListener(document, 'touchcancel', this);
 };
 
 /**
- * Handle the mousemove event
+ * Handle the touchmove event
  * @param {!Event} e
  */
-treesaver.ui.Chrome.prototype.mouseMove = function(e) {
-  // Don't try to track swiping when within the iOS app
-  if (WITHIN_IOS_WRAPPER && window.SLOW_DEVICE) {
-    // Return early so we don't use up cycles
-    return;
-  }
+treesaver.ui.Chrome.prototype.touchMove = function(e) {
+  // Do all the handling ourselves
+  e.stopPropagation();
+  e.preventDefault();
 
-  // Collect mouse data
-  this.getMouseData_(e, !!e.touches);
+  this.touchData_.move = true;
+  this.touchData_.deltaTime = goog.now() - this.touchData_.startTime;
+  this.touchData_.deltaX = e.touches[0].pageX - this.touchData_.startX;
+  this.touchData_.deltaY = e.touches[0].pageY - this.touchData_.startY;
+  this.touchData_.touchCount = Math.min(e.touches.length, this.touchData_.touchCount);
+  this.touchData_.swipe =
+    // One-finger only
+    this.touchData_.touchCount > 1 ? 0 :
+    // Finger has to move far enough
+    Math.abs(this.touchData_.deltaX) <= SWIPE_THRESHOLD ? 0 :
+    // Within the time limit
+    this.touchData_.deltaTime > SWIPE_TIME_LIMIT ? 0 :
+    // And greater than the Y dimension
+    Math.abs(this.touchData_.deltaX) < Math.abs(this.touchData_.deltaY) ? 0 :
+    this.touchData_.deltaX < 0 ? -1 : 1;
 
-  if (Math.abs(this.mouseData_.deltaX) >
-      Math.abs(this.mouseData_.deltaY)) {
-    // Update offset
-    this.pageOffset = this.mouseData_.deltaX;
+  if (this.touchData_.swipe) {
+    this.pageOffset = this.touchData_.deltaX;
     this._updatePagePositions(true);
-    e.preventDefault();
-    return false;
   }
-  else {
-    // Don't offset
-    this.pageOffset = 0;
-    this._updatePagePositions(true);
-  }
-};
-
-/**
- * Handle the mouseup event
- * @param {!Event} e
- */
-treesaver.ui.Chrome.prototype.mouseUp = function(e) {
-  // Collect mouse data
-  var md = this.getMouseData_(e, !!e.touches);
-
-  // Stop listening to events
-  this.removeMouseHandlers_();
-
-  var pageChanged = false;
-
-  if ((Math.abs(md.deltaX) >
-       Math.abs(md.deltaY)) &&
-      (Math.abs(md.deltaX) > SWIPE_THRESHOLD) &&
-      md.deltaTime < SWIPE_TIME_LIMIT) {
-    // A swipe, but we have to check and see if it actually
-    // caused a page change
-    if (md.deltaX < 0) {
-      pageChanged = treesaver.ui.ArticleManager.nextPage();
-    }
-    else {
-      pageChanged = treesaver.ui.ArticleManager.previousPage();
-    }
-  }
-
-  if (pageChanged) {
-    // Swiping always deactivates
-    this.setUiIdle_();
-
-    // Page swiped and animation will occur. preventDefault in order to avoid
-    // activating links, etc
-    e.preventDefault();
-
-    return;
-  }
-  else {
-    // If it's a tap, then we toggle the active state
-    if (!md.move) {
-      // TODO: This can cause issues with trying to click a link in touch safari
-      // Need to either:
-      //   1. Set a timer and watch for a click event right after this event.
-      //      if none comes, toggle
-      //   2. Prevent iPhone from firing click events altogether, and fire the
-      //      click event manually. Note that the event must be fired in case
-      //      another element (e.g. video) wishes to handle it
-      //   3. ???
-      this.toggleUiActive_();
-    }
-
-    // Not a swipe, animate back to the initial position
-    // and let the event process
+  else if (this.pageOffset) {
     this.animationStart = goog.now();
     this._updatePagePositions();
-
-    return;
   }
 };
 
 /**
- * Handle the mousecancel event
+ * Handle the touchend event
  * @param {!Event} e
  */
-treesaver.ui.Chrome.prototype.mouseCancel = function(e) {
-  // This event can be tough to duplicate on touch devices, but need to make
-  // sure the page position gets restored when it happens
-  this.animationStart = goog.now();
-  this._updatePagePositions();
+treesaver.ui.Chrome.prototype.touchEnd = function(e) {
+  // Do all the handling ourselves
+  e.stopPropagation();
+  e.preventDefault();
 
-  // Stop listening to events
-  this.removeMouseHandlers_();
+  if (this.touchData_.touchCount === 1) {
+    // No move means we create a click
+    if (!this.touchData_.move) {
+      // Lightbox is honorary viewer
+      var target = treesaver.ui.Chrome.findTarget_(e.target),
+          withinViewer = this.lightBoxActive || this.viewer.contains(target);
+
+      var evt = document.createEvent('MouseEvents');
+      evt.initMouseEvent('click', true, true, e.view, 1,
+          e.changedTouches[0].screenX, e.changedTouches[0].screenY,
+          e.changedTouches[0].clientX, e.changedTouches[0].clientY,
+          e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
+
+      if (target.dispatchEvent(evt) && withinViewer) {
+        // Event went unhandled, toggle active state
+        this.toggleUiActive_();
+      }
+      else if (withinViewer) {
+        // Handled event within viewer = idle
+        this.setUiIdle_();
+      }
+      else {
+        // Otherwise, active
+        this.setUiActive_();
+      }
+    }
+    // Check for a swipe
+    else if (this.touchData_.swipe) {
+      var pageChanged = false;
+
+      if (this.touchData_.deltaX < 0) {
+        pageChanged = treesaver.ui.ArticleManager.nextPage();
+      }
+      else {
+        pageChanged = treesaver.ui.ArticleManager.previousPage();
+      }
+
+      if (!pageChanged) {
+        this.animationStart = goog.now();
+        this._updatePagePositions();
+        // Failed page turn = Show UI
+        this.setUiActive_();
+      }
+      else {
+        // Successful page turn = Hide UI
+        this.setUiIdle_();
+      }
+    }
+    // No swipe and no tap, do nothing
+    else {
+      // Nothing
+    }
+  }
+  else {
+    // TODO: Zoom gesture and two-finger swipe
+  }
+
+  // Clear out touch data
+  this.touchCancel(e);
 };
 
 /**
- * Remove opt-in mouse event handlers
- *
- * @private
+ * Handle the touchcancel event
+ * @param {!Event} e
  */
-treesaver.ui.Chrome.prototype.removeMouseHandlers_ = function() {
-  // Remove event handlers
-  treesaver.ui.Chrome.optInMouseEvents_.forEach(function(evt) {
-    treesaver.events.removeListener(document, evt, this);
-  }, this);
-
-  // Clear mouse data
-  this.mouseData_ = null;
+treesaver.ui.Chrome.prototype.touchCancel = function(e) {
+  this.touchData_ = null;
 };
 
 /**

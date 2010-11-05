@@ -164,7 +164,8 @@ treesaver.capabilities.SUPPORTS_ORIENTATION = 'orientation' in window;
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_TOUCH = 'createTouch' in document ||
+treesaver.capabilities.SUPPORTS_TOUCH = WITHIN_IOS_WRAPPER ||
+  'createTouch' in document ||
   // Android doesn't expose createTouch, must test userAgent manually
   /android/.test(treesaver.capabilities.ua_);
 
