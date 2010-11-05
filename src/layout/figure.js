@@ -5,7 +5,6 @@ goog.require('treesaver.capabilities');
 goog.require('treesaver.dom');
 // Block requires Figure, so avoid a circular dependency
 //goog.require('treesaver.layout.Block');
-goog.require('treesaver.json');
 goog.require('treesaver.layout.FigureSize'); // trim
 goog.require('treesaver.string');
 goog.require('treesaver.template');
