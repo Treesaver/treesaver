@@ -23,6 +23,8 @@ treesaver.dom.addClass = function(el, className) {
   else {
     el.className = className;
   }
+  // Set the className again for IE7.
+  el.className = el.className;
 };
 
 /**
