@@ -142,29 +142,31 @@ if (SUPPORT_IE &&
     return el.currentStyle;
   };
 
-  treesaver.dimensions.getOffsetTop = function(el) {
-    if (el) {
-      el.style.zoom = 1;
-      return el.offsetTop;
-    }
-    return 0;
-  };
+  if (treesaver.capabilities.IS_LEGACY) {
+    treesaver.dimensions.getOffsetTop = function(el) {
+      if (el) {
+        el.style.zoom = 1;
+        return el.offsetTop;
+      }
+      return 0;
+    };
 
-  treesaver.dimensions.getOffsetHeight = function(el) {
-    if (el) {
-      el.style.zoom = 1;
-      return el.offsetHeight;
-    }
-    return 0;
-  };
+    treesaver.dimensions.getOffsetHeight = function(el) {
+      if (el) {
+        el.style.zoom = 1;
+        return el.offsetHeight;
+      }
+      return 0;
+    };
 
-  treesaver.dimensions.getOffsetWidth = function(el) {
-    if (el) {
-      el.style.zoom = 1;
-      return el.offsetWidth;
-    }
-    return 0;
-  };
+    treesaver.dimensions.getOffsetWidth = function(el) {
+      if (el) {
+        el.style.zoom = 1;
+        return el.offsetWidth;
+      }
+      return 0;
+    };
+  }
 
   // If we are dealing with IE and the value contains some sort
   // of number we try Dean Edward's hack:
@@ -246,7 +248,7 @@ treesaver.dimensions.Metrics = function(el) {
   // styling -- may affect the measurements anyway
 
   // Force hasLayout on IE7 so we get accurate measurements.
-  if (SUPPORT_IE && SUPPORT_LEGACY) {
+  if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
     el.style.zoom = 1;
   }
 
@@ -311,7 +313,7 @@ treesaver.dimensions.Metrics = function(el) {
 
   // Not sure if resetting hasLayout is the right thing to do
   // here, as it might affect the measurements we just did.
-  //if (SUPPORT_IE && SUPPORT_LEGACY) {
+  //if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
   //  el.style.zoom = 'normal';
   //}
 };
