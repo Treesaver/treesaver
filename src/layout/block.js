@@ -103,6 +103,9 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
     // TODO: Collapse if there is only one child element
 
     hasFigures = !!this.figures.length;
+
+    // An item only has block children if it actually has block children
+    this.hasBlockChildren = !!this.blocks.length;
   }
   else {
     // TODO: What if there are figures within a keeptogether?
@@ -535,6 +538,10 @@ treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
 
   // Cast for compiler type checks
   node = /** @type {Element} */ (node);
+
+  if (goog.DEBUG) {
+    node.setAttribute('data-originalHTML', treesaver.dom.outerHTML(node));
+  }
 
   // Remove IDs, since we can end up with more than one copy of an element
   // in the tree (across column splits, etc)
