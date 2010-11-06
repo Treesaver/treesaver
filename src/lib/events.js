@@ -134,6 +134,13 @@ if (SUPPORT_IE && (!('addEventListener' in document) || document.documentMode ==
     this.returnValue = false;
   };
 
+  /**
+   * @this {Event}
+   */
+  treesaver.events.stopPropagation = function() {
+    this.cancelBubble = true;
+  };
+
   treesaver.events.fireEvent = function(obj, type, data) {
     var e = document.createEventObject(),
         cur;
@@ -150,6 +157,10 @@ if (SUPPORT_IE && (!('addEventListener' in document) || document.documentMode ==
     // Add 'preventDefault' if it doesn't already exist
     if (!e.preventDefault) {
       e.preventDefault = treesaver.events.preventDefault;
+    }
+
+    if (!e.stopPropagation) {
+      e.stopPropagation = treesaver.events.stopPropagation;
     }
 
     // If it's an event IE supports natively, fire it through the
@@ -194,6 +205,8 @@ if (SUPPORT_IE && (!('addEventListener' in document) || document.documentMode ==
 
       // Need to set up preventDefault
       e.preventDefault = treesaver.events.preventDefault;
+
+      e.stopPropagation = treesaver.events.stopPropagation;
 
       // Call each handler
       obj.custom_handlers[type].handlers.forEach(function(fun) {

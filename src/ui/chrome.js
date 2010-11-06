@@ -563,13 +563,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   }
 
   if (handled) {
-    // IE does not support stopPropagation.
-    if (SUPPORT_IE && !('stopPropagation' in e)) {
-      e.cancelBubble = true;
-    }
-    else {
-      e.stopPropagation();
-    }
+    e.stopPropagation();
     e.preventDefault();
   }
 };
