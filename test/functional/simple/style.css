@@ -172,6 +172,7 @@ article {
   border: 1px solid #ccc;
   padding: 20px;
   margin: 20px;
+  background-color: white;
 }
 
 .grid.cols-2 {
