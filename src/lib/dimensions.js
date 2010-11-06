@@ -97,12 +97,42 @@ treesaver.dimensions.toPixels = function(el, val) {
 /**
  * Return the computedStyle object, which varies based on
  * browsers
- * @param {!Element} el
+ * @param {?Element} el
  * @return {Object}
  */
 treesaver.dimensions.getStyleObject = function(el) {
   return document.defaultView.getComputedStyle(el, null);
 };
+
+/**
+ * Return the offsetHeight of the element.
+ *
+ * @param {?Element} el
+ * @return {!number} Value in pixels.
+ */
+treesaver.dimensions.getOffsetHeight = function(el) {
+  return el && el.offsetHeight || 0;
+};
+
+/**
+ * Return the offsetWidth of the element.
+ *
+ * @param {?Element} el
+ * @return {!number} Value in pixels.
+ */
+treesaver.dimensions.getOffsetWidth = function(el) {
+  return el && el.offsetWidth || 0;
+};
+
+/**
+ * Return the offsetTop of the element.
+ *
+ * @param {?Element} el
+ * @return {!number} Value in pixels.
+ */
+treesaver.dimensions.getOffsetTop = function(el) {
+  return el && el.offsetTop || 0;
+}
 
 // IE doesn't support getComputedStyle
 if (SUPPORT_IE &&
@@ -110,6 +140,30 @@ if (SUPPORT_IE &&
   // Patch to use MSIE API
   treesaver.dimensions.getStyleObject = function(el) {
     return el.currentStyle;
+  };
+
+  treesaver.dimensions.getOffsetTop = function(el) {
+    if (el) {
+      el.style.zoom = 1;
+      return el.offsetTop;
+    }
+    return 0;
+  };
+
+  treesaver.dimensions.getOffsetHeight = function(el) {
+    if (el) {
+      el.style.zoom = 1;
+      return el.offsetHeight;
+    }
+    return 0;
+  };
+
+  treesaver.dimensions.getOffsetWidth = function(el) {
+    if (el) {
+      el.style.zoom = 1;
+      return el.offsetWidth;
+    }
+    return 0;
   };
 
   // If we are dealing with IE and the value contains some sort

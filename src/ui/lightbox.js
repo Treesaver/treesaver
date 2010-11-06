@@ -108,8 +108,8 @@ treesaver.ui.LightBox.prototype.getMaxSize = function() {
   }
 
   return {
-    w: this.container.offsetWidth,
-    h: this.container.offsetHeight
+    w: treesaver.dimensions.getOffsetWidth(this.container),
+    h: treesaver.dimensions.getOffsetHeight(this.container)
   };
 };
 
@@ -119,8 +119,8 @@ treesaver.ui.LightBox.prototype.getMaxSize = function() {
  */
 treesaver.ui.LightBox.prototype.showFigure = function(figure) {
   var largest = figure.getLargestSize(this.getMaxSize()),
-      w = this.container.offsetParent.offsetWidth,
-      h = this.container.offsetParent.offsetHeight;
+      w = treesaver.dimensions.getOffsetWidth(this.container.offsetParent),
+      h = treesaver.dimensions.getOffsetHeight(this.container.offsetParent);
 
   // TODO: Provide name for sizing via CSS?
 
@@ -131,8 +131,8 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
     largest.figureSize.applySize(this.container, largest.name);
     this.container.style.bottom = 'auto';
     this.container.style.right = 'auto';
-    treesaver.dimensions.setCssPx(this.container, 'left', (w - this.container.offsetWidth) / 2);
-    treesaver.dimensions.setCssPx(this.container, 'top', (h - this.container.offsetHeight) / 2);
+    treesaver.dimensions.setCssPx(this.container, 'left', (w - treesaver.dimensions.getOffsetWidth(this.container)) / 2);
+    treesaver.dimensions.setCssPx(this.container, 'top', (h - treesaver.dimensions.getOffsetHeight(this.container)) / 2);
     // TODO: What if the figure is too large?
     return true;
   }

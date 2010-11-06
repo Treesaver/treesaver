@@ -50,7 +50,7 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   node = /** @type {!Element} */ (node);
 
   // Quick check in case the element is display none and should be ignored
-  if (!node.offsetHeight) {
+  if (!treesaver.dimensions.getOffsetHeight(node)) {
     // TODO: Check display: none / visibility: collapse
     // This is a very defensive move, since a display: none item that
     // is made visible when in a specific column or grid can really mess up a

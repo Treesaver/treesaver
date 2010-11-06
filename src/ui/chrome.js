@@ -946,8 +946,8 @@ treesaver.ui.Chrome.prototype.showLightBox = function(el) {
   this.lightBox.node = /** @type {!Element} */ (this.lightBox.node);
 
   // Cover entire chrome with the lightbox
-  treesaver.dimensions.setCssPx(this.lightBox.node, 'width', this.node.offsetWidth);
-  treesaver.dimensions.setCssPx(this.lightBox.node, 'height', this.node.offsetHeight);
+  treesaver.dimensions.setCssPx(this.lightBox.node, 'width', treesaver.dimensions.getOffsetWidth(this.node));
+  treesaver.dimensions.setCssPx(this.lightBox.node, 'height', treesaver.dimensions.getOffsetHeight(this.node));
 
   if (!this.lightBox.showFigure(figure)) {
     // Showing failed
@@ -1004,8 +1004,8 @@ treesaver.ui.Chrome.prototype.calculatePageArea = function() {
   }
 
   this.pageArea = {
-    w: this.viewer.offsetWidth,
-    h: this.viewer.offsetHeight
+    w: treesaver.dimensions.getOffsetWidth(this.viewer),
+    h: treesaver.dimensions.getOffsetHeight(this.viewer)
   };
 };
 

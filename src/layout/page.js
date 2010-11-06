@@ -100,7 +100,7 @@ treesaver.layout.Page = function(content, grids, br) {
 
         // Size to the container
         if (i === 0 && best.grid.scoringFlags['sizetocontainer']) {
-          this.size.height = containerNode.offsetHeight +
+          this.size.height = treesaver.dimensions.getOffsetHeight(containerNode) +
             best.grid.containers[0].delta;
           this.size.outerH = this.size.height + this.size.bpHeight;
           this.node.style.height = this.size.height + 'px';
@@ -193,7 +193,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     }
   }
 
-  maxContainerHeight = container.offsetHeight;
+  maxContainerHeight = treesaver.dimensions.getOffsetHeight(container);
 
   // Do any content switching that needs to happen
   figureSize.applySize(container, size);
@@ -214,7 +214,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     container.style.bottom = 'auto';
   }
 
-  containerHeight = container.offsetHeight;
+  containerHeight = treesaver.dimensions.getOffsetHeight(container);
 
   // Did not fit :(
   // TODO: Use something better than parent height
@@ -261,7 +261,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
       treesaver.dom.addClass(sibling, 'flexed');
 
       // Make sure we don't go negative
-      if (sibling.offsetHeight <= containerHeight) {
+      if (treesaver.dimensions.getOffsetHeight(sibling) <= containerHeight) {
         treesaver.debug.info('Sibling shrunk to zero height: ' + sibling);
         // TODO: Remove from tree?
         sibling.style.height = 0;
@@ -272,13 +272,13 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
         // offsets
         if (anchoredTop) {
           treesaver.dimensions.setCssPx(sibling, 'top',
-            sibling.offsetTop + containerHeight);
+            treesaver.dimensions.getOffsetTop(sibling) + containerHeight);
         }
         else {
           // Compute the current 'bottom' value by using the parent's offsetHeight
           treesaver.dimensions.setCssPx(sibling, 'bottom',
-            sibling.offsetParent.offsetHeight -
-            (sibling.offsetTop + sibling.offsetHeight) + containerHeight);
+            treesaver.dimensions.getOffsetHeight(sibling.offsetParent) -
+            (treesaver.dimensions.getOffsetTop(sibling) + treesaver.dimensions.getOffsetHeight(sibling)) + containerHeight);
         }
       }
     }
@@ -295,7 +295,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
   * @param {number} minH Minimum height of the column.
   */
 treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, minH) {
-  var colHeight = node.offsetHeight,
+  var colHeight = treesaver.dimensions.getOffsetHeight(node),
       height = 0,
       remainingHeight,
       firstBlock,
@@ -380,10 +380,10 @@ treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, min
 
       // Go to the next block, skipping any children of this block
       br.index = nextNonChild ? nextNonChild.index : blockCount;
-
       // Move on to the next block
       continue block_loop;
     }
+
 
     parent = block.parent;
     remainingHeight = colHeight - height;
