@@ -227,8 +227,6 @@ $(function() {
     view = { className: 'test' };
     treesaver.template.expand(view, div);
 
-    alert(div.innerHTML);
-
     ok(htmlEquals(div.innerHTML, '<a class="url test" data-bind="className:class">Hello World</a>'));
   });
 
