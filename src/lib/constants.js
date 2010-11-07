@@ -44,7 +44,7 @@ var UI_IDLE_INTERVAL = 5000; // 5 seconds
  *
  * @define {number}
  */
-var PAGINATE_DEBOUNCE_TIME = 100; // .1 seconds
+var PAGINATE_DEBOUNCE_TIME = 200; // .2 seconds
 
 /**
  * How many pixels of movement before it's considered a swipe
