@@ -219,6 +219,19 @@ $(function() {
     ok(htmlEquals(div.innerHTML, '<a href="index.html#hello%20world" data-href="index.html#{{ test }}" data-bind="test:href">test</a>'), 'white space in attribute template name is ignored.');
   });
 
+  test('partial bind with unrelated class', function() {
+    var div = document.createElement('div'),
+        view = {};
+
+    div.innerHTML = '<a data-bind="className:class" class="url {{className}}">Hello World</a>';
+    view = { className: 'test' };
+    treesaver.template.expand(view, div);
+
+    alert(div.innerHTML);
+
+    ok(htmlEquals(div.innerHTML, '<a class="url test" data-bind="className:class">Hello World</a>'));
+  });
+
   test('escaping', function() {
     var div = document.createElement('div'),
         view = {
