@@ -108,7 +108,9 @@ treesaver.template.expandObject_ = function(view, scope) {
             if ((mapName === 'href' || mapName === 'src') && treesaver.dom.hasAttr(el, 'data-' + mapName)) {
               text = el.getAttribute('data-' + mapName);
             }
-            else {
+            else if (mapName === 'class') {
+              text = el.className;
+            } else {
               text = el.getAttribute(mapName);
             }
           }
@@ -146,7 +148,12 @@ treesaver.template.expandObject_ = function(view, scope) {
           }
 
           if (mapName) {
-            el.setAttribute(mapName, text);
+            if (mapName === 'class') {
+              el.className = text;
+            }
+            else {
+              el.setAttribute(mapName, text);
+            }
           }
           else {
             el.innerHTML = text;
