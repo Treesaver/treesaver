@@ -280,3 +280,7 @@ if (SUPPORT_IE && (!('addEventListener' in document) || document.documentMode ==
     }
   };
 }
+
+// Expose event helper functions via externs
+goog.exportSymbol('treesaver.addListener', treesaver.events.addListener);
+goog.exportSymbol('treesaver.removeListener', treesaver.events.removeListener);
