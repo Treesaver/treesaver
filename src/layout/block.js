@@ -539,10 +539,6 @@ treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
   // Cast for compiler type checks
   node = /** @type {Element} */ (node);
 
-  if (goog.DEBUG) {
-    node.setAttribute('data-originalHTML', treesaver.dom.outerHTML(node));
-  }
-
   // Remove IDs, since we can end up with more than one copy of an element
   // in the tree (across column splits, etc)
   node.removeAttribute('id');
@@ -556,7 +552,7 @@ treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
   }
 
   // Strip out all non-element nodes (textnodes, comments) from block nodes
-  if (treesaver.layout.Block.hasBlockChildren(node)) {
+  if (treesaver.layout.Block.hasBlockChildren(node) && !treesaver.dom.hasClass(node, 'keeptogether')) {
     for (i = node.childNodes.length - 1; i >= 0; i -= 1) {
       childNode = node.childNodes[i];
       if (childNode.nodeType !== 1) {
