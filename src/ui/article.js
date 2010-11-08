@@ -346,7 +346,7 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
   // (TODO: What if this conflicts with other articles?)
   treesaver.scheduler.clear('paginate');
 
-  var page, ignore_flag = false;
+  var page;
   index = index || 0;
 
   while (!this.br.finished) {
@@ -357,7 +357,7 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
     );
 
     // Pagination can fail to produce a useful page
-    if (page.ignore && !ignore_flag) {
+    if (page.ignore) {
       if (this.br.finished) {
         treesaver.debug.info('Page ignored during pagination and article terminated');
       }
@@ -370,10 +370,9 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
       }
 
       // Ignore this page and try again
-      ignore_flag = true;
       continue;
     }
-    else if (page.error || ignore_flag) {
+    else if (page.error) {
       if (this.br.finished) {
         // Meh, I guess we're done
         break;
@@ -399,7 +398,6 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
     this.pageCount += 1;
     // Clear the error flags
     this.error = false;
-    ignore_flag = false;
 
     // Update page constraint
     this.constraint =

@@ -17,7 +17,13 @@ goog.require('treesaver.layout.Block');
 treesaver.layout.Page = function(content, grids, br) {
   var best = treesaver.layout.Grid.best(content, grids, br),
       host = document.createElement('div'),
-      originalBr = br.clone();
+      originalBr = br.clone(),
+      containerFilled = false;
+
+  /**
+   * @type {boolean}
+   */
+  this.ignore;
 
   if (!best || !best.grid) {
     // Might have leftover figures that just won't fit
@@ -26,12 +32,13 @@ treesaver.layout.Page = function(content, grids, br) {
 
     if (br.finished) {
       treesaver.debug.info('Finished article in face of error.');
+      this.ignore = true;
     }
     else {
       treesaver.debug.error('No best grid found: ' + arguments);
+      this.error = true;
     }
 
-    this.error = true;
     return;
   }
 
@@ -87,6 +94,7 @@ treesaver.layout.Page = function(content, grids, br) {
       // Account for the figure we used
       if (success) {
         br.useFigure(figureIndex);
+        containerFilled = true;
 
         // Need to store some extra data when supporting zoom
         if (figure.zoomable) {
@@ -133,6 +141,11 @@ treesaver.layout.Page = function(content, grids, br) {
   if (originalBr.equals(br)) {
     treesaver.debug.error('No progress made in pagination: ' + arguments + best);
     this.error = true;
+  }
+  else if (!containerFilled && best.grid.scoringFlags['sizetocontainer']) {
+    treesaver.debug.warn('sizetocontainer not filled, page ignored');
+    // Couldn't fill the container, ignore this page
+    this.ignore = true;
   }
   else {
     // Export HTML
