@@ -1364,6 +1364,10 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
       }
     }
   }
+  else if (!this.pageOffset) {
+    // Can't let pageOffset be undefined, will throw errors in IE
+    this.pageOffset = 0;
+  }
 
   this._updatePagePositions();
 };
