@@ -176,6 +176,8 @@ def compile(args):
     # Whether we should compile to a single file instead of modules
     is_single = '--single' in args or not options.modules_file.isfile()
 
+    single_filename = 'treesaver-all.js'
+
     compiler_flags = [
         '--compilation_level=ADVANCED_OPTIMIZATIONS',
         ' --jscomp_error '.join(options.compiler_errors),
@@ -197,6 +199,7 @@ def compile(args):
         compiler_flags.append('--define="SUPPORT_LEGACY=false"')
         compiler_flags.append('--define="WITHIN_IOS_WRAPPER=true"')
         is_single = True
+        single_filename = 'treesaver-all-ios.js'
 
     # Make pretty output for debug mode
     if '--debug' in args:
@@ -219,7 +222,7 @@ def compile(args):
     if is_single:
         file_list = get_dependency_list(js_files)
         compiler_flags.append('--js %s' % ' --js '.join(file_list))
-        compiler_flags.append('--js_output_file=%s' % (options.build_dir / 'all.js'))
+        compiler_flags.append('--js_output_file=%s' % (options.build_dir / single_filename))
 
         # Let code know modules are not being used
         compiler_flags.append('--define="USE_MODULES=false"')
