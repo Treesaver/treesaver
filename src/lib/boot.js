@@ -27,7 +27,7 @@ treesaver.boot.LOAD_TIMEOUT = 5000; // 5 seconds
 treesaver.boot.load = function() {
   treesaver.debug.info('Begin Treesaver booting');
 
-  if (!goog.DEBUG || !window.TREESAVER_NO_AUTOLOAD) {
+  if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // Hide content to avoid ugly flashes
     document.documentElement.style.display = 'none';
   }
@@ -82,7 +82,7 @@ treesaver.boot.load = function() {
     treesaver.boot.domReady();
   }
 
-  if (!goog.DEBUG || !window.TREESAVER_NO_AUTOLOAD) {
+  if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // Fallback in case things never load
     treesaver.scheduler.delay(
       treesaver.boot.unload,
@@ -161,7 +161,7 @@ treesaver.boot.domReady = function(e) {
   // Remove main content
   treesaver.boot.originalHtml_ = treesaver.boot.cleanOriginalHtml_();
 
-  if (!goog.DEBUG || !window.TREESAVER_NO_AUTOLOAD) {
+  if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // Place a loading message
     document.body.innerHTML = '<div id="loading">Loading ' + document.title + '...</div>';
     // Re-enable content display
@@ -209,7 +209,7 @@ treesaver.boot.loadProgress_ = function() {
   // Clean up handlers and timers
   treesaver.boot.cleanup_();
 
-  if (!goog.DEBUG || !window.TREESAVER_NO_AUTOLOAD) {
+  if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // Start the UI
 
     // TODO: In compiled module mode, this function won't be visible ...
@@ -227,7 +227,7 @@ treesaver.boot.loadProgress_ = function() {
 treesaver.boot.cleanOriginalHtml_ = function() {
   var html = document.body.innerHTML;
 
-  if (!goog.DEBUG || !window.TREESAVER_NO_AUTOLOAD) {
+  if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // TODO: Are there elements that should be retained?
     treesaver.dom.clearChildren(/** @type {!Element} */(document.body));
   }

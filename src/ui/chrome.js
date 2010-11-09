@@ -709,7 +709,7 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     this.touchData_.deltaX < 0 ? -1 : 1;
 
   // Don't follow finger when a native app in a older model
-  if (WITHIN_IOS_WRAPPER && window.SLOW_DEVICE) {
+  if (WITHIN_IOS_WRAPPER && window.TS_SLOW_DEVICE) {
     // Nothing left to do but eye candy
     return;
   }

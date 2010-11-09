@@ -569,7 +569,7 @@ treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
   }
 
   // Make sure all our metrics line up with our vertical grid
-  if (!window.TREESAVER_NO_AUTOMETRICS) {
+  if (!window.TS_NO_AUTOMETRICS) {
     treesaver.layout.Block.normalizeMetrics_(node, baseLineHeight);
   }
 
