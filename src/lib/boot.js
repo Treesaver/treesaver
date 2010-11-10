@@ -153,11 +153,8 @@ treesaver.boot.cleanup_ = function() {
  * @param {Event=} e
  */
 treesaver.boot.domReady = function(e) {
-  if (!document.body) {
-    treesaver.debug.error('DOMReady callback without document.body');
-  }
-
   treesaver.boot.domReady_ = true;
+
   // Remove main content
   treesaver.boot.originalHtml_ = treesaver.boot.cleanOriginalHtml_();
 

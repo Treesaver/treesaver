@@ -64,7 +64,9 @@ treesaver.domready.ready_ = function() {
   if (!document.body) {
     treesaver.debug.error('DOMReady without document.body');
 
-    // TODO: Schedule another poll?
+    // Strange state, re-run the handler in a bit
+    treesaver.debug.info('Requeue domReady handler in order to wait for document.body');
+    treesaver.scheduler.queue(treesaver.domready.ready_);
     return;
   }
 
