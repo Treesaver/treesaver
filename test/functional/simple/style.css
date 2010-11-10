@@ -169,10 +169,12 @@ article {
   position: absolute;
   width: 320px;
   line-height: 20px;
-  border: 1px solid #ccc;
-  padding: 20px;
-  margin: 20px;
+  margin: 0 20px;
   background-color: white;
+}
+
+.no-smallscreen .grid {
+  border: 1px solid #ccc;
 }
 
 .grid.cols-2 {
@@ -186,22 +188,22 @@ article {
 .column {
   position: absolute;
   width: 300px;
-  top: 20px;
-  bottom: 20px;
-  left: 20px;
+  top: 10px;
+  bottom: 10px;
+  left: 10px;
   line-height: 20px;
 }
 
 .container {
   position: absolute;
   top: 80px;
-  bottom: 20px;
-  left: 20px;
+  bottom: 10px;
+  left: 10px;
   width: 300px;
 }
 
 .container.title {
-  top: 20px;
+  top: 10px;
 }
 
 .lightbox {
@@ -226,11 +228,11 @@ article {
 }
 
 .col-2 {
-  left: 340px;
+  left: 330px;
 }
 
 .col-3 {
-  left: 660px;
+  left: 650px;
 }
 
 .pullquote {
@@ -287,6 +289,11 @@ p[itemprop=byline], .toc .byline {
 
 p[itemprop=abstract], .toc .abstract {
   margin-top: 0;
+}
+
+p.thumb {
+  display: none;
+  margin: 0;
 }
 
 p.caption {
