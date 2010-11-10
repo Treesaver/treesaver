@@ -287,7 +287,8 @@ treesaver.capabilities.SUPPORTS_LOCALSTORAGE =
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_APPLICATIONCACHE = 'applicationCache' in window;
+treesaver.capabilities.SUPPORTS_APPLICATIONCACHE =
+  !WITHIN_IOS_WRAPPER && 'applicationCache' in window;
 
 /**
  * Current browser capabilities
