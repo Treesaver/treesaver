@@ -463,8 +463,14 @@ treesaver.layout.Grid.SCORING = {
   */
 treesaver.layout.Grid.best = function(content, grids, breakRecord) {
   if (goog.DEBUG) {
-    if (!content || !grids.length || !breakRecord) {
-      treesaver.debug.error('Bad arguments to grid.best: ' + arguments);
+    if (!content) {
+      treesaver.debug.error('No content passed to grid.best');
+    }
+    else if (!grids.length) {
+      treesaver.debug.error('No grids passed to grid.best');
+    }
+    else if (!breakRecord) {
+      treesaver.debug.error('No breakRecord passed to grid.best');
     }
   }
 

@@ -269,6 +269,11 @@ treesaver.ui.Article.prototype.stretchGrids = function(size) {
     return grid.stretch(size.h);
   });
 
+  // Are there any grids?
+  if (!this.eligible_grids.length) {
+    treesaver.debug.error('No eligible grids at ' + size.w + 'x' + size.h);
+  }
+
   // Sort by highest text height (helps with shortcutting in scoring)
   this.eligible_grids.sort(treesaver.layout.Grid.sort);
 };
