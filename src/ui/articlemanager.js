@@ -330,9 +330,12 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
   var initialArticleIsTOC = (toc_url === treesaver.ui.ArticleManager.initialUrl);
 
   if (html) {
-    // Cache the result no matter what
-    treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url,
-        html, true);
+    // Don't use storage when native
+    if (!WITHIN_IOS_WRAPPER) {
+      // Cache the result no matter what
+      treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url,
+          html, true);
+    }
 
     // If the initial was loaded from the cache, we could have stale content in the DOM
     if (initialArticleIsTOC && treesaver.network.loadedFromCache()) {
@@ -346,8 +349,11 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     }
   }
   else {
-    // TOC failed to load, check the cache
-    html = treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
+    // Don't use storage when native
+    if (!WITHIN_IOS_WRAPPER) {
+      // TOC failed to load, check the cache
+      html = treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
+    }
 
     if (!html) {
       // We don't have content for a TOC, so there is nothing more we can do
@@ -409,7 +415,9 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
   });
 
   // Clear out old article storage
-  treesaver.storage.clean(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX, unique_urls);
+  if (!WITHIN_IOS_WRAPPER) {
+    treesaver.storage.clean(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX, unique_urls);
+  }
 
   // TODO: Fire an event (let's chrome know it can display)
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.TOCUPDATED);
@@ -963,23 +971,25 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
   // Set flag so we don't try to paginate, etc before content loads
   article.loading = true;
 
-  var cached_text =
-    /** @type {?string} */
-    (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
+  if (!WITHIN_IOS_WRAPPER) {
+    var cached_text =
+      /** @type {?string} */
+      (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
 
-  if (cached_text) {
-    article.processHTML(cached_text);
+    if (cached_text) {
+      article.processHTML(cached_text);
 
-    // Only for article manager?
-    // TODO: Don't use events for this?
-    treesaver.events.fireEvent(document, treesaver.ui.Article.events.LOADED, { article: article });
+      // Only for article manager?
+      // TODO: Don't use events for this?
+      treesaver.events.fireEvent(document, treesaver.ui.Article.events.LOADED, { article: article });
+    }
   }
 
   treesaver.network.get(article.url, function(text) {
     article.loading = false;
 
     if (!text) {
-      if (!cached_text) {
+      if (WITHIN_IOS_WRAPPER || !cached_text) {
         // Fire event
         article.loadFailed = true;
         // TODO: Don't use events for this?
@@ -989,14 +999,19 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       }
       else {
         // Stick with cached content
+        treesaver.debug.log('Using cached content for article: ' + article.url);
       }
     }
-    else if (cached_text !== text) {
-      treesaver.debug.log('Fetched content newer than cache');
+    else if (WITHIN_IOS_WRAPPER || cached_text !== text) {
+      if (!WITHIN_IOS_WRAPPER) {
+        treesaver.debug.log('Fetched content newer than cache for article: ' + article.url);
 
-      // Save the HTML in the cache
-      treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url,
-          text, true);
+        // Save the HTML in the cache
+        treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url,
+            text, true);
+      }
+
+      treesaver.debug.log('Processing HTML content for article: ' + article.url);
 
       article.processHTML(text);
 
