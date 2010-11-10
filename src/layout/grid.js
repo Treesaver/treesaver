@@ -52,12 +52,20 @@ treesaver.layout.Grid = function(node) {
   /**
    * @type {Object.<string, boolean>}
    */
-  this.scoringFlags = treesaver.layout.Grid.findScoringFlags(this.classes);
+  this.scoringFlags;
 
   /**
    * @type {?Object.<number, boolean>}
    */
-  this.pageNumberFlags = treesaver.layout.Grid.findPageNumberFlags(this.classes);
+  this.pageNumberFlags;
+
+  /**
+   * @type {?Object.<number, boolean>}
+   */
+  this.pageNumberNegationFlags;
+
+  // Calculate all page scoring flags
+  this.findScoringFlags();
 
   // Sizing
   // Flex grids get stretched later
@@ -145,44 +153,41 @@ treesaver.layout.Grid.knownFlags = {
   'sizetocontainer': true
 };
 
-treesaver.layout.Grid.pageFlagRegex = /^page-(\d*)$/;
+treesaver.layout.Grid.pageFlagRegex = /^(no-)?page-(\d+)$/;
 
 /**
- * Find any scoring flags specified in the grid classes
- *
- * @param {Array.<string>} classes
- * @return {Object.<number, boolean>}
+ * Parse the class array and find any scoring flags
  */
-treesaver.layout.Grid.findScoringFlags = function(classes) {
-  var flags = {};
-  classes.forEach(function(className) {
+treesaver.layout.Grid.prototype.findScoringFlags = function() {
+  var pageNumberFlagFound = false,
+      match, index;
+
+  this.scoringFlags = {};
+  this.pageNumberFlags = {};
+  this.pageNumberNegationFlags = {};
+
+  this.classes.forEach(function(className) {
     if (className in treesaver.layout.Grid.knownFlags) {
-      flags[className] = true;
+      this.scoringFlags[className] = true;
     }
-  });
+    else if ((match = treesaver.layout.Grid.pageFlagRegex.exec(className))) {
+      index = parseInt(match[2], 10);
 
-  return flags;
-};
-
-/**
- * Find any page number flags specified in the grid classes
- *
- * @param {Array.<string>} classes
- * @return {?Object.<number, boolean>}
- */
-treesaver.layout.Grid.findPageNumberFlags = function(classes) {
-  var flags = {},
-      found = false;
-
-  classes.forEach(function(className) {
-    var match = treesaver.layout.Grid.pageFlagRegex.exec(className);
-    if (match) {
-      flags[parseInt(match[1], 10)] = true;
-      found = true;
+      if (!isNaN(index)) {
+        if (className.substr(0, 3) === 'no-') {
+          this.pageNumberNegationFlags[index] = true;
+        }
+        else {
+          pageNumberFlagFound = true;
+          this.pageNumberFlags[index] = true;
+        }
+      }
     }
-  });
+  }, this);
 
-  return found ? flags : null;
+  if (!pageNumberFlagFound) {
+    this.pageNumberFlags = null;
+  }
 };
 
 /**
@@ -283,6 +288,11 @@ treesaver.layout.Grid.prototype.score = function(content, breakRecord) {
     else {
       score -= treesaver.layout.Grid.SCORING.NON_PAGE_NUMBER;
     }
+  }
+
+  // Check negations
+  if (this.pageNumberNegationFlags[humanPageNum]) {
+    score -= treesaver.layout.Grid.SCORING.NON_PAGE_NUMBER;
   }
 
   if (humanPageNum % 2) {
