@@ -92,12 +92,14 @@ def default(args = []):
 def debug(args):
     """Create debug versions for testing"""
     output_mode = 'script'
+    is_ios = '--ios' in args
+    is_single = '--single' in args or is_ios
 
-    for jsfile in options.src_dir.files('*.js'):
-        outfile = options.build_dir / jsfile.basename()
+    if is_single:
+        outfile = options.build_dir / 'treesaver.js'
         js = sh('python %s -i %s -p % s -p %s -o %s --output_file %s' % (
             options.calcdeps,
-            jsfile,
+            ' -i'.join(options.src_dir.files('*.js')),
             options.src_dir,
             options.closure_library_dir,
             output_mode,
@@ -107,7 +109,32 @@ def debug(args):
         # Need to modify the output in order to set COMPILED to true, since
         # this normally happens via the compiler
         contents = outfile.text().replace('COMPILED = false', 'COMPILED = true', 1)
+        contents = contents.replace('USE_MODULES = true', 'USE_MODULES = false', 1)
+
+        if is_ios:
+            contents = contents.replace('SUPPORT_IE = true', 'SUPPORT_IE = false', 1)
+            contents = contents.replace('SUPPORT_LEGACY = true', 'SUPPORT_LEGACY = false', 1)
+            contents = contents.replace('WITHIN_IOS_WRAPPER = false', 'WITHIN_IOS_WRAPPER = true', 1)
+
         outfile.write_text(contents)
+
+    else:
+        for jsfile in options.src_dir.files('*.js'):
+            outfile = options.build_dir / jsfile.basename()
+            js = sh('python %s -i %s -p % s -p %s -o %s --output_file %s' % (
+                options.calcdeps,
+                jsfile,
+                options.src_dir,
+                options.closure_library_dir,
+                output_mode,
+                outfile
+            ), capture=True)
+
+            # Need to modify the output in order to set COMPILED to true, since
+            # this normally happens via the compiler
+            contents = outfile.text().replace('COMPILED = false', 'COMPILED = true', 1)
+
+            outfile.write_text(contents)
 
 @task
 @consume_args
