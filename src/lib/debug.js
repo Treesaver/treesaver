@@ -4,6 +4,28 @@
 
 goog.provide('treesaver.debug');
 
+goog.require('treesaver.scheduler');
+
+/**
+ * Message queue for IOS debugging
+ *
+ * @type {Array.<string>}
+ */
+treesaver.debug.messageQueue_ = [];
+
+if (goog.DEBUG && WITHIN_IOS_WRAPPER) {
+  // Outputs items from the queue at a limited rate, because the logging
+  // "API" used can't handle many messages at once (will merge into one)
+  treesaver.scheduler.repeat(function() {
+    var msg = treesaver.debug.messageQueue_.pop();
+
+    if (msg) {
+      msg = window.escape(msg);
+      document.location = "ts://log/" + msg;
+    }
+  }, 50, Infinity);
+}
+
 /**
  * Original load time of debug code
  *
@@ -29,7 +51,10 @@ treesaver.debug.info = function(msg) {
   if (goog.DEBUG && window.console) {
     msg = treesaver.debug.timestamp_() + msg;
 
-    if ('info' in window.console) {
+    if (window.TS_WITHIN_NATIVE_IOS_APP) {
+      treesaver.debug.messageQueue_.push(msg);
+    }
+    else if ('info' in window.console) {
       window.console.info(msg);
     }
     else {
@@ -46,7 +71,10 @@ treesaver.debug.log = function(msg) {
   if (goog.DEBUG && window.console) {
     msg = treesaver.debug.timestamp_() + msg;
 
-    if ('debug' in window.console) {
+    if (window.TS_WITHIN_NATIVE_IOS_APP) {
+      treesaver.debug.messageQueue_.push(msg);
+    }
+    else if ('debug' in window.console) {
       window.console.debug(msg);
     }
     else {
@@ -63,7 +91,10 @@ treesaver.debug.warn = function(msg) {
   if (goog.DEBUG && window.console) {
     msg = treesaver.debug.timestamp_() + msg;
 
-    if ('warn' in window.console) {
+    if (window.TS_WITHIN_NATIVE_IOS_APP) {
+      treesaver.debug.messageQueue_.push(msg);
+    }
+    else if ('warn' in window.console) {
       window.console.warn(msg);
     }
     else {
@@ -80,7 +111,10 @@ treesaver.debug.error = function(msg) {
   if (goog.DEBUG && window.console) {
     msg = treesaver.debug.timestamp_() + msg;
 
-    if ('error' in window.console) {
+    if (window.TS_WITHIN_NATIVE_IOS_APP) {
+      treesaver.debug.messageQueue_.push(msg);
+    }
+    else if ('error' in window.console) {
       window.console.error(msg);
     }
     else {

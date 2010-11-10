@@ -985,11 +985,14 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
     }
   }
 
+  treesaver.debug.info('loadArticle: Downloading article: ' + article.url);
+
   treesaver.network.get(article.url, function(text) {
     article.loading = false;
 
     if (!text) {
       if (WITHIN_IOS_WRAPPER || !cached_text) {
+        treesaver.debug.info('loadArticle: Load failed, no content: ' + article.url);
         // Fire event
         article.loadFailed = true;
         // TODO: Don't use events for this?

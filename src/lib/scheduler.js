@@ -5,7 +5,8 @@
 
 goog.provide('treesaver.scheduler');
 
-goog.require('treesaver.debug');
+// Avoid circular dependency
+//goog.require('treesaver.debug');
 
 /**
  * Milliseconds between checks for task execution
