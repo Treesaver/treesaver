@@ -1408,8 +1408,8 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
   }
 
   this.pages.forEach(function(page, i) {
-    if (page) {
-      this.setPagePosition(page, this.pagePositions[i] + offset);
+    if (page && page.node) {
+      this.setPagePosition(page.node, this.pagePositions[i] + offset);
     }
   }, this);
 
@@ -1426,25 +1426,27 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
 };
 
 /**
+ * @param {!Element} node
  * @param {number} offset
  */
-treesaver.ui.Chrome.prototype.setPagePosition = function(page, offset) {
-  if (page.node) {
+treesaver.ui.Chrome.prototype.setPagePosition = function(node, offset) {
+  treesaver.dimensions.setCssPx(node, 'left', offset);
+}
+
+// Use CSS transforms when possible
+if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) {
+  treesaver.ui.Chrome.prototype.setPagePosition = function(node, offset) {
+    var cssVal = 'translateX(' + offset + 'px)';
+
     // TODO: Detect only once
-    if ('transform' in page.node.style) {
-      page.node.style['transform'] = 'translate(' + offset + 'px, 0)';
-    }
-    else if ('webkitTransform' in page.node.style) {
-      page.node.style['webkitTransform'] = 'translate(' + offset + 'px, 0)';
-    }
-    else if ('MozTransform' in page.node.style) {
-      page.node.style['MozTransform'] = 'translate(' + offset + 'px, 0)';
+    if ('transformProperty' in node.style) {
+      node.style['transformProperty'] = cssVal;
     }
     else {
-      treesaver.dimensions.setCssPx(page.node, 'left', offset);
+      node.style[treesaver.capabilities.domCSSPrefix + 'Transform'] = cssVal;
     }
   }
-};
+}
 
 /**
  * Update the display of fields like the page count
