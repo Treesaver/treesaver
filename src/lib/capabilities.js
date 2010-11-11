@@ -8,6 +8,7 @@ goog.provide('treesaver.capabilities');
 goog.require('treesaver.array'); // array.some
 goog.require('treesaver.constants');
 goog.require('treesaver.debug');
+goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 // Avoid circular dependency
 // goog.require('treesaver.network');
@@ -163,6 +164,105 @@ treesaver.capabilities.BROWSER_OS =
   exec(treesaver.capabilities.platform_))[0] || 'unknown';
 
 /**
+ * Browser engine prefix for non-standard CSS properties
+ *
+ * @const
+ * @type {string}
+ */
+treesaver.capabilities.cssPrefix = (function() {
+  switch (treesaver.capabilities.BROWSER_NAME) {
+  case 'chrome':
+  case 'safari':
+  case 'webkit':
+    return '-webkit-';
+  case 'mozilla':
+    return '-moz-'
+  case 'msie':
+    return '-ms-';
+  case 'opera':
+    return '-o-';
+  default:
+    return '';
+  }
+}());
+
+/**
+ * Browser engine prefix for non-standard CSS properties
+ *
+ * @const
+ * @type {string}
+ */
+treesaver.capabilities.domCSSPrefix = (function() {
+  switch (treesaver.capabilities.BROWSER_NAME) {
+  case 'chrome':
+  case 'safari':
+  case 'webkit':
+    return 'Webkit';
+  case 'mozilla':
+    return 'Moz'
+  case 'msie':
+    return 'ms';
+  case 'opera':
+    return 'O';
+  default:
+    return '';
+  }
+}());
+
+/**
+ * Helper function for testing CSS properties
+ *
+ * @private
+ * @param {!string} propName
+ * @param {boolean=} testPrefix
+ * @param {boolean=} skipPrimary
+ * @return {boolean}
+ */
+treesaver.capabilities.cssPropertySupported_ = function(propName, testPrefix, skipPrimary) {
+  var styleObj = document.documentElement.style,
+      prefixed = testPrefix && treesaver.capabilities.domCSSPrefix ?
+        (treesaver.capabilities.domCSSPrefix + propName.charAt(0).toUpperCase() + propName.substr(1)) :
+        false;
+
+  return (!skipPrimary && typeof styleObj[propName] !== 'undefined') ||
+         (!!prefixed && typeof styleObj[prefixed] !== 'undefined');
+};
+
+/**
+ * Helper function for testing support of a CSS @media query
+ * Hat tip to Modernizr for this code
+ *
+ * @private
+ * @param {!string} queryName
+ * @param {boolean=} testPrefix
+ * @return {boolean}
+ */
+treesaver.capabilities.mediaQuerySupported_ = function(queryName, testPrefix) {
+  var st = document.createElement('style'),
+      div = document.createElement('div'),
+      div_id = 'ts-test',
+      mq = '@media (' + queryName + ')',
+      result;
+
+  if (testPrefix) {
+    mq += ',(' + treesaver.capabilities.cssPrefix + queryName + ')';
+  }
+
+  st.textContent = mq + '{#' + div_id + ' {height:3px}}';
+  div.setAttribute('id', div_id);
+  document.documentElement.appendChild(st);
+  document.documentElement.appendChild(div);
+
+  // Confirm the style was applied
+  result = div.offsetHeight === 3;
+
+  document.documentElement.removeChild(st);
+  document.documentElement.removeChild(div);
+
+  return result;
+};
+
+/**
  * Whether the browser exposes orientation information
  *
  * @const
@@ -178,7 +278,7 @@ treesaver.capabilities.SUPPORTS_ORIENTATION = 'orientation' in window;
  */
 treesaver.capabilities.SUPPORTS_TOUCH = WITHIN_IOS_WRAPPER ||
   'createTouch' in document ||
-  // Android doesn't expose createTouch, must test userAgent manually
+  // Android doesn't expose createTouch, use quick hack
   /android/.test(treesaver.capabilities.ua_);
 
 /**
@@ -291,6 +391,47 @@ treesaver.capabilities.SUPPORTS_APPLICATIONCACHE =
   !WITHIN_IOS_WRAPPER && 'applicationCache' in window;
 
 /**
+ * Whether the browser supports CSS transforms
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.SUPPORTS_CSSTRANSFORMS =
+  treesaver.capabilities.cssPropertySupported_('transformProperty') ||
+  // Browsers used WebkitTransform instead of WebkitTransformProperty
+  treesaver.capabilities.cssPropertySupported_('transform', true, true);
+
+/**
+ * Whether the browser supports CSS 3d transforms
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D = (function() {
+  var result = treesaver.capabilities.cssPropertySupported_('perspectiveProperty') ||
+    treesaver.capabilities.cssPropertySupported_('perspective', true, true);
+
+  // Chrome gives false positives for webkitPerspective
+  // Hat tip to modernizr
+  if (result && 'WebkitPerspective' in document.documentElement.style &&
+    treesaver.capabilities.BROWSER_NAME !== 'safari') {
+    // Confirm support via media query test
+    result = treesaver.capabilities.mediaQuerySupported_('perspective', true);
+  }
+
+  return result;
+}());
+
+/**
+ * Whether the browser supports CSS transitions
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.SUPPORTS_CSSTRANSITIONS =
+  treesaver.capabilities.cssPropertySupported_('transitionProperty', true);
+
+/**
  * Current browser capabilities
  *
  * @private
@@ -340,6 +481,9 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_APPLICATIONCACHE) + 'applicationcache',
       p(treesaver.capabilities.SUPPORTS_FONTFACE) + 'fontface',
       p(treesaver.capabilities.SUPPORTS_TOUCH) + 'touch',
+      p(treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) + 'csstransforms',
+      p(treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D) + 'csstransforms3d',
+      p(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS) + 'csstransitions',
       // Not in modernizr
       p(treesaver.capabilities.SUPPORTS_MICRODATA) + 'microdata',
       p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
