@@ -268,7 +268,8 @@ treesaver.capabilities.mediaQuerySupported_ = function(queryName, testPrefix) {
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_ORIENTATION = 'orientation' in window;
+treesaver.capabilities.SUPPORTS_ORIENTATION = WITHIN_IOS_WRAPPER ||
+  'orientation' in window;
 
 /**
  * Whether the browser supports touch events
@@ -287,7 +288,7 @@ treesaver.capabilities.SUPPORTS_TOUCH = WITHIN_IOS_WRAPPER ||
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_FLASH = (function() {
+treesaver.capabilities.SUPPORTS_FLASH = !WITHIN_IOS_WRAPPER && (function() {
   if (!!window.navigator.plugins && window.navigator.plugins.length) {
     // Non-IE browsers are pretty simple
     return !!window.navigator.plugins['Shockwave Flash'];
@@ -396,7 +397,7 @@ treesaver.capabilities.SUPPORTS_APPLICATIONCACHE =
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_CSSTRANSFORMS =
+treesaver.capabilities.SUPPORTS_CSSTRANSFORMS = WITHIN_IOS_WRAPPER ||
   treesaver.capabilities.cssPropertySupported_('transformProperty') ||
   // Browsers used WebkitTransform instead of WebkitTransformProperty
   treesaver.capabilities.cssPropertySupported_('transform', true, true);
@@ -407,20 +408,21 @@ treesaver.capabilities.SUPPORTS_CSSTRANSFORMS =
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D = (function() {
-  var result = treesaver.capabilities.cssPropertySupported_('perspectiveProperty') ||
-    treesaver.capabilities.cssPropertySupported_('perspective', true, true);
+treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D = WITHIN_IOS_WRAPPER ||
+  (function() {
+    var result = treesaver.capabilities.cssPropertySupported_('perspectiveProperty') ||
+      treesaver.capabilities.cssPropertySupported_('perspective', true, true);
 
-  // Chrome gives false positives for webkitPerspective
-  // Hat tip to modernizr
-  if (result && 'WebkitPerspective' in document.documentElement.style &&
-    treesaver.capabilities.BROWSER_NAME !== 'safari') {
-    // Confirm support via media query test
-    result = treesaver.capabilities.mediaQuerySupported_('perspective', true);
-  }
+    // Chrome gives false positives for webkitPerspective
+    // Hat tip to modernizr
+    if (result && 'WebkitPerspective' in document.documentElement.style &&
+      treesaver.capabilities.BROWSER_NAME !== 'safari') {
+      // Confirm support via media query test
+      result = treesaver.capabilities.mediaQuerySupported_('perspective', true);
+    }
 
-  return result;
-}());
+    return result;
+  }());
 
 /**
  * Whether the browser supports CSS transitions
@@ -428,7 +430,7 @@ treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D = (function() {
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_CSSTRANSITIONS =
+treesaver.capabilities.SUPPORTS_CSSTRANSITIONS = WITHIN_IOS_WRAPPER ||
   treesaver.capabilities.cssPropertySupported_('transitionProperty', true);
 
 /**
