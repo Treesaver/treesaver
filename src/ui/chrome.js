@@ -221,8 +221,8 @@ treesaver.ui.Chrome.prototype.activate = function() {
       treesaver.events.addListener(document, evt, this);
     }, this);
 
-    // Always start off idle
-    this.setUiIdle_();
+    // Always start off active
+    this.setUiActive_();
   }
 
   return /** @type {!Element} */ (this.node);
