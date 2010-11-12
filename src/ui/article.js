@@ -233,6 +233,9 @@ treesaver.ui.Article.prototype.processHTML = function(html) {
   fake_grid.removeChild(fake_column);
   treesaver.dom.clearChildren(fake_column);
 
+  // Reset pagination state
+  this.resetPagination();
+
   return true;
 };
 
