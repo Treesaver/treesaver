@@ -6,6 +6,7 @@
 body {
   font-size: 14px;
   line-height: 20px;
+  background: #fff;
 }
 
 /**
@@ -155,6 +156,7 @@ article {
   bottom: 0;
   right: 0;
   line-height: 20px;
+  background: white;
 }
 
 .grid {
@@ -162,7 +164,7 @@ article {
   width: 320px;
   line-height: 20px;
   margin: 0 20px;
-  /*background-color: white;*/
+  background-color: white;
 }
 
 .no-smallscreen .grid {

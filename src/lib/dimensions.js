@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.dimensions');
 
+goog.require('treesaver.capabilities');
 goog.require('treesaver.constants');
 
 /**

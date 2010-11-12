@@ -681,6 +681,9 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
   treesaver.events.addListener(document, 'touchmove', this);
   treesaver.events.addListener(document, 'touchend', this);
   treesaver.events.addListener(document, 'touchcancel', this);
+
+  // Pause other work for better swipe performance
+  //treesaver.scheduler.pause([], SWIPE_TIME_LIMIT);
 };
 
 /**
@@ -720,7 +723,7 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
   }
   else if (this.pageOffset) {
     this.animationStart = goog.now();
-    this._updatePagePositions();
+    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
   }
 };
 
@@ -733,9 +736,15 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  if (this.touchData_.touchCount === 1) {
+  // Hold onto a reference before clearing
+  var touchData = this.touchData_;
+
+  // Clear out touch data
+  this.touchCancel(e);
+
+  if (touchData.touchCount === 1) {
     // No move means we create a click
-    if (!this.touchData_.move) {
+    if (!touchData.move) {
       // Lightbox is honorary viewer
       var target = treesaver.ui.Chrome.findTarget_(e.target),
           withinViewer = this.lightBoxActive || this.viewer.contains(target);
@@ -763,10 +772,10 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
       }
     }
     // Check for a swipe
-    else if (this.touchData_.swipe) {
+    else if (touchData.swipe) {
       var pageChanged = false;
 
-      if (this.touchData_.deltaX < 0) {
+      if (touchData.deltaX < 0) {
         pageChanged = treesaver.ui.ArticleManager.nextPage();
       }
       else {
@@ -775,7 +784,8 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
 
       if (!pageChanged) {
         this.animationStart = goog.now();
-        this._updatePagePositions();
+        this.pageOffset = 0;
+        this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
         // Failed page turn = Show UI
         this.setUiActive_();
       }
@@ -792,9 +802,6 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   else {
     // TODO: Zoom gesture and two-finger swipe
   }
-
-  // Clear out touch data
-  this.touchCancel(e);
 };
 
 /**
@@ -802,6 +809,9 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchCancel = function(e) {
+  // Let the tasks begin again
+  //treesaver.scheduler.resume();
+
   this.touchData_ = null;
 };
 
@@ -1278,21 +1288,32 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
   // TODO: Master page width?
   this.pages = treesaver.ui.ArticleManager.getPages(/** @type {!treesaver.dimensions.Size} */ (this.pageArea), 1);
 
-  treesaver.dom.clearChildren(/** @type {!Element} */ (this.viewer));
-
   old_pages.forEach(function(page) {
     // Only deactivate pages we're not about to use again
     if (page) {
       if (this.pages.indexOf(page) === -1) {
+        if (page.node && page.node.parentNode === this.viewer) {
+          this.viewer.removeChild(page.node);
+        }
         page.deactivate();
       }
     }
   }, this);
 
-  this.pages.forEach(function(page) {
+  this.pages.forEach(function(page, i) {
     if (page) {
-      // Don't worry about extra calls to activate
-      this.viewer.appendChild(page.activate());
+      if (!page.node) {
+        page.activate();
+      }
+
+      if (page.node.parentNode !== this.viewer) {
+        if (direction === treesaver.ui.ArticleManager.transitionDirection.BACKWARD) {
+          this.viewer.insertBefore(page.node, this.viewer.firstChild);
+        }
+        else {
+          this.viewer.appendChild(page.node);
+        }
+      }
     }
   }, this);
 };
@@ -1315,7 +1336,6 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
       leftMargin = Math.max(currentPage.size.marginRight, nextPage ? nextPage.size.marginLeft : 0),
       rightMargin = Math.max(currentPage.size.marginLeft, prevPage ? prevPage.size.marginRight : 0),
       oldOffset = this.pageOffset;
-
 
   // Mark the master page
   currentPage.node.setAttribute('id', 'currentPage');
@@ -1369,7 +1389,11 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
     this.pageOffset = 0;
   }
 
-  this._updatePagePositions();
+  if (treesaver.capabilities.SUPPORTS_CSSTRANSITIONS && this.pageOffset) {
+    this.pageOffset = 0;
+  }
+
+  this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
 };
 
 /**
@@ -1385,44 +1409,38 @@ treesaver.ui.Chrome.prototype._updatePagePositionsDelayed = function() {
  * @param {boolean=} preventAnimation
  */
 treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) {
+  var offset = this.pageOffset;
 
-  // Pause tasks to keep animation smooth
   if (!preventAnimation) {
-    treesaver.scheduler.pause(['animatePages'], 3 * MAX_ANIMATION_DURATION);
-  }
+    // Pause tasks to keep animation smooth
+    treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
 
-  var now = goog.now(),
-      percentRemaining = !preventAnimation ?
-        Math.max(0, (this.animationStart || 0) +
-          MAX_ANIMATION_DURATION - now) / MAX_ANIMATION_DURATION :
-        1,
-      ratio = -Math.cos(percentRemaining * Math.PI) / 2 + 0.5,
-      offset = ratio * this.pageOffset;
+    var now = goog.now(),
+        percentRemaining = !preventAnimation ?
+          Math.max(0, (this.animationStart || 0) +
+            MAX_ANIMATION_DURATION - now) / MAX_ANIMATION_DURATION :
+          1,
+        ratio = -Math.cos(percentRemaining * Math.PI) / 2 + 0.5;
+
+    offset *= ratio;
+
+    if (Math.abs(offset) < 5) {
+      this.pageOffset = offset = 0;
+      // Re-enable other tasks
+      treesaver.scheduler.resume();
+    }
+    else {
+      // Queue up another call in a bit
+      this._updatePagePositionsDelayed();
+    }
+  }
 
   // Update position
-  if (Math.abs(offset) < 5) {
-    offset = 0;
-  }
-  else {
-    now = 0;
-  }
-
   this.pages.forEach(function(page, i) {
     if (page && page.node) {
       this.setPagePosition(page.node, this.pagePositions[i] + offset);
     }
   }, this);
-
-  if (offset && !preventAnimation) {
-    // Run again in a bit
-    this._updatePagePositionsDelayed();
-  }
-  else if (!offset) {
-    this.pageOffset = 0;
-    if (!preventAnimation) {
-      treesaver.scheduler.resume();
-    }
-  }
 };
 
 /**
@@ -1436,7 +1454,9 @@ treesaver.ui.Chrome.prototype.setPagePosition = function(node, offset) {
 // Use CSS transforms when possible
 if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) {
   treesaver.ui.Chrome.prototype.setPagePosition = function(node, offset) {
-    var cssVal = 'translateX(' + offset + 'px)';
+    var cssVal = treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D ?
+      'translate3d(' + offset + 'px, 0, 0)' :
+      'translateX(' + offset + 'px)';
 
     // TODO: Detect only once
     if ('transformProperty' in node.style) {
