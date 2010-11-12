@@ -677,11 +677,6 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     swipe: 0
   };
 
-  // Start listening to the other events
-  treesaver.events.addListener(document, 'touchmove', this);
-  treesaver.events.addListener(document, 'touchend', this);
-  treesaver.events.addListener(document, 'touchcancel', this);
-
   // Pause other work for better swipe performance
   //treesaver.scheduler.pause([], SWIPE_TIME_LIMIT);
 };
