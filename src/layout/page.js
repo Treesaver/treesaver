@@ -61,7 +61,7 @@ treesaver.layout.Page = function(content, grids, br) {
   /**
    * @type {?Element}
    */
-  this.node = /** @type {Element} */ host.firstChild;
+  this.node = /** @type {!Element} */ (host.firstChild);
 
   // Manually set dimensions on the page
   this.node.style.width = this.size.width + 'px';
@@ -148,7 +148,9 @@ treesaver.layout.Page = function(content, grids, br) {
     this.ignore = true;
   }
   else {
-    // Export HTML
+    // Centers the page vertically with less work for us
+    treesaver.dimensions.setCssPx(this.node, 'marginTop', -this.size.outerH / 2);
+
     /**
      * @type {string}
      */
@@ -914,9 +916,6 @@ treesaver.layout.Page.prototype.activate = function() {
 
   // Re-hydrate the HTML
   this.node = treesaver.dom.createElementFromHTML(this.html);
-  // TODO: Do this directly on the node before storage?
-  this.node.style.top = '50%';
-  treesaver.dimensions.setCssPx(/** @type {!Element} */ (this.node), 'marginTop', -this.size.outerH / 2);
 
   // Flag
   this.active = true;

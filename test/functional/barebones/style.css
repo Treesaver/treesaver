@@ -1,11 +1,3 @@
-/* Used for temporary items that should never be visible */
-.offscreen {
-  position: absolute;
-  top: -200%;
-  right: -200%;
-  visibility: hidden;
-}
-
 /* Make sure seams aren't visible */
 .chrome, .viewer, .grid, .column {
   overflow: hidden;

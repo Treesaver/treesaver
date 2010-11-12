@@ -5,6 +5,7 @@
 goog.provide('treesaver.ui');
 
 goog.require('treesaver.debug');
+goog.require('treesaver.styles');
 goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.ArticleManager');
 goog.require('treesaver.ui.Chrome');
