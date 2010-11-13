@@ -206,6 +206,70 @@ treesaver.dimensions.setCssPx = function(el, propName, val) {
   return val;
 };
 
+/**
+ * Helper for setting the offset on an element, using CSS transforms if
+ * supported, absolute positioning if not
+ *
+ * @param {!Element} el
+ * @param {!number} x
+ */
+treesaver.dimensions.setOffsetX;
+
+/**
+ * Helper for setting the offset on an element, using CSS transforms if
+ * supported, absolute positioning if not
+ *
+ * @param {!Element} el
+ * @param {!number} y
+ */
+treesaver.dimensions.setOffsetY;
+
+if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) {
+  /**
+  * Helper for setting the transform property on an element
+  *
+  * @param {!Element} el
+  * @param {!string} val
+  */
+  treesaver.dimensions.setTransformProperty_ = function(el, val) {
+    // TODO: Detect once
+    if ('transformProperty' in el.style) {
+      el.style['transformProperty'] = val;
+    }
+    else {
+      el.style[treesaver.capabilities.domCSSPrefix + 'Transform'] = val;
+    }
+  };
+
+  if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D) {
+    treesaver.dimensions.setOffsetX = function(el, x) {
+      treesaver.dimensions.setTransformProperty_(el, 'translate3d(' + x + 'px,0,0)');
+    };
+
+    treesaver.dimensions.setOffsetY = function(el, y) {
+      treesaver.dimensions.setTransformProperty_(el, 'translate3d(0,' + y + 'px,0)');
+    };
+  }
+  else {
+    treesaver.dimensions.setOffsetX = function(el, x) {
+      treesaver.dimensions.setTransformProperty_(el, 'translateX(' + x + 'px)');
+    };
+
+    treesaver.dimensions.setOffsetY = function(el, y) {
+      treesaver.dimensions.setTransformProperty_(el, 'translateY(' + y + 'px)');
+    };
+  }
+}
+else {
+  // Fall back to absolute positioning
+  treesaver.dimensions.setOffsetX = function(el, x) {
+    treesaver.dimensions.setCssPx(el, 'left', x);
+  };
+
+  treesaver.dimensions.setOffsetY = function(el, y) {
+    treesaver.dimensions.setCssPx(el, 'top', y);
+  };
+}
 
 /**
  * Round up to the nearest multiple of the base number

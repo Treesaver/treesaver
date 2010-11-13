@@ -1433,35 +1433,10 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
   // Update position
   this.pages.forEach(function(page, i) {
     if (page && page.node) {
-      this.setPagePosition(page.node, this.pagePositions[i] + offset);
+      treesaver.dimensions.setOffsetX(page.node, this.pagePositions[i] + offset);
     }
   }, this);
 };
-
-/**
- * @param {!Element} node
- * @param {number} offset
- */
-treesaver.ui.Chrome.prototype.setPagePosition = function(node, offset) {
-  treesaver.dimensions.setCssPx(node, 'left', offset);
-}
-
-// Use CSS transforms when possible
-if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) {
-  treesaver.ui.Chrome.prototype.setPagePosition = function(node, offset) {
-    var cssVal = treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D ?
-      'translate3d(' + offset + 'px, 0, 0)' :
-      'translateX(' + offset + 'px)';
-
-    // TODO: Detect only once
-    if ('transformProperty' in node.style) {
-      node.style['transformProperty'] = cssVal;
-    }
-    else {
-      node.style[treesaver.capabilities.domCSSPrefix + 'Transform'] = cssVal;
-    }
-  }
-}
 
 /**
  * Update the display of fields like the page count
