@@ -124,6 +124,11 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
   // Construct
   this.fallback = new treesaver.layout.Block(fallbackNode, baseLineHeight, indices, true);
   this.fallback.figure = this;
+  // Set the figure on any child blocks
+  this.fallback.blocks.forEach(function(block) {
+    block.figure = this;
+    block.withinFallback = true;
+  }, this);
 
   // Remove the node
   parent.removeChild(fallbackNode);

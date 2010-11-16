@@ -592,6 +592,16 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
       // Avoid completely empty grids (will cause loops?)
       score = -Infinity;
     }
+    else if (!blockAdded && br.overhang) {
+      // Check if the current block that has overhang is actually a required fallback,
+      // in which case we penalize this grid for not finishing the required figure
+      block = content.blocks[br.index];
+      if ((block.isFallback || block.withinFallback) && !block.figure.optional) {
+        treesaver.debug.warn('No forward progress on required figure fallback');
+        // Must make forward progress on open required figure
+        score = -Infinity;
+      }
+    }
     else if (remaining_height > 0) {
       // Penalize for emptiness, based on percentage
       percentEmpty = remaining_height / cur.textHeight;

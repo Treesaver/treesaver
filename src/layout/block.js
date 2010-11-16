@@ -79,6 +79,8 @@ treesaver.layout.Block = function(node, baseLineHeight, indices, isFallback) {
   /** @type {boolean } */
   this.isFallback = false; // Set during process children
   /** @type {boolean } */
+  this.withinFallback = false; // Set during process children
+  /** @type {boolean } */
   this.containsFallback = false;
   /** @type {?treesaver.layout.Figure} */
   this.figure = null;
