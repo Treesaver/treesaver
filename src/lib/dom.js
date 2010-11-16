@@ -85,12 +85,7 @@ treesaver.dom.getElementsByClassName = function(className, root) {
   var result = [];
 
   // Use native functions whenever possible
-  if (!SUPPORT_LEGACY || 'getElementsByClassName' in root) {
-    result = treesaver.array.toArray(
-      root.getElementsByClassName(className)
-    );
-  }
-  else if (SUPPORT_IE && 'querySelectorAll' in root) {
+  if (!SUPPORT_LEGACY || 'querySelectorAll' in root) {
     // IE8 has QSA, but no getElementsByClassName
     result = treesaver.array.toArray(
       root.querySelectorAll('.' + className)
