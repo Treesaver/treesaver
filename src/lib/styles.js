@@ -31,22 +31,23 @@ if (treesaver.dom.getElementsByTagName('head').length) {
   // Offscreen
   treesaver.styles.insertRule('.offscreen',
     'position:absolute;top:-200%;right:-200%;visibility:hidden;');
-  // Grids
+  // Grids & Scrollers
   treesaver.styles.insertRule('.grid', 'top:50%');
   if (treesaver.capabilities.SUPPORTS_CSSTRANSITIONS) {
-    treesaver.styles.insertRule('.grid',
-      'transition:transform ease-out ' + MAX_ANIMATION_DURATION / 1000 + 's');
+    treesaver.styles.insertRule('.grid, .scroll-container',
+      'transition:transform cubic-bezier(0,0,0.25,1) ' + MAX_ANIMATION_DURATION / 1000 + 's');
     if (treesaver.capabilities.cssPrefix) {
-      treesaver.styles.insertRule('.grid',
+      treesaver.styles.insertRule('.grid, .scroll-container',
         treesaver.capabilities.cssPrefix + 'transition:' +
-        treesaver.capabilities.cssPrefix + 'transform ease-out ' +
+        treesaver.capabilities.cssPrefix + 'transform cubic-bezier(0,0,0.25,1) ' +
         MAX_ANIMATION_DURATION / 1000 + 's'
       );
     }
     if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D) {
-      treesaver.styles.insertRule('.grid', 'backface-visibility:hidden');
+      treesaver.styles.insertRule('.grid, .scroll-container',
+          'backface-visibility:hidden');
       if (treesaver.capabilities.cssPrefix) {
-        treesaver.styles.insertRule('.grid',
+        treesaver.styles.insertRule('.grid, .scroll-container',
           treesaver.capabilities.cssPrefix + 'backface-visibility:hidden');
       }
     }

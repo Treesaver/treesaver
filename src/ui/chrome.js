@@ -13,6 +13,7 @@ goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.template');
 goog.require('treesaver.ui.ArticleManager');
+goog.require('treesaver.ui.Scrollable');
 
 /**
  * Chrome
@@ -39,6 +40,15 @@ treesaver.ui.Chrome = function(node) {
    */
   this.requirements = treesaver.dom.hasAttr(node, 'data-requires') ?
     node.getAttribute('data-requires').split(' ') : null;
+
+  // Create DOM infrastructure for scrolling elements
+  treesaver.dom.getElementsByClassName('scroll', node).
+    forEach(treesaver.ui.Scrollable.initDom);
+
+  /**
+   * @type {Array.<Element>}
+   */
+  this.scrollers = [];
 
   /**
    * @type {?Element}
@@ -193,6 +203,11 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.nextArticle = treesaver.dom.getElementsByClassName('nextArticle', this.node);
     this.prevPage = treesaver.dom.getElementsByClassName('prev', this.node);
     this.prevArticle = treesaver.dom.getElementsByClassName('prevArticle', this.node);
+
+    this.scrollers = treesaver.dom.getElementsByClassName('scroll', this.node).
+      map(function(el) {
+        return new treesaver.ui.Scrollable(el);
+      });
 
     menus = treesaver.dom.getElementsByClassName('menu', this.node);
     if (menus.length > 0) {
@@ -668,9 +683,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     return;
   }
 
-
   this.touchData_ = {
-    move: false,
     startTime: goog.now(),
     deltaTime: 0,
     startX: e.touches[0].pageX,
@@ -681,8 +694,14 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     swipe: 0
   };
 
+  this.scrollers.forEach(function(s) {
+    if (s.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
+      this.touchData_.scroller = s;
+    }
+  }, this);
+
   // Pause other work for better swipe performance
-  //treesaver.scheduler.pause([], SWIPE_TIME_LIMIT);
+  treesaver.scheduler.pause([], SWIPE_TIME_LIMIT);
 };
 
 /**
@@ -694,10 +713,17 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  this.touchData_.move = true;
-  this.touchData_.deltaTime = goog.now() - this.touchData_.startTime;
-  this.touchData_.deltaX = e.touches[0].pageX - this.touchData_.startX;
-  this.touchData_.deltaY = e.touches[0].pageY - this.touchData_.startY;
+  if (!this.touchData_) {
+    // No touch info, nothing to do
+    return;
+  }
+
+  this.touchData_.lastMove = goog.now();
+  this.touchData_.lastX = e.touches[0].pageX;
+  this.touchData_.lastY = e.touches[0].pageY;
+  this.touchData_.deltaTime = this.touchData_.lastMove - this.touchData_.startTime;
+  this.touchData_.deltaX = this.touchData_.lastX - this.touchData_.startX;
+  this.touchData_.deltaY = this.touchData_.lastY - this.touchData_.startY;
   this.touchData_.touchCount = Math.min(e.touches.length, this.touchData_.touchCount);
   this.touchData_.swipe =
     // One-finger only
@@ -710,19 +736,24 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     Math.abs(this.touchData_.deltaX) < Math.abs(this.touchData_.deltaY) ? 0 :
     this.touchData_.deltaX < 0 ? -1 : 1;
 
-  // Don't follow finger when a native app in a older model
-  if (WITHIN_IOS_WRAPPER && window.TS_SLOW_DEVICE) {
-    // Nothing left to do but eye candy
-    return;
+  if (this.touchData_.scroller) {
+    this.touchData_.scroller.setOffset(this.touchData_.deltaX, -this.touchData_.deltaY);
   }
+  else {
+    // Don't follow finger when a native app in a older model
+    if (WITHIN_IOS_WRAPPER && window.TS_SLOW_DEVICE) {
+      // Nothing left to do but eye candy
+      return;
+    }
 
-  if (this.touchData_.swipe) {
-    this.pageOffset = this.touchData_.deltaX;
-    this._updatePagePositions(true);
-  }
-  else if (this.pageOffset) {
-    this.animationStart = goog.now();
-    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+    if (this.touchData_.swipe) {
+      this.pageOffset = this.touchData_.deltaX;
+      this._updatePagePositions(true);
+    }
+    else if (this.pageOffset) {
+      this.animationStart = goog.now();
+      this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+    }
   }
 };
 
@@ -741,9 +772,17 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   // Clear out touch data
   this.touchCancel(e);
 
-  if (touchData.touchCount === 1) {
+  if (!touchData) {
+    // No touch info, nothing to do
+    return;
+  }
+
+  if (touchData.scroller && touchData.lastMove) {
+    touchData.scroller.setOffset(touchData.deltaX, -touchData.deltaY, true);
+  }
+  else if (touchData.touchCount === 1) {
     // No move means we create a click
-    if (!touchData.move) {
+    if (!touchData.lastMove) {
       // Lightbox is honorary viewer
       var target = treesaver.ui.Chrome.findTarget_(e.target),
           withinViewer = this.lightBoxActive || this.viewer.contains(target);
@@ -809,7 +848,7 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
  */
 treesaver.ui.Chrome.prototype.touchCancel = function(e) {
   // Let the tasks begin again
-  //treesaver.scheduler.resume();
+  treesaver.scheduler.resume();
 
   this.touchData_ = null;
 };
@@ -1032,6 +1071,9 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
   // Update to our new page area
   this.calculatePageArea();
 
+  // Refresh the size of scrollable areas
+  this.scrollers.forEach(function(s) { s.refreshDimensions(); });
+
   if (treesaver.ui.ArticleManager.currentArticle) {
     // Re-query for pages later
     this.selectPagesDelayed();
@@ -1072,6 +1114,10 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
         }
       });
     }
+
+    // Refresh the size of scrollable areas (often used with TOC)
+    // TODO: Figure out better separate here?
+    this.scrollers.forEach(function(s) { s.refreshDimensions(); });
   }
 };
 
@@ -1437,7 +1483,7 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
   // Update position
   this.pages.forEach(function(page, i) {
     if (page && page.node) {
-      treesaver.dimensions.setOffsetX(page.node, this.pagePositions[i] + offset);
+      treesaver.dimensions.setOffset(page.node, this.pagePositions[i] + offset, 0);
     }
   }, this);
 };
