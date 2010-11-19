@@ -586,16 +586,6 @@ treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
     return true;
   }
 
-  var now = goog.now();
-
-  if (this.lastMouseWheel_ &&
-      (now - this.lastMouseWheel_ < MOUSE_WHEEL_INTERVAL)) {
-    // Ignore if too frequent (magic mouse)
-    return true;
-  }
-
-  this.lastMouseWheel_ = now;
-
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
@@ -603,24 +593,38 @@ treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
     return;
   }
 
-  // Firefox handles this differently than others
-  // http://adomas.org/javascript-mouse-wheel/
-  var delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0;
+  var now = goog.now();
 
-  if (delta) {
-    if (delta > 0) {
-      treesaver.ui.ArticleManager.previousPage();
-    }
-    else {
-      treesaver.ui.ArticleManager.nextPage();
-    }
-
-    // Mousewheel always deactivates UI
-    this.setUiIdle_();
-
-    e.preventDefault();
+  if (this.lastMouseWheel_ &&
+      (now - this.lastMouseWheel_ < MOUSE_WHEEL_INTERVAL)) {
+    // Ignore if too frequent (magic mouse)
     return;
   }
+
+  this.lastMouseWheel_ = now;
+
+  // Firefox handles this differently than others
+  // http://adomas.org/javascript-mouse-wheel/
+  var delta = e.wheelDelta ? e.wheelDelta : e.detail ? -e.detail : 0,
+      withinViewer = this.viewer.contains(treesaver.ui.Chrome.findTarget_(e.target));
+
+  if (!delta || !withinViewer) {
+    return;
+  }
+
+  // Handle the event
+  e.preventDefault();
+  e.stopPropagation();
+
+  if (delta > 0) {
+    treesaver.ui.ArticleManager.previousPage();
+  }
+  else {
+    treesaver.ui.ArticleManager.nextPage();
+  }
+
+  // Mousewheel always deactivates UI
+  this.setUiIdle_();
 };
 
 /**
