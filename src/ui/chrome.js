@@ -739,21 +739,13 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
   if (this.touchData_.scroller) {
     this.touchData_.scroller.setOffset(this.touchData_.deltaX, -this.touchData_.deltaY);
   }
-  else {
-    // Don't follow finger when a native app in a older model
-    if (WITHIN_IOS_WRAPPER && window.TS_SLOW_DEVICE) {
-      // Nothing left to do but eye candy
-      return;
-    }
-
-    if (this.touchData_.swipe) {
-      this.pageOffset = this.touchData_.deltaX;
-      this._updatePagePositions(true);
-    }
-    else if (this.pageOffset) {
-      this.animationStart = goog.now();
-      this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
-    }
+  else if (this.touchData_.swipe) {
+    this.pageOffset = this.touchData_.deltaX;
+    this._updatePagePositions(true);
+  }
+  else if (this.pageOffset) {
+    this.animationStart = goog.now();
+    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
   }
 };
 
