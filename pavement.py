@@ -200,6 +200,9 @@ def compile(args):
     if not options.build_dir.isdir():
         options.build_dir.makedirs()
 
+    version = sh('git describe --long --tags', capture=True).replace('\n', '')
+    tag = sh('git describe', capture=True).replace('\n', '')
+
     # Whether we should compile to a single file instead of modules
     is_single = '--single' in args or not options.modules_file.isfile()
 
@@ -212,7 +215,9 @@ def compile(args):
         # Don't leak global variables
         """--output_wrapper '(function(){ "use strict"; %output% }());'""",
         # Not sure why compiler doesn't do this automatically
-        '--define="COMPILED=true"'
+        '--define="COMPILED=true"',
+
+        '--define="TS_VERSION=\'%s\'"' % version
     ]
 
     if ('--nolegacy' in args):
