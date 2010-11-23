@@ -690,9 +690,12 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     startY: e.touches[0].pageY,
     deltaX: 0,
     deltaY: 0,
-    touchCount: e.touches.length,
-    swipe: 0
+    touchCount: e.touches.length
   };
+
+  if (this.touchData_.touchCount === 2) {
+    this.touchData_.startX2 = e.touches[1].pageX;
+  }
 
   this.scrollers.forEach(function(s) {
     if (s.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
@@ -746,6 +749,10 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
   else if (this.pageOffset) {
     this.animationStart = goog.now();
     this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+  }
+  else if (this.touchData_.touchCount === 2) {
+    // Track second finger changes
+    this.touchData_.deltaX2 = e.touches[1].pageX - this.touchData_.startX2;
   }
 };
 
@@ -829,8 +836,27 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
       // Nothing
     }
   }
-  else {
-    // TODO: Zoom gesture and two-finger swipe
+  else if (touchData.touchCount === 2) {
+    // Two finger swipe in the same direction is next/previous article
+    if (Math.abs(touchData.deltaX2) >= SWIPE_THRESHOLD) {
+      var articleChanged = false;
+
+      if (touchData.deltaX < 0 && touchData.deltaX2 < 0) {
+        articleChanged = treesaver.ui.ArticleManager.nextArticle();
+      }
+      else if (touchData.deltaX > 0 && touchData.deltaX2 > 0) {
+        articleChanged = treesaver.ui.ArticleManager.previousArticle();
+      }
+
+      if (!articleChanged) {
+        // Failed article change = Show UI
+        this.setUiActive_();
+      }
+      else {
+        // Success = Hide UI
+        this.setUiIdle_();
+      }
+    }
   }
 };
 
