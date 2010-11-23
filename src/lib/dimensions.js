@@ -229,6 +229,15 @@ treesaver.dimensions.setCssPx = function(el, propName, val) {
  */
 treesaver.dimensions.setOffset;
 
+/**
+ * Helper for setting the x-offset on an element, using CSS transforms if
+ * supported, absolute positioning if not
+ *
+ * @param {!Element} el
+ * @param {!number} x
+ */
+treesaver.dimensions.setOffsetX;
+
 if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) {
   /**
    * Helper for setting the transform property on an element
@@ -258,12 +267,22 @@ if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) {
         'translate(' + x + 'px,' + y + 'px)');
     };
   }
+
+  // Take the easy way out of setting the x offset
+  treesaver.dimensions.setOffsetX = function(el, x) {
+    treesaver.dimensions.setOffset(el, x, 0);
+  };
 }
 else {
   // Fall back to absolute positioning
   treesaver.dimensions.setOffset = function(el, x, y) {
     treesaver.dimensions.setCssPx(el, 'left', x);
     treesaver.dimensions.setCssPx(el, 'top', y);
+  };
+
+  // Take the easy way out of setting the x offset
+  treesaver.dimensions.setOffsetX = function(el, x) {
+    treesaver.dimensions.setCssPx(el, 'left', x);
   };
 }
 

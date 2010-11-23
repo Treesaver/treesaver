@@ -1500,7 +1500,7 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
   // Update position
   this.pages.forEach(function(page, i) {
     if (page && page.node) {
-      treesaver.dimensions.setOffset(page.node, this.pagePositions[i] + offset, 0);
+      treesaver.dimensions.setOffsetX(page.node, this.pagePositions[i] + offset);
     }
   }, this);
 };
