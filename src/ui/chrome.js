@@ -730,14 +730,11 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
   this.touchData_.touchCount = Math.min(e.touches.length, this.touchData_.touchCount);
   this.touchData_.swipe =
     // One-finger only
-    this.touchData_.touchCount > 1 ? 0 :
+    this.touchData_.touchCount === 1 &&
     // Finger has to move far enough
-    Math.abs(this.touchData_.deltaX) <= SWIPE_THRESHOLD ? 0 :
+    Math.abs(this.touchData_.deltaX) >= SWIPE_THRESHOLD &&
     // Within the time limit
-    this.touchData_.deltaTime > SWIPE_TIME_LIMIT ? 0 :
-    // And greater than the Y dimension
-    Math.abs(this.touchData_.deltaX) < Math.abs(this.touchData_.deltaY) ? 0 :
-    this.touchData_.deltaX < 0 ? -1 : 1;
+    this.touchData_.deltaTime < SWIPE_TIME_LIMIT;
 
   if (this.touchData_.scroller) {
     this.touchData_.scroller.setOffset(this.touchData_.deltaX, -this.touchData_.deltaY);
@@ -809,10 +806,12 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
       }
     }
     // Check for a swipe
-    else if (touchData.swipe) {
+    // Also allow for users to swipe down in order to go to next page. This is a
+    // common mistake made when users first interact with a paged UI
+    else if (touchData.swipe || touchData.deltaY <= -SWIPE_THRESHOLD) {
       var pageChanged = false;
 
-      if (touchData.deltaX < 0) {
+      if (touchData.deltaX < 0 || touchData.deltaY <= -SWIPE_THRESHOLD) {
         pageChanged = treesaver.ui.ArticleManager.nextPage();
       }
       else {
