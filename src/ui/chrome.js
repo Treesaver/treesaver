@@ -811,11 +811,11 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
     else if (touchData.swipe || touchData.deltaY <= -SWIPE_THRESHOLD) {
       var pageChanged = false;
 
-      if (touchData.deltaX < 0 || touchData.deltaY <= -SWIPE_THRESHOLD) {
-        pageChanged = treesaver.ui.ArticleManager.nextPage();
+      if (touchData.deltaX > 0) {
+        pageChanged = treesaver.ui.ArticleManager.previousPage();
       }
       else {
-        pageChanged = treesaver.ui.ArticleManager.previousPage();
+        pageChanged = treesaver.ui.ArticleManager.nextPage();
       }
 
       if (!pageChanged) {
