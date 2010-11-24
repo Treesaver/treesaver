@@ -206,7 +206,7 @@ def compile(args):
     # Whether we should compile to a single file instead of modules
     is_single = '--single' in args or not options.modules_file.isfile()
 
-    single_filename = 'treesaver-all.js'
+    single_filename = 'treesaver-all-%s.js' % tag
 
     compiler_flags = [
         '--compilation_level=ADVANCED_OPTIMIZATIONS',
@@ -296,6 +296,23 @@ def compile(args):
         options.closure_compiler,
         ' '.join(compiler_flags),
     ))
+
+    if not is_single:
+      for i, js_name in enumerate(compile_order):
+        target_name = "%s-%s.js" % (js_name[:-3], tag)
+
+        target_file = options.build_dir / target_name
+        js_file = options.build_dir / js_name
+
+        os.rename(js_file, target_file)
+
+        contents = target_file.text()
+
+        for i, source_name in enumerate(compile_order):
+          replacement_name = "%s-%s.js" % (source_name[:-3], tag)
+          contents = contents.replace(source_name, replacement_name)
+
+        target_file.write_text(contents)
 
     size()
 
