@@ -217,7 +217,7 @@ def compile(args):
         # Not sure why compiler doesn't do this automatically
         '--define="COMPILED=true"',
 
-        '--define="TS_VERSION=\'%s\'"' % version
+        '--define="treesaver.VERSION=\'%s\'"' % version
     ]
 
     if ('--nolegacy' in args):

@@ -88,13 +88,3 @@ var MOUSE_WHEEL_INTERVAL = 1500; // 1.5 seconds
  * @define {boolean}
  */
 var WITHIN_IOS_WRAPPER = false;
-
-/**
- * The version number of the code used to build a production
- * bundle.
- *
- * @define {string}
- */
-var TS_VERSION = 'dev';
-
-window['TS_VERSION'] = TS_VERSION;

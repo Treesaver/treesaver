@@ -25,3 +25,13 @@ if (treesaver.capabilities.SUPPORTS_TREESAVER) {
 else {
   treesaver.debug.warn('Treesaver not supported');
 }
+
+/**
+ * The version number of the code used to build a production
+ * bundle.
+ *
+ * @define {string}
+ */
+treesaver.VERSION = 'dev';
+
+goog.exportSymbol('treesaver.VERSION', treesaver.VERSION);
