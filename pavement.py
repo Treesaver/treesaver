@@ -201,7 +201,7 @@ def compile(args):
         options.build_dir.makedirs()
 
     version = sh('git describe --long --tags', capture=True).replace('\n', '')
-    tag = sh('git describe', capture=True).replace('\n', '')
+    tag = sh('git describe --abbrev=0', capture=True).replace('\n', '')
 
     # Whether we should compile to a single file instead of modules
     is_single = '--single' in args or not options.modules_file.isfile()
