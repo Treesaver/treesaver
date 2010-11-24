@@ -1122,9 +1122,13 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
     var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
         tocElements = treesaver.template.getElementsByBindName('article', null, this.toc);
 
+    tocEntries = tocEntries.filter(function(entry) {
+      return !entry.flags['hidden'];
+    });
+
     if (tocEntries.length === tocElements.length) {
       tocEntries.forEach(function(entry, index) {
-        if (entry.url === e.url) {
+        if (entry.fields.url === e.url) {
           treesaver.dom.addClass(tocElements[index], 'current');
         } else {
           treesaver.dom.removeClass(tocElements[index], 'current');
@@ -1312,10 +1316,14 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
         newToc = /** @type {!Element} */ (this.tocTemplate.cloneNode(true)),
         tocParent = this.toc.parentNode;
 
+    tocEntries = tocEntries.filter(function(entry) {
+      return !entry.flags['hidden'];
+    });
+
     // Format the TOC entries to fit our TOC template format.
     tocEntries = tocEntries.map(function(entry) {
       return {
-        'article': entry
+        'article': entry.fields
       };
     });
 

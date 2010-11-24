@@ -239,7 +239,8 @@ if (SUPPORT_MICRODATA) {
    */
   treesaver.microdata.getObject_ = function(item) {
     var result = {},
-        properties = {};
+        properties = {},
+        flags = {};
 
     if (item.itemType) {
       result['type'] = item.itemType;
@@ -247,6 +248,15 @@ if (SUPPORT_MICRODATA) {
     if (item.itemId) {
       result['id'] = item.itemId;
     }
+
+    if (treesaver.dom.hasAttr(item, 'data-properties')) {
+      item.getAttribute('data-properties').split(/\s+/g).
+        forEach(function(p) {
+          flags[p] = true;
+        });
+      result['flags'] = flags;
+    }
+
     item.properties.forEach(function(property) {
       var value = property.itemValue,
           names = [];
