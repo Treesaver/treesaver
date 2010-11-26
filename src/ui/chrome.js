@@ -479,11 +479,6 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     }
   }
 
-  // No real target, leave the event alone
-  if (el === document.body || el === document.documentElement) {
-    return;
-  }
-
   // Compiler cast
   el = /** @type {!Element} */ (el);
 
@@ -504,7 +499,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     withinCurrentPage = this.pages[1] && this.pages[1].node.contains(el);
 
     // Go up the tree and see if there's anything we want to process
-    while (!handled && el !== document.body) {
+    while (!handled && el && el !== treesaver.boot.tsContainer) {
       if (!withinCurrentPage) {
         if (treesaver.dom.hasClass(el, 'prev')) {
           treesaver.ui.ArticleManager.previousPage();
@@ -651,11 +646,11 @@ treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
  */
 treesaver.ui.Chrome.findTarget_ = function(node) {
   if (!node) {
-    node = document.body;
+    node = treesaver.boot.tsContainer;
   }
   else if (node.nodeType !== 1 && node.parentNode) {
     // Safari Bug that gives you textNode on events
-    node = node.parentNode || document.body;
+    node = node.parentNode || treesaver.boot.tsContainer;
   }
 
   // Cast for compiler
@@ -673,6 +668,10 @@ treesaver.ui.Chrome.prototype.touchData_;
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchStart = function(e) {
+  if (!treesaver.boot.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
+    return;
+  }
+
   // Do all the handling ourselves
   e.stopPropagation();
   e.preventDefault();
@@ -712,14 +711,14 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchMove = function(e) {
-  // Do all the handling ourselves
-  e.stopPropagation();
-  e.preventDefault();
-
   if (!this.touchData_) {
     // No touch info, nothing to do
     return;
   }
+
+  // Do all the handling ourselves
+  e.stopPropagation();
+  e.preventDefault();
 
   this.touchData_.lastMove = goog.now();
   this.touchData_.lastX = e.touches[0].pageX;
@@ -758,10 +757,6 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchEnd = function(e) {
-  // Do all the handling ourselves
-  e.stopPropagation();
-  e.preventDefault();
-
   // Hold onto a reference before clearing
   var touchData = this.touchData_;
 
@@ -772,6 +767,10 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
     // No touch info, nothing to do
     return;
   }
+
+  // Do all the handling ourselves
+  e.stopPropagation();
+  e.preventDefault();
 
   if (touchData.scroller && touchData.lastMove) {
     touchData.scroller.setOffset(touchData.deltaX, -touchData.deltaY, true);
@@ -891,7 +890,7 @@ treesaver.ui.Chrome.prototype.setUiActive_ = function() {
   this.uiActive = true;
   treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
 
-  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.ACTIVE);
+  treesaver.events.fireEvent(treesaver.ui.eventRoot, treesaver.ui.Chrome.events.ACTIVE);
 
   // Fire the idle event on a timer using debouncing, which delays
   // the function when receiving multiple calls
@@ -913,7 +912,7 @@ treesaver.ui.Chrome.prototype.setUiIdle_ = function() {
   this.uiActive = false;
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
 
-  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.IDLE);
+  treesaver.events.fireEvent(treesaver.ui.eventRoot, treesaver.ui.Chrome.events.IDLE);
 
   // Clear anything that might debounce
   treesaver.scheduler.clear('idletimer');

@@ -100,8 +100,11 @@ treesaver.boot.unload = function() {
   treesaver.debug.info('Treesaver unbooting');
 
   // Restore HTML
-  if (treesaver.boot.originalHtml_) {
-    document.body.innerHTML = treesaver.boot.originalHtml_;
+  if (!WITHIN_IOS_WRAPPER && treesaver.boot.inContainedMode) {
+    treesaver.boot.tsContainer.innerHTML = treesaver.boot.originalContainerHtml;
+  }
+  else if (treesaver.boot.originalHtml) {
+    treesaver.boot.tsContainer.innerHTML = treesaver.boot.originalHtml;
   }
 
   // First, do standard cleanup
@@ -142,9 +145,6 @@ treesaver.boot.cleanup_ = function() {
     delete treesaver.boot.uiLoaded_;
   }
   delete treesaver.boot.domReady_;
-
-  // Kill other data storage
-  delete treesaver.boot.originalHtml_;
 };
 
 /**
@@ -155,12 +155,29 @@ treesaver.boot.cleanup_ = function() {
 treesaver.boot.domReady = function(e) {
   treesaver.boot.domReady_ = true;
 
+  if (!WITHIN_IOS_WRAPPER) {
+    treesaver.boot.tsContainer = document.getElementById('ts_container');
+  }
+
+  if (!WITHIN_IOS_WRAPPER && treesaver.boot.tsContainer) {
+    // Is the treesaver display area contained within a portion of the page?
+    treesaver.boot.inContainedMode = true;
+    treesaver.boot.originalContainerHtml = treesaver.boot.tsContainer.innerHTML;
+  }
+  else {
+    treesaver.boot.inContainedMode = false;
+    treesaver.boot.tsContainer = document.body;
+  }
+
+  treesaver.boot.originalHtml = document.body.innerHTML;
+
   // Remove main content
-  treesaver.boot.originalHtml_ = treesaver.boot.cleanOriginalHtml_();
+  treesaver.dom.clearChildren(/** @type {!Element} */(treesaver.boot.tsContainer));
 
   if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // Place a loading message
-    document.body.innerHTML = '<div id="loading">Loading ' + document.title + '...</div>';
+    treesaver.boot.tsContainer.innerHTML =
+      '<div id="loading">Loading ' + document.title + '...</div>';
     // Re-enable content display
     document.documentElement.style.display = 'block';
   }
@@ -201,8 +218,6 @@ treesaver.boot.loadProgress_ = function() {
 
   treesaver.debug.info('Treesaver boot complete');
 
-  var html = treesaver.boot.originalHtml_;
-
   // Clean up handlers and timers
   treesaver.boot.cleanup_();
 
@@ -211,23 +226,6 @@ treesaver.boot.loadProgress_ = function() {
 
     // TODO: In compiled module mode, this function won't be visible ...
     // may need to export
-    treesaver.ui.load(html);
+    treesaver.ui.load();
   }
-};
-
-/**
- * Remove the original page content and return the HTML
- *
- * @private
- * @return {!string}
- */
-treesaver.boot.cleanOriginalHtml_ = function() {
-  var html = document.body.innerHTML;
-
-  if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
-    // TODO: Are there elements that should be retained?
-    treesaver.dom.clearChildren(/** @type {!Element} */(document.body));
-  }
-
-  return html;
 };

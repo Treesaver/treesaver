@@ -389,8 +389,11 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
       this.error = true;
 
       // Fire pagination error for logging
-      treesaver.events.fireEvent(document, treesaver.ui.Article.events.PAGINATIONERROR,
-          { article: this });
+      treesaver.events.fireEvent(
+        document,
+        treesaver.ui.Article.events.PAGINATIONERROR,
+        { article: this }
+      );
 
       // Put the error page in the collection
 
@@ -421,8 +424,11 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
       if (bg) {
         // Fire progress event, but only when async
         // TODO: Is this the right thing here?
-        treesaver.events.fireEvent(document, treesaver.ui.Article.events.PAGINATIONPROGRESS,
-            { article: this });
+        treesaver.events.fireEvent(
+          document,
+          treesaver.ui.Article.events.PAGINATIONPROGRESS,
+          { article: this }
+        );
 
         // Delay rest of pagination to make sure UI thread doesn't hang
         this.paginateAsync(treesaver.array.toArray(arguments));
@@ -435,8 +441,11 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
 
   // All done, fire completed event
   this.paginationComplete = true;
-  treesaver.events.fireEvent(document, treesaver.ui.Article.events.PAGINATIONPROGRESS,
-      { article: this, completed: true });
+  treesaver.events.fireEvent(
+    document,
+    treesaver.ui.Article.events.PAGINATIONPROGRESS,
+    { article: this, completed: true }
+  );
 };
 
 /**

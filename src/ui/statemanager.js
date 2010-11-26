@@ -38,7 +38,7 @@ treesaver.ui.StateManager.load = function() {
   };
 
   // Clean the body
-  treesaver.dom.clearChildren(/** @type {!Element} */ (document.body));
+  treesaver.dom.clearChildren(/** @type {!Element} */ (treesaver.boot.tsContainer));
 
   // Install container for chrome used to measure screen space, etc
   treesaver.ui.StateManager.state_.chromeContainer = treesaver.ui.StateManager.getChromeContainer_();
@@ -63,24 +63,26 @@ treesaver.ui.StateManager.load = function() {
   // Setup checkstate timer
   treesaver.scheduler.repeat(treesaver.ui.StateManager.checkState, CHECK_STATE_INTERVAL, Infinity, [], 'checkState');
 
-  if (treesaver.capabilities.SUPPORTS_ORIENTATION) {
-    treesaver.events.addListener(window, 'orientationchange', treesaver.ui.StateManager.onOrientationChange);
-  }
+  if (treesaver.capabilities.SUPPORTS_ORIENTATION && !treesaver.boot.inContainedMode) {
+    treesaver.events.addListener(window, 'orientationchange',
+      treesaver.ui.StateManager.onOrientationChange);
 
-  // Hide the address bar on iPhone
-  treesaver.scheduler.delay(function() {
-    // IE's window.scrollTo is some kind of weird function without an apply()
-    // so we have to wrap this call within a wrapper to avoid nasty errors
-    window.scrollTo(0, 1);
-  }, 100);
+    // Hide the address bar on iPhone
+    treesaver.scheduler.delay(function() {
+      // IE's window.scrollTo is some kind of weird function without an apply()
+      // so we have to wrap this call within a wrapper to avoid nasty errors
+      window.scrollTo(0, 1);
+    }, 100);
+  }
 
   return true;
 };
 
 treesaver.ui.StateManager.unload = function() {
   // Remove handler
-  if (treesaver.capabilities.SUPPORTS_ORIENTATION) {
-    treesaver.events.removeListener(window, 'orientationchange', treesaver.ui.StateManager.onOrientationChange);
+  if (treesaver.capabilities.SUPPORTS_ORIENTATION && !treesaver.boot.inContainedMode) {
+    treesaver.events.removeListener(window, 'orientationchange',
+      treesaver.ui.StateManager.onOrientationChange);
   }
 
   // Deactive any active chrome
@@ -99,10 +101,15 @@ treesaver.ui.StateManager.unload = function() {
  * @return {!Element}
  */
 treesaver.ui.StateManager.getChromeContainer_ = function() {
-  var container = document.createElement('div');
-  container.setAttribute('id', 'chromeContainer');
-  document.body.appendChild(container);
-  return container;
+  if (treesaver.boot.inContainedMode) {
+    return treesaver.boot.tsContainer;
+  }
+  else {
+    var container = document.createElement('div');
+    container.setAttribute('id', 'chromeContainer');
+    treesaver.boot.tsContainer.appendChild(container);
+    return container;
+  }
 };
 
 /**
@@ -218,23 +225,28 @@ treesaver.ui.StateManager.onOrientationChange = function() {
  * @return {{ w: number, h: number }}
  */
 treesaver.ui.StateManager.getAvailableSize_ = function() {
-  if (window.pageYOffset || window.pageXOffset) {
-    window.scrollTo(0, 1);
-  }
+  if (WITHIN_IOS_WRAPPER || !treesaver.boot.inContainedMode) {
+    if (window.pageYOffset || window.pageXOffset) {
+      window.scrollTo(0, 1);
+    }
 
-  // IE9+ and all other browsers
-  if (!SUPPORT_IE || 'innerWidth' in window) {
-    return {
-      w: window.innerWidth,
-      h: window.innerHeight
-    };
+    // IE9+ and all other browsers
+    if (!SUPPORT_IE || 'innerWidth' in window) {
+      return {
+        w: window.innerWidth,
+        h: window.innerHeight
+      };
+    }
+    else {
+      // IE8-
+      return {
+        w: document.documentElement.clientWidth,
+        h: document.documentElement.clientHeight
+      };
+    }
   }
   else {
-    // IE8-
-    return {
-      w: document.documentElement.clientWidth,
-      h: document.documentElement.clientHeight
-    };
+    return treesaver.dimensions.getSize(treesaver.boot.tsContainer);
   }
 };
 
