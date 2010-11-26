@@ -231,7 +231,7 @@ def compile(args):
         compiler_flags.append('--define="SUPPORT_LEGACY=false"')
         compiler_flags.append('--define="WITHIN_IOS_WRAPPER=true"')
         is_single = True
-        single_filename = 'treesaver-all-ios.js'
+        single_filename = 'treesaver-all-ios-%s.js' % tag
 
     # Make pretty output for debug mode
     if '--debug' in args:
