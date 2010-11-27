@@ -1128,7 +1128,7 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
 
     if (tocEntries.length === tocElements.length) {
       tocEntries.forEach(function(entry, index) {
-        if (entry.fields.url === e.url) {
+        if (entry.fields['url'] === e.url) {
           treesaver.dom.addClass(tocElements[index], 'current');
         } else {
           treesaver.dom.removeClass(tocElements[index], 'current');

@@ -374,13 +374,13 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     // data-properties=self is used by the TOC to indicate its position in the article
     // order. Make sure to use the TOC url we already computed in order to avoid
     // duplicates such as '/' and '/index.html'.
-    if (item.flags.hasOwnProperty('self')) {
+    if (item.flags['self']) {
       url = toc_url;
       item.fields.url = toc_url;
       foundTOC = true;
     }
     else {
-      url = treesaver.network.absoluteURL(item.fields.url);
+      url = treesaver.network.absoluteURL(item.fields['url']);
     }
 
     article = treesaver.ui.ArticleManager.articles[url];
@@ -389,7 +389,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     // Have we seen this URL before?
     if (!article) {
       // Have not seen the url, create a new article and store
-      article = new treesaver.ui.Article(url, item.fields.title || '', treesaver.ui.ArticleManager.grids_);
+      article = new treesaver.ui.Article(url, item.fields['title'] || '', treesaver.ui.ArticleManager.grids_);
       treesaver.ui.ArticleManager.articles[url] = article;
     }
 
