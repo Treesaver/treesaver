@@ -931,6 +931,19 @@ treesaver.layout.Page.prototype.deactivate = function() {
   this.node = null;
 };
 
+/**
+ * Clone this page.
+ * @return {!treesaver.layout.Page} A clone of this page
+ */
+treesaver.layout.Page.prototype.clone = function() {
+  var p = Object.clone(this);
+  // We override the properties that are different by creating a clone
+  // and setting those properties explicitly.
+  p.node = /** @type {!Element} */ (this.node && this.node.cloneNode(true) || null);
+  p.active = this.active;
+  return /** @type {!treesaver.layout.Page} */ (p);
+};
+
 if (goog.DEBUG) {
   treesaver.layout.Page.prototype.toString = function() {
     return "[Page]";

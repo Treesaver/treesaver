@@ -738,7 +738,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
       startIndex,
       pageCount = 2 * buffer + 1,
       missingPageCount,
-      i, len;
+      i, j, len;
 
   // What is the base page?
   if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
@@ -835,6 +835,15 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
     // Set only if it's a real page
     treesaver.ui.ArticleManager.currentPageWidth =
       treesaver.ui.ArticleManager.currentArticle.getPageWidth();
+  }
+
+  // Clone any duplicates so we always have unique nodes
+  for (i = 0; i < pages.length; i += 1) {
+    for (j = 0; j < pages.length; j += 1) {
+      if (i !== j && pages[i] === pages[j]) {
+        pages[j] = pages[i].clone();
+      }
+    }
   }
 
   return pages;
