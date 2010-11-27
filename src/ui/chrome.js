@@ -1340,8 +1340,10 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
     // because we receive the article changed event (which is
     // normally used to update the active TOC) before the TOC
     // changed event.
-    this.updateTOCActive({
-      url: treesaver.ui.ArticleManager.currentArticle.url
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
+      article: treesaver.ui.ArticleManager.currentArticle,
+      'url': treesaver.ui.ArticleManager.currentArticle.url,
+      'path': treesaver.ui.ArticleManager.currentArticle.path
     });
   }
 };
