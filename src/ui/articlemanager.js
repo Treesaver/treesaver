@@ -839,8 +839,8 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
 
   // Clone any duplicates so we always have unique nodes
   for (i = 0; i < pages.length; i += 1) {
-    for (j = 0; j < pages.length; j += 1) {
-      if (i !== j && pages[i] === pages[j]) {
+    for (j = i + 1; j < pages.length; j += 1) {
+      if (pages[i] === pages[j]) {
         pages[j] = pages[i].clone();
       }
     }
