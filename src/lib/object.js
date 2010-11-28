@@ -29,3 +29,17 @@ if (!Object.isObject) {
     return Object.prototype.toString.apply(value) === '[object Object]';
   };
 }
+
+/**
+ * Clone an object by creating a new object and
+ * setting its prototype to the original object.
+ *
+ * @param {!Object} o The object to be cloned.
+ * @return {!Object} A clone of the given object.
+ */
+Object.clone = function(o) {
+  /** @constructor */
+  function Clone() {}
+  Clone.prototype = o;
+	return new Clone();
+};

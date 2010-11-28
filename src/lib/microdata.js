@@ -242,11 +242,11 @@ if (SUPPORT_MICRODATA) {
         properties = {},
         flags = {};
 
-    if (item.itemType) {
-      result['type'] = item.itemType;
+    if (item['itemType']) {
+      result.type = item['itemType'];
     }
-    if (item.itemId) {
-      result['id'] = item.itemId;
+    if (item['itemId']) {
+      result.id = item['itemId'];
     }
 
     if (treesaver.dom.hasAttr(item, 'data-properties')) {
@@ -254,28 +254,28 @@ if (SUPPORT_MICRODATA) {
         forEach(function(p) {
           flags[p] = true;
         });
-      result['flags'] = flags;
+      result.flags = flags;
     }
 
     item.properties.forEach(function(property) {
-      var value = property.itemValue,
+      var value = property['itemValue'],
           names = [];
 
       // If value is an item (i.e. value has an itemScope attribute)
-      if (value.itemScope) {
+      if (value['itemScope']) {
         value = treesaver.microdata.getObject_(value);
       }
 
-      names = property.itemProp.split(/\s+/g);
+      names = property['itemProp'].split(/\s+/g);
 
       names.forEach(function(n) {
-        if (!properties.hasOwnProperty(n)) {
+        if (!properties[n]) {
           properties[n] = [];
         }
         properties[n].push(value);
       });
     });
-    result['properties'] = properties;
+    result.properties = properties;
     return result;
   };
 

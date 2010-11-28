@@ -1127,7 +1127,7 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
 
     if (tocEntries.length === tocElements.length) {
       tocEntries.forEach(function(entry, index) {
-        if (entry.fields.url === e.url) {
+        if (entry.fields['url'] === e.url && index === treesaver.ui.ArticleManager.currentArticleIndex) {
           treesaver.dom.addClass(tocElements[index], 'current');
         } else {
           treesaver.dom.removeClass(tocElements[index], 'current');
@@ -1339,8 +1339,10 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
     // because we receive the article changed event (which is
     // normally used to update the active TOC) before the TOC
     // changed event.
-    this.updateTOCActive({
-      url: treesaver.ui.ArticleManager.currentArticle.url
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
+      article: treesaver.ui.ArticleManager.currentArticle,
+      'url': treesaver.ui.ArticleManager.currentArticle.url,
+      'path': treesaver.ui.ArticleManager.currentArticle.path
     });
   }
 };

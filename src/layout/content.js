@@ -109,7 +109,7 @@ treesaver.layout.Content = function(el) {
         keys = Object.keys(scope);
 
     keys.forEach(function(key) {
-      if (!this.fields.hasOwnProperty(key)) {
+      if (!this.fields[key]) {
         this.fields[key] = scope[key];
         treesaver.debug.info('Field found --- ' + key + ': ' + scope[key].toString());
       }

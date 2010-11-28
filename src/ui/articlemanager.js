@@ -374,13 +374,13 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     // data-properties=self is used by the TOC to indicate its position in the article
     // order. Make sure to use the TOC url we already computed in order to avoid
     // duplicates such as '/' and '/index.html'.
-    if (item.flags.hasOwnProperty('self')) {
+    if (item.flags['self']) {
       url = toc_url;
       item.fields.url = toc_url;
       foundTOC = true;
     }
     else {
-      url = treesaver.network.absoluteURL(item.fields.url);
+      url = treesaver.network.absoluteURL(item.fields['url']);
     }
 
     article = treesaver.ui.ArticleManager.articles[url];
@@ -389,7 +389,7 @@ treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
     // Have we seen this URL before?
     if (!article) {
       // Have not seen the url, create a new article and store
-      article = new treesaver.ui.Article(url, item.fields.title || '', treesaver.ui.ArticleManager.grids_);
+      article = new treesaver.ui.Article(url, item.fields['title'] || '', treesaver.ui.ArticleManager.grids_);
       treesaver.ui.ArticleManager.articles[url] = article;
     }
 
@@ -738,7 +738,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
       startIndex,
       pageCount = 2 * buffer + 1,
       missingPageCount,
-      i, len;
+      i, j, len;
 
   // What is the base page?
   if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
@@ -835,6 +835,15 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
     // Set only if it's a real page
     treesaver.ui.ArticleManager.currentPageWidth =
       treesaver.ui.ArticleManager.currentArticle.getPageWidth();
+  }
+
+  // Clone any duplicates so we always have unique nodes
+  for (i = 0; i < pages.length; i += 1) {
+    for (j = 0; j < pages.length; j += 1) {
+      if (i !== j && pages[i] === pages[j]) {
+        pages[j] = pages[i].clone();
+      }
+    }
   }
 
   return pages;

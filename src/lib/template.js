@@ -76,7 +76,7 @@ treesaver.template.expandObject_ = function(view, scope) {
         keyName = key;
       }
 
-      if (view.hasOwnProperty(keyName)) {
+      if (view[keyName]) {
         value = view[keyName];
 
         if (Array.isArray(value)) {
