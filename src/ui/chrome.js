@@ -1120,21 +1120,19 @@ treesaver.ui.Chrome.prototype.updatePageURL = function(e) {
 treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
   if (this.toc) {
     var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
-        tocElements = treesaver.template.getElementsByBindName('article', null, this.toc);
+        tocElements = treesaver.template.getElementsByBindName('article', null, this.toc),
+        i = 0;
 
-    tocEntries = tocEntries.filter(function(entry) {
-      return !entry.flags['hidden'];
-    });
-
-    if (tocEntries.length === tocElements.length) {
-      tocEntries.forEach(function(entry, index) {
-        if (entry.fields['url'] === e.url && index === treesaver.ui.ArticleManager.currentArticleIndex) {
-          treesaver.dom.addClass(tocElements[index], 'current');
+    tocEntries.forEach(function(entry, index) {
+      if (!entry.flags['hidden'] && tocElements[i]) {
+        if (index === treesaver.ui.ArticleManager.currentArticleIndex) {
+          treesaver.dom.addClass(tocElements[i], 'current');
         } else {
-          treesaver.dom.removeClass(tocElements[index], 'current');
+          treesaver.dom.removeClass(tocElements[i], 'current');
         }
-      });
-    }
+        i += 1;
+      }
+    });
 
     // Refresh the size of scrollable areas (often used with TOC)
     // TODO: Figure out better separate here?
