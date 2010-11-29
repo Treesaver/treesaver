@@ -13,7 +13,7 @@ $(function () {
       };
 
       // Set the initial url of the article manager
-      treesaver.ui.ArticleManager.initialUrl = document.location.href;
+      treesaver.ui.ArticleManager.initialUrl = treesaver.network.stripHash(document.location.href);
     },
     teardown: function () {
       $('.testonly').remove();
@@ -24,10 +24,10 @@ $(function () {
   });
 
   test('getTOCLocation', function () {
-    var root = /http:\/\/[^\/]*\//.exec(document.location.href),
+    var root = /http:\/\/[^\/]*\//.exec(treesaver.network.stripHash(document.location.href)),
         basename = /^(.*)\/[^\/]*$/.exec(document.location.pathname)[1].substr(1) ;
 
-    equals(treesaver.ui.ArticleManager.getTOCLocation(), document.location.href, 'Non-existant <link> uses current document');
+    equals(treesaver.ui.ArticleManager.getTOCLocation(), treesaver.network.stripHash(document.location.href), 'Non-existant <link> uses current document');
 
     // OK, now add a <link> that points here
     $('<link rel="contents" href="http://test.com/" class="testonly" />').appendTo($('head'));
@@ -43,11 +43,11 @@ $(function () {
     equals(treesaver.ui.ArticleManager.getTOCLocation(), root + basename + '/hello', 'Relative path');
 
     $('link[rel*=contents]').attr('rel', 'self contents');
-    equals(treesaver.ui.ArticleManager.getTOCLocation(), document.location.href, 'Self overrides href');
+    equals(treesaver.ui.ArticleManager.getTOCLocation(), treesaver.network.stripHash(document.location.href), 'Self overrides href');
   });
 
   test('findTOCLinks', function () {
-    var root = /http:\/\/[^\/]*\//.exec(document.location.href),
+    var root = /http:\/\/[^\/]*\//.exec(treesaver.network.stripHash(document.location.href)),
         basename = /^(.*)\/[^\/]*$/.exec(document.location.pathname)[1].substr(1),
         urls = ['http://example.com/', '/', '/hello', '', '/'],
         html,
@@ -81,7 +81,7 @@ $(function () {
     equals(treesaver.ui.ArticleManager.articleOrder.length, 5, 'Duplicate URLs inserted twice');
     equals(treesaver.ui.ArticleManager.currentArticleIndex, 3, 'Current Index');
     same(treesaver.ui.ArticleManager.articleMap['http://example.com/'], [0], 'Absolute URL positions');
-    same(treesaver.ui.ArticleManager.articleMap[document.location.href], [3], 'Current URL positions');
+    same(treesaver.ui.ArticleManager.articleMap[treesaver.network.stripHash(document.location.href)], [3], 'Current URL positions');
     same(treesaver.ui.ArticleManager.articleMap[root], [1, 4], 'Duplicate URLs positions');
     equals(treesaver.ui.ArticleManager.articleOrder[0].url, 'http://example.com/', 'Absolute URL correct');
     equals(treesaver.ui.ArticleManager.articleOrder[1].url, root, 'Root URL correct');
@@ -94,7 +94,7 @@ $(function () {
   });
 
   test('getArticleIndex / previousArticle / nextArticle', function () {
-    var root = /http:\/\/[^\/]*\//.exec(document.location.href),
+    var root = /http:\/\/[^\/]*\//.exec(treesaver.network.stripHash(document.location.href)),
         basename = /^(.*)\/[^\/]*$/.exec(document.location.pathname)[1].substr(1),
         urls = ['http://example.com/', '/', '/hello', 'example.html', '/'],
         html,
