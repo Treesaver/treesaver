@@ -251,7 +251,9 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
   }
 
   // Round to nearest for column adjustment to maintain grid
-  containerHeight = treesaver.dimensions.roundUp(containerHeight, lineHeight || 1);
+  if (lineHeight && containerHeight % lineHeight) {
+    containerHeight = treesaver.dimensions.roundUp(containerHeight, lineHeight);
+  }
 
   // Go through this containers siblings, adjusting their sizes
   sibling = container;
