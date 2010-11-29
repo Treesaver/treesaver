@@ -64,8 +64,9 @@ $(function () {
     html += $(div).html();
 
     // Make sure loaded event fires
-    treesaver.events.addListener(document, treesaver.ui.ArticleManager.events.TOCUPDATED, function () {
+    treesaver.events.addListener(document, treesaver.ui.ArticleManager.events.TOCUPDATED, function handler() {
       ok(true, 'TOC Loaded event received');
+      treesaver.events.removeListener(document, treesaver.ui.ArticleManager.events.TOCUPDATED, handler);
       start();
     });
 
@@ -86,7 +87,7 @@ $(function () {
     equals(treesaver.ui.ArticleManager.articleOrder[1].url, root, 'Root URL correct');
 
     // Make sure loaded event fires
-    stop(1000);
+    stop(4000);
   });
 
   test('loadingPage', function () {

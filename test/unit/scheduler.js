@@ -3,6 +3,7 @@ goog.require('treesaver.scheduler');
 $(function() {
   module("scheduler", {
     setup: function () {
+      treesaver.scheduler.stopAll();
     },
     teardown: function () {
       treesaver.scheduler.stopAll();

@@ -4,8 +4,10 @@ goog.require('treesaver.scheduler');
 $(function() {
   module('network', {
     setup: function () {
+      treesaver.scheduler.stopAll();
     },
     teardown: function () {
+      treesaver.scheduler.stopAll();
     }
   });
 
@@ -16,7 +18,7 @@ $(function() {
       ok(true, 'Callback received');
       ok(text, 'Text received');
       start();
-    });
+    }, 3000);
   });
 
   test('get 404', function () {
@@ -26,7 +28,7 @@ $(function() {
       ok(true, 'Callback received on 404');
       ok(!text, 'No text received on 404');
       start();
-    });
+    }, 3000);
   });
 
   //test('xhrGet X-domain', function () {

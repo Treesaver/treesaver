@@ -3,6 +3,7 @@ goog.require('treesaver.resources');
 $(function() {
   module('resources', {
     setup: function () {
+      treesaver.scheduler.stopAll();
       jQuery('<link rel="resources" href="../assets/resources.html" />').appendTo(document.documentElement);
     },
     teardown: function () {
@@ -43,6 +44,7 @@ $(function() {
 
   test('findByClassName', function () {
     stop(2000);
+    expect(3);
     treesaver.resources.load(function () {
       equals(treesaver.resources.findByClassName('chrome').length, 1, 'Find resource by class');
       ok(treesaver.resources.findByClassName('grid').length, 'Grids found');
