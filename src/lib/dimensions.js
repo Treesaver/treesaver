@@ -48,8 +48,8 @@ treesaver.dimensions.inSizeRange = function(range, size) {
 
   // Use minW/minH for Metrics, w/h for a range
   // TODO: Make this consistent
-  var w = 'minW' in range ? range.minW : range.w,
-      h = 'minH' in range ? range.minH : range.h;
+  var w = (range.minW || range.minW === 0) ? range.minW : range.w,
+      h = (range.minH || range.minH === 0) ? range.minH : range.h;
 
   return size.w >= w && size.h >= h &&
     size.w <= range.maxW && size.h <= range.maxH;
