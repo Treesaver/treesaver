@@ -37,7 +37,7 @@ treesaver.dimensions.number = /^-?\d/;
 /**
  * Whether the given size fits within the bounds set by the range
  *
- * @param {treesaver.dimensions.SizeRange} range
+ * @param {treesaver.dimensions.SizeRange|treesaver.dimensions.Metrics} range
  * @param {treesaver.dimensions.Size} size
  * @return {boolean} True if both dimensions are within the min and max.
  */
@@ -46,10 +46,13 @@ treesaver.dimensions.inSizeRange = function(range, size) {
     return false;
   }
 
-  return size.w >= range.minW && size.h >= range.minH &&
-    // If Max isn't set, assume Infinity
-    (!range.maxW || size.w <= range.maxW) &&
-    (!range.maxH || size.h <= range.maxH);
+  // Use minW/minH for Metrics, w/h for a range
+  // TODO: Make this consistent
+  var w = 'minW' in range ? range.minW : range.w,
+      h = 'minH' in range ? range.minH : range.h;
+
+  return size.w >= w && size.h >= h &&
+    size.w <= range.maxW && size.h <= range.maxH;
 };
 
 /**
