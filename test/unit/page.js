@@ -259,8 +259,8 @@ $(function () {
           index: 1,
           blocks: [],
           metrics: {
-            height: 500,
-            outerHeight: 500,
+            h: 500,
+            outerH: 500,
             bpBottom: 0,
             lineHeight: 20
           }
@@ -275,7 +275,7 @@ $(function () {
     equals(br.index, 1, 'Perfect fit: br.index');
 
     // Simple overhang
-    block.metrics.height = block.metrics.outerHeight = 600;
+    block.metrics.h = block.metrics.outerH = 600;
     height = 600;
     result = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
     equals(br.overhang, 100, 'Simple overhang: overhang');
@@ -283,7 +283,7 @@ $(function () {
     equals(br.index, 1, 'Simple overhang: br.index');
 
     // Simple underhang
-    block.metrics.height = block.metrics.outerHeight = 400;
+    block.metrics.h = block.metrics.outerH = 400;
     height = 400;
     result = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
     equals(br.overhang, 0, 'Simple underhang: overhang');
@@ -292,7 +292,7 @@ $(function () {
 
     // Overhang with simple multiple
     block.metrics.lineHeight = 40;
-    block.metrics.height = block.metrics.outerHeight = 600;
+    block.metrics.h = block.metrics.outerH = 600;
     height = 600;
     result = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
     equals(br.overhang, 120, 'Simple multiple: overhang');
@@ -304,14 +304,14 @@ $(function () {
     // be no overhang
     block.metrics.lineHeight = 20;
     block.metrics.bpBottom = 100;
-    block.metrics.height = 500;
+    block.metrics.h = 500;
     result = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
     equals(br.overhang, 0, 'BP-only overhang: overhang');
     equals(result, 500, 'BP-only overhang: colHeight');
     equals(br.index, 2, 'BP-only overhang: br.index');
 
     // Huge BP as overhang, should be no different than a small one
-    block.metrics.height = block.metrics.bpBottom = 300;
+    block.metrics.h = block.metrics.bpBottom = 300;
     result = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
     equals(br.overhang, 0, 'Huge BP-only overhang: overhang');
     equals(result, 500, 'Huge BP-only overhang: colHeight');
@@ -321,8 +321,8 @@ $(function () {
     br.index = 1;
     block.metrics.lineHeight = 80;
     block.metrics.bpBottom = 60;
-    block.metrics.outerHeight = height = 620;
-    block.metrics.height = 560;
+    block.metrics.outerH = height = 620;
+    block.metrics.h = 560;
     result = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
     equals(br.overhang, 140, 'Mis-sync BP overhang: overhang');
     equals(result, 480, 'Mis-sync BP overhang: colHeight');
@@ -332,8 +332,8 @@ $(function () {
     br.index = 1;
     block.metrics.lineHeight = 20;
     block.metrics.bpBottom = 60;
-    block.metrics.outerHeight = 460;
-    block.metrics.height = 400;
+    block.metrics.outerH = 460;
+    block.metrics.h = 400;
     height = 550;
     result = treesaver.layout.Page.computeOverhang(br, block, colHeight, height);
     equals(br.overhang, 0, 'Parent-only BP overhang: overhang');

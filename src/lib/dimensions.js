@@ -63,18 +63,14 @@ treesaver.dimensions.mergeSizeRange = function(a, b, outer) {
   a = a || {};
   b = b || {};
 
-  var bpHeight = outer ? b.bpHeight ||
-        (b.outerHeight ? b.outerHeight - b.h : 0) : 0,
-      bpWidth = outer ? b.bpWidth ||
-        (b.outerWidth ? b.outerWidth - b.w : 0) : 0;
+  var bpHeight = outer ? b.bpHeight || (b.outerH ? b.outerH - b.h : 0) : 0,
+      bpWidth = outer ? b.bpWidth || (b.outerW ? b.outerW - b.w : 0) : 0;
 
   return {
     w: Math.max(a.w || 0, (b.w + bpWidth) || 0),
     h: Math.max(a.h || 0, (b.h + bpHeight) || 0),
-    maxW: Math.min(a.maxW || Infinity,
-        b.maxW + bpWidth || Infinity),
-    maxH: Math.min(a.maxH || Infinity,
-        b.maxH + bpHeight || Infinity)
+    maxW: Math.min(a.maxW || Infinity, b.maxW + bpWidth || Infinity),
+    maxH: Math.min(a.maxH || Infinity, b.maxH + bpHeight || Infinity)
   };
 };
 
@@ -92,8 +88,6 @@ treesaver.dimensions.toPixels = function(el, val) {
 
   return null;
 };
-
-
 
 /**
  * Return the computedStyle object, which varies based on
