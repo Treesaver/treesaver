@@ -67,12 +67,12 @@ treesaver.ui.Chrome = function(node) {
   this.size = new treesaver.dimensions.Metrics(node);
 
   // Clean up metrics object
-  delete this.size.width;
-  delete this.size.height;
+  delete this.size.w;
+  delete this.size.h;
 
   /**
    * The area available to pages (i.e. the size of the viewer)
-   * @type {treesaver.dimensions.Size}
+   * @type {?treesaver.dimensions.Size}
    */
   this.pageArea = null;
 

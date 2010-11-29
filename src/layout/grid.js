@@ -71,12 +71,12 @@ treesaver.layout.Grid = function(node) {
   // Flex grids get stretched later
   this.stretchedSize = this.size = new treesaver.dimensions.Metrics(node);
   if (!this.flexible) {
-    this.size.minH = this.size.height;
-    this.size.minW = this.size.width;
+    this.size.minH = this.size.h;
+    this.size.minW = this.size.w;
   }
   else {
     // Use width instead of minWidth
-    this.size.minW = Math.max(this.size.minW || 0, this.size.width);
+    this.size.minW = Math.max(this.size.minW || 0, this.size.w);
   }
   // Line height needs to be set for stretch sizing ...
   // TODO: What's a reasonable back-up value here?
@@ -108,12 +108,12 @@ treesaver.layout.Grid = function(node) {
    */
   this.cols = [];
   treesaver.dom.getElementsByClassName('column', node).forEach(function(colNode) {
-    var cur = new treesaver.layout.Column(colNode, this.size.height);
+    var cur = new treesaver.layout.Column(colNode, this.size.h);
     this.cols.push(cur);
 
     // Calculate total height
-    this.textHeight += cur.height;
-    this.maxColHeight = Math.max(this.maxColHeight, cur.height);
+    this.textHeight += cur.h;
+    this.maxColHeight = Math.max(this.maxColHeight, cur.h);
 
     // Confirm column width
     if (!this.colWidth) {
@@ -131,7 +131,7 @@ treesaver.layout.Grid = function(node) {
    */
   this.containers = [];
   treesaver.dom.getElementsByClassName('container', node).forEach(function(containerNode) {
-    var cur = new treesaver.layout.Container(containerNode, this.size.height);
+    var cur = new treesaver.layout.Container(containerNode, this.size.h);
     this.containers.push(cur);
   }, this);
 
@@ -215,8 +215,8 @@ treesaver.layout.Grid.prototype.stretch = function(totalHeight) {
   this.textHeight = 0;
   // Stretch columns and compute new heights
   this.cols.forEach(function(col) {
-    this.textHeight += col.stretch(finalHeight).height;
-    this.maxColHeight = Math.max(this.maxColHeight, col.height);
+    this.textHeight += col.stretch(finalHeight).h;
+    this.maxColHeight = Math.max(this.maxColHeight, col.h);
   }, this);
 
   // Stretch containers
@@ -225,7 +225,7 @@ treesaver.layout.Grid.prototype.stretch = function(totalHeight) {
   }, this);
 
   this.stretchedSize = this.size.clone();
-  this.stretchedSize.height = finalHeight;
+  this.stretchedSize.h = finalHeight;
   this.stretchedSize.outerH = finalHeight + this.size.bpHeight;
 
   // Max
@@ -248,8 +248,8 @@ treesaver.layout.Grid.prototype.stretch = function(totalHeight) {
 treesaver.layout.Grid.sort = function(a, b) {
   // Sort by column and container count, descending
   // Note: Grids should be stretched beforehand
-  return (b.size.width + 20 * b.containers.length) -
-    (a.size.width + 20 * a.containers.length);
+  return (b.size.w + 20 * b.containers.length) -
+    (a.size.w + 20 * a.containers.length);
 };
 
 /**
@@ -364,7 +364,7 @@ treesaver.layout.Grid.prototype.mapContainers = function(content, br) {
           // Fixed containers should know better than to specify
           // a size that doesn't fit
           if (container.flexible && figureSize.minH &&
-              figureSize.minH > container.height) {
+              figureSize.minH > container.h) {
             // This size won't work, go to the next
             continue size_loop;
           }

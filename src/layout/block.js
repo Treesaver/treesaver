@@ -641,6 +641,9 @@ treesaver.layout.Block.normalizeMetrics_ = function(node, baseLineHeight) {
       metrics.borderBottom);
   }
 
+  // (Potentially) changed padding and line-height, so update outerH
+  metrics.outerH = treesaver.dimensions.getOffsetHeight(node);
+
   // Sanity check to make sure something out of our control isn't
   // happening
   if (metrics.outerH % baseLineHeight) {

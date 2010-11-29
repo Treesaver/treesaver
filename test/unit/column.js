@@ -16,17 +16,17 @@ $(function() {
 
     ok(col, 'Object constructed');
     ok(!col.flexible, 'Fixed flag detected');
-    equals(col.height, 550, 'Height computed');
+    equals(col.h, 550, 'Height computed');
     equals(col.minH, 200, 'Height computed');
     equals(col.delta, 250, 'Computed delta');
 
     col.stretch(1000);
-    equals(col.height, 550, 'Fixed column does not stretch');
+    equals(col.h, 550, 'Fixed column does not stretch');
 
     col.flexible = true;
 
     col.stretch(1000);
-    equals(col.height, 750, 'Flexible column stretches');
+    equals(col.h, 750, 'Flexible column stretches');
 
     document.body.removeChild(colNode);
   });

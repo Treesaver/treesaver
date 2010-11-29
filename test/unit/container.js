@@ -16,17 +16,17 @@ $(function() {
 
     ok(container, 'Object constructed');
     ok(!container.flexible, 'Fixed flag detected');
-    equals(container.height, 550, 'Height computed');
+    equals(container.h, 550, 'Height computed');
     equals(container.delta, 250, 'Computed delta');
     equals(container.sizes.length, 3, 'Sizes array');
 
     container.stretch(1000);
-    equals(container.height, 550, 'Fixed container does not stretch');
+    equals(container.h, 550, 'Fixed container does not stretch');
 
     container.flexible = true;
 
     container.stretch(1000);
-    equals(container.height, 750, 'Flexible container stretches');
+    equals(container.h, 750, 'Flexible container stretches');
 
     document.body.removeChild(containerNode);
   });

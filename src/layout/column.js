@@ -36,12 +36,12 @@ treesaver.layout.Column = function(el, gridHeight) {
   /**
    * @type {number}
    */
-  this.height = d.outerH;
+  this.h = d.outerH;
 
   /**
    * @type {number}
    */
-  this.delta = Math.max(0, gridHeight - this.height);
+  this.delta = Math.max(0, gridHeight - this.h);
 };
 
 /**
@@ -53,13 +53,13 @@ treesaver.layout.Column.prototype.stretch = function stretchColumn(gridHeight) {
     return this;
   }
 
-  this.height = Math.max(0, gridHeight - this.delta);
+  this.h = Math.max(0, gridHeight - this.delta);
 
   return this;
 };
 
 if (goog.DEBUG) {
   treesaver.layout.Column.prototype.toString = function toString() {
-    return '[Column ' + this.height + '/' + this.delta + ']';
+    return '[Column ' + this.h + '/' + this.delta + ']';
   };
 }

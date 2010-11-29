@@ -64,8 +64,8 @@ treesaver.layout.Page = function(content, grids, br) {
   this.node = /** @type {!Element} */ (host.firstChild);
 
   // Manually set dimensions on the page
-  this.node.style.width = this.size.width + 'px';
-  this.node.style.height = this.size.height + 'px';
+  treesaver.dimensions.setCssPx(this.node, 'width', this.size.w);
+  treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
   // Fill in fields
   Object.keys(content.fields || {}).forEach(function(key) {
@@ -108,10 +108,10 @@ treesaver.layout.Page = function(content, grids, br) {
 
         // Size to the container
         if (i === 0 && best.grid.scoringFlags['sizetocontainer']) {
-          this.size.height = treesaver.dimensions.getOffsetHeight(containerNode) +
+          this.size.h = treesaver.dimensions.getOffsetHeight(containerNode) +
             best.grid.containers[0].delta;
-          this.size.outerH = this.size.height + this.size.bpHeight;
-          this.node.style.height = this.size.height + 'px';
+          this.size.outerH = this.size.h + this.size.bpHeight;
+          treesaver.dimensions.setCssPx(/** @type {!Element} */ (this.node), 'height', this.size.h);
         }
       }
       else {
@@ -279,7 +279,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
       if (treesaver.dimensions.getOffsetHeight(sibling) <= containerHeight) {
         treesaver.debug.info('Sibling shrunk to zero height: ' + sibling);
         // TODO: Remove from tree?
-        sibling.style.height = 0;
+        treesaver.dimensions.setCssPx(sibling, 'height', 0);
       }
       else {
         // Since items are always absolutely positioned, we can
@@ -764,7 +764,7 @@ treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, min
   }
 
   // Do a tight fix on the column height
-  node.style.height = colHeight + 'px';
+  treesaver.dimensions.setCssPx(node, 'height', colHeight);
 
   // Join string array and insert into column node
   node.innerHTML = blockStrings.join("");
@@ -873,7 +873,7 @@ treesaver.layout.Page.computeOverhang = function(br, lastBlock, colHeight, heigh
     // Calculate where the line boundaries occur, and figure out if
     // it's in sync with the clip point.
     // Then check to make sure that's a multiple of line height
-    excess = (lastBlock.metrics.height - contentOnlyOverhang) %
+    excess = (lastBlock.metrics.h - contentOnlyOverhang) %
              lastBlock.metrics.lineHeight;
 
     // NOTE: Excess can be larger than the entire block in cases

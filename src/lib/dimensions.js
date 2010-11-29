@@ -17,7 +17,7 @@ treesaver.dimensions.Size;
 /**
  * Alias for SizeRange type
  *
- * @typedef {{ width: number, height: number, maxW: number, maxH: number }}
+ * @typedef {{ w: number, h: number, maxW: number, maxH: number }}
  */
 treesaver.dimensions.SizeRange;
 
@@ -64,13 +64,13 @@ treesaver.dimensions.mergeSizeRange = function(a, b, outer) {
   b = b || {};
 
   var bpHeight = outer ? b.bpHeight ||
-        (b.outerHeight ? b.outerHeight - b.height : 0) : 0,
+        (b.outerHeight ? b.outerHeight - b.h : 0) : 0,
       bpWidth = outer ? b.bpWidth ||
-        (b.outerWidth ? b.outerWidth - b.width : 0) : 0;
+        (b.outerWidth ? b.outerWidth - b.w : 0) : 0;
 
   return {
-    width: Math.max(a.width || 0, (b.width + bpWidth) || 0),
-    height: Math.max(a.height || 0, (b.height + bpHeight) || 0),
+    w: Math.max(a.w || 0, (b.w + bpWidth) || 0),
+    h: Math.max(a.h || 0, (b.h + bpHeight) || 0),
     maxW: Math.min(a.maxW || Infinity,
         b.maxW + bpWidth || Infinity),
     maxH: Math.min(a.maxH || Infinity,
@@ -362,12 +362,12 @@ treesaver.dimensions.Metrics = function(el) {
   this.bpWidth = this.bpLeft + this.bpRight;
 
   // Outer Width & Height
-  this.outerW = el.offsetWidth;
-  this.outerH = el.offsetHeight;
+  this.outerW = treesaver.dimensions.getOffsetWidth(el);
+  this.outerH = treesaver.dimensions.getOffsetHeight(el);
 
   // Inner Width & Height
-  this.width = this.outerW - this.bpWidth;
-  this.height = this.outerH - this.bpHeight;
+  this.w = this.outerW - this.bpWidth;
+  this.h = this.outerH - this.bpHeight;
 
   // Min & Max : Width & Height
   this.minW = treesaver.dimensions.toPixels(el, style.minWidth) || 0;
@@ -420,6 +420,6 @@ treesaver.dimensions.Metrics.prototype.clone = function() {
 
 if (goog.DEBUG) {
   treesaver.dimensions.Metrics.prototype.toString = function() {
-    return '[Metrics: ' + this.width + 'x' + this.height + ']';
+    return '[Metrics: ' + this.w + 'x' + this.h + ']';
   };
 }

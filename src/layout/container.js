@@ -36,12 +36,12 @@ treesaver.layout.Container = function(el, gridHeight) {
   /**
    * @type {number}
    */
-  this.height = d.outerH;
+  this.h = d.outerH;
 
   /**
    * @type {number}
    */
-  this.delta = Math.max(0, gridHeight - this.height);
+  this.delta = Math.max(0, gridHeight - this.h);
 
   var sizesProperty = el.getAttribute('data-sizes');
 
@@ -60,13 +60,13 @@ treesaver.layout.Container.prototype.stretch = function stretchContainer(gridHei
     return this;
   }
 
-  this.height = Math.max(0, gridHeight - this.delta);
+  this.h = Math.max(0, gridHeight - this.delta);
 
   return this;
 };
 
 if (goog.DEBUG) {
   treesaver.layout.Container.prototype.toString = function toString() {
-    return '[Container ' + this.height + '/' + this.delta + ']';
+    return '[Container ' + this.h + '/' + this.delta + ']';
   };
 }

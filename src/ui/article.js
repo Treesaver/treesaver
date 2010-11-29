@@ -105,6 +105,7 @@ treesaver.ui.Article = function(url, title, grids, html) {
 
   /**
    * Constraint ...
+   * @type {?treesaver.dimensions.SizeRange}
    */
   this.constraint = null;
 
@@ -292,7 +293,8 @@ treesaver.ui.Article.prototype.setMaxPageSize = function(size) {
     this.maxPageSize = size;
 
     // Check if all the pages of our content will fit at this size
-    this.paginationClean = treesaver.dimensions.inSizeRange(this.constraint, size);
+    this.paginationClean =
+      treesaver.dimensions.inSizeRange(/** @type {!treesaver.dimensions.SizeRange} */ (this.constraint), size);
   }
 
   return !this.paginationClean;
@@ -412,7 +414,7 @@ treesaver.ui.Article.prototype.paginate = function(bg, index, pos) {
 
     // Update page constraint
     this.constraint =
-      treesaver.dimensions.mergeSizeRange(this.constraint, page.size, true);
+      treesaver.dimensions.mergeSizeRange(/** @type {!treesaver.dimensions.SizeRange} */ (this.constraint), page.size, true);
 
     if (index && this.pageCount <= index ||
         pos && ((pos === treesaver.layout.ContentPosition.END) || !pos.lessOrEqual(page.end))) {
@@ -464,7 +466,7 @@ treesaver.ui.Article.prototype.paginateAsync = function(args) {
  */
 treesaver.ui.Article.prototype.getPageWidth = function() {
   if (this.constraint) {
-    return this.constraint.width;
+    return this.constraint.w;
   }
 
   return 0;

@@ -1,3 +1,7 @@
+.testonly {
+  visibility: hidden;
+}
+
 .column {
   line-height: 20px;
 }
