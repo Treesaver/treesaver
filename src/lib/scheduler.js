@@ -252,7 +252,8 @@ treesaver.scheduler.limit = function(fun, interval, args, name, obj) {
 treesaver.scheduler.pause = function(whitelist, timeout) {
   treesaver.scheduler.taskWhitelist_ = whitelist;
   if (timeout) {
-    setTimeout(treesaver.scheduler.resume, timeout);
+    treesaver.scheduler.pauseTimeoutId_ =
+      setTimeout(treesaver.scheduler.resume, timeout);
   }
 };
 
@@ -261,6 +262,10 @@ treesaver.scheduler.pause = function(whitelist, timeout) {
  */
 treesaver.scheduler.resume = function() {
   treesaver.scheduler.taskWhitelist_ = null;
+  if (treesaver.scheduler.pauseTimeoutId_) {
+    window.clearTimeout(treesaver.scheduler.pauseTimeoutId_);
+    treesaver.scheduler.pauseTimeoutId_ = null;
+  }
 };
 
 /**
@@ -288,9 +293,11 @@ treesaver.scheduler.stopAll = function() {
     window.clearInterval(treesaver.scheduler.tickID_);
   }
 
+  // Clear out any timeout
+  treesaver.scheduler.resume();
+
   // Clear data stores
   treesaver.scheduler.tickID_ = null;
   treesaver.scheduler.tasks_ = [];
   treesaver.scheduler.namedTasks_ = {};
-  treesaver.scheduler.taskWhitelist_ = null;
 };
