@@ -703,7 +703,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
   }, this);
 
   // Pause other work for better swipe performance
-  treesaver.scheduler.pause([], SWIPE_TIME_LIMIT);
+  treesaver.scheduler.pause([], 2 * SWIPE_TIME_LIMIT);
 };
 
 /**
@@ -731,9 +731,7 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     // One-finger only
     this.touchData_.touchCount === 1 &&
     // Finger has to move far enough
-    Math.abs(this.touchData_.deltaX) >= SWIPE_THRESHOLD &&
-    // Within the time limit
-    this.touchData_.deltaTime < SWIPE_TIME_LIMIT;
+    Math.abs(this.touchData_.deltaX) >= SWIPE_THRESHOLD;
 
   if (this.touchData_.scroller) {
     this.touchData_.scroller.setOffset(this.touchData_.deltaX, -this.touchData_.deltaY);
