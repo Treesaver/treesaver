@@ -890,7 +890,7 @@ treesaver.ui.Chrome.prototype.setUiActive_ = function() {
   this.uiActive = true;
   treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
 
-  treesaver.events.fireEvent(treesaver.ui.eventRoot, treesaver.ui.Chrome.events.ACTIVE);
+  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.ACTIVE);
 
   // Fire the idle event on a timer using debouncing, which delays
   // the function when receiving multiple calls
@@ -912,7 +912,7 @@ treesaver.ui.Chrome.prototype.setUiIdle_ = function() {
   this.uiActive = false;
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
 
-  treesaver.events.fireEvent(treesaver.ui.eventRoot, treesaver.ui.Chrome.events.IDLE);
+  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.IDLE);
 
   // Clear anything that might debounce
   treesaver.scheduler.clear('idletimer');
