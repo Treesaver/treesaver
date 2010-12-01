@@ -302,3 +302,35 @@ treesaver.ui.StateManager.checkState = function() {
     treesaver.ui.StateManager.state_.chrome.setSize(availSize);
   }
 };
+
+// Expose special functions for use by the native app wrappers
+if (WITHIN_IOS_WRAPPER) {
+  // UI is shown/hidden based on the active and idle events fired by the
+  // currently visible chrome.
+  //
+  // Since the next/prev, etc controls are contained within external UI,
+  // need to expose functions that both go to next/prev and fire active
+  //
+  // Create a wrapper function that calls active on the current chrome
+  // before calling the actual function
+  var activeFunctionWrapper = function(f) {
+    return (function() {
+      // Manually call the chrome's function, if it exists
+      if (treesaver.ui.StateManager.state_.chrome) {
+        treesaver.ui.StateManager.state_.chrome.setUiActive_();
+      }
+
+      // Call original function
+      f();
+    });
+  };
+
+  goog.exportSymbol('treesaver.nextPage',
+    activeFunctionWrapper(treesaver.ui.ArticleManager.nextPage));
+  goog.exportSymbol('treesaver.previousPage',
+    activeFunctionWrapper(treesaver.ui.ArticleManager.previousPage));
+  goog.exportSymbol('treesaver.nextArticle',
+    activeFunctionWrapper(treesaver.ui.ArticleManager.nextArticle));
+  goog.exportSymbol('treesaver.previousArticle',
+    activeFunctionWrapper(treesaver.ui.ArticleManager.previousArticle));
+}
