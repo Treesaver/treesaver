@@ -885,6 +885,10 @@ treesaver.ui.Chrome.prototype.mouseOver = function(e) {
  * @private
  */
 treesaver.ui.Chrome.prototype.setUiActive_ = function() {
+  if (this.uiActive) {
+    return;
+  }
+
   this.uiActive = true;
   treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
 
@@ -907,6 +911,10 @@ treesaver.ui.Chrome.prototype.setUiActive_ = function() {
  * @private
  */
 treesaver.ui.Chrome.prototype.setUiIdle_ = function() {
+  if (!this.uiActive) {
+    return;
+  }
+
   this.uiActive = false;
   treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
 
