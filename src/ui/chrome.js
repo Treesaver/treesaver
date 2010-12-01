@@ -757,7 +757,9 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
  */
 treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   // Hold onto a reference before clearing
-  var touchData = this.touchData_;
+  var touchData = this.touchData_,
+      // Flag to track whether we need to reset positons, etc
+      actionTaken = false;
 
   // Clear out touch data
   this.touchCancel(e);
@@ -802,24 +804,22 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
         // Otherwise, active
         this.setUiActive_();
       }
+
+      // Counts as handling
+      actionTaken = true;
     }
     // Check for a swipe
     // Also allow for users to swipe down in order to go to next page. This is a
     // common mistake made when users first interact with a paged UI
     else if (touchData.swipe || touchData.deltaY <= -SWIPE_THRESHOLD) {
-      var pageChanged = false;
-
       if (touchData.swipe && touchData.deltaX > 0) {
-        pageChanged = treesaver.ui.ArticleManager.previousPage();
+        actionTaken = treesaver.ui.ArticleManager.previousPage();
       }
       else {
-        pageChanged = treesaver.ui.ArticleManager.nextPage();
+        actionTaken = treesaver.ui.ArticleManager.nextPage();
       }
 
-      if (!pageChanged) {
-        this.animationStart = goog.now();
-        this.pageOffset = 0;
-        this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+      if (!actionTaken) {
         // Failed page turn = Show UI
         this.setUiActive_();
       }
@@ -828,24 +828,21 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
         this.setUiIdle_();
       }
     }
-    // No swipe and no tap, do nothing
     else {
-      // Nothing
+      // No swipe and no tap, do nothing
     }
   }
   else if (touchData.touchCount === 2) {
     // Two finger swipe in the same direction is next/previous article
     if (Math.abs(touchData.deltaX2) >= SWIPE_THRESHOLD) {
-      var articleChanged = false;
-
       if (touchData.deltaX < 0 && touchData.deltaX2 < 0) {
-        articleChanged = treesaver.ui.ArticleManager.nextArticle();
+        actionTaken = treesaver.ui.ArticleManager.nextArticle();
       }
       else if (touchData.deltaX > 0 && touchData.deltaX2 > 0) {
-        articleChanged = treesaver.ui.ArticleManager.previousArticle();
+        actionTaken = treesaver.ui.ArticleManager.previousArticle();
       }
 
-      if (!articleChanged) {
+      if (!actionTaken) {
         // Failed article change = Show UI
         this.setUiActive_();
       }
@@ -854,6 +851,13 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
         this.setUiIdle_();
       }
     }
+  }
+
+  // Reset page position, if applicable
+  if (!actionTaken) {
+    this.animationStart = goog.now();
+    this.pageOffset = 0;
+    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
   }
 };
 
