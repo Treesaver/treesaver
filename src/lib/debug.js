@@ -55,7 +55,7 @@ treesaver.debug.info = function(msg) {
       treesaver.debug.messageQueue_.push(msg);
     }
     else if ('info' in window.console) {
-      window.console.info(msg);
+      window.console['info'](msg);
     }
     else {
       window.console.log(msg);
@@ -75,7 +75,7 @@ treesaver.debug.log = function(msg) {
       treesaver.debug.messageQueue_.push(msg);
     }
     else if ('debug' in window.console) {
-      window.console.debug(msg);
+      window.console['debug'](msg);
     }
     else {
       window.console.log(msg);
@@ -95,7 +95,7 @@ treesaver.debug.warn = function(msg) {
       treesaver.debug.messageQueue_.push(msg);
     }
     else if ('warn' in window.console) {
-      window.console.warn(msg);
+      window.console['warn'](msg);
     }
     else {
       window.console.log(msg);
@@ -115,7 +115,7 @@ treesaver.debug.error = function(msg) {
       treesaver.debug.messageQueue_.push(msg);
     }
     else if ('error' in window.console) {
-      window.console.error(msg);
+      window.console['error'](msg);
     }
     else {
       window.console.log(msg);
