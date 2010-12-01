@@ -237,6 +237,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
     }, this);
 
     // Always start off active
+    this.uiActive = false; // Set to false to force event firing
     this.setUiActive_();
   }
 
@@ -885,14 +886,13 @@ treesaver.ui.Chrome.prototype.mouseOver = function(e) {
  * @private
  */
 treesaver.ui.Chrome.prototype.setUiActive_ = function() {
-  if (this.uiActive) {
-    return;
+  // Don't fire events needlessly
+  if (!this.uiActive) {
+    this.uiActive = true;
+    treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
+
+    treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.ACTIVE);
   }
-
-  this.uiActive = true;
-  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'active');
-
-  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.ACTIVE);
 
   // Fire the idle event on a timer using debouncing, which delays
   // the function when receiving multiple calls
@@ -911,14 +911,13 @@ treesaver.ui.Chrome.prototype.setUiActive_ = function() {
  * @private
  */
 treesaver.ui.Chrome.prototype.setUiIdle_ = function() {
-  if (!this.uiActive) {
-    return;
+  // Don't fire events unless needed
+  if (this.uiActive) {
+    this.uiActive = false;
+    treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
+
+    treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.IDLE);
   }
-
-  this.uiActive = false;
-  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'active');
-
-  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.IDLE);
 
   // Clear anything that might debounce
   treesaver.scheduler.clear('idletimer');
