@@ -92,6 +92,7 @@ treesaver.capabilities.IS_IE8INIE7 = SUPPORT_IE &&
  * @type {boolean}
  */
 treesaver.capabilities.IS_MOBILE = WITHIN_IOS_WRAPPER ||
+  treesaver.capabilities.BROWSER_OS === 'android' ||
   /mobile/.test(treesaver.capabilities.ua_);
 
 /**
