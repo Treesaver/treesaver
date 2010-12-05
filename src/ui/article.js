@@ -184,7 +184,8 @@ treesaver.ui.Article.prototype.processHTML = function(html) {
   fake_grid.innerHTML = html;
 
   // Look for just the content node
-  article_node = treesaver.dom.getElementsByTagName('article', fake_grid)[0];
+  article_node = document.getElementById('ts_content') ||
+                 treesaver.dom.getElementsByTagName('article', fake_grid)[0];
 
   if (!article_node) {
     treesaver.debug.error('Could not find article content in HTML: ' + html);
