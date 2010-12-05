@@ -7,18 +7,7 @@ goog.provide('treesaver.html5');
 
 goog.require('treesaver.constants');
 
-// Use eval because Closure Compiler strips out comments
-if (SUPPORT_IE && eval('/*@cc_on!@*/0')) {
-  (function() {
-    var els = ['abbr', 'article', 'aside', 'audio', 'canvas', 'details',
-               'figcaption', 'figure', 'footer', 'header', 'hgroup',
-               'mark', 'meter', 'nav', 'output', 'progress', 'section',
-               'summary', 'time', 'video'],
-        i;
-
-    // HTML5 shiv for IE, hat tip Resig: http://ejohn.org/blog/html5-shiv/
-    for (i = els.length - 1; i >= 0; i -= 1) {
-      document.createElement(els[i]);
-    }
-  }());
+if (SUPPORT_IE) {
+  // HTML5 shim, courtesy of: https://github.com/lindsayevans/html5-shiv
+  eval("/*@cc_on (function(a,b,c){while(b--)a.createElement(c[b])})(document,21,['abbr','article','aside','audio','canvas','details','figcaption','figure','footer','header','hgroup','mark','menu','meter','nav','output','progress','section','summary','time','video'])@*/");
 }
