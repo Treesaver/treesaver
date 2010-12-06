@@ -413,6 +413,7 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
     case 34: // PageUp
     case 39: // Right && down
     case 40:
+    case 74: // j
     case 32: // Space
       treesaver.ui.ArticleManager.nextPage();
       break;
@@ -420,7 +421,16 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
     case 33: // PageDown
     case 37: // Left & up
     case 38:
+    case 75: // k
       treesaver.ui.ArticleManager.previousPage();
+      break;
+
+    case 72: // h
+      treesaver.ui.ArticleManager.previousArticle();
+      break;
+
+    case 76: // l
+      treesaver.ui.ArticleManager.nextArticle();
       break;
 
     default: // Let the event through if not handled
