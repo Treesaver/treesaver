@@ -327,8 +327,9 @@ treesaver.network.makeRequestId_ = function(request) {
 treesaver.network.createHandler_ = function createHandler_(request) {
   return function() {
     if (request.xhr.readyState === 4) {
-      // The hosted UIWebView gives us a status of 0 for some reason
-      if ((WITHIN_IOS_WRAPPER && request.xhr.status === 0) ||
+      // Requests from local file system give 0 status
+      // This happens in IOS wrapper, as well as packaged Chrome web store
+      if (request.xhr.status === 0 ||
           (request.xhr.status === 200 || request.xhr.status === 304)) {
         treesaver.debug.info('XHR response from: ' + request.url);
         request.callback(request.xhr.responseText, request.url);
