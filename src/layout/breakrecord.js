@@ -205,6 +205,21 @@ treesaver.layout.BreakRecord.prototype.useFigure = function(figureIndex) {
 };
 
 /**
+ * Update the break record in order to delay a figure
+ *
+ * @param {!number} figureIndex
+ */
+treesaver.layout.BreakRecord.prototype.delayFigure = function(figureIndex) {
+  if (this.delayed.indexOf(figureIndex) === -1) {
+    // Pretend the figure was used
+    this.useFigure(figureIndex);
+
+    // But move it into the delayed array
+    this.delayed.push(figureIndex);
+  }
+};
+
+/**
  * Check if the given figure index has been used
  *
  * @param {!number} figureIndex

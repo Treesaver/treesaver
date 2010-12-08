@@ -117,8 +117,16 @@ treesaver.layout.Page = function(content, grids, br) {
       else {
         treesaver.debug.info('Container failure, figureIndex: ' + figureIndex);
 
-        // TODO: Note more info about failure?
-        br.failedFigure(figureIndex);
+        // TODO: Note more info about failure? E.g. target size and actual size, etc
+        if (!figure.optional && figure.fallback) {
+          // Required figures with fallbacks must be preserved, delay instead of
+          // failing
+          // TODO: How to make sure we don't continually re-try the delayed figure?
+          br.delayFigure(figure.figureIndex);
+        }
+        else {
+          br.failedFigure(figureIndex);
+        }
 
         // Remove node for easier styling
         containerNode.parentNode.removeChild(containerNode);
@@ -549,7 +557,7 @@ treesaver.layout.Page.fillColumn = function(content, br, node, maxColHeight, min
             //
             // TODO: What if it was failed? We'll be placing it in the
             // wrong array
-            br.delayed.push(parent.figure.figureIndex);
+            br.delayFigure(parent.figure.figureIndex);
           }
 
           // Move up one level
