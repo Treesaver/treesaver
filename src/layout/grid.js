@@ -588,18 +588,24 @@ treesaver.layout.Grid.best = function(content, grids, breakRecord) {
     } // block_loop
 
     // Check for forward progress
-    if (!blockAdded && !filledContainerCount) {
-      // Avoid completely empty grids (will cause loops?)
-      score = -Infinity;
-    }
-    else if (!blockAdded && br.overhang) {
-      // Check if the current block that has overhang is actually a required fallback,
-      // in which case we penalize this grid for not finishing the required figure
-      block = content.blocks[br.index];
-      if ((block.isFallback || block.withinFallback) && !block.figure.optional) {
-        treesaver.debug.warn('No forward progress on required figure fallback');
-        // Must make forward progress on open required figure
+    if (!blockAdded) {
+      if (!filledContainerCount) {
+        // Avoid completely empty grids (will cause loops?)
         score = -Infinity;
+      }
+      else {
+        // The current/next block
+        block = content.blocks[br.index];
+
+        // Is this block part of a fallback for a required figure?
+        if (block && block.figure && !block.figure.optional) {
+          // If so, check if we've already started displaying the fallback for this figure
+          if (br.overhang || block.withinFallback) {
+            treesaver.debug.warn('No forward progress on required figure fallback');
+            // Must make forward progress on open required figure, penalize severely
+            score = -Infinity;
+          }
+        }
       }
     }
     else if (remaining_height > 0) {
