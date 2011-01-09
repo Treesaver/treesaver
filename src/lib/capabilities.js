@@ -154,6 +154,7 @@ treesaver.capabilities.BROWSER_NAME = (function() {
  *   - linux
  *   - iphone
  *   - ipad
+ *   - ipod
  *   - android
  *   - unknown
  *
@@ -161,8 +162,8 @@ treesaver.capabilities.BROWSER_NAME = (function() {
  * @type {string}
  */
 treesaver.capabilities.BROWSER_OS =
-  (/(android|ipad|iphone|win|mac|linux)/.
-  exec(treesaver.capabilities.platform_))[0] || 'unknown';
+  (/(android|ipad|iphone|ipod|win|mac|linux)/.
+  exec(treesaver.capabilities.platform_) || ['unknown'])[0];
 
 /**
  * Browser engine prefix for non-standard CSS properties
