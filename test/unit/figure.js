@@ -100,7 +100,7 @@ $(function () {
     else {
       ok(figure.sizes['two'][0] === figure.sizes['one'][0], 'Data-requires failure on no legacy');
     }
-    equals(figure.sizes['four'].length, 2, 'Transient capability figureSizes preserved');
+    equals(figure.sizes['four'].length, 2, 'Mutable capability figureSizes preserved');
   });
 
   test('Figure - Flags', function() {

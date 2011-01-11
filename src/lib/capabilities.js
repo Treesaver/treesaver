@@ -444,13 +444,13 @@ treesaver.capabilities.SUPPORTS_CSSTRANSITIONS = WITHIN_IOS_WRAPPER ||
 treesaver.capabilities.caps_;
 
 /**
- * Transient browser capabilities, such as online/offline, that may change
+ * Mutable browser capabilities, such as online/offline, that may change
  * after a page is loaded
  *
  * @private
  * @type {Array.<string>}
  */
-treesaver.capabilities.transientCaps_;
+treesaver.capabilities.mutableCaps_;
 
 /**
  * Return 'no-' if false
@@ -504,15 +504,15 @@ treesaver.capabilities.update_ = function() {
     );
   }
 
-  // Always update transient info
-  treesaver.capabilities.transientCaps_ = [
+  // Always update mutable info
+  treesaver.capabilities.mutableCaps_ = [
     // Online/offline
     p(!treesaver.network.isOnline()) + 'offline'
   ];
 
   if (treesaver.capabilities.SUPPORTS_ORIENTATION) {
     // Orientation
-    treesaver.capabilities.transientCaps_.push(
+    treesaver.capabilities.mutableCaps_.push(
       'orientation-' + (window['orientation'] ? 'horizontal' : 'vertical')
     );
   }
@@ -547,17 +547,17 @@ treesaver.capabilities.updateClasses = function() {
       className = '';
     }
 
-    // Add the non-transient capabilities on the body
+    // Add the non-mutable capabilities on the body
     className += ' ' + treesaver.capabilities.caps_.join(' ');
 
     treesaver.debug.info('Capability classes: ' + className);
   }
 
-  // Now, remove values of transient capabilities
+  // Now, remove values of mutable capabilities
   // TODO: As we get more of these, need a simpler way to filter out the old values
-  className = className.replace(treesaver.capabilities.transientCapabilityRegex_, '');
+  className = className.replace(treesaver.capabilities.mutableCapabilityRegex_, '');
 
-  className += ' ' + treesaver.capabilities.transientCaps_.join(' ');
+  className += ' ' + treesaver.capabilities.mutableCaps_.join(' ');
 
   // Now set the classes (and normalize whitespace)
   document.documentElement.className = className.split(/\s+/).join(' ');
@@ -571,25 +571,25 @@ treesaver.capabilities.resetClasses = function() {
 };
 
 /**
- * Array with all the transient capability names
+ * Array with all the mutable capability names
  *
  * @private
  * @type {!Array.<string>}
  */
-treesaver.capabilities.transientCapabilityList_ = [
+treesaver.capabilities.mutableCapabilityList_ = [
   'offline',
   'orientation-vertical',
   'orientation-horizontal'
 ];
 
 /**
- * Regex for removing transient capabilities from a string
+ * Regex for removing mutable capabilities from a string
  *
  * @private
  * @type {!RegExp}
  */
-treesaver.capabilities.transientCapabilityRegex_ = (function() {
-  var terms = treesaver.capabilities.transientCapabilityList_.map(function(term) {
+treesaver.capabilities.mutableCapabilityRegex_ = (function() {
+  var terms = treesaver.capabilities.mutableCapabilityList_.map(function(term) {
     return '((no-)?' + term + ')';
   });
 
@@ -600,11 +600,11 @@ treesaver.capabilities.transientCapabilityRegex_ = (function() {
  * Check if a set of requirements are met by the current browser state
  *
  * @param {!Array.<string>} required Required capabilities.
- * @param {boolean=} useTransient Whether transient capabilities should be
+ * @param {boolean=} useMutable Whether mutable capabilities should be
  *                                checked as well.
  * @return {boolean} True if requirements are met.
  */
-treesaver.capabilities.check = function checkCapabilities(required, useTransient) {
+treesaver.capabilities.check = function checkCapabilities(required, useMutable) {
   if (!required.length) {
     return true;
   }
@@ -614,7 +614,7 @@ treesaver.capabilities.check = function checkCapabilities(required, useTransient
     var isNegation = req.substr(0, 3) === 'no-',
         rootReq = isNegation ? req.substr(3) : req,
         allCaps = treesaver.capabilities.caps_.concat(
-          useTransient ? treesaver.capabilities.transientCaps_ : []
+          useMutable ? treesaver.capabilities.mutableCaps_ : []
         );
 
     if (isNegation) {
@@ -627,10 +627,10 @@ treesaver.capabilities.check = function checkCapabilities(required, useTransient
         return true;
       }
 
-      // Requirement may be a transient property, need to check
-      if (!useTransient &&
-          treesaver.capabilities.transientCapabilityList_.indexOf(rootReq) !== -1) {
-          // Requirement isn't met, but is transient, let it pass for now
+      // Requirement may be a mutable property, need to check
+      if (!useMutable &&
+          treesaver.capabilities.mutableCapabilityList_.indexOf(rootReq) !== -1) {
+          // Requirement isn't met, but is mutable, let it pass for now
           return true;
       }
 

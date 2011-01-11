@@ -32,7 +32,7 @@ treesaver.layout.Grid = function(node) {
 
   /**
    * List of required capabilities for this Grid
-   * TODO: Only store transient capabilities
+   * TODO: Only store mutable capabilities
    *
    * @type {?Array.<string>}
    */

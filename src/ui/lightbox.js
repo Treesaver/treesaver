@@ -29,7 +29,7 @@ treesaver.ui.LightBox = function(node) {
 
   /**
    * List of required capabilities for this LightBox
-   * TODO: Only store transient capabilities
+   * TODO: Only store mutable capabilities
    *
    * @type {?Array.<string>}
    */
