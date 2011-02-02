@@ -56,17 +56,19 @@ treesaver.boot.load = function() {
 
       // Wrap in a try-catch in order to avoid errors
       try {
-        gr('treesaver.ui');
+        gr('treesaver.core');
       }
       catch (ex) {
         // Ignore
       }
     }
 
-    treesaver.scriptloader.load('ui.js', function(name) {
-      treesaver.boot.uiLoaded_ = true;
-      treesaver.boot.loadProgress_();
-    });
+    treesaver.scriptloader.load(COMPILED ? 'treesaver-core.js' : 'core.js',
+      function(name) {
+        treesaver.boot.coreLoaded_ = true;
+        treesaver.boot.loadProgress_();
+      }
+    );
   }
 
   // Watch for dom ready
@@ -142,7 +144,7 @@ treesaver.boot.cleanup_ = function() {
   // Kill loading flags
   delete treesaver.boot.resourcesLoaded_;
   if (USE_MODULES) {
-    delete treesaver.boot.uiLoaded_;
+    delete treesaver.boot.coreLoaded_;
   }
   delete treesaver.boot.domReady_;
 };
@@ -196,7 +198,7 @@ treesaver.boot.loadProgress_ = function() {
     return;
   }
 
-  if (USE_MODULES && !treesaver.boot.uiLoaded_) {
+  if (USE_MODULES && !treesaver.boot.coreLoaded_) {
     // Must wait for the other modules to load
     return;
   }
@@ -222,10 +224,10 @@ treesaver.boot.loadProgress_ = function() {
   treesaver.boot.cleanup_();
 
   if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
-    // Start the UI
+    // Start loading the core (UI, layout, etc)
 
-    // TODO: In compiled module mode, this function won't be visible ...
-    // may need to export
-    treesaver.ui.load();
+    // TODO: In compiled module mode, this function won't be visible if in a
+    // closure ... may need to export
+    treesaver.core.load();
   }
 };

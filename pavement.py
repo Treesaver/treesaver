@@ -206,7 +206,7 @@ def compile(args):
     # Whether we should compile to a single file instead of modules
     is_single = '--single' in args or not options.modules_file.isfile()
 
-    single_filename = 'treesaver-all-%s.js' % tag
+    single_filename = 'treesaver-%s.js' % tag
 
     compiler_flags = [
         '--compilation_level=ADVANCED_OPTIMIZATIONS',
@@ -231,7 +231,7 @@ def compile(args):
         compiler_flags.append('--define="SUPPORT_LEGACY=false"')
         compiler_flags.append('--define="WITHIN_IOS_WRAPPER=true"')
         is_single = True
-        single_filename = 'treesaver-all-ios-%s.js' % tag
+        single_filename = 'treesaver-ios-%s.js' % tag
 
     # Make pretty output for debug mode
     if '--debug' in args:
@@ -276,7 +276,7 @@ def compile(args):
                     file_count += 1
             file_counts.append(file_count)
 
-        compiler_flags.append('--module_output_path_prefix %s' % (options.build_dir / ''))
+        compiler_flags.append('--module_output_path_prefix %s' % (options.build_dir / 'treesaver-'))
         compiler_flags.append('--js %s' % ' --js '.join(file_list))
         for i, js_file in enumerate(compile_order):
             dependencies = ''
@@ -301,8 +301,8 @@ def compile(args):
       for i, js_name in enumerate(compile_order):
         target_name = "%s-%s.js" % (js_name[:-3], tag)
 
-        target_file = options.build_dir / target_name
-        js_file = options.build_dir / js_name
+        target_file = options.build_dir / 'treesaver-' + target_name
+        js_file = options.build_dir / 'treesaver-' + js_name
 
         os.rename(js_file, target_file)
 

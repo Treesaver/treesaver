@@ -7,9 +7,9 @@ goog.provide('treesaver.scriptloader');
 goog.require('treesaver.constants');
 
 /**
- * @define {string}
+ * @const
  */
-treesaver.scriptloader.BASE_FILENAME = 'treesaver.js';
+treesaver.scriptloader.BASE_FILENAME = COMPILED ? 'treesaver-init.js' : 'init.js';
 
 /**
  * Load a script asynchronously

@@ -71,7 +71,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
       treesaver.debug.warn('Error in initial article');
 
       // Unload and show plain content
-      treesaver.ui.unload();
+      treesaver.core.unload();
     }
   }
   else {

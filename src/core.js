@@ -2,7 +2,7 @@
  * @fileoverview Reading UI.
  */
 
-goog.provide('treesaver.ui');
+goog.provide('treesaver.core');
 
 goog.require('treesaver.debug');
 goog.require('treesaver.styles');
@@ -14,11 +14,11 @@ goog.require('treesaver.ui.StateManager');
 /**
  * Load the UI
  */
-treesaver.ui.load = function() {
-  treesaver.debug.info('UI load begin');
+treesaver.core.load = function() {
+  treesaver.debug.info('Core load begin');
 
   // Make sure we clean up when leaving the page
-  treesaver.events.addListener(window, 'unload', treesaver.ui.unload);
+  treesaver.events.addListener(window, 'unload', treesaver.core.unload);
 
   // Root element for listening to UI events
   treesaver.ui.eventRoot = treesaver.boot.inContainedMode ?
@@ -32,17 +32,17 @@ treesaver.ui.load = function() {
   else {
     treesaver.debug.error('Load failed');
 
-    treesaver.ui.unload();
+    treesaver.core.unload();
   }
 };
 
 /**
  * Unload the UI and cleanup
  */
-treesaver.ui.unload = function() {
-  treesaver.debug.info('UI unloading');
+treesaver.core.unload = function() {
+  treesaver.debug.info('Core unloading');
 
-  treesaver.events.removeListener(window, 'unload', treesaver.ui.unload);
+  treesaver.events.removeListener(window, 'unload', treesaver.core.unload);
 
   treesaver.ui.ArticleManager.unload();
   treesaver.ui.StateManager.unload();
