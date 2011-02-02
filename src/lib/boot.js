@@ -11,6 +11,7 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.domready');
 goog.require('treesaver.events');
+goog.require('treesaver.modules');
 goog.require('treesaver.resources');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.scriptloader');
@@ -63,7 +64,7 @@ treesaver.boot.load = function() {
       }
     }
 
-    treesaver.scriptloader.load('ui.js', function(name) {
+    treesaver.scriptloader.load(treesaver.modules.get('treesaver-ui'), function(name) {
       treesaver.boot.uiLoaded_ = true;
       treesaver.boot.loadProgress_();
     });

@@ -5,11 +5,11 @@
 goog.provide('treesaver.scriptloader');
 
 goog.require('treesaver.constants');
-
+goog.require('treesaver.modules');
 /**
- * @define {string}
+ * @const {string}
  */
-treesaver.scriptloader.BASE_FILENAME = 'treesaver.js';
+treesaver.scriptloader.BASE_FILENAME = treesaver.modules.get('treesaver');
 
 /**
  * Load a script asynchronously
