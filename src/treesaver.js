@@ -3,10 +3,10 @@
  */
 
 /**
- * @preserve Copyright 2010 Filipe Fortes ( www.fortes.com ).
+ * @preserve Copyright 2011 Filipe Fortes ( www.fortes.com ).
  * Version: 0.1.
  *
- * Open source license to be determined.
+ * Licensed under MIT and GPLv2.
  */
 
 goog.provide('treesaver');
