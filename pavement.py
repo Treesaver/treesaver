@@ -93,7 +93,7 @@ def debug(args):
     """Create debug versions for testing"""
     output_mode = 'script'
     is_ios = '--ios' in args
-    is_single = '--single' in args or is_ios
+    is_single = '--modules' not in args and options.modules_file.isfile()
 
     if is_single:
         outfile = options.build_dir / 'treesaver.js'
@@ -204,7 +204,7 @@ def compile(args):
     tag = sh('git describe --abbrev=0', capture=True).replace('\n', '')
 
     # Whether we should compile to a single file instead of modules
-    is_single = '--single' in args or not options.modules_file.isfile()
+    is_single = '--modules' not in args and options.modules_file.isfile()
 
     single_filename = 'treesaver-%s.js' % tag
 

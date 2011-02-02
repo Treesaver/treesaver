@@ -32,10 +32,15 @@ Use the instructions below if you wish to build Treesaver from scratch. *Most pe
 Note that these commands *must* be run from the root directory of the repository.
 
 * `paver`: Create dependency script for testing
-* `paver compile`: Compile JavaScript files for production (compiles into two separate files)
-  * `paver compile --single`: Compile into a single JavaScript file
-  * `paver compile --debug`: Use debug-friendly minification
-* `paver debug`: Concatenate files for use when debugging (preserves comments, formatting, etc)
+* `paver compile`: Compile JavaScript files for production. Can be used with one or more compilation flags:
+  * `--modules`: Compile into modules for async loading (compiles into two separate files)
+  * `--debug`: Use debug-friendly minification
+  * `--ios`: Compile version for use within an IOS `UIWebView`
+  * `--noie`: Compile without IE support
+  * `--nolegacy`: Compile without support for legacy browsers (IE7, mostly)
+* `paver debug`: Concatenate files for use when debugging (preserves comments, formatting, etc). Supports the following compilation flags:
+  * `--ios`: Compile version for use within an IOS `UIWebView`
+  * `--modules`: Compile into modules for async loading (compiles into two separate files)
 * `paver lint`: Check style with lint
 * `paver fix_lint`: Automatically fix lint errors
 
