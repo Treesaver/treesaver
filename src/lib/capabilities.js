@@ -8,7 +8,6 @@ goog.provide('treesaver.capabilities');
 goog.require('treesaver.array'); // array.some
 goog.require('treesaver.constants');
 goog.require('treesaver.debug');
-goog.require('treesaver.dom');
 // Avoid circular dependency
 // goog.require('treesaver.network');
 // goog.require('treesaver.dimensions');

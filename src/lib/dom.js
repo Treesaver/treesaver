@@ -5,6 +5,7 @@
 goog.provide('treesaver.dom');
 
 goog.require('treesaver.array');
+goog.require('treesaver.capabilities');
 goog.require('treesaver.constants');
 
 /**
