@@ -11,6 +11,7 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.domready');
 goog.require('treesaver.events');
+goog.require('treesaver.modules');
 goog.require('treesaver.resources');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.scriptloader');
@@ -63,12 +64,10 @@ treesaver.boot.load = function() {
       }
     }
 
-    treesaver.scriptloader.load(COMPILED ? 'treesaver-core.js' : 'core.js',
-      function(name) {
-        treesaver.boot.coreLoaded_ = true;
-        treesaver.boot.loadProgress_();
-      }
-    );
+    treesaver.scriptloader.load(treesaver.modules.get('treesaver-core'), function(name) {
+      treesaver.boot.coreLoaded_ = true;
+      treesaver.boot.loadProgress_();
+    });
   }
 
   // Watch for dom ready

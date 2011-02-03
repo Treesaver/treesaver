@@ -1,3 +1,4 @@
 build
 .tmp
 test/deps.js
+src/modules.js

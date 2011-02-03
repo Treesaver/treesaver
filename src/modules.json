@@ -1,10 +1,12 @@
-{
-  "order": [
-    "init.js",
-    "core.js"
-  ],
-  "dependencies": {
-    "init.js": [],
-    "core.js": ["init.js"]
+[
+  {
+    "name": "treesaver-init",
+    "src": "init.js",
+    "dependencies": []
+  },
+  {
+    "name": "treesaver-core",
+    "src": "core.js",
+    "dependencies": ["treesaver-init"]
   }
-}
+]
