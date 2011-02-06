@@ -226,8 +226,9 @@ treesaver.layout.Figure.prototype.saveSizes = function saveSizes(sizes, html, mi
  */
 treesaver.layout.Figure.prototype.processElement = function processElement(el) {
   var sizes = el.getAttribute('data-sizes'),
-      minW = parseInt(el.getAttribute('data-minwidth'), 10),
-      minH = parseInt(el.getAttribute('data-minheight'), 10),
+      // Use native width & height if available, otherwise use custom data- properties
+      minW = parseInt(el.getAttribute(treesaver.dom.hasAttr(el, 'width') ? 'width' : 'data-minwidth'), 10),
+      minH = parseInt(el.getAttribute(treesaver.dom.hasAttr(el, 'height') ? 'height' : 'data-minheight'), 10),
       requirements = treesaver.dom.hasAttr(el, 'data-requires') ?
         el.getAttribute('data-requires').split(' ') : null,
       html;
