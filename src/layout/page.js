@@ -125,7 +125,10 @@ treesaver.layout.Page = function(content, grids, br) {
           br.delayFigure(figure.figureIndex);
         }
         else {
-          br.failedFigure(figureIndex);
+          // Don't mark the figure as failed if the container was reduced in size
+          if (!treesaver.dom.hasClass(containerNode, 'flexed')) {
+            br.failedFigure(figureIndex);
+          }
         }
 
         // Remove node for easier styling
