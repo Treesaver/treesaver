@@ -265,4 +265,21 @@ $(function() {
     treesaver.template.expand(view, div);
     ok(htmlEquals(div.innerHTML, '<a data-bind="url:title" title="http://www.example.org/some file?=&quot;something&quot;">click here</a>'), 'mapped attribute values are escaped properly');
   });
+
+  test('multi-bind', function() {
+    var div = document.createElement('div'),
+        data = {
+          'current-url': 'first-article.html',
+          'title': 'First article',
+          'byline': 'By John Doe'
+        };
+
+    div.innerHTML = '<a data-href="http://www.twitter.com?subject={{byline}}&link={{current-url}}" data-bind="current-url:href byline:href title">{{title}}</a>';
+    treesaver.template.expand(data, div);
+    ok(htmlEquals(div.innerHTML, '<a href="http://www.twitter.com?subject=By%20John%20Doe&amp;link=first-article.html" data-href="http://www.twitter.com?subject={{byline}}&amp;link={{current-url}}" data-bind="current-url:href byline:href title">First article</a>'));
+
+    div.innerHTML = '<span data-bind="title byline">{{title}} {{byline}}</span>';
+    treesaver.template.expand(data, div);
+    ok(htmlEquals(div.innerHTML, '<span data-bind="title byline">First article By John Doe</span>'));
+  });
 });

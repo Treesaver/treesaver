@@ -106,7 +106,11 @@ treesaver.template.expandObject_ = function(view, scope) {
         else {
           if (mapName !== null) {
             if ((mapName === 'href' || mapName === 'src') && treesaver.dom.hasAttr(el, 'data-' + mapName)) {
-              text = el.getAttribute('data-' + mapName);
+              // We check if the target attribute exists and it still has unexpanded bindings. If not we
+              // retrieve the data template.
+              if (!(treesaver.dom.hasAttr(el, mapName) && /{{[^}]+}}/.test(text = el.getAttribute(mapName)))) {
+                text = el.getAttribute('data-' + mapName);
+              }
             }
             else if (mapName === 'class') {
               text = el.className;
