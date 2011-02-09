@@ -58,5 +58,5 @@ Although Google Closure style and compiler are used, note that Treesaver does *n
 
 ### Contributors
 
-* [Filipe Fortes](http://www.fortes.com/)
-* [Bram Stein](http://www.bramstein.com/)
+* [Filipe Fortes](http://www.fortes.com/) [@fortes](http://twitter.com/fortes)
+* [Bram Stein](http://www.bramstein.com/) [@bram_stein](http://twitter.com/bram_stein)
