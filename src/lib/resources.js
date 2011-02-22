@@ -68,7 +68,7 @@ treesaver.resources.processResourceFile = function(html) {
     // Must attach element into the tree to avoid parsing issues from
     // HTML5 shiv in IE using innerHTML
     if (SUPPORT_IE) {
-      document.documentElement.appendChild(div);
+      treesaver.dom.safeAppendToDocument(div);
     }
 
     // Parse the HTML
@@ -91,7 +91,7 @@ treesaver.resources.processResourceFile = function(html) {
 
     // Clean up
     if (SUPPORT_IE) {
-      document.documentElement.removeChild(div);
+      div.parentNode.removeChild(div);
     }
     div.innerHTML = '';
   }
