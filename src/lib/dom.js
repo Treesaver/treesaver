@@ -175,10 +175,6 @@ treesaver.dom.getElementsByProperty = function(propName, value, tagName, root) {
 
   // Modern browsers do this quite well via querySelectorAll
   if (!SUPPORT_LEGACY || 'querySelectorAll' in root) {
-    if (!root) {
-      root = document;
-    }
-
     // Construct a selector via the arguments
     var selector = tagName + '[' + propName +
       // Note, this queries based on a space separated single value match
