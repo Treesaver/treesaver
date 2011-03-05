@@ -62,4 +62,16 @@ $(function() {
     equals(treesaver.dom.getElementsByProperty('itemscope', null, null, div).length, 1, 'Property without value');
     equals(treesaver.dom.getElementsByProperty('type', null, null, div).length, 1);
   });
+
+  test('getElementsByQuery', function () {
+    var div = document.createElement('div');
+    div.innerHTML = '<p>Hello <strong class="test">world</p>';
+
+    equals(treesaver.dom.getElementsByQuery('p', div).length, 1);
+    equals(treesaver.dom.getElementsByQuery('p, strong', div).length, 2);
+    equals(treesaver.dom.getElementsByQuery('p,strong', div).length, 2);
+    equals(treesaver.dom.getElementsByQuery('.test', div).length, 1);
+    equals(treesaver.dom.getElementsByQuery('.test, p', div).length, 2);
+    equals(treesaver.dom.getElementsByQuery('.test, p, strong, p', div).length, 2);
+  });
 });

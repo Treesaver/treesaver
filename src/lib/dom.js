@@ -125,6 +125,38 @@ treesaver.dom.getElementsByTagName = function(tagName, root) {
 };
 
 /**
+ * Query an element tree by query. This is a simplified version
+ * of querySelectorAll.
+ * @param {!string} selector A comma separated list of element names or
+ * class names.
+ * @param {HTMLDocument|Element=} root Element root (optional.)
+ * @return {!Array.<Element>} Array of matching elements.
+ */
+treesaver.dom.getElementsByQuery = function (selector, root) {
+  root = root || document;
+
+  if (!SUPPORT_LEGACY || 'querySelectorAll' in root) {
+    return treesaver.array.toArray(root.querySelectorAll(selector));
+  } else {
+    var result = [],
+        elements = treesaver.dom.getElementsByTagName('*', root),
+        selectors = selector.split(/,\s?/g);
+
+    elements.forEach(function (el) {
+      selectors.forEach(function (s) {
+        if ((s.charAt(0) === '.' && treesaver.dom.hasClass(el, s.substr(1))) ||
+              el.nodeName.toLowerCase() === s.toLowerCase()) {
+          if (result.indexOf(el) === -1) {
+            result.push(el);
+          }
+        }
+      });
+    });
+    return result;
+  }
+};
+
+/**
  * Query an element by property name and value
  *
  * In modern browsers, this wraps querySelectorAll
