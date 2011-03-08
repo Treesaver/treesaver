@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.layout.Content');
 
+goog.require('treesaver.css');
 goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
@@ -28,7 +29,7 @@ treesaver.layout.Content = function(el) {
    * @type {number}
    */
   this.lineHeight = treesaver.dimensions.toPixels(el,
-    treesaver.dimensions.getStyleObject(el).lineHeight
+    treesaver.css.getStyleObject(el).lineHeight
   ) || 1;
 
   /**
