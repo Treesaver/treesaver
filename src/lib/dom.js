@@ -229,6 +229,36 @@ treesaver.dom.hasAttr = function(el, propName) {
 };
 
 /**
+ * The namespace prefix for custom elements
+ *
+ * @const
+ * @type {string}
+ */
+treesaver.dom.customAttributePrefix = 'data-ts-';
+
+/**
+ * Whether the element has a custom Treesaver-namespaced attribute
+ *
+ * @param {!Element} el
+ * @param {!string} propName Unescaped
+ * @return {boolean}
+ */
+treesaver.dom.hasCustomAttr = function(el, propName) {
+  return treesaver.dom.hasAttr(el, treesaver.dom.customAttributePrefix + propName);
+};
+
+/**
+ * Whether the element has a custom Treesaver-namespaced attribute
+ *
+ * @param {!Element} el
+ * @param {!string} propName Unescaped
+ * @return {boolean}
+ */
+treesaver.dom.getCustomAttr = function(el, propName) {
+  return el.getAttribute(treesaver.dom.customAttributePrefix + propName);
+};
+
+/**
  * Remove all children from an Element
  *
  * @param {!Element} el

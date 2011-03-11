@@ -5,6 +5,7 @@
 goog.provide('treesaver.dimensions');
 
 goog.require('treesaver.capabilities');
+goog.require('treesaver.css');
 goog.require('treesaver.constants');
 
 /**
@@ -86,20 +87,10 @@ treesaver.dimensions.mergeSizeRange = function(a, b, outer) {
  */
 treesaver.dimensions.toPixels = function(el, val) {
   if (val && treesaver.dimensions.pixel.test(val)) {
-    return parseFloat(val);
+    return parseFloat(val) || 0;
   }
 
   return null;
-};
-
-/**
- * Return the computedStyle object, which varies based on
- * browsers
- * @param {?Element} el
- * @return {Object}
- */
-treesaver.dimensions.getStyleObject = function(el) {
-  return document.defaultView.getComputedStyle(el, null);
 };
 
 /**
@@ -145,14 +136,38 @@ treesaver.dimensions.getOffsetTop = function(el) {
   return el && el.offsetTop || 0;
 }
 
+/**
+ * getBoundingClientRect wrapper for IE support
+ *
+ * @param {?Element} el
+ * @return {!Object} boundingRect
+ */
+treesaver.dimensions.getBoundingClientRect = function(el) {
+  if (!el) {
+    return {};
+  }
+
+  var rect = el.getBoundingClientRect(),
+      oldRect, key;
+
+  // IE (and others?) don't include height/width in the rect, and
+  // the object cannot be edited, so clone it here
+  if (!('height' in rect)) {
+    oldRect = rect;
+    rect = {};
+    for (key in oldRect) {
+      rect[key] = oldRect[key];
+    }
+    rect.height = rect.bottom - rect.top;
+    rect.width  = rect.right - rect.left;
+  }
+
+  return rect;
+};
+
 // IE doesn't support getComputedStyle
 if (SUPPORT_IE &&
     !(document.defaultView && document.defaultView.getComputedStyle)) {
-  // Patch to use MSIE API
-  treesaver.dimensions.getStyleObject = function(el) {
-    return el.currentStyle;
-  };
-
   if (treesaver.capabilities.IS_LEGACY) {
     treesaver.dimensions.getOffsetTop = function(el) {
       if (el) {
@@ -306,7 +321,7 @@ treesaver.dimensions.Metrics = function(el) {
     return;
   }
 
-  var style = treesaver.dimensions.getStyleObject(el),
+  var style = treesaver.css.getStyleObject(el),
       oldPosition = el.style.position,
       oldStyleAttribute = el.getAttribute('style'),
       tmp;
@@ -330,25 +345,25 @@ treesaver.dimensions.Metrics = function(el) {
   }
 
   // Margin
-  this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop) || 0;
-  this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom) || 0;
-  this.marginLeft = treesaver.dimensions.toPixels(el, style.marginLeft) || 0;
-  this.marginRight = treesaver.dimensions.toPixels(el, style.marginRight) || 0;
+  this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop);
+  this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom);
+  this.marginLeft = treesaver.dimensions.toPixels(el, style.marginLeft);
+  this.marginRight = treesaver.dimensions.toPixels(el, style.marginRight);
   // Summed totals
   this.marginHeight = this.marginTop + this.marginBottom;
   this.marginWidth = this.marginLeft + this.marginRight;
 
   // Border
-  this.borderTop = treesaver.dimensions.toPixels(el, style.borderTopWidth) || 0;
-  this.borderBottom = treesaver.dimensions.toPixels(el, style.borderBottomWidth) || 0;
-  this.borderLeft = treesaver.dimensions.toPixels(el, style.borderLeftWidth) || 0;
-  this.borderRight = treesaver.dimensions.toPixels(el, style.borderRightWidth) || 0;
+  this.borderTop = treesaver.dimensions.toPixels(el, style.borderTopWidth);
+  this.borderBottom = treesaver.dimensions.toPixels(el, style.borderBottomWidth);
+  this.borderLeft = treesaver.dimensions.toPixels(el, style.borderLeftWidth);
+  this.borderRight = treesaver.dimensions.toPixels(el, style.borderRightWidth);
 
   // Padding
-  this.paddingTop = treesaver.dimensions.toPixels(el, style.paddingTop) || 0;
-  this.paddingBottom = treesaver.dimensions.toPixels(el, style.paddingBottom) || 0;
-  this.paddingLeft = treesaver.dimensions.toPixels(el, style.paddingLeft) || 0;
-  this.paddingRight = treesaver.dimensions.toPixels(el, style.paddingRight) || 0;
+  this.paddingTop = treesaver.dimensions.toPixels(el, style.paddingTop);
+  this.paddingBottom = treesaver.dimensions.toPixels(el, style.paddingBottom);
+  this.paddingLeft = treesaver.dimensions.toPixels(el, style.paddingLeft);
+  this.paddingRight = treesaver.dimensions.toPixels(el, style.paddingRight);
 
   // Summed totals for border & padding
   this.bpTop = this.borderTop + this.paddingTop;
@@ -367,8 +382,8 @@ treesaver.dimensions.Metrics = function(el) {
   this.h = this.outerH - this.bpHeight;
 
   // Min & Max : Width & Height
-  this.minW = treesaver.dimensions.toPixels(el, style.minWidth) || 0;
-  this.minH = treesaver.dimensions.toPixels(el, style.minHeight) || 0;
+  this.minW = treesaver.dimensions.toPixels(el, style.minWidth);
+  this.minH = treesaver.dimensions.toPixels(el, style.minHeight);
 
   // Opera returns -1 for a max-width or max-height that is not set.
   tmp = treesaver.dimensions.toPixels(el, style.maxWidth);

@@ -455,7 +455,7 @@ treesaver.layout.Block.hasBlockChildren = function(node) {
       }
 
       child_seen = true;
-      childStyle = treesaver.dimensions.getStyleObject(child);
+      childStyle = treesaver.css.getStyleObject(child);
       if (/inline/.test(childStyle.display)) {
         // Found an inline text node, bow out
         return false;

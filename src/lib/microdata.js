@@ -326,4 +326,31 @@ if (SUPPORT_MICRODATA) {
       return treesaver.microdata.getObject_(item);
     });
   };
+
+  /**
+   * Normalizes a microdata item by pulling out values from
+   * the properties array and reducing multiple values to a
+   * single value.
+   *
+   * @private
+   * @param {!Object} obj The microdata item to normalize.
+   * @return {!Object} A normalized microdata item.
+   */
+  treesaver.microdata.normalizeItem = function (obj) {
+    var result = {},
+        keys;
+
+    if (obj.properties) {
+      keys = Object.keys(obj.properties);
+      keys.forEach(function(key) {
+        var v = obj.properties[key][0];
+
+        if (Object.isObject(v)) {
+          v = treesaver.layout.normalizeItem(v);
+        }
+        result[key] = v;
+      });
+    }
+    return result;
+  };
 }
