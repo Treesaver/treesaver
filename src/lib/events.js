@@ -80,11 +80,7 @@ treesaver.events.removeListener = function(obj, type, fn) {
 };
 
 // Need to patch functions for IE
-// HACK / TODO: IE9 beta has a Frankenstein model where addEventListener is present,
-// but 'handleEvent' delegation does not work. Adding an IE-only exception for now.
-// If IE9 ships with this annoying bug, will have revisit. Reference:
-// https://connect.microsoft.com/IE/feedback/details/574560/addeventlistener-should-support-objects-implementing-the-eventlistener-interface
-if (SUPPORT_IE && (!('addEventListener' in document) || document.documentMode === 9)) {
+if (SUPPORT_IE && (!('addEventListener' in document))) {
   treesaver.debug.warn('Using IE event model');
 
   // IE's lack of DOM Level 2 support really sucks here, for a few reasons
