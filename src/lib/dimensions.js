@@ -136,6 +136,35 @@ treesaver.dimensions.getOffsetTop = function(el) {
   return el && el.offsetTop || 0;
 }
 
+/**
+ * getBoundingClientRect wrapper for IE support
+ *
+ * @param {?Element} el
+ * @return {!Object} boundingRect
+ */
+treesaver.dimensions.getBoundingClientRect = function(el) {
+  if (!el) {
+    return {};
+  }
+
+  var rect = el.getBoundingClientRect(),
+      oldRect, key;
+
+  // IE (and others?) don't include height/width in the rect, and
+  // the object cannot be edited, so clone it here
+  if (!('height' in rect)) {
+    oldRect = rect;
+    rect = {};
+    for (key in oldRect) {
+      rect[key] = oldRect[key];
+    }
+    rect.height = rect.bottom - rect.top;
+    rect.width  = rect.right - rect.left;
+  }
+
+  return rect;
+};
+
 // IE doesn't support getComputedStyle
 if (SUPPORT_IE &&
     !(document.defaultView && document.defaultView.getComputedStyle)) {
