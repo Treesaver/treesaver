@@ -89,7 +89,6 @@ treesaver.dimensions.toPixels = function(el, val) {
   if (val && treesaver.dimensions.pixel.test(val)) {
     return parseFloat(val) || 0;
   }
-
   return null;
 };
 
@@ -158,8 +157,8 @@ treesaver.dimensions.getBoundingClientRect = function(el) {
     for (key in oldRect) {
       rect[key] = oldRect[key];
     }
-    rect.height = rect.bottom - rect.top;
-    rect.width  = rect.right - rect.left;
+    rect.height = rect['bottom'] - rect['top'];
+    rect.width  = rect['right'] - rect['left'];
   }
 
   return rect;
@@ -345,10 +344,10 @@ treesaver.dimensions.Metrics = function(el) {
   }
 
   // Margin
-  this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop);
-  this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom);
-  this.marginLeft = treesaver.dimensions.toPixels(el, style.marginLeft);
-  this.marginRight = treesaver.dimensions.toPixels(el, style.marginRight);
+  this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop) || 0;
+  this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom) || 0;
+  this.marginLeft = treesaver.dimensions.toPixels(el, style.marginLeft) || 0;
+  this.marginRight = treesaver.dimensions.toPixels(el, style.marginRight) || 0;
   // Summed totals
   this.marginHeight = this.marginTop + this.marginBottom;
   this.marginWidth = this.marginLeft + this.marginRight;
@@ -382,8 +381,8 @@ treesaver.dimensions.Metrics = function(el) {
   this.h = this.outerH - this.bpHeight;
 
   // Min & Max : Width & Height
-  this.minW = treesaver.dimensions.toPixels(el, style.minWidth);
-  this.minH = treesaver.dimensions.toPixels(el, style.minHeight);
+  this.minW = treesaver.dimensions.toPixels(el, style.minWidth) || 0;
+  this.minH = treesaver.dimensions.toPixels(el, style.minHeight) || 0;
 
   // Opera returns -1 for a max-width or max-height that is not set.
   tmp = treesaver.dimensions.toPixels(el, style.maxWidth);

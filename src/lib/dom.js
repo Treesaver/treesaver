@@ -252,7 +252,7 @@ treesaver.dom.hasCustomAttr = function(el, propName) {
  *
  * @param {!Element} el
  * @param {!string} propName Unescaped
- * @return {boolean}
+ * @return {string}
  */
 treesaver.dom.getCustomAttr = function(el, propName) {
   return el.getAttribute(treesaver.dom.customAttributePrefix + propName);
