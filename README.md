@@ -46,7 +46,7 @@ Note that these commands *must* be run from the root directory of the repository
 
 ## License
 
-Licensed under MIT
+Dual-licensed under MIT and GPLv2
 
 ## Contributing
 
