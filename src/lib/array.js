@@ -44,6 +44,19 @@ Array.prototype.remove = function(from, to) {
   return this.push.apply(this, rest);
 };
 
+Array.prototype.append = function () {
+  var i = 0, len = arguments.length;
+
+  for (; i < len; i += 1) {
+	  this.push.apply(this, arguments[i]);
+  }
+  return this;
+};
+
+Array.prototype.peek = function () {
+  return this[this.length - 1];
+};
+
 // IE doesn't support these
 if (SUPPORT_IE) {
   // TODO: Move into legacy?

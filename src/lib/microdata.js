@@ -189,8 +189,12 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
       types = [];
     }
 
+    if (root && treesaver.dom.hasAttr(root, 'itemscope')) {
+      items.push(root);
+    }
+
     // Retrieve all microdata items
-    items = treesaver.dom.getElementsByProperty('itemscope', null, null, root);
+    items.append(treesaver.dom.getElementsByProperty('itemscope', null, null, root));
 
     // Filter out top level items, and optionally items that match
     // the given types.

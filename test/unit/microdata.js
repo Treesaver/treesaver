@@ -208,4 +208,13 @@ $(function () {
 
     equals(data.length, 1, 'one item returned for second context');
   });
+
+  test('nested-itemscope', function () {
+    var el = document.getElementById('itemscope-root'),
+        data = treesaver.microdata.getJSONItems(null, el);
+
+    equals(data.length, 2, 'two items returned');
+    equals(data[0].properties.title[0], 'Hello', 'First property is correct');
+    equals(data[1].properties.title[0], 'World', 'First property is correct');
+  });
 });
