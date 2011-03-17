@@ -209,12 +209,20 @@ $(function () {
     equals(data.length, 1, 'one item returned for second context');
   });
 
-  test('nested-itemscope', function () {
+  test('itemscope at root', function () {
     var el = document.getElementById('itemscope-root'),
         data = treesaver.microdata.getJSONItems(null, el);
 
-    equals(data.length, 2, 'two items returned');
+    equals(data.length, 1, 'one item returned');
     equals(data[0].properties.title[0], 'Hello', 'First property is correct');
-    equals(data[1].properties.title[0], 'World', 'First property is correct');
+  });
+
+  test('itemscope-nested', function () {
+    var el = document.getElementById('itemscope-nested'),
+        data = treesaver.microdata.getItems(null, el);
+
+    equals(data.length, 2, 'two properties returned');
+    equals(data[0].properties.length, 1, 'first scope has one property');
+    equals(data[1].properties.length, 1, 'second scope has one property');
   });
 });
