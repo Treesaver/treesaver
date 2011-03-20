@@ -74,4 +74,16 @@ $(function() {
     equals(treesaver.dom.getElementsByQuery('.test, p', div).length, 2);
     equals(treesaver.dom.getElementsByQuery('.test, p, strong, p', div).length, 2);
   });
+
+  test('getAncestor', function () {
+    var div = document.createElement('div');
+    div.innerHTML = '<article id="top"><article id="article"><p id="text">Hello World</p></article></article>';
+
+    var p = treesaver.dom.getElementsByTagName('p', div)[0];
+
+    equals(treesaver.dom.getAncestor(p, 'ARTICLE').id, 'article', 'closest ancestor returned');
+    equals(treesaver.dom.getAncestor(p, 'article').id, 'article', 'closest ancestor returned (lowercase)');
+    equals(treesaver.dom.getAncestor(treesaver.dom.getAncestor(p, 'article'), 'article').id, 'top', 'retrieved two nearest ancestors');
+    equals(treesaver.dom.getAncestor(p, 'body'), null, 'correctly returned null on disconnected node');
+  });
 });

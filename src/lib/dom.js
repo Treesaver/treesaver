@@ -407,6 +407,20 @@ treesaver.dom.compareDocumentPosition = function(a, b) {
     0 : 0;
 };
 
+treesaver.dom.getAncestor = function (el, tagName) {
+  var parent = el,
+      tag = tagName.toUpperCase();
+
+  console.log(parent);
+
+  while ((parent = parent.parentNode) !== null && parent.nodeType === 1) {
+    if (parent.nodeName === tag) {
+      return parent;
+    }
+  }
+  return null;
+};
+
 /**
  * Find an appropriate element we can use as an insertion point for
  * new DOM elements
