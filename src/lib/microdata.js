@@ -241,7 +241,7 @@ if (SUPPORT_MICRODATA) {
    * @param {!Element} item The element to generate the representation for.
    * @return {!Object} The JSON representation of an item.
    */
-  treesaver.microdata.getObject_ = function(item) {
+  treesaver.microdata.getObject = function(item) {
     var result = {},
         properties = {},
         flags = {};
@@ -327,7 +327,7 @@ if (SUPPORT_MICRODATA) {
   treesaver.microdata.getJSONItems = function(types, root) {
     var items = treesaver.microdata.getItems(types, root);
     return items.map(function(item) {
-      return treesaver.microdata.getObject_(item);
+      return treesaver.microdata.getObject(item);
     });
   };
 
