@@ -176,7 +176,7 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
    * given in the argument, if any are listed.
    *
    * @param {?string=} types A space-separated list of types.
-   * @param {HTMLDocument|Element=} root The root element to use as
+   * @param {Element=} root The root element to use as
    * context.
    * @return {!Array} A non-live Array of elements.
    */
