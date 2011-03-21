@@ -6,57 +6,6 @@ goog.provide('treesaver.array');
 
 goog.require('treesaver.constants');
 
-// IE has no Array.indexOf (why?)
-if (SUPPORT_IE && !Array.prototype.indexOf) {
-  Array.prototype.indexOf = function(obj, start) {
-    var i, len;
-    for (i = (start || 0), len = this.length; i < len; i += 1) {
-      if (this[i] === obj) {
-        return i;
-      }
-    }
-    return -1;
-  };
-}
-
-if (!Array.isArray) {
-  /**
-   * Test Array-ness.
-   *
-   * @param {!Object} value Test if value is an array.
-   * @return {!boolean} True if the given value is an array, false otherwise.
-   */
-  Array.isArray = function(value) {
-    return Object.prototype.toString.apply(value) === '[object Array]';
-  };
-}
-
-/**
- * Remove an index from an array
- * By John Resig (MIT Licensed)
- *
- * @param {!number} from
- * @param {number=} to
- */
-Array.prototype.remove = function(from, to) {
-  var rest = this.slice((to || from) + 1 || this.length);
-  this.length = from < 0 ? this.length + from : from;
-  return this.push.apply(this, rest);
-};
-
-Array.prototype.append = function () {
-  var i = 0, len = arguments.length;
-
-  for (; i < len; i += 1) {
-	  this.push.apply(this, arguments[i]);
-  }
-  return this;
-};
-
-Array.prototype.peek = function () {
-  return this[this.length - 1];
-};
-
 // IE doesn't support these
 if (SUPPORT_IE) {
   // TODO: Move into legacy?
@@ -143,6 +92,18 @@ if (SUPPORT_IE) {
       return res;
     };
   }
+
+  if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function(obj, start) {
+      var i, len;
+      for (i = (start || 0), len = this.length; i < len; i += 1) {
+        if (this[i] === obj) {
+          return i;
+        }
+      }
+      return -1;
+    };
+  }
 }
 
 /**
@@ -153,6 +114,29 @@ if (SUPPORT_IE) {
  */
 treesaver.array.toArray = function(obj) {
   return Array.prototype.slice.call(obj, 0);
+};
+
+/**
+ * Remove an index from an array
+ * By John Resig (MIT Licensed)
+ *
+ * @param {!number} from
+ * @param {number=} to
+ */
+treesaver.array.remove = function(array, from, to) {
+  var rest = array.slice((to || from) + 1 || array.length);
+  array.length = from < 0 ? array.length + from : from;
+  return array.push.apply(array, rest);
+};
+
+/**
+ * Test Array-ness.
+ *
+ * @param {!Object} value Test if value is an array.
+ * @return {!boolean} True if the given value is an array, false otherwise.
+ */
+treesaver.array.isArray = function(value) {
+  return Object.prototype.toString.apply(value) === '[object Array]';
 };
 
 // IE doesn't let you call slice on a nodelist, so provide a backup

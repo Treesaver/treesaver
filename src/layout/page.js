@@ -68,7 +68,7 @@ treesaver.layout.Page = function(content, grids, br) {
   treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
   // Fill in fields
-  Object.keys(content.fields || {}).forEach(function(key) {
+  treesaver.object.keys(content.fields || {}).forEach(function(key) {
     var fields = treesaver.template.getElementsByBindName(key, null, this.node);
 
     fields.forEach(function(node) {
@@ -949,7 +949,7 @@ treesaver.layout.Page.prototype.deactivate = function() {
  * @return {!treesaver.layout.Page} A clone of this page
  */
 treesaver.layout.Page.prototype.clone = function() {
-  var p = Object.clone(this);
+  var p = treesaver.object.clone(this);
   // We override the properties that are different by creating a clone
   // and setting those properties explicitly.
   p.node = /** @type {!Element} */ (this.node && this.node.cloneNode(true) || null);

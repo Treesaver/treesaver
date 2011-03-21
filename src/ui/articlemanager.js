@@ -445,7 +445,7 @@ treesaver.ui.ArticleManager.parseTOC = function(html) {
   items = treesaver.microdata.getJSONItems(null, container);
 
   treesaver.ui.ArticleManager.toc = items.map(function(item) {
-    var keys = Object.keys(item.properties),
+    var keys = treesaver.object.keys(item.properties),
         result = {
           fields: {},
           flags: item.flags || {}

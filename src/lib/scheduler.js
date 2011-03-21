@@ -88,7 +88,7 @@ treesaver.scheduler.tick_ = function() {
       // they only get removed when their times count is -1
       if (!task.immediate || task.times < 0) {
         // Remove from registries
-        treesaver.scheduler.tasks_.remove(i);
+        treesaver.array.remove(treesaver.scheduler.tasks_, i);
         delete treesaver.scheduler.namedTasks_[task.name];
 
         // Exit early in order to make sure we don't execute an extra time
@@ -277,7 +277,7 @@ treesaver.scheduler.clear = function(name) {
 
   treesaver.scheduler.tasks_.forEach(function(task, i) {
     if (task.name === name) {
-      treesaver.scheduler.tasks_.remove(i);
+      treesaver.array.remove(treesaver.scheduler.tasks_, i);
       // Mark task as inactive, in case there are any references left
       task.removed = true;
     }
