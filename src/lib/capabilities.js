@@ -365,6 +365,46 @@ treesaver.capabilities.SUPPORTS_CANVAS =
   'getContext' in document.createElement('canvas');
 
 /**
+ * SVG detection based on Modernizr (http://www.modernizr.com)
+ * Copyright (c) 2009-2011, Faruk Ates and Paul Irish
+ * Dual-licensed under the BSD or MIT licenses.
+ */
+if ('createElementNS' in document) {
+  /**
+   * Whether the browser supports SVG
+   *
+   * @const
+   * @type {boolean}
+   */
+  treesaver.capabilities.SUPPORTS_SVG = 'createSVGRect' in document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+  /**
+   * Whether the browser supports SMIL
+   *
+   * @const
+   * @type {boolean}
+   */
+  treesaver.capabilities.SUPPORTS_SMIL = /SVG/.test(document.createElementNS('http://www.w3.org/2000/svg', 'animate').toString());
+
+  /**
+   * Whether the browser supports SVG clip paths
+   *
+   * @const
+   * @type {boolean}
+   */
+  treesaver.capabilities.SUPPORTS_SVGCLIPPATHS = /SVG/.test(document.createElementNS('http://www.w3.org/2000/svg', 'clipPath').toString());
+} else {
+  // Don't bother with SVG in IE7/8
+  treesaver.capabilities.SUPPORTS_SVG = treesaver.capabilities.SUPPORTS_SMIL = treesaver.capabilities.SUPPORTS_SVGCLIPPATHS = false;
+}
+
+treesaver.capabilities.SUPPORTS_INLINESVG = (function() {
+  var div = document.createElement('div');
+  div.innerHTML = '<svg/>';
+  return (div.firstChild && div.firstChild.namespaceURI) == 'http://www.w3.org/2000/svg';
+}());
+
+/**
  * Whether the browser can play <video>
  *
  * @const
@@ -488,6 +528,10 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) + 'csstransforms',
       p(treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D) + 'csstransforms3d',
       p(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS) + 'csstransitions',
+      p(treesaver.capabilities.SUPPORTS_SVG) + 'svg',
+      p(treesaver.capabilities.SUPPORTS_INLINESVG) + 'inlinesvg',
+      p(treesaver.capabilities.SUPPORTS_SMIL) + 'smil',
+      p(treesaver.capabilities.SUPPORTS_SVGCLIPPATHS) + 'svgclippaths',
       // Not in modernizr
       p(treesaver.capabilities.SUPPORTS_MICRODATA) + 'microdata',
       p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
