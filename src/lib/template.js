@@ -79,7 +79,7 @@ treesaver.template.expandObject_ = function(view, scope) {
       if (view[keyName]) {
         value = view[keyName];
 
-        if (Array.isArray(value)) {
+        if (treesaver.array.isArray(value)) {
           children = treesaver.array.toArray(el.childNodes);
           value.forEach(function(item) {
             children.forEach(function(child) {
@@ -95,7 +95,7 @@ treesaver.template.expandObject_ = function(view, scope) {
             el.removeChild(child);
           });
         }
-        else if (Object.isObject(value)) {
+        else if (treesaver.object.isObject(value)) {
           children = treesaver.array.toArray(el.childNodes);
           children.forEach(function(child) {
             if (child.nodeType === 1) {

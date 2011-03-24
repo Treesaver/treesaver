@@ -176,7 +176,7 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
    * given in the argument, if any are listed.
    *
    * @param {?string=} types A space-separated list of types.
-   * @param {HTMLDocument|Element=} root The root element to use as
+   * @param {Element=} root The root element to use as
    * context.
    * @return {!Array} A non-live Array of elements.
    */
@@ -194,7 +194,7 @@ if (SUPPORT_MICRODATA && !treesaver.capabilities.SUPPORTS_MICRODATA) {
     }
 
     // Retrieve all microdata items
-    items.append(treesaver.dom.getElementsByProperty('itemscope', null, null, root));
+    items = items.concat(treesaver.dom.getElementsByProperty('itemscope', null, null, root));
 
     // Filter out top level items, and optionally items that match
     // the given types.
@@ -345,11 +345,11 @@ if (SUPPORT_MICRODATA) {
         keys;
 
     if (obj.properties) {
-      keys = Object.keys(obj.properties);
+      keys = treesaver.object.keys(obj.properties);
       keys.forEach(function(key) {
         var v = obj.properties[key][0];
 
-        if (Object.isObject(v)) {
+        if (treesaver.object.isObject(v)) {
           v = treesaver.layout.normalizeItem(v);
         }
         result[key] = v;

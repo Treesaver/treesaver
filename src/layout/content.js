@@ -80,7 +80,7 @@ treesaver.layout.Content = function(el) {
   // of each itemprop and pull properties up to the global field object.)
   treesaver.microdata.getJSONItems(null, el).forEach(function(item) {
     var scope = treesaver.microdata.normalizeItem(item),
-        keys = Object.keys(scope);
+        keys = treesaver.object.keys(scope);
 
     keys.forEach(function(key) {
       if (!this.fields[key]) {

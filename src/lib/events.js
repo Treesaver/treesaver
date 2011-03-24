@@ -260,7 +260,7 @@ if (SUPPORT_IE && (!('addEventListener' in document))) {
     if (obj.custom_handlers && obj.custom_handlers[type]) {
       var index = obj.custom_handlers[type].handlers.indexOf(fn);
       if (index !== -1) {
-        obj.custom_handlers[type].handlers.remove(index);
+        treesaver.array.remove(obj.custom_handlers[type].handlers, index);
       }
 
       // Do we have any handlers left?

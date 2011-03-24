@@ -180,11 +180,11 @@ treesaver.layout.BreakRecord.prototype.useFigure = function(figureIndex) {
   if (figureIndex < this.figureIndex) {
     if ((delayedIndex = this.delayed.indexOf(figureIndex)) !== -1) {
       // Remove from delayed
-      this.delayed.remove(delayedIndex);
+      treesaver.array.remove(this.delayed, delayedIndex);
     }
     else if ((delayedIndex = this.failed.indexOf(figureIndex)) !== -1) {
       // Was a failure, remove
-      this.failed.remove(delayedIndex);
+      treesaver.array.remove(this.failed, delayedIndex);
     }
     else {
       // Do nothing
