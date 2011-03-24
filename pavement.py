@@ -13,8 +13,8 @@ options(
     src_dir = HOME_DIR / 'src',
     test_dir = HOME_DIR / 'test',
     tmp_dir = HOME_DIR / '.tmp',
-    closure_library_dir = HOME_DIR / '../closure-library-read-only',
-    closure_compiler = HOME_DIR / '../closure-compiler-read-only/build/compiler.jar',
+    closure_dir = HOME_DIR / 'closure',
+    closure_compiler = HOME_DIR / 'closure/compiler.jar',
     closure_lint = 'gjslint',
     closure_fix_lint = 'fixjsstyle',
     tag = sh('git describe --abbrev=0', capture=True).replace('\n', ''),
@@ -25,8 +25,8 @@ options(
 options(
     modules_file = options.src_dir / 'modules.json',
     externs_dir = options.src_dir / 'externs',
-    calcdeps = options.closure_library_dir / 'closure/bin/calcdeps.py',
-    depswriter = options.closure_library_dir / 'closure/bin/build/depswriter.py',
+    calcdeps = HOME_DIR / 'closure/bin/calcdeps.py',
+    depswriter = HOME_DIR / 'closure/bin/build/depswriter.py',
 )
 
 # Closure compiler options
@@ -58,9 +58,6 @@ options(
 
 def check_requirements():
     """Make sure all system requirements are met"""
-    if not options.closure_library_dir.isdir():
-        raise BuildFailure("Closure library not found")
-
     if not options.closure_compiler.isfile():
         raise BuildFailure("Closure compiler not found")
 
@@ -90,7 +87,7 @@ def default(args = []):
         options.calcdeps,
         ' -i '.join(js_files),
         options.src_dir,
-        options.closure_library_dir,
+        options.closure_dir,
         output_mode,
         options.test_dir / 'deps.js'
     ))
@@ -112,7 +109,7 @@ def debug(args):
             options.calcdeps,
             ' -i'.join(options.src_dir.files('*.js')),
             options.src_dir,
-            options.closure_library_dir,
+            options.closure_dir,
             output_mode,
             outfile
         ), capture=True)
@@ -136,7 +133,7 @@ def debug(args):
                 options.calcdeps,
                 jsfile,
                 options.src_dir,
-                options.closure_library_dir,
+                options.closure_dir,
                 output_mode,
                 outfile
             ), capture=True)
@@ -188,7 +185,7 @@ def get_dependency_list(js_files):
         options.calcdeps,
         ' -i '.join(js_files),
         options.src_dir,
-        options.closure_library_dir,
+        options.closure_dir,
         options.closure_compiler,
     ), capture=True)
 
