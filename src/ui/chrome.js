@@ -130,9 +130,9 @@ treesaver.ui.Chrome = function(node) {
 
   /**
    * Cached references to the menu TOC
-   * @type {?Element}
+   * @type {?Array.<Element>}
    */
-  this.menu = null;
+  this.menus = [];
 
   /**
    * @type {boolean}
@@ -186,7 +186,6 @@ treesaver.ui.Chrome = function(node) {
 treesaver.ui.Chrome.prototype.activate = function() {
   var toc = [],
       tocTemplates = [],
-      menus = [],
       sidebars = [];
 
   if (!this.active) {
@@ -209,10 +208,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
         return new treesaver.ui.Scrollable(el);
       });
 
-    menus = treesaver.dom.getElementsByClassName('menu', this.node);
-    if (menus.length > 0) {
-      this.menu = menus[0];
-    }
+    this.menus = treesaver.dom.getElementsByClassName('menu', this.node);
 
     toc = treesaver.template.getElementsByBindName('toc', null, this.node);
 
@@ -266,7 +262,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageNum = null;
   this.pageCount = null;
   this.pageWidth = null;
-  this.menu = null;
+  this.menus = null;
   this.currentURL = null;
   this.toc = null;
   this.tocTemplate = null;
@@ -477,10 +473,15 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       withinSidebar = false,
       withinMenu = false;
 
-  if (this.isMenuActive()) {
-    withinMenu = this.menu.contains(el);
-    this.menuInactive();
-  }
+  // If there are any menus active and the event target
+  // is contained within one, we deactive it and set
+  // withinMenu to true.
+  this.menus.forEach(function (menu) {
+    if (this.isMenuActive(menu)) {
+      withinMenu = menu.contains(el);
+      this.menuInactive(menu);
+    }
+  }, this);
 
   if (this.isSidebarActive()) {
     withinSidebar = this.sidebar.contains(el);
@@ -534,7 +535,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         }
         else if (treesaver.dom.hasClass(el, 'menu')) {
           if (!withinMenu) {
-            this.menuActive();
+            this.menuActive(el);
           }
           handled = true;
         }
@@ -953,22 +954,22 @@ treesaver.ui.Chrome.prototype.toggleUiActive_ = function() {
 /**
  * Show menu
  */
-treesaver.ui.Chrome.prototype.menuActive = function() {
-  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'menu-active');
+treesaver.ui.Chrome.prototype.menuActive = function(menu) {
+  treesaver.dom.addClass(/** @type {!Element} */ (menu), 'menu-active');
 };
 
 /**
  * Hide menu
  */
-treesaver.ui.Chrome.prototype.menuInactive = function() {
-  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'menu-active');
+treesaver.ui.Chrome.prototype.menuInactive = function(menu) {
+  treesaver.dom.removeClass(/** @type {!Element} */ (menu), 'menu-active');
 };
 
 /**
  * Returns the current state of the menu.
  */
-treesaver.ui.Chrome.prototype.isMenuActive = function() {
-  return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'menu-active');
+treesaver.ui.Chrome.prototype.isMenuActive = function(menu) {
+  return treesaver.dom.hasClass(/** @type {!Element} */ (menu), 'menu-active');
 };
 
 /**
