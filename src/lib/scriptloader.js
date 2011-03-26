@@ -5,7 +5,6 @@
 goog.provide('treesaver.scriptloader');
 
 goog.require('treesaver.constants');
-goog.require('treesaver.dom');
 goog.require('treesaver.modules');
 
 /**
@@ -26,7 +25,7 @@ treesaver.scriptloader.load = function(name, callback) {
   s.setAttribute('async', 'async');
 
   // Insert into tree
-  treesaver.dom.safeAppendToDocument(s);
+  document.documentElement.appendChild(s);
   // Setup callback
   s.onload = s.onreadystatechange = function(e) {
     if (!e) {

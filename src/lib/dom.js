@@ -5,9 +5,8 @@
 goog.provide('treesaver.dom');
 
 goog.require('treesaver.array');
+goog.require('treesaver.capabilities');
 goog.require('treesaver.constants');
-// Avoid circular dependency
-//goog.require('treesaver.capabilities');
 
 /**
  * Add a CSS class to an element
@@ -405,28 +404,6 @@ treesaver.dom.compareDocumentPosition = function(a, b) {
         (a.sourceIndex > b.sourceIndex && 2) :
       1) +
     0 : 0;
-};
-
-/**
- * Find an appropriate element we can use as an insertion point for
- * new DOM elements
- *
- * @private
- * @type {!Element}
- */
-treesaver.dom.safeInsertionPoint_ = /** @type {!Element} */
-  (treesaver.dom.getElementsByTagName('base')[0] ||
-  treesaver.dom.getElementsByTagName('script')[0]);
-
-/**
- * Add an element into the tree in a safe manner. Hat tip Paul Irish:
- * http://paulirish.com/2011/surefire-dom-element-insertion/
- *
- * @param {!Element} el Element to insert into document
- */
-treesaver.dom.safeAppendToDocument = function(el) {
-  treesaver.dom.safeInsertionPoint_.parentNode
-    .insertBefore(el, treesaver.dom.safeInsertionPoint_);
 };
 
 /**
