@@ -287,7 +287,7 @@ treesaver.ui.ArticleManager.getTOCLocation = function() {
 
   // Is the current document the index?
   // Treat no TOC link as being a self-index
-  if (!link || link.getAttribute('rel').indexOf('self') !== -1) {
+  if (!link || link.getAttribute('rel').indexOf('self') !== -1 || treesaver.network.absoluteURL(link.href) == treesaver.ui.ArticleManager.initialUrl) {
     url = treesaver.ui.ArticleManager.initialUrl;
   }
   else {
