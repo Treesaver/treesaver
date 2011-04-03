@@ -264,7 +264,7 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
       var position = e['state'].position;
 
       treesaver.ui.ArticleManager._setArticle(treesaver.ui.ArticleManager.articleOrder[index],
-          new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang), index, true);
+          position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null, index, true);
     }
     else {
       treesaver.ui.ArticleManager.goToArticleByURL(e['state'].url);
