@@ -17,15 +17,12 @@ Use the instructions below if you wish to build Treesaver from scratch. *Most pe
 ### Dependencies
 
 * [Paver](http://www.blueskyonmars.com/projects/paver/): For running build script. Requires Python.
-* [Closure Compiler](http://code.google.com/closure/compiler/): Aggregates and minifies JavaScript.
-* [Closure Library](http://code.google.com/closure/library/): Required for best use of Closure Compiler. (Technically, only the `base.js` file is required)
 * [Closure Linter](http://code.google.com/closure/utilities/docs/linter_howto.html): Check and fix coding style. (optional)
 
 ### Setup Instructions
 
 1. Make sure to install all the dependencies
 2. Clone a copy of the Treesaver repo by running: `git clone git://github.com/treesaver/treesaver.git`
-3. Edit the `pavement.py` file and make sure to set up the correct path for the Closure Compiler and Library
 
 ### Commands
 
@@ -41,6 +38,7 @@ Note that these commands *must* be run from the root directory of the repository
 * `paver debug`: Concatenate files for use when debugging (preserves comments, formatting, etc). Supports the following compilation flags:
   * `--ios`: Compile version for use within an IOS `UIWebView`
   * `--modules`: Compile into modules for async loading (compiles into two separate files)
+* `paver clean`: remove build artifacts
 * `paver lint`: Check style with lint
 * `paver fix_lint`: Automatically fix lint errors
 

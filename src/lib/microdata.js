@@ -345,7 +345,7 @@ if (SUPPORT_MICRODATA) {
         keys;
 
     if (obj.properties) {
-      keys = treesaver.object.keys(obj.properties);
+      keys = Object.keys(obj.properties);
       keys.forEach(function(key) {
         var v = obj.properties[key][0];
 

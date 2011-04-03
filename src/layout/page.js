@@ -68,7 +68,7 @@ treesaver.layout.Page = function(content, grids, br) {
   treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
   // Fill in fields
-  treesaver.object.keys(content.fields || {}).forEach(function(key) {
+  Object.keys(content.fields || {}).forEach(function(key) {
     var fields = treesaver.template.getElementsByBindName(key, null, this.node);
 
     fields.forEach(function(node) {

@@ -130,9 +130,9 @@ treesaver.ui.Chrome = function(node) {
 
   /**
    * Cached references to the menu TOC
-   * @type {?Element}
+   * @type {?Array.<Element>}
    */
-  this.menu = null;
+  this.menus = [];
 
   /**
    * @type {boolean}
@@ -151,9 +151,9 @@ treesaver.ui.Chrome = function(node) {
   this.currentURL = null;
 
   /**
-   * @type {?Element}
+   * @type {?Array.<Element>}
    */
-  this.sidebar = null;
+  this.sidebars = null;
 
   /**
    * Cached reference to the next page DOM
@@ -185,9 +185,7 @@ treesaver.ui.Chrome = function(node) {
  */
 treesaver.ui.Chrome.prototype.activate = function() {
   var toc = [],
-      tocTemplates = [],
-      menus = [],
-      sidebars = [];
+      tocTemplates = [];
 
   if (!this.active) {
     this.active = true;
@@ -209,10 +207,8 @@ treesaver.ui.Chrome.prototype.activate = function() {
         return new treesaver.ui.Scrollable(el);
       });
 
-    menus = treesaver.dom.getElementsByClassName('menu', this.node);
-    if (menus.length > 0) {
-      this.menu = menus[0];
-    }
+    this.menus = treesaver.dom.getElementsByClassName('menu', this.node);
+    this.sidebars = treesaver.dom.getElementsByClassName('sidebar', this.node);
 
     toc = treesaver.template.getElementsByBindName('toc', null, this.node);
 
@@ -221,12 +217,6 @@ treesaver.ui.Chrome.prototype.activate = function() {
     if (toc.length >= 1) {
       this.toc = /** @type {!Element} */ (toc[0]);
       this.tocTemplate = /** @type {!Element} */ (this.toc.cloneNode(true));
-    }
-
-    sidebars = treesaver.dom.getElementsByClassName('sidebar', this.node);
-
-    if (sidebars.length > 0) {
-      this.sidebar = sidebars[0];
     }
 
     this.pages = [];
@@ -266,11 +256,11 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageNum = null;
   this.pageCount = null;
   this.pageWidth = null;
-  this.menu = null;
+  this.menus = null;
   this.currentURL = null;
   this.toc = null;
   this.tocTemplate = null;
-  this.sidebar = null;
+  this.sidebars = null;
   this.nextPage = null;
   this.nextArticle = null;
   this.prevPage = null;
@@ -475,19 +465,27 @@ treesaver.ui.Chrome.prototype.click = function(e) {
       withinCurrentPage = false,
       handled = false,
       withinSidebar = false,
-      withinMenu = false;
+      withinMenu = false,
+      nearestSidebar = null;
 
-  if (this.isMenuActive()) {
-    withinMenu = this.menu.contains(el);
-    this.menuInactive();
-  }
-
-  if (this.isSidebarActive()) {
-    withinSidebar = this.sidebar.contains(el);
-
-    if (!withinSidebar) {
-      this.sidebarInactive();
+  // If there are any menus active and the event target
+  // is contained within one, we deactive it and set
+  // withinMenu to true.
+  this.menus.forEach(function (menu) {
+    if (this.isMenuActive(menu)) {
+      withinMenu = menu.contains(el);
+      this.menuInactive(menu);
     }
+  }, this);
+
+  withinSidebar = this.sidebars.some(function(sidebar) {
+    return sidebar.contains(el);
+  });
+
+  if (!withinSidebar) {
+    this.sidebars.forEach(function(sidebar) {
+      this.sidebarInactive(sidebar);
+    }, this);
   }
 
   // Compiler cast
@@ -534,20 +532,25 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         }
         else if (treesaver.dom.hasClass(el, 'menu')) {
           if (!withinMenu) {
-            this.menuActive();
+            this.menuActive(el);
           }
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'sidebar') ||
                 treesaver.dom.hasClass(el, 'open-sidebar')) {
-          if (!this.isSidebarActive()) {
-            this.sidebarActive();
+
+          nearestSidebar = this.getNearestSidebar(el);
+
+          if (nearestSidebar && !this.isSidebarActive(nearestSidebar)) {
+            this.sidebarActive(nearestSidebar);
           }
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
-          if (this.isSidebarActive()) {
-            this.sidebarInactive();
+          nearestSidebar = this.getNearestSidebar(el);
+
+          if (nearestSidebar && this.isSidebarActive(nearestSidebar)) {
+            this.sidebarInactive(nearestSidebar);
             handled = true;
           }
         }
@@ -953,36 +956,36 @@ treesaver.ui.Chrome.prototype.toggleUiActive_ = function() {
 /**
  * Show menu
  */
-treesaver.ui.Chrome.prototype.menuActive = function() {
-  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'menu-active');
+treesaver.ui.Chrome.prototype.menuActive = function(menu) {
+  treesaver.dom.addClass(/** @type {!Element} */ (menu), 'menu-active');
 };
 
 /**
  * Hide menu
  */
-treesaver.ui.Chrome.prototype.menuInactive = function() {
-  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'menu-active');
+treesaver.ui.Chrome.prototype.menuInactive = function(menu) {
+  treesaver.dom.removeClass(/** @type {!Element} */ (menu), 'menu-active');
 };
 
 /**
  * Returns the current state of the menu.
  */
-treesaver.ui.Chrome.prototype.isMenuActive = function() {
-  return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'menu-active');
+treesaver.ui.Chrome.prototype.isMenuActive = function(menu) {
+  return treesaver.dom.hasClass(/** @type {!Element} */ (menu), 'menu-active');
 };
 
 /**
  * Show sidebar
  */
-treesaver.ui.Chrome.prototype.sidebarActive = function() {
-  treesaver.dom.addClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+treesaver.ui.Chrome.prototype.sidebarActive = function(sidebar) {
+  treesaver.dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
 };
 
 /**
  * Hide sidebar
  */
-treesaver.ui.Chrome.prototype.sidebarInactive = function() {
-  treesaver.dom.removeClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+treesaver.ui.Chrome.prototype.sidebarInactive = function(sidebar) {
+  treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
 };
 
 /**
@@ -990,10 +993,28 @@ treesaver.ui.Chrome.prototype.sidebarInactive = function() {
  *
  * @return {boolean} true if the sidebar is active, false otherwise.
  */
-treesaver.ui.Chrome.prototype.isSidebarActive = function() {
-  return treesaver.dom.hasClass(/** @type {!Element} */ (this.node), 'sidebar-active');
+treesaver.ui.Chrome.prototype.isSidebarActive = function(sidebar) {
+  return treesaver.dom.hasClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
 };
 
+/**
+ * Returns the nearest ancestor sidebar to the given element.
+ * @return {?Element} The nearest ancestor sidebar or null.
+ */
+treesaver.ui.Chrome.prototype.getNearestSidebar = function(el) {
+  var parent = el;
+
+  if (treesaver.dom.hasClass(parent, 'sidebar')) {
+    return parent;
+  }
+
+  while ((parent = parent.parentNode) !== null && parent.nodeType === 1) {
+    if (treesaver.dom.hasClass(parent, 'sidebar')) {
+      return parent;
+    }
+  }
+  return null;
+};
 
 /**
  * Show lightbox

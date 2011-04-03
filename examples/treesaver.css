@@ -1,0 +1,38 @@
+.treesaver body {
+  /* Hide scrollbars */
+  overflow: hidden;
+  /* Use full body canvas */
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.chrome, .viewer, .grid, .column, .container {
+  /* Manually position everything */
+  position: absolute;
+  /* Make sure seams aren't visible */
+  overflow: hidden;
+  /* Set the base vertical grid */
+  line-height: 20px;
+}
+
+/* Stretch the viewer to fill the screen */
+.viewer {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.grid {
+  width: 300px;
+  border: 1px solid #ccc;
+  margin: 9px;
+}
+
+.column {
+  width: 280px;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+}

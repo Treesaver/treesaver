@@ -1,0 +1,100 @@
+<!doctype html>
+<html class="no-js no-treesaver">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1,minimum-scale=1,maximum-scale=1">
+    <title>Treesaver Sidebar</title>
+    <link rel="resources" href="resources.html">
+    <link rel="stylesheet" href="../treesaver.css">
+    <script src="../../closure/goog/base.js"></script>
+    <script src="../../test/deps.js"></script>
+    <script>
+      goog.require('treesaver');
+    </script>
+    <style>
+      .sidebar {
+        position: absolute;
+        background-color: black;
+        color: white;
+      }
+
+      /**
+       * Left sidebar
+       */
+
+      /* Position the left sidebar offscreen when it is not active */
+      .sidebar-left {
+        width: 150px;
+        left: -150px;
+        top: 0;
+        bottom: 0;
+      }
+
+      /* Position the left sidebar correctly when it is active */
+      .sidebar-active.sidebar-left {
+        left: 0;
+      }
+
+      /* Hide the close button when the left sidebar is not active */
+      .sidebar-left .close-sidebar {
+        display: none;
+      }
+
+      /* Show the close button when the left sidebar is active */
+      .sidebar-active.sidebar-left .close-sidebar {
+        display: block;
+      }
+
+      /* Hide the open button when the left sidebar is active */
+      .sidebar-active.sidebar-left .open-sidebar {
+        display: none;
+      }
+      
+      /* Show the open button when the left sidebar is not active. We have to position it
+         relative to its parent (which we positioned at -150px. This is just one way to
+         hide a sidebar. You can also use CSS animations to show a sidebar. */
+      .sidebar-left .open-sidebar {
+        display: block;
+        position: absolute;
+        left: 150px;
+      }
+    
+      /**
+       * Right sidebar
+       */
+      .sidebar-right {
+        top: 0;
+        right: 0;
+      }
+
+      /* The right sidebar is a little bit different in that it is not hidden by moving it
+         offscreen, but by hiding its content element. */
+      .sidebar-right .content {
+        width: 200px;
+        display: none;
+      }
+
+      .sidebar-active.sidebar-right .open-sidebar {
+        display: none;
+      }
+
+      .sidebar.sidebar-right .close-sidebar {
+        display: none;
+      }
+
+      .sidebar-active.sidebar-right .close-sidebar {
+        display: block;
+      }
+
+      .sidebar-active.sidebar-right .content {
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body>
+    <article>
+      <p>This markup is an example of using multiple sidebars.</p>
+    </article>
+  </body>
+</html>

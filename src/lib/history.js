@@ -7,7 +7,6 @@ goog.provide('treesaver.history');
 
 goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
-goog.require('treesaver.dom');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.storage');
 
@@ -252,12 +251,12 @@ if (!treesaver.history.NATIVE_SUPPORT) {
       /**
        * iFrame used for supporting the back button in IE7
        * @private
-       * @type {!Element}
+       * @type {Element}
        */
       treesaver.history.dummyIFrame_ = document.createElement('iframe');
 
       // Add the iFrame to the document
-      treesaver.dom.safeAppendToDocument(treesaver.history.dummyIFrame_);
+      document.documentElement.appendChild(treesaver.history.dummyIFrame_);
 
       // Redefine the hasHashChanged_ function to ensure check the iFrame
       // contents

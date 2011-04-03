@@ -8,7 +8,6 @@ goog.provide('treesaver.capabilities');
 goog.require('treesaver.array'); // array.some
 goog.require('treesaver.constants');
 goog.require('treesaver.debug');
-goog.require('treesaver.dom');
 // Avoid circular dependency
 // goog.require('treesaver.network');
 // goog.require('treesaver.dimensions');
@@ -252,14 +251,14 @@ treesaver.capabilities.mediaQuerySupported_ = function(queryName, testPrefix) {
 
   st.textContent = mq + '{#' + div_id + ' {height:3px}}';
   div.setAttribute('id', div_id);
-  treesaver.dom.safeAppendToDocument(st);
-  treesaver.dom.safeAppendToDocument(div);
+  document.documentElement.appendChild(st);
+  document.documentElement.appendChild(div);
 
   // Confirm the style was applied
   result = div.offsetHeight === 3;
 
-  st.parentNode.removeChild(st);
-  div.parentNode.removeChild(div);
+  document.documentElement.removeChild(st);
+  document.documentElement.removeChild(div);
 
   return result;
 };
