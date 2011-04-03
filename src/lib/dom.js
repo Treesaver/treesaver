@@ -410,8 +410,6 @@ treesaver.dom.getAncestor = function (el, tagName) {
   var parent = el,
       tag = tagName.toUpperCase();
 
-  console.log(parent);
-
   while ((parent = parent.parentNode) !== null && parent.nodeType === 1) {
     if (parent.nodeName === tag) {
       return parent;
