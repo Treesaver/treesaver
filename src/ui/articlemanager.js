@@ -58,21 +58,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 
   // Set the display to the current article?
   if (initialHTML) {
-    var initialArticle = new treesaver.ui.Article(treesaver.ui.ArticleManager.initialUrl,
-                                          document.title,
-                                          treesaver.ui.ArticleManager.grids_,
-                                          initialHTML);
-
-    if (!initialArticle.error) {
-      treesaver.ui.ArticleManager.articles[treesaver.ui.ArticleManager.initialUrl] = initialArticle;
-      treesaver.ui.ArticleManager._setArticle(initialArticle, null, 0, true);
-    }
-    else {
-      treesaver.debug.warn('Error in initial article');
-
-      // Unload and show plain content
-      treesaver.core.unload();
-    }
+    treesaver.ui.ArticleManager.parseMultiArticle_(initialHTML);
   }
   else {
     treesaver.debug.warn('No initial article');
@@ -90,6 +76,50 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.generateTOC();
 
   return true;
+};
+
+treesaver.ui.ArticleManager.getArticles_ = function (html, url) {
+    var node = document.createElement('div');
+
+    node.innerHTML = html;
+
+    return treesaver.dom.getElementsByTagName('article', node).filter(function (article) {
+      // For now we only handle top-level articles. This might change.
+      return treesaver.dom.getAncestor(article, 'article') === null;
+    }).map(function (article, i) {
+      var id = article.getAttribute('id') || (i === 0 ? null : ('_' + i));
+      return {
+        node: article,
+        url: id === null ? url : url + '#' + id
+      };
+    });
+}
+
+treesaver.ui.ArticleManager.parseMultiArticle_ = function (html) {
+    var articles = treesaver.ui.ArticleManager.getArticles_(html, treesaver.ui.ArticleManager.initialUrl);
+
+    if (articles.length === 0) {
+      treesaver.debug.warn('No initial articles found.');
+      treesaver.core.unload();
+    } else {
+      articles.every(function (a, i) {
+        var article = new treesaver.ui.Article(a.url, document.title, treesaver.ui.ArticleManager.grids_, a.node);
+
+        if (article.error) {
+          treesaver.debug.warn('Error in initial article');
+
+          // Unload and show plain content
+          treesaver.core.unload();
+          return false;
+        }
+
+        treesaver.ui.ArticleManager.articles[a.url] = article;
+        if (i === 0) {
+          treesaver.ui.ArticleManager._setArticle(article, null, 0, true);
+        }
+        return true;
+      });
+    }
 };
 
 /**
@@ -801,6 +831,9 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
         pages.length = pageCount;
       }
       else {
+        if (!nextArticle.maxPageSize) {
+          nextArticle.setMaxPageSize(maxSize);
+        }
         // Always grab starting at the first page
         pages = pages.
           concat(nextArticle.getPages(0, missingPageCount));
@@ -972,6 +1005,27 @@ treesaver.ui.ArticleManager._redirectToArticle = function(article) {
 };
 
 /**
+ * @type {RegExp}
+ */
+treesaver.ui.ArticleManager.bodyRegExp = /<body>\s*([\s\S]+?)\s*<\/body>/i;
+
+/**
+ * Find and return any text within a <title>
+ * @param {?string} html
+ * @return {?string}
+ */
+treesaver.ui.ArticleManager.extractBody = function(html) {
+  var res = treesaver.resources.bodyRegExp.exec(html);
+  if (res && res[1]) {
+    var div = document.createElement('div');
+    div.innerHTML = res[1];
+    return div;
+  }
+  return null;
+};
+
+
+/**
  * Load the content for an article
  * @private
  * @param {!treesaver.ui.Article} article
@@ -990,8 +1044,11 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       /** @type {?string} */
       (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
 
+    // FIXME: This effectively disables caching.
+    cached_text = null;
+
     if (cached_text) {
-      article.processHTML(cached_text);
+      article.processHTML(treesaver.dom.getElementsByTagName('article', treesaver.ui.ArticleManager.extractBody(cached_text))[0]);
 
       // Only for article manager?
       // TODO: Don't use events for this?
@@ -1020,6 +1077,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       }
     }
     else if (WITHIN_IOS_WRAPPER || cached_text !== text) {
+      // FIXME: This should store the text representation of each individual article, not the whole document
       if (!WITHIN_IOS_WRAPPER) {
         treesaver.debug.log('Fetched content newer than cache for article: ' + article.url);
 
@@ -1030,7 +1088,15 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
 
       treesaver.debug.log('Processing HTML content for article: ' + article.url);
 
-      article.processHTML(text);
+      var articles = treesaver.ui.ArticleManager.getArticles_(text, treesaver.network.stripHash(article.url));
+
+      articles.forEach(function (a) {
+        if (a.url === article.url) {
+          article.processHTML(a.node);
+        } else {
+          treesaver.ui.ArticleManager.articles[a.url].processHTML(a.node);
+        }
+      });
 
       // Only for article manager?
       // TODO: Don't use events for this?

@@ -29,10 +29,22 @@
 
 
       <div itemscope>
+        <h2 itemprop="title"><a itemprop="url" href="#inline-article">Inline article</a></h2>
+        <p itemprop="byline">John Doe & Jane Doe</p>
+        <p itemprop="abstract">An inline article. Amazingly it just works!</p>
+      </div>
+
+      <div itemscope>
         <h2 itemprop="title"><a href="one.html" itemprop="url">Article One</a></h2>
         <p class="keeptogether thumb"><img itemprop="thumb" src="openroad-thumb.jpg"/></p>
         <p itemprop="byline">John Doe</p>
         <p itemprop="abstract">Lorem ipsum dolor sit amet, consequeter adipiscing elit.</p>
+      </div>
+
+      <div itemscope>
+        <h2 itemprop="title"><a href="one.html#some-other-article" itemprop="url">Article One And A Half</a></h2>
+        <p itemprop="byline">John Doe</p>
+        <p itemprop="abstract">The secret article.</p>
       </div>
 
       <div itemscope>
@@ -41,6 +53,12 @@
         <p itemprop="byline">Jane Doe</p>
         <p itemprop="abstract">Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus.</p>
       </div>
+    </article>
+    <article id="inline-article">
+      <p>Some other text</p>
+      <article>
+        <p>Sub article</p>
+      </article>
     </article>
   </body>
 </html>

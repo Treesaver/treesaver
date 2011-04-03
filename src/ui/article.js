@@ -27,7 +27,7 @@ goog.require('treesaver.scheduler');
  * @param {!Array.<treesaver.layout.Grid>} grids
  * @param {string=} html
  */
-treesaver.ui.Article = function(url, title, grids, html) {
+treesaver.ui.Article = function(url, title, grids, node) {
   /**
    * @type {?string}
    */
@@ -120,8 +120,8 @@ treesaver.ui.Article = function(url, title, grids, html) {
   this.grids = grids;
 
   // Automatically process the HTML, if any was given to us
-  if (html) {
-    this.processHTML(html);
+  if (node) {
+    this.processHTML(node);
   }
 };
 
@@ -137,41 +137,16 @@ treesaver.ui.Article.events = {
 };
 
 /**
- * @type {RegExp}
- */
-treesaver.ui.Article.titleRegExp = /<title>\s*(.+?)\s*<\/title>/i;
-
-/**
- * Find and return any text within a <title>
- * @param {?string} html
- * @return {?string}
- */
-treesaver.ui.Article.extractTitle = function(html) {
-  var res = treesaver.ui.Article.titleRegExp.exec(html);
-  if (res && res[1]) {
-    return res[1];
-  }
-  return null;
-};
-
-/**
  * @param {?string} html  HTML for the article. May be just the
  *                        <article> node, or an entire .html page.
  */
-treesaver.ui.Article.prototype.processHTML = function(html) {
+treesaver.ui.Article.prototype.processHTML = function(article_node) {
   // Content is here, so we're loaded
   this.loaded = true;
 
   // Container used for manipulation and finding things
   var fake_grid = document.createElement('div'),
-      fake_column = document.createElement('div'),
-      article_node,
-      title = treesaver.ui.Article.extractTitle(html);
-
-  // Grab the title, while we've got the HTML on hand
-  if (title) {
-    this.title = /** @type {!string} */ (title);
-  }
+      fake_column = document.createElement('div');
 
   // Set up a temporary container for layout
   fake_grid.style.display = 'none';
@@ -181,24 +156,6 @@ treesaver.ui.Article.prototype.processHTML = function(html) {
   // Container needs to be in tree for measuring, and for
   // IE HTML5 shiv to work properly as well
   document.body.appendChild(fake_grid);
-  fake_grid.innerHTML = html;
-
-  // Look for just the content node
-  article_node = document.getElementById('ts_content') ||
-                 treesaver.dom.getElementsByTagName('article', fake_grid)[0];
-
-  if (!article_node) {
-    treesaver.debug.error('Could not find article content in HTML: ' + html);
-
-    // Cleanup before exiting in error
-    document.body.removeChild(fake_grid);
-
-    // TODO: Fire event?
-    // this.error currently used for mis-loaded doc, does it matter?
-    this.error = true;
-
-    return false;
-  }
 
   // Remove any ID so CSS styles don't affect the elements within
   article_node.removeAttribute('id');
