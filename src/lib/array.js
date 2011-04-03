@@ -106,6 +106,18 @@ if (SUPPORT_IE) {
   }
 }
 
+if (!Array.isArray) {
+  /**
+   * Test Array-ness.
+   *
+   * @param {!Object} value Test if value is an array.
+   * @return {!boolean} True if the given value is an array, false otherwise.
+   */
+  Array.isArray = function(value) {
+    return Object.prototype.toString.apply(value) === '[object Array]';
+  };
+}
+
 /**
  * Convert array-like things to an array
  *
@@ -127,16 +139,6 @@ treesaver.array.remove = function(array, from, to) {
   var rest = array.slice((to || from) + 1 || array.length);
   array.length = from < 0 ? array.length + from : from;
   return array.push.apply(array, rest);
-};
-
-/**
- * Test Array-ness.
- *
- * @param {!Object} value Test if value is an array.
- * @return {!boolean} True if the given value is an array, false otherwise.
- */
-treesaver.array.isArray = function(value) {
-  return Object.prototype.toString.apply(value) === '[object Array]';
 };
 
 // IE doesn't let you call slice on a nodelist, so provide a backup
