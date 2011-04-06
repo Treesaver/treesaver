@@ -54,7 +54,7 @@ $(function () {
 
   test('Construction', function () {
     var $content = $('.testonly.content'),
-        article = new treesaver.ui.Article(document.location.href, 'Article Title', [], $content.html());
+        article = new treesaver.ui.Article(document.location.href, 'Article Title', [], $content[0]);
 
     ok(article, 'Object constructed');
     equals(article.url, document.location.href, 'Path stored');
@@ -138,20 +138,9 @@ $(function () {
     //}, 400);
   //});
 
-  test('Title Extraction from HTML', function () {
-    var title_tag = '<title>This is the title</title>';
-
-    ok(!treesaver.ui.Article.extractTitle('Bogus Stuff'), 'No match returns null');
-    equals(treesaver.ui.Article.extractTitle(title_tag), 'This is the title', "Plain title tag");
-
-    // Add in some surrounding HTML
-    new_title_tag = ('<html><head><title>My Title</title></head><body><p>Hello there.</p><p>Good bye</p></body>');
-    equals(treesaver.ui.Article.extractTitle(new_title_tag), 'My Title', "Title tag with surrounding HTML");
-  });
-
   test('HTML content processing', function () {
-    var container = $('.testonly.content')[0],
-        article = new treesaver.ui.Article('', '', [], container.innerHTML),
+    var articleNode = $('.testonly.content article')[0],
+        article = new treesaver.ui.Article('', '', [], articleNode.cloneNode(true)),
         tmp;
 
     // Passing the html into the constructor should auto-process
@@ -160,15 +149,18 @@ $(function () {
        'Article content has blocks and figures');
     ok(!article.theme, 'No theme unless specified');
 
+    tmp = articleNode.cloneNode(true);
+
     // Make sure theme flag is properly extracted
-    container.firstChild.setAttribute('data-theme', 'theme');
+    tmp.setAttribute('data-theme', 'theme');
     article = new treesaver.ui.Article('', '', []);
-    ok(article.processHTML(container.innerHTML), 'Returns true on success');
+    console.log(tmp.outerHTML);
+    ok(article.processHTML(tmp), 'Returns true on success');
     equals(article.theme, 'theme', 'Theme stored');
 
     // Make sure we don't do extra work when calling process again
     tmp = article.content;
-    ok(article.processHTML(container.innerHTML), 'Returns true on repeat call');
+    ok(article.processHTML(articleNode.cloneNode(true)), 'Returns true on repeat call');
     // We now support refreshing due to caching
     //ok(article.content === tmp, 'Use previous results on repeat call');
 
@@ -212,8 +204,8 @@ $(function () {
   });
 
   test('Pagination', function () {
-    var $content = $('.testonly.content'),
-        article = new treesaver.ui.Article('/path', 'Article Title', [], $content.html()),
+    var $content = $('.testonly.content article')[0],
+        article = new treesaver.ui.Article('/path', 'Article Title', [], $content),
         grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
         pos;
 
@@ -249,8 +241,8 @@ $(function () {
   });
 
   test('getPages', function () {
-    var $content = $('.testonly.content'),
-        article = new treesaver.ui.Article('/path', 'Article Title', [], $content.html()),
+    var $content = $('.testonly.content article')[0],
+        article = new treesaver.ui.Article('/path', 'Article Title', [], $content),
         grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
         pages,
         page,

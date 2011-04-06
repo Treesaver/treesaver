@@ -137,10 +137,17 @@ treesaver.ui.Article.events = {
 };
 
 /**
- * @param {?string} html  HTML for the article. May be just the
- *                        <article> node, or an entire .html page.
+ * @param {?string} html  HTML for the article. Must be an article node.
  */
 treesaver.ui.Article.prototype.processHTML = function(article_node) {
+  if (article_node.nodeName !== 'ARTICLE') {
+    treesaver.debug.error('Could not find article content: ' + article_node.innerHTML);
+
+    this.error = true;
+
+    return false;
+  }
+
   // Content is here, so we're loaded
   this.loaded = true;
 
