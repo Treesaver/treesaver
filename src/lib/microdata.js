@@ -267,7 +267,7 @@ if (SUPPORT_MICRODATA) {
 
       // If value is an item (i.e. value has an itemScope attribute)
       if (value['itemScope']) {
-        value = treesaver.microdata.getObject_(value);
+        value = treesaver.microdata.getObject(value);
       }
 
       names = property['itemProp'].split(/\s+/g);
