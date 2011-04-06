@@ -1004,26 +1004,13 @@ treesaver.ui.ArticleManager._redirectToArticle = function(article) {
   }
 };
 
-/**
- * @type {RegExp}
- */
-treesaver.ui.ArticleManager.bodyRegExp = /<body>\s*([\s\S]+?)\s*<\/body>/i;
+treesaver.ui.ArticleManager.processArticleText = function (text, url) {
+  var articles = treesaver.ui.ArticleManager.getArticles_(text, treesaver.network.stripHash(url));
 
-/**
- * Find and return any text within a <title>
- * @param {?string} html
- * @return {?string}
- */
-treesaver.ui.ArticleManager.extractBody = function(html) {
-  var res = treesaver.resources.bodyRegExp.exec(html);
-  if (res && res[1]) {
-    var div = document.createElement('div');
-    div.innerHTML = res[1];
-    return div;
-  }
-  return null;
+  articles.forEach(function (a) {
+    treesaver.ui.ArticleManager.articles[a.url].processHTML(a.node);
+  });
 };
-
 
 /**
  * Load the content for an article
@@ -1044,11 +1031,8 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       /** @type {?string} */
       (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
 
-    // FIXME: This effectively disables caching.
-    cached_text = null;
-
     if (cached_text) {
-      article.processHTML(treesaver.dom.getElementsByTagName('article', treesaver.ui.ArticleManager.extractBody(cached_text))[0]);
+      treesaver.ui.ArticleManager.processArticleText(cached_text, article.url);
 
       // Only for article manager?
       // TODO: Don't use events for this?
@@ -1087,16 +1071,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       }
 
       treesaver.debug.log('Processing HTML content for article: ' + article.url);
-
-      var articles = treesaver.ui.ArticleManager.getArticles_(text, treesaver.network.stripHash(article.url));
-
-      articles.forEach(function (a) {
-        if (a.url === article.url) {
-          article.processHTML(a.node);
-        } else {
-          treesaver.ui.ArticleManager.articles[a.url].processHTML(a.node);
-        }
-      });
+      treesaver.ui.ArticleManager.processArticleText(text, article.url);
 
       // Only for article manager?
       // TODO: Don't use events for this?
