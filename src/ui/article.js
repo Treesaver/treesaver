@@ -27,7 +27,7 @@ goog.require('treesaver.scheduler');
  * @param {!Array.<treesaver.layout.Grid>} grids
  * @param {string=} html
  */
-treesaver.ui.Article = function(url, title, grids, node) {
+treesaver.ui.Article = function(url, grids, node) {
   /**
    * @type {?string}
    */
@@ -47,11 +47,6 @@ treesaver.ui.Article = function(url, title, grids, node) {
    * @type {!string}
    */
   this.path = treesaver.network.urlToPath(url);
-
-  /**
-   * @type {string}
-   */
-  this.title = title;
 
   /**
    * @type {treesaver.layout.BreakRecord}

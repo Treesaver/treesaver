@@ -219,6 +219,16 @@ treesaver.network.urlToPath = function(url) {
   return path;
 };
 
+treesaver.network.stripFile = function(url) {
+  var slashIndex = url.lastIndexOf('/');
+
+  if (slashIndex === -1 || slashIndex === url.length - 1 || /^https?:\/\/[^\/]+$/i.test(url)) {
+    return url;
+  } else {
+    return url.substr(0, slashIndex + 1);
+  }
+};
+
 /**
  * @param {!string} url
  * @return {!string} The url without the hash.

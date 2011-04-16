@@ -33,11 +33,21 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.currentTransitionDirection = null;
   treesaver.ui.ArticleManager.currentPageWidth = null;
 
-  // Data store
-  treesaver.ui.ArticleManager.articleOrder = [];
-  treesaver.ui.ArticleManager.articleMap = {};
-  treesaver.ui.ArticleManager.articles = {};
+  // The table of contents
   treesaver.ui.ArticleManager.toc = [];
+
+  // Maps URLs to multiple articles
+  treesaver.ui.ArticleManager.urlMap = {};
+
+  // Maps URLs to single articles
+  treesaver.ui.ArticleManager.articleMap = {};
+
+  // The linear order of the articles
+  treesaver.ui.ArticleManager.articleOrder = [];
+
+  // the positions of each article
+  treesaver.ui.ArticleManager.articlePositions = {};
+
   /**
    * @private
    */
@@ -58,7 +68,14 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 
   // Set the display to the current article?
   if (initialHTML) {
-    treesaver.ui.ArticleManager.parseMultiArticle_(initialHTML);
+    treesaver.ui.ArticleManager.parseMultiArticle_(initialHTML, treesaver.ui.ArticleManager.initialUrl);
+
+    // Set the initial TOC to this article, so we at least have something if this
+    // document does not reference a TOC.
+    treesaver.ui.ArticleManager.toc = [{
+      "url": treesaver.ui.ArticleManager.initialUrl
+    }];
+    treesaver.ui.ArticleManager.updateTOC();
   }
   else {
     treesaver.debug.warn('No initial article');
@@ -95,15 +112,16 @@ treesaver.ui.ArticleManager.getArticles_ = function (html, url) {
     });
 }
 
-treesaver.ui.ArticleManager.parseMultiArticle_ = function (html) {
-    var articles = treesaver.ui.ArticleManager.getArticles_(html, treesaver.ui.ArticleManager.initialUrl);
+treesaver.ui.ArticleManager.parseMultiArticle_ = function (html, url) {
+    var articles = treesaver.ui.ArticleManager.getArticles_(html, url);
 
     if (articles.length === 0) {
       treesaver.debug.warn('No initial articles found.');
       treesaver.core.unload();
     } else {
+
       articles.every(function (a, i) {
-        var article = new treesaver.ui.Article(a.url, document.title, treesaver.ui.ArticleManager.grids_, a.node);
+        var article = new treesaver.ui.Article(a.url, treesaver.ui.ArticleManager.grids_, a.node);
 
         if (article.error) {
           treesaver.debug.warn('Error in initial article');
@@ -113,7 +131,15 @@ treesaver.ui.ArticleManager.parseMultiArticle_ = function (html) {
           return false;
         }
 
-        treesaver.ui.ArticleManager.articles[a.url] = article;
+        if (!treesaver.ui.ArticleManager.urlMap[url]) {
+          treesaver.ui.ArticleManager.urlMap[url] = [article];
+        } else {
+          treesaver.ui.ArticleManager.urlMap[url].push(article);
+        }
+
+        // We insert directly into articleMap since we have content.
+        treesaver.ui.ArticleManager.articleMap[a.url] = article;
+
         if (i === 0) {
           treesaver.ui.ArticleManager._setArticle(article, null, 0, true);
         }
@@ -207,10 +233,11 @@ treesaver.ui.ArticleManager.unload = function() {
   treesaver.ui.ArticleManager.currentTransitionDirection = null;
 
   // Clear data store
-  treesaver.ui.ArticleManager.articleOrder = null;
-  treesaver.ui.ArticleManager.articleMap = null;
-  treesaver.ui.ArticleManager.articles = null;
   treesaver.ui.ArticleManager.toc = null;
+  treesaver.ui.ArticleManager.urlMap = null;
+  treesaver.ui.ArticleManager.articleMap = null;
+  treesaver.ui.ArticleManager.articleOrder = null;
+  treesaver.ui.ArticleManager.articlePositions = null;
 
   treesaver.ui.ArticleManager.loadingPageHTML = null;
   treesaver.ui.ArticleManager.loadingPageSize = null;
@@ -314,40 +341,111 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
  * @return {string}
  */
 treesaver.ui.ArticleManager.getTOCLocation = function() {
-  var link = treesaver.dom.getElementsByProperty('rel', 'contents', 'link')[0],
-      url;
+  var link = treesaver.dom.getElementsByProperty('rel', 'index', 'link')[0];
 
-  // Is the current document the index?
-  // Treat no TOC link as being a self-index
-  if (!link || link.getAttribute('rel').indexOf('self') !== -1 || treesaver.network.absoluteURL(link.href) == treesaver.ui.ArticleManager.initialUrl) {
-    url = treesaver.ui.ArticleManager.initialUrl;
+  if (!link) {
+    return null;
   }
-  else {
-    url = treesaver.network.absoluteURL(link.href);
-  }
-
-  return url;
+  return treesaver.network.absoluteURL(link.href);
 };
 
 /**
  * Create the data structure for holding articles
- * Download the table of contents for this issue asynchronously
+ * Download the table of contents for this issue asynchronously. This should
+ * only be called once.
  * @private
  */
 treesaver.ui.ArticleManager.generateTOC = function() {
   var url = treesaver.ui.ArticleManager.getTOCLocation();
 
-  // We can use the original HTML if this is the index, and we are not
-  // running from an old cached version while online
-  if (url === treesaver.ui.ArticleManager.initialUrl &&
-      !(treesaver.network.loadedFromCache() && treesaver.network.isOnline())) {
-    // Current article is the up-to-date index
-    treesaver.ui.ArticleManager.findTOCLinks(treesaver.ui.ArticleManager.initialHTML, url);
-  }
-  else {
-    // In all other cases, fetch the article, then process
+  if (url) {
     treesaver.network.get(url, treesaver.ui.ArticleManager.findTOCLinks);
   }
+};
+
+treesaver.ui.ArticleManager.updateTOCAux = function (entries) {
+  entries.forEach(function (entry) {
+    var url = entry['url'],
+        articles = treesaver.ui.ArticleManager.urlMap[url];
+
+    articles.forEach(function (article) {
+      var articleURL = article.url,
+          i = treesaver.ui.ArticleManager.articleOrder.length;
+
+      if (!treesaver.ui.ArticleManager.articlePositions[articleURL]) {
+        treesaver.ui.ArticleManager.articlePositions[articleURL] = [i];
+      } else {
+        treesaver.ui.ArticleManager.articlePositions[articleURL].push(i);
+      }
+      treesaver.ui.ArticleManager.articleOrder.push(article);
+    });
+  });
+};
+
+treesaver.ui.ArticleManager.updateTOC = function () {
+  treesaver.ui.ArticleManager.articleOrder = [];
+  treesaver.ui.ArticleManager.articlePositions = {};
+
+  treesaver.ui.ArticleManager.updateTOCAux(treesaver.ui.ArticleManager.toc);
+
+  // FIXME: Going back screws up the article index when the previous article
+  // contains more than one article (i.e. it will jump back to the first previous
+  // article instead of the last one.)
+/*
+  console.log(treesaver.ui.ArticleManager.toc);
+  console.log(treesaver.ui.ArticleManager.articleMap);
+  console.log(treesaver.ui.ArticleManager.urlMap);
+  console.log(treesaver.ui.ArticleManager.articleOrder);
+  console.log(treesaver.ui.ArticleManager.articlePositions);
+*/
+  // TODO: Fire an event (let's chrome know it can display)
+  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.TOCUPDATED);
+};
+
+treesaver.ui.ArticleManager.parseTOC = function (entries) {
+  return entries.map(function (entry) {
+    var url = entry['url'],
+        article = null;
+
+    if (!url) {
+      return;
+    }
+
+    url = treesaver.network.stripHash(treesaver.network.absoluteURL(url));
+    article = treesaver.ui.ArticleManager.articleMap[url];
+
+    if (!article) {
+      article = new treesaver.ui.Article(url, treesaver.ui.ArticleManager.grids_);
+    }
+
+    // TODO: Expose this as a configuration option with this as default. It is not perfect,
+    // but in my opinion a lot better than adding arbitrary attributes or properties all over
+    // the place. Besides this will probably catch most of the cases automagically.
+    if (/(index|default)\.html?$/i.test(url)) {
+      // If we have an entry in the urlMap we have already loaded the index. Fix up the
+      // urlMap so that we can reference the same articles from multiple URLs.
+      if (treesaver.ui.ArticleManager.urlMap[url]) {
+        treesaver.ui.ArticleManager.urlMap[treesaver.network.stripFile(url)] = treesaver.ui.ArticleManager.urlMap[url];
+      } else if (treesaver.ui.ArticleManager.urlMap[treesaver.network.stripFile(url)]) {
+        treesaver.ui.ArticleManager.urlMap[url] = treesaver.ui.ArticleManager.urlMap[treesaver.network.stripFile(url)];
+      } else {
+        treesaver.ui.ArticleManager.urlMap[url] = [article];
+      }
+    } else if (!treesaver.ui.ArticleManager.urlMap[url]) {
+      treesaver.ui.ArticleManager.urlMap[url] = [article];
+    }
+
+    treesaver.ui.ArticleManager.articleMap[url] = article;
+
+    // Process its children, if any
+    if (entry.children) {
+      treesaver.ui.ArticleManager.parseTOC(entry.children);
+    }
+
+    entry['url'] = url;
+
+    return entry;
+  });
 };
 
 /**
@@ -358,139 +456,33 @@ treesaver.ui.ArticleManager.generateTOC = function() {
  * @param {?string} html String of HTML which may contain links.
  * @param {string} toc_url URL of the TOC.
  */
-treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
-  var initialArticleIsTOC = (toc_url === treesaver.ui.ArticleManager.initialUrl);
+treesaver.ui.ArticleManager.findTOCLinks = function(text, toc_url) {
+  var toc = null;
 
-  if (html) {
-    // Don't use storage when native
+  if (text) {
     if (!WITHIN_IOS_WRAPPER) {
-      // Cache the result no matter what
-      treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url,
-          html, true);
+      treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url, text, true);
     }
+  } else {
+    // We failed to retrieve the TOC, so check the cache
+    if (!WITHIN_IOS_WRAPPER) {
+      text = treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
 
-    // If the initial was loaded from the cache, we could have stale content in the DOM
-    if (initialArticleIsTOC && treesaver.network.loadedFromCache()) {
-      // Content would only be new if we are online
-      if (treesaver.network.isOnline()) {
-        // Re-process the current article with the updated content
-        treesaver.ui.ArticleManager.currentArticle.processHTML(html);
-        // Make sure chrome re-queries pages
-        treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
+      // No TOC information, nothing we can do
+      if (!text) {
+        return;
       }
     }
   }
-  else {
-    // Don't use storage when native
-    if (!WITHIN_IOS_WRAPPER) {
-      // TOC failed to load, check the cache
-      html = treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
-    }
 
-    if (!html) {
-      // We don't have content for a TOC, so there is nothing more we can do
-      return;
-    }
-  }
+  toc = JSON.parse(text);
 
-  var unique_urls = [],
-      foundTOC = false;
-
-  treesaver.ui.ArticleManager.parseTOC(/** @type {!string} */ (html));
-
-  treesaver.ui.ArticleManager.toc.forEach(function(item) {
-    var url,
-        article,
-        i;
-
-    // data-properties=self is used by the TOC to indicate its position in the article
-    // order. Make sure to use the TOC url we already computed in order to avoid
-    // duplicates such as '/' and '/index.html'.
-    if (item.flags['self']) {
-      url = toc_url;
-      item.fields.url = toc_url;
-      foundTOC = true;
-    }
-    else {
-      url = treesaver.network.absoluteURL(item.fields['url']);
-    }
-
-    article = treesaver.ui.ArticleManager.articles[url];
-    i = treesaver.ui.ArticleManager.articleOrder.length;
-
-    // Have we seen this URL before?
-    if (!article) {
-      // Have not seen the url, create a new article and store
-      article = new treesaver.ui.Article(url, item.fields['title'] || '', treesaver.ui.ArticleManager.grids_);
-      treesaver.ui.ArticleManager.articles[url] = article;
-    }
-
-    // Now store the indicies where the article occurs (since an article can appear
-    // multiple times)
-    if (!treesaver.ui.ArticleManager.articleMap[url]) {
-      // First time seeing the article
-      treesaver.ui.ArticleManager.articleMap[url] = [i];
-      unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + url);
-
-      if (url === treesaver.ui.ArticleManager.initialUrl) {
-        // Current article is initial
-        treesaver.ui.ArticleManager.currentArticleIndex = i;
-      }
-    }
-    else {
-      // Add another occurence
-      treesaver.ui.ArticleManager.articleMap[url].push(i);
-    }
-
-    // Add into the order
-    treesaver.ui.ArticleManager.articleOrder.push(article);
-  });
-
-  // Clear out old article storage
-  if (!WITHIN_IOS_WRAPPER) {
-    treesaver.storage.clean(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX, unique_urls);
-  }
-
-  // TODO: Fire an event (let's chrome know it can display)
-  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.TOCUPDATED);
-};
-
-/**
- * Parse the TOC using the microdata API. Out of necessity we
- * append the container node to the document first, and remove
- * it afterwards.
- *
- * @param {!string} html The string to find TOC content in.
- * @private
- */
-treesaver.ui.ArticleManager.parseTOC = function(html) {
-  var container = document.createElement('div'),
-      items = [];
-
-  // Must have container connected to tree for HTML5 parsing in IE
-  if (SUPPORT_IE) {
-    container.className = 'offscreen';
-    document.body.appendChild(container);
-  }
-
-  container.innerHTML = html;
-  items = treesaver.microdata.getJSONItems(null, container);
-
-  treesaver.ui.ArticleManager.toc = items.map(function(item) {
-    var keys = Object.keys(item.properties),
-        result = {
-          fields: {},
-          flags: item.flags || {}
-        };
-    keys.forEach(function(key) {
-      result.fields[key] = item.properties[key][0];
-    });
-    return result;
-  });
-
-  // Remove from tree if using HTML5 shiv
-  if (SUPPORT_IE) {
-    document.body.removeChild(container);
+  if (toc && Array.isArray(toc)) {
+    treesaver.ui.ArticleManager.toc = treesaver.ui.ArticleManager.parseTOC(toc);
+    treesaver.ui.ArticleManager.updateTOC();
+    // TODO: clean CACHE_STORAGE
+  } else {
+    treesaver.debug.warn('Found TOC, but could not parse it: ' + toc_url);
   }
 };
 
@@ -959,7 +951,7 @@ treesaver.ui.ArticleManager.getCurrentTOC = function() {
  * @return {?number}
  */
 treesaver.ui.ArticleManager._getArticleIndex = function(url, fwd) {
-  var locations = treesaver.ui.ArticleManager.articleMap[url],
+  var locations = treesaver.ui.ArticleManager.articlePositions[url],
       i, index;
 
   if (!locations || !locations.length) {
@@ -1005,11 +997,21 @@ treesaver.ui.ArticleManager._redirectToArticle = function(article) {
 };
 
 treesaver.ui.ArticleManager.processArticleText = function (text, url) {
-  var articles = treesaver.ui.ArticleManager.getArticles_(text, treesaver.network.stripHash(url));
+  var articles = treesaver.ui.ArticleManager.getArticles_(text, url),
+      article = null;
 
-  articles.forEach(function (a) {
-    treesaver.ui.ArticleManager.articles[a.url].processHTML(a.node);
+  articles.forEach(function (a, index) {
+    var article = treesaver.ui.ArticleManager.articleMap[a.url];
+
+    if (!article) {
+      article = new treesaver.ui.Article(a.url, treesaver.ui.ArticleManager.grids_);
+      treesaver.ui.ArticleManager.articleMap[a.url] = article;
+      treesaver.ui.ArticleManager.urlMap[url].push(article);
+    }
+
+    article.processHTML(a.node);
   });
+  treesaver.ui.ArticleManager.updateTOC();
 };
 
 /**
@@ -1032,7 +1034,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
 
     if (cached_text) {
-      treesaver.ui.ArticleManager.processArticleText(cached_text, article.url);
+      treesaver.ui.ArticleManager.processArticleText(cached_text, treesaver.network.stripHash(article.url));
 
       // Only for article manager?
       // TODO: Don't use events for this?
@@ -1071,7 +1073,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       }
 
       treesaver.debug.log('Processing HTML content for article: ' + article.url);
-      treesaver.ui.ArticleManager.processArticleText(text, article.url);
+      treesaver.ui.ArticleManager.processArticleText(text, treesaver.network.stripHash(article.url));
 
       // Only for article manager?
       // TODO: Don't use events for this?
