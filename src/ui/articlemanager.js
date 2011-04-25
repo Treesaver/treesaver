@@ -388,16 +388,9 @@ treesaver.ui.ArticleManager.updateTOC = function () {
 
   treesaver.ui.ArticleManager.updateTOCAux(treesaver.ui.ArticleManager.toc);
 
-  // FIXME: Going back screws up the article index when the previous article
-  // contains more than one article (i.e. it will jump back to the first previous
-  // article instead of the last one.)
-/*
-  console.log(treesaver.ui.ArticleManager.toc);
-  console.log(treesaver.ui.ArticleManager.articleMap);
-  console.log(treesaver.ui.ArticleManager.urlMap);
-  console.log(treesaver.ui.ArticleManager.articleOrder);
-  console.log(treesaver.ui.ArticleManager.articlePositions);
-*/
+  // update the currentIndex because it might have changed now that we've loaded the TOC, or inserted new articles
+  treesaver.ui.ArticleManager.currentArticleIndex = treesaver.ui.ArticleManager._getArticleIndex(treesaver.ui.ArticleManager.currentArticle.url);
+
   // TODO: Fire an event (let's chrome know it can display)
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.TOCUPDATED);
 };
@@ -816,7 +809,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
 
     if (nextArticle) {
       if (!nextArticle.content) {
-        treesaver.ui.ArticleManager._loadArticle(nextArticle);
+        treesaver.ui.ArticleManager._loadArticle(nextArticle, false);
         // Set size only on first load so pagination can happen
         nextArticle.setMaxPageSize(maxSize);
         // Expand array. Will fill in loading pages below
@@ -996,8 +989,9 @@ treesaver.ui.ArticleManager._redirectToArticle = function(article) {
   }
 };
 
-treesaver.ui.ArticleManager.processArticleText = function (text, url) {
+treesaver.ui.ArticleManager.processArticleText = function (text, url, backward) {
   var articles = treesaver.ui.ArticleManager.getArticles_(text, url),
+      index = 0,
       article = null;
 
   articles.forEach(function (a, index) {
@@ -1012,6 +1006,19 @@ treesaver.ui.ArticleManager.processArticleText = function (text, url) {
     article.processHTML(a.node);
   });
   treesaver.ui.ArticleManager.updateTOC();
+
+  // If we are navigating backwards and the article we're loading has more than one inline article,
+  // we'll need to adjust the current article so as to select the last article instead of the
+  // first in the HTML document.
+  if (backward && articles.length > 1) {
+    // currentArticleIndex is already set to the first article in the document we are
+    // loading, so we just add the number of articles and retrieve the article, and jump
+    // to its END.
+    index = treesaver.ui.ArticleManager.currentArticleIndex + articles.length - 1;
+    article = treesaver.ui.ArticleManager.articleOrder[index];
+
+    treesaver.ui.ArticleManager._setArticle(article, treesaver.layout.ContentPosition.END, index);
+  }
 };
 
 /**
@@ -1019,7 +1026,7 @@ treesaver.ui.ArticleManager.processArticleText = function (text, url) {
  * @private
  * @param {!treesaver.ui.Article} article
  */
-treesaver.ui.ArticleManager._loadArticle = function(article) {
+treesaver.ui.ArticleManager._loadArticle = function(article, backward) {
   // Don't try to load multiple times (duh)
   if (article.loading) {
     return;
@@ -1034,7 +1041,8 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
 
     if (cached_text) {
-      treesaver.ui.ArticleManager.processArticleText(cached_text, treesaver.network.stripHash(article.url));
+      treesaver.debug.log('Processing cached HTML content for article: ' + article.url);
+      treesaver.ui.ArticleManager.processArticleText(cached_text, treesaver.network.stripHash(article.url), backward);
 
       // Only for article manager?
       // TODO: Don't use events for this?
@@ -1063,7 +1071,6 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       }
     }
     else if (WITHIN_IOS_WRAPPER || cached_text !== text) {
-      // FIXME: This should store the text representation of each individual article, not the whole document
       if (!WITHIN_IOS_WRAPPER) {
         treesaver.debug.log('Fetched content newer than cache for article: ' + article.url);
 
@@ -1073,7 +1080,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article) {
       }
 
       treesaver.debug.log('Processing HTML content for article: ' + article.url);
-      treesaver.ui.ArticleManager.processArticleText(text, treesaver.network.stripHash(article.url));
+      treesaver.ui.ArticleManager.processArticleText(text, treesaver.network.stripHash(article.url), backward);
 
       // Only for article manager?
       // TODO: Don't use events for this?
@@ -1125,7 +1132,7 @@ treesaver.ui.ArticleManager._setArticle = function(article, pos, index, noHistor
 
   // Load the article, if it hasn't been loaded already
   if (!article.loaded) {
-    treesaver.ui.ArticleManager._loadArticle(article);
+    treesaver.ui.ArticleManager._loadArticle(article, treesaver.ui.ArticleManager.currentArticleIndex > index);
   }
   else if (article.error) {
     // Article didn't load successfully on previous attempt
@@ -1133,47 +1140,48 @@ treesaver.ui.ArticleManager._setArticle = function(article, pos, index, noHistor
     return false;
   }
 
-  // Set the index
-  if (index || index === 0) {
-    // Set the transition direction (assume not neutral)
-    treesaver.ui.ArticleManager.currentTransitionDirection =
-      (treesaver.ui.ArticleManager.currentArticleIndex > index) ?
-      treesaver.ui.ArticleManager.transitionDirection.BACKWARD :
-      treesaver.ui.ArticleManager.transitionDirection.FORWARD;
+  if (!article.loading) {
+    // Set the index
+    if (index || index === 0) {
+      // Set the transition direction (assume not neutral)
+      treesaver.ui.ArticleManager.currentTransitionDirection =
+        (treesaver.ui.ArticleManager.currentArticleIndex > index) ?
+        treesaver.ui.ArticleManager.transitionDirection.BACKWARD :
+        treesaver.ui.ArticleManager.transitionDirection.FORWARD;
 
-    treesaver.ui.ArticleManager.currentArticleIndex = index;
-  }
-  else {
-    treesaver.ui.ArticleManager.currentTransitionDirection =
-      treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
-    treesaver.ui.ArticleManager.currentArticleIndex =
-      treesaver.ui.ArticleManager._getArticleIndex(article.url);
-  }
+      treesaver.ui.ArticleManager.currentArticleIndex = index;
+    }
+    else {
+      treesaver.ui.ArticleManager.currentTransitionDirection =
+        treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
+      treesaver.ui.ArticleManager.currentArticleIndex =
+        treesaver.ui.ArticleManager._getArticleIndex(article.url);
+    }
 
-  // Update the browser URL, but only if we are supposed to
-  if (!noHistory) {
-    treesaver.history.pushState({
-      index: index,
-      url: article.url,
-      position: pos
-    }, article.title, article.path);
-  }
-  else {
-    treesaver.history.replaceState({
-      index: index,
-      url: article.url,
-      position: pos
-    }, article.title, article.path);
-  }
+    // Update the browser URL, but only if we are supposed to
+    if (!noHistory) {
+      treesaver.history.pushState({
+        index: index,
+        url: article.url,
+        position: pos
+      }, article.title, article.path);
+    }
+    else {
+      treesaver.history.replaceState({
+        index: index,
+        url: article.url,
+        position: pos
+      }, article.title, article.path);
+    }
 
-  // Fire events
-  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
-  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
-    article: article,
-    'url': article.url,
-    'path': article.path
-  });
-
+    // Fire events
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
+      article: article,
+      'url': article.url,
+      'path': article.path
+    });
+  }
   return true;
 };
 
