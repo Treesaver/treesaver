@@ -75,20 +75,6 @@ treesaver.layout.Content = function(el) {
    * @type {Object.<string, string>}
    */
   this.fields = {};
-
-  // Extract the microdata items and normalize them (i.e. pick the last item
-  // of each itemprop and pull properties up to the global field object.)
-  treesaver.microdata.getJSONItems(null, el).forEach(function(item) {
-    var scope = treesaver.microdata.normalizeItem(item),
-        keys = Object.keys(scope);
-
-    keys.forEach(function(key) {
-      if (!this.fields[key]) {
-        this.fields[key] = scope[key];
-        treesaver.debug.info('Field found --- ' + key + ': ' + scope[key].toString());
-      }
-    }, this);
-  }, this);
 };
 
 if (goog.DEBUG) {

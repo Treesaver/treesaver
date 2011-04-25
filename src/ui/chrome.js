@@ -1158,7 +1158,7 @@ treesaver.ui.Chrome.prototype.updatePageURL = function(e) {
  */
 treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
   if (this.toc) {
-    var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
+    var tocEntries = /*treesaver.ui.ArticleManager.getCurrentTOC()*/ [],
         tocElements = treesaver.template.getElementsByBindName('article', null, this.toc),
         i = 0;
 
@@ -1349,7 +1349,7 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
   treesaver.scheduler.clear('updateTOC');
 
   if (this.toc) {
-    var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
+    var tocEntries = /*treesaver.ui.ArticleManager.getCurrentTOC()*/ [],
         newToc = /** @type {!Element} */ (this.tocTemplate.cloneNode(true)),
         tocParent = this.toc.parentNode;
 

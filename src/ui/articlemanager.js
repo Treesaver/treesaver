@@ -8,7 +8,6 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');
-goog.require('treesaver.microdata');
 goog.require('treesaver.network');
 goog.require('treesaver.resources');
 goog.require('treesaver.storage');
@@ -929,16 +928,6 @@ treesaver.ui.ArticleManager.getFigure = function(el) {
 
   // TODO: Refactor this
   return treesaver.ui.ArticleManager.currentArticle.content.figures[figureIndex];
-};
-
-
-/**
- * Get the current TOC.
- * @return {!Array.<Object>} An array of microdata items
- * representing the TOC.
- */
-treesaver.ui.ArticleManager.getCurrentTOC = function() {
-  return treesaver.ui.ArticleManager.toc || [];
 };
 
 /**
