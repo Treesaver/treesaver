@@ -473,7 +473,11 @@ treesaver.ui.ArticleManager.findTOCLinks = function(text, toc_url) {
   if (toc && Array.isArray(toc)) {
     treesaver.ui.ArticleManager.toc = treesaver.ui.ArticleManager.parseTOC(toc);
     treesaver.ui.ArticleManager.updateTOC();
-    // TODO: clean CACHE_STORAGE
+
+    // Clear out old article storage
+    if (!WITHIN_IOS_WRAPPER) {
+      treesaver.storage.clean(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX, Object.keys(treesaver.ui.ArticleManager.urlMap));
+    }
   } else {
     treesaver.debug.warn('Found TOC, but could not parse it: ' + toc_url);
   }
