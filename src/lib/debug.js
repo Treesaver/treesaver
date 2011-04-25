@@ -123,4 +123,25 @@ treesaver.debug.error = function(msg) {
   }
 };
 
+/**
+ * Assert helper
+ * @param {boolean} assertion
+ * @param {?string} msg
+ */
+treesaver.debug.assert = function(assertion, msg) {
+  if (goog.DEBUG && window.console) {
+    if (window.TS_WITHIN_NATIVE_IOS_APP) {
+      if (!assertion) {
+        treesaver.debug.messageQueue_.push('Assertion failed: ' + msg);
+      }
+    }
+    else if ('assert' in window.console) {
+      window.console['assert'](assertion, msg);
+    }
+    else if (!assertion) {
+      treesaver.debug.error('Assertion failed: ' + msg);
+    }
+  }
+};
+
 treesaver.debug.info('Running in DEBUG mode');
