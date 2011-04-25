@@ -162,6 +162,14 @@ treesaver.layout.Page = function(content, grids, br) {
     // Centers the page vertically with less work for us
     treesaver.dimensions.setCssPx(this.node, 'marginTop', -this.size.outerH / 2);
 
+    // Are we finished?
+    br.finished = best.grid.scoringFlags['onlypage'] || br.atEnd(content);
+
+    // Add last page flag if complete
+    if (br.finished) {
+      treesaver.dom.addClass(this.node, 'last-page');
+    }
+
     /**
      * @type {string}
      */
@@ -180,9 +188,6 @@ treesaver.layout.Page = function(content, grids, br) {
 
     // Increment page number
     br.pageNumber += 1;
-
-    // Are we finished?
-    br.finished = best.grid.scoringFlags['onlypage'] || br.atEnd(content);
   }
 
   // Cleanup
