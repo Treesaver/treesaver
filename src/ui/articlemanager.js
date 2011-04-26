@@ -723,7 +723,11 @@ treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
       article;
 
   if (!index && index !== 0) {
-    return false;
+    index = treesaver.ui.ArticleManager._getArticleIndex(treesaver.network.stripHash(url));
+
+    if (!index && index !== 0) {
+      return false;
+    }
   }
 
   article = treesaver.ui.ArticleManager.articleOrder[index];
