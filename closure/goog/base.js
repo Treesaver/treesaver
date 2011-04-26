@@ -19,9 +19,8 @@
  * global <code>CLOSURE_NO_DEPS</code> is set to true.  This allows projects to
  * include their own deps file(s) from different locations.
  *
- *
- *
  */
+
 
 /**
  * @define {boolean} Overridden to true by the compiler when --closure_pass
@@ -37,7 +36,7 @@ var COMPILED = false;
  *
  * @const
  */
-var goog = goog || {};
+var goog = goog || {}; // Identifies this file as the Closure base.
 
 
 /**
@@ -102,17 +101,48 @@ goog.provide = function(name) {
     // declaration. And when JSCompiler transforms goog.provide into a real
     // variable declaration, the compiled JS should work the same as the raw
     // JS--even when the raw JS uses goog.provide incorrectly.
-    if (goog.getObjectByName(name) && !goog.implicitNamespaces_[name]) {
+    if (goog.isProvided_(name)) {
       throw Error('Namespace "' + name + '" already declared.');
     }
+    delete goog.implicitNamespaces_[name];
 
     var namespace = name;
     while ((namespace = namespace.substring(0, namespace.lastIndexOf('.')))) {
+      if (goog.getObjectByName(namespace)) {
+        break;
+      }
       goog.implicitNamespaces_[namespace] = true;
     }
   }
 
   goog.exportPath_(name);
+};
+
+
+/**
+ * Check if the given name has been goog.provided. This will return false for
+ * names that are available only as implicit namespaces.
+ * @param {string} name name of the object to look for.
+ * @return {boolean} Whether the name has been provided.
+ * @private
+ */
+goog.isProvided_ = function(name) {
+  return !goog.implicitNamespaces_[name] && !!goog.getObjectByName(name);
+};
+
+
+/**
+ * Marks that the current file should only be used for testing, and never for
+ * live code in production.
+ * @param {string=} opt_message Optional message to add to the error that's
+ *     raised when used in production code.
+ */
+goog.setTestOnly = function(opt_message) {
+  if (COMPILED && !goog.DEBUG) {
+    opt_message = opt_message || '';
+    throw Error('Importing test-only code into non-debug environment' +
+                opt_message ? ': ' + opt_message : '.');
+  }
 };
 
 
@@ -185,7 +215,7 @@ goog.getObjectByName = function(name, opt_obj) {
   var parts = name.split('.');
   var cur = opt_obj || goog.global;
   for (var part; part = parts.shift(); ) {
-    if (cur[part]) {
+    if (goog.isDefAndNotNull(cur[part])) {
       cur = cur[part];
     } else {
       return null;
@@ -241,7 +271,6 @@ goog.addDependency = function(relPath, provides, requires) {
 };
 
 
-
 /**
  * Implements a system for the dynamic resolution of dependencies
  * that works in parallel with the BUILD system. Note that all calls
@@ -271,9 +300,7 @@ goog.require = function(rule) {
         goog.global.console['error'](errorMessage);
       }
 
-      
         throw Error(errorMessage);
-        
     }
   }
 };
@@ -299,6 +326,18 @@ goog.global.CLOSURE_BASE_PATH;
  * @type {boolean|undefined}
  */
 goog.global.CLOSURE_NO_DEPS;
+
+
+/**
+ * A function to import a single script. This is meant to be overridden when
+ * Closure is being run in non-HTML contexts, such as web workers. It's defined
+ * in the global scope so that it can be set before base.js is loaded, which
+ * allows deps.js to be imported properly.
+ *
+ * The function is passed the script source, which is a relative URI. It should
+ * return true if the script was imported, false otherwise.
+ */
+goog.global.CLOSURE_IMPORT_SCRIPT;
 
 
 /**
@@ -398,21 +437,21 @@ if (!COMPILED) {
    * @private
    */
   goog.findBasePath_ = function() {
-    if (!goog.inHtmlDocument_()) {
-      return;
-    }
-    var doc = goog.global.document;
     if (goog.global.CLOSURE_BASE_PATH) {
       goog.basePath = goog.global.CLOSURE_BASE_PATH;
       return;
+    } else if (!goog.inHtmlDocument_()) {
+      return;
     }
+    var doc = goog.global.document;
     var scripts = doc.getElementsByTagName('script');
     // Search backwards since the current script is in almost all cases the one
     // that has base.js.
     for (var i = scripts.length - 1; i >= 0; --i) {
       var src = scripts[i].src;
-      var l = src.length;
-      if (src.substr(l - 7) == 'base.js') {
+      var qmark = src.lastIndexOf('?');
+      var l = qmark == -1 ? src.length : qmark;
+      if (src.substr(l - 7, 7) == 'base.js') {
         goog.basePath = src.substr(0, l - 7);
         return;
       }
@@ -421,25 +460,43 @@ if (!COMPILED) {
 
 
   /**
-   * Writes a script tag if, and only if, that script hasn't already been added
-   * to the document.  (Must be called at execution time)
+   * Imports a script if, and only if, that script hasn't already been imported.
+   * (Must be called at execution time)
    * @param {string} src Script source.
    * @private
    */
-  goog.writeScriptTag_ = function(src) {
-    if (goog.inHtmlDocument_() &&
-        !goog.dependencies_.written[src]) {
+  goog.importScript_ = function(src) {
+    var importScript = goog.global.CLOSURE_IMPORT_SCRIPT ||
+        goog.writeScriptTag_;
+    if (!goog.dependencies_.written[src] && importScript(src)) {
       goog.dependencies_.written[src] = true;
+    }
+  };
+
+
+  /**
+   * The default implementation of the import function. Writes a script tag to
+   * import the script.
+   *
+   * @param {string} src The script source.
+   * @return {boolean} True if the script was imported, false otherwise.
+   * @private
+   */
+  goog.writeScriptTag_ = function(src) {
+    if (goog.inHtmlDocument_()) {
       var doc = goog.global.document;
-      doc.write('<script type="text/javascript" src="' +
-                src + '"></' + 'script>');
+      doc.write(
+          '<script type="text/javascript" src="' + src + '"></' + 'script>');
+      return true;
+    } else {
+      return false;
     }
   };
 
 
   /**
    * Resolves dependencies based on the dependencies added using addDependency
-   * and calls writeScriptTag_ in the correct order.
+   * and calls importScript_ in the correct order.
    * @private
    */
   goog.writeScripts_ = function() {
@@ -467,13 +524,14 @@ if (!COMPILED) {
 
       if (path in deps.requires) {
         for (var requireName in deps.requires[path]) {
-          if (requireName in deps.nameToPath) {
-            visitNode(deps.nameToPath[requireName]);
-          } else if (!goog.getObjectByName(requireName)) {
-            // If the required name is defined, we assume that this
-            // dependency was bootstapped by other means. Otherwise,
-            // throw an exception.
-            throw Error('Undefined nameToPath for ' + requireName);
+          // If the required name is defined, we assume that it was already
+          // bootstrapped by other means.
+          if (!goog.isProvided_(requireName)) {
+            if (requireName in deps.nameToPath) {
+              visitNode(deps.nameToPath[requireName]);
+            } else {
+              throw Error('Undefined nameToPath for ' + requireName);
+            }
           }
         }
       }
@@ -492,7 +550,7 @@ if (!COMPILED) {
 
     for (var i = 0; i < scripts.length; i++) {
       if (scripts[i]) {
-        goog.writeScriptTag_(goog.basePath + scripts[i]);
+        goog.importScript_(goog.basePath + scripts[i]);
       } else {
         throw Error('Undefined script input');
       }
@@ -519,7 +577,7 @@ if (!COMPILED) {
 
   // Allow projects to manage the deps files themselves.
   if (!goog.global.CLOSURE_NO_DEPS) {
-    goog.writeScriptTag_(goog.basePath + 'deps.js');
+    goog.importScript_(goog.basePath + 'deps.js');
   }
 }
 
@@ -540,7 +598,30 @@ goog.typeOf = function(value) {
   var s = typeof value;
   if (s == 'object') {
     if (value) {
-      // We cannot use constructor == Array or instanceof Array because
+      // Check these first, so we can avoid calling Object.prototype.toString if
+      // possible.
+      //
+      // IE improperly marshals tyepof across execution contexts, but a
+      // cross-context object will still return false for "instanceof Object".
+      if (value instanceof Array) {
+        return 'array';
+      } else if (value instanceof Object) {
+        return s;
+      }
+
+      // HACK: In order to use an Object prototype method on the arbitrary
+      //   value, the compiler requires the value be cast to type Object,
+      //   even though the ECMA spec explicitly allows it.
+      var className = Object.prototype.toString.call(
+          /** @type {Object} */ (value));
+      // In Firefox 3.6, attempting to access iframe window objects' length
+      // property throws an NS_ERROR_FAILURE, so we need to special-case it
+      // here.
+      if (className == '[object Window]') {
+        return 'object';
+      }
+
+      // We cannot always use constructor == Array or instanceof Array because
       // different frames have different Array objects. In IE6, if the iframe
       // where the array was created is destroyed, the array loses its
       // prototype. Then dereferencing val.splice here throws an exception, so
@@ -558,20 +639,7 @@ goog.typeOf = function(value) {
       //         "[object ", Result(1), and "]".
       //      3. Return Result(2).
       // and this behavior survives the destruction of the execution context.
-      if (value instanceof Array ||  // Works quickly in same execution context.
-          // If value is from a different execution context then
-          // !(value instanceof Object), which lets us early out in the common
-          // case when value is from the same context but not an array.
-          // The {if (value)} check above means we don't have to worry about
-          // undefined behavior of Object.prototype.toString on null/undefined.
-          //
-          // HACK: In order to use an Object prototype method on the arbitrary
-          //   value, the compiler requires the value be cast to type Object,
-          //   even though the ECMA spec explicitly allows it.
-          (!(value instanceof Object) &&
-           (Object.prototype.toString.call(
-               /** @type {Object} */ (value)) == '[object Array]') ||
-
+      if ((className == '[object Array]' ||
            // In IE all non value types are wrapped as objects across window
            // boundaries (not iframe though) so we have to do object detection
            // for this edge case
@@ -597,9 +665,7 @@ goog.typeOf = function(value) {
       // (it appears just as an object) so we cannot use just typeof val ==
       // 'function'. However, if the object has a call property, it is a
       // function.
-      if (!(value instanceof Object) &&
-          (Object.prototype.toString.call(
-              /** @type {Object} */ (value)) == '[object Function]' ||
+      if ((className == '[object Function]' ||
           typeof value.call != 'undefined' &&
           typeof value.propertyIsEnumerable != 'undefined' &&
           !value.propertyIsEnumerable('call'))) {
@@ -915,6 +981,58 @@ Object.prototype.clone;
 
 
 /**
+ * A native implementation of goog.bind.
+ * @param {Function} fn A function to partially apply.
+ * @param {Object|undefined} selfObj Specifies the object which |this| should
+ *     point to when the function is run. If the value is null or undefined, it
+ *     will default to the global object.
+ * @param {...*} var_args Additional arguments that are partially
+ *     applied to the function.
+ * @return {!Function} A partially-applied form of the function bind() was
+ *     invoked as a method of.
+ * @private
+ * @suppress {deprecated} The compiler thinks that Function.prototype.bind
+ *     is deprecated because some people have declared a pure-JS version.
+ *     Only the pure-JS version is truly deprecated.
+ */
+goog.bindNative_ = function(fn, selfObj, var_args) {
+  return /** @type {!Function} */ (fn.call.apply(fn.bind, arguments));
+};
+
+
+/**
+ * A pure-JS implementation of goog.bind.
+ * @param {Function} fn A function to partially apply.
+ * @param {Object|undefined} selfObj Specifies the object which |this| should
+ *     point to when the function is run. If the value is null or undefined, it
+ *     will default to the global object.
+ * @param {...*} var_args Additional arguments that are partially
+ *     applied to the function.
+ * @return {!Function} A partially-applied form of the function bind() was
+ *     invoked as a method of.
+ * @private
+ */
+goog.bindJs_ = function(fn, selfObj, var_args) {
+  var context = selfObj || goog.global;
+
+  if (arguments.length > 2) {
+    var boundArgs = Array.prototype.slice.call(arguments, 2);
+    return function() {
+      // Prepend the bound arguments to the current arguments.
+      var newArgs = Array.prototype.slice.call(arguments);
+      Array.prototype.unshift.apply(newArgs, boundArgs);
+      return fn.apply(context, newArgs);
+    };
+
+  } else {
+    return function() {
+      return fn.apply(context, arguments);
+    };
+  }
+};
+
+
+/**
  * Partially applies this function to a particular 'this object' and zero or
  * more arguments. The result is a new function with some arguments of the first
  * function pre-filled and the value of |this| 'pre-specified'.<br><br>
@@ -934,27 +1052,26 @@ Object.prototype.clone;
  *     will default to the global object.
  * @param {...*} var_args Additional arguments that are partially
  *     applied to the function.
- *
  * @return {!Function} A partially-applied form of the function bind() was
  *     invoked as a method of.
+ * @suppress {deprecated} See above.
  */
 goog.bind = function(fn, selfObj, var_args) {
-  var context = selfObj || goog.global;
-
-  if (arguments.length > 2) {
-    var boundArgs = Array.prototype.slice.call(arguments, 2);
-    return function() {
-      // Prepend the bound arguments to the current arguments.
-      var newArgs = Array.prototype.slice.call(arguments);
-      Array.prototype.unshift.apply(newArgs, boundArgs);
-      return fn.apply(context, newArgs);
-    };
-
+  // TODO(nicksantos): narrow the type signature.
+  if (Function.prototype.bind &&
+      // NOTE(nicksantos): Somebody pulled base.js into the default
+      // Chrome extension environment. This means that for Chrome extensions,
+      // they get the implementation of Function.prototype.bind that
+      // calls goog.bind instead of the native one. Even worse, we don't want
+      // to introduce a circular dependency between goog.bind and
+      // Function.prototype.bind, so we have to hack this to make sure it
+      // works correctly.
+      Function.prototype.bind.toString().indexOf('native code') != -1) {
+    goog.bind = goog.bindNative_;
   } else {
-    return function() {
-      return fn.apply(context, arguments);
-    };
+    goog.bind = goog.bindJs_;
   }
+  return goog.bind.apply(null, arguments);
 };
 
 
@@ -1056,24 +1173,6 @@ goog.globalEval = function(script) {
 
 
 /**
- * A macro for defining composite types.
- *
- * By assigning goog.typedef to a name, this tells JSCompiler that this is not
- * the name of a class, but rather it's the name of a composite type.
- *
- * For example,
- * /** @type {Array|NodeList} / goog.ArrayLike = goog.typedef;
- * will tell JSCompiler to replace all appearances of goog.ArrayLike in type
- * definitions with the union of Array and NodeList.
- *
- * Does nothing in uncompiled code.
- *
- * @deprecated Please use the {@code @typedef} annotation.
- */
-goog.typedef = true;
-
-
-/**
  * Optional map of CSS class names to obfuscated names used with
  * goog.getCssName().
  * @type {Object|undefined}
@@ -1084,31 +1183,41 @@ goog.cssNameMapping_;
 
 
 /**
+ * Optional obfuscation style for CSS class names. Should be set to either
+ * 'BY_WHOLE' or 'BY_PART' if defined.
+ * @type {string|undefined}
+ * @private
+ * @see goog.setCssNameMapping
+ */
+goog.cssNameMappingStyle_;
+
+
+/**
  * Handles strings that are intended to be used as CSS class names.
  *
- * Without JS Compiler the arguments are simple joined with a hyphen and passed
- * through unaltered.
+ * This function works in tandem with @see goog.setCssNameMapping.
  *
- * With the JS Compiler the arguments are inlined, e.g:
+ * Without any mapping set, the arguments are simple joined with a
+ * hyphen and passed through unaltered.
+ *
+ * When there is a mapping, there are two possible styles in which
+ * these mappings are used. In the BY_PART style, each part (i.e. in
+ * between hyphens) of the passed in css name is rewritten according
+ * to the map. In the BY_WHOLE style, the full css name is looked up in
+ * the map directly. If a rewrite is not specified by the map, the
+ * compiler will output a warning.
+ *
+ * When the mapping is passed to the compiler, it will replace calls
+ * to goog.getCssName with the strings from the mapping, e.g.
  *     var x = goog.getCssName('foo');
  *     var y = goog.getCssName(this.baseClass, 'active');
  *  becomes:
  *     var x= 'foo';
  *     var y = this.baseClass + '-active';
  *
- * If a CSS renaming map is passed to the compiler it will replace symbols in
- * the classname.  If one argument is passed it will be processed, if two are
- * passed only the modifier will be processed, as it is assumed the first
+ * If one argument is passed it will be processed, if two are passed
+ * only the modifier will be processed, as it is assumed the first
  * argument was generated as a result of calling goog.getCssName.
- *
- * Names are split on 'hyphen' and processed in parts such that the following
- * are equivalent:
- *   var base = goog.getCssName('baseclass');
- *   goog.getCssName(base, 'modifier');
- *   goog.getCSsName('baseclass-modifier');
- *
- * If any part does not appear in the renaming map a warning is logged and the
- * original, unobfuscated class name is inlined.
  *
  * @param {string} className The class name.
  * @param {string=} opt_modifier A modifier to be appended to the class name.
@@ -1116,9 +1225,35 @@ goog.cssNameMapping_;
  *     the modifier.
  */
 goog.getCssName = function(className, opt_modifier) {
-  var cssName = className + (opt_modifier ? '-' + opt_modifier : '');
-  return (goog.cssNameMapping_ && (cssName in goog.cssNameMapping_)) ?
-      goog.cssNameMapping_[cssName] : cssName;
+  var getMapping = function(cssName) {
+    return goog.cssNameMapping_[cssName] || cssName;
+  };
+
+  var renameByParts = function(cssName) {
+    // Remap all the parts individually.
+    var parts = cssName.split('-');
+    var mapped = [];
+    for (var i = 0; i < parts.length; i++) {
+      mapped.push(getMapping(parts[i]));
+    }
+    return mapped.join('-');
+  };
+
+  var rename;
+  if (goog.cssNameMapping_) {
+    rename = goog.cssNameMappingStyle_ == 'BY_WHOLE' ?
+        getMapping : renameByParts;
+  } else {
+    rename = function(a) {
+      return a;
+    };
+  }
+
+  if (opt_modifier) {
+    return className + '-' + rename(opt_modifier);
+  } else {
+    return rename(className);
+  }
 };
 
 
@@ -1126,14 +1261,13 @@ goog.getCssName = function(className, opt_modifier) {
  * Sets the map to check when returning a value from goog.getCssName(). Example:
  * <pre>
  * goog.setCssNameMapping({
- *   "goog-menu": "a",
- *   "goog-menu-disabled": "a-b",
- *   "CSS_LOGO": "b",
- *   "hidden": "c"
+ *   "goog": "a",
+ *   "disabled": "b",
  * });
  *
+ * var x = goog.getCssName('goog');
  * // The following evaluates to: "a a-b".
- * goog.getCssName('goog-menu') + ' ' + goog.getCssName('goog-menu', 'disabled')
+ * goog.getCssName('goog') + ' ' + goog.getCssName(x, 'disabled')
  * </pre>
  * When declared as a map of string literals to string literals, the JSCompiler
  * will replace all calls to goog.getCssName() using the supplied map if the
@@ -1142,9 +1276,13 @@ goog.getCssName = function(className, opt_modifier) {
  * @param {!Object} mapping A map of strings to strings where keys are possible
  *     arguments to goog.getCssName() and values are the corresponding values
  *     that should be returned.
+ * @param {string=} style The style of css name mapping. There are two valid
+ *     options: 'BY_PART', and 'BY_WHOLE'.
+ * @see goog.getCssName for a description.
  */
-goog.setCssNameMapping = function(mapping) {
+goog.setCssNameMapping = function(mapping, style) {
   goog.cssNameMapping_ = mapping;
+  goog.cssNameMappingStyle_ = style;
 };
 
 
@@ -1317,6 +1455,5 @@ goog.base = function(me, opt_methodName, var_args) {
 goog.scope = function(fn) {
   fn.call(goog.global);
 };
-
 
 
