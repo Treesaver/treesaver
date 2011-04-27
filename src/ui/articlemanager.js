@@ -12,6 +12,7 @@ goog.require('treesaver.network');
 goog.require('treesaver.resources');
 goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
+goog.require('treesaver.uri');
 
 /**
  * @const
@@ -62,7 +63,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.initLoadingPage();
   treesaver.ui.ArticleManager.initErrorPage();
 
-  treesaver.ui.ArticleManager.initialUrl = treesaver.network.stripHash(document.location.href);
+  treesaver.ui.ArticleManager.initialUrl = treesaver.uri.stripHash(document.location.href);
   treesaver.ui.ArticleManager.initialHTML = initialHTML;
 
   // Set the display to the current article?
@@ -403,7 +404,7 @@ treesaver.ui.ArticleManager.parseTOC = function (entries) {
       return;
     }
 
-    url = treesaver.network.stripHash(treesaver.network.absoluteURL(url));
+    url = treesaver.uri.stripHash(treesaver.network.absoluteURL(url));
     article = treesaver.ui.ArticleManager.articleMap[url];
 
     if (!article) {
@@ -417,9 +418,9 @@ treesaver.ui.ArticleManager.parseTOC = function (entries) {
       // If we have an entry in the urlMap we have already loaded the index. Fix up the
       // urlMap so that we can reference the same articles from multiple URLs.
       if (treesaver.ui.ArticleManager.urlMap[url]) {
-        treesaver.ui.ArticleManager.urlMap[treesaver.network.stripFile(url)] = treesaver.ui.ArticleManager.urlMap[url];
-      } else if (treesaver.ui.ArticleManager.urlMap[treesaver.network.stripFile(url)]) {
-        treesaver.ui.ArticleManager.urlMap[url] = treesaver.ui.ArticleManager.urlMap[treesaver.network.stripFile(url)];
+        treesaver.ui.ArticleManager.urlMap[treesaver.uri.stripFile(url)] = treesaver.ui.ArticleManager.urlMap[url];
+      } else if (treesaver.ui.ArticleManager.urlMap[treesaver.uri.stripFile(url)]) {
+        treesaver.ui.ArticleManager.urlMap[url] = treesaver.ui.ArticleManager.urlMap[treesaver.uri.stripFile(url)];
       } else {
         treesaver.ui.ArticleManager.urlMap[url] = [article];
       }
@@ -723,7 +724,7 @@ treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
       article;
 
   if (!index && index !== 0) {
-    index = treesaver.ui.ArticleManager._getArticleIndex(treesaver.network.stripHash(url));
+    index = treesaver.ui.ArticleManager._getArticleIndex(treesaver.uri.stripHash(url));
 
     if (!index && index !== 0) {
       return false;
@@ -1039,7 +1040,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article, backward) {
 
     if (cached_text) {
       treesaver.debug.log('Processing cached HTML content for article: ' + article.url);
-      treesaver.ui.ArticleManager.processArticleText(cached_text, treesaver.network.stripHash(article.url), backward);
+      treesaver.ui.ArticleManager.processArticleText(cached_text, treesaver.uri.stripHash(article.url), backward);
 
       // Only for article manager?
       // TODO: Don't use events for this?
@@ -1077,7 +1078,7 @@ treesaver.ui.ArticleManager._loadArticle = function(article, backward) {
       }
 
       treesaver.debug.log('Processing HTML content for article: ' + article.url);
-      treesaver.ui.ArticleManager.processArticleText(text, treesaver.network.stripHash(article.url), backward);
+      treesaver.ui.ArticleManager.processArticleText(text, treesaver.uri.stripHash(article.url), backward);
 
       // Only for article manager?
       // TODO: Don't use events for this?

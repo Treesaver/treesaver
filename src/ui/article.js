@@ -17,6 +17,7 @@ goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Page');
 goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
+goog.require('treesaver.uri');
 
 /**
  * A chunk of content
@@ -46,7 +47,7 @@ treesaver.ui.Article = function(url, grids, node) {
   /**
    * @type {!string}
    */
-  this.path = treesaver.network.urlToPath(url);
+  this.path = treesaver.uri.parse(url)['relative'];
 
   /**
    * @type {treesaver.layout.BreakRecord}
