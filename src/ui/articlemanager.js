@@ -379,6 +379,10 @@ treesaver.ui.ArticleManager.updateTOCAux = function (entries) {
       }
       treesaver.ui.ArticleManager.articleOrder.push(article);
     });
+
+    if (entry['children']) {
+      treesaver.ui.ArticleManager.updateTOCAux(entry['children']);
+    }
   });
 };
 
@@ -431,8 +435,8 @@ treesaver.ui.ArticleManager.parseTOC = function (entries) {
     treesaver.ui.ArticleManager.articleMap[url] = article;
 
     // Process its children, if any
-    if (entry.children) {
-      treesaver.ui.ArticleManager.parseTOC(entry.children);
+    if (entry['children']) {
+      treesaver.ui.ArticleManager.parseTOC(entry['children']);
     }
 
     entry['url'] = url;
