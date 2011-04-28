@@ -13,7 +13,7 @@ $(function () {
       };
 
       // Set the initial url of the article manager
-      treesaver.ui.ArticleManager.initialUrl = treesaver.network.stripHash(document.location.href);
+      treesaver.ui.ArticleManager.initialUrl = treesaver.uri.stripHash(document.location.href);
     },
     teardown: function () {
       $('.testonly').remove();
@@ -24,7 +24,7 @@ $(function () {
   });
 
   test('getTOCLocation', function () {
-    var root = /http:\/\/[^\/]*\//.exec(treesaver.network.stripHash(document.location.href)),
+    var root = /http:\/\/[^\/]*\//.exec(treesaver.uri.stripHash(document.location.href)),
         basename = /^(.*)\/[^\/]*$/.exec(document.location.pathname)[1].substr(1) ;
 
     // OK, now add a <link> that points here
