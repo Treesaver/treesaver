@@ -732,6 +732,9 @@ treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
 
     if (!index && index !== 0) {
       return false;
+    } else {
+      article = new treesaver.ui.Article(url, treesaver.ui.ArticleManager.grids_);
+      return treesaver.ui.ArticleManager._setArticle(article);
     }
   }
 
@@ -1020,6 +1023,14 @@ treesaver.ui.ArticleManager.processArticleText = function (text, url, backward) 
     article = treesaver.ui.ArticleManager.articleOrder[index];
 
     treesaver.ui.ArticleManager._setArticle(article, treesaver.layout.ContentPosition.END, index);
+  } else if (articles.length > 1) {
+    index = treesaver.ui.ArticleManager.currentArticleIndex;
+    if (index && index !== 0) {
+      article = treesaver.ui.ArticleManager.articleOrder[index];
+      treesaver.ui.ArticleManager._setArticle(article, null, index);
+    } else {
+      treesaver.debug.warn('Tried to load a non-existing article: ' + url);
+    }
   }
 };
 
