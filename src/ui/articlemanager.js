@@ -266,7 +266,7 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
     if (index || index === 0) {
       position = e['state'].position;
 
-      treesaver.ui.setActiveDocument(treesaver.ui.ArticleManager.index.documents[index], position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null, index, true);
+      treesaver.ui.setActiveDocument(treesaver.ui.ArticleManager.index.getDocumentByIndex(index), position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null, index, true);
     } else {
       treesaver.ui.ArticleManager.goToDocumentByURL(e['state'].url);
     }
@@ -480,7 +480,7 @@ treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
   }
 
   var index = treesaver.ui.ArticleManager.currentDocumentIndex - 1,
-      doc = treesaver.ui.ArticleManager.index.documents[index];
+      doc = treesaver.ui.ArticleManager.index.getDocumentByIndex(index);
 
   return fetch ? doc : treesaver.ui.ArticleManager.setActiveDocument(doc, end ? treesaver.layout.ContentPosition.END : null, index);
 };
@@ -492,7 +492,7 @@ treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
  */
 treesaver.ui.ArticleManager.canGoToNextDocument = function() {
   return treesaver.ui.ArticleManager.currentDocumentIndex !== -1 &&
-          treesaver.ui.ArticleManager.currentDocumentIndex < treesaver.ui.ArticleManager.index.documents.length - 1;
+          treesaver.ui.ArticleManager.currentDocumentIndex < treesaver.ui.ArticleManager.getNumberOfDocuments() - 1;
 };
 
 /**
@@ -506,7 +506,7 @@ treesaver.ui.ArticleManager.nextDocument = function (fetch) {
   }
 
   var index = treesaver.ui.ArticleManager.currentDocumentIndex + 1,
-      doc = treesaver.ui.ArticleManager.index.documents[index];
+      doc = treesaver.ui.ArticleManager.index.getDocumentByIndex(index);
 
   return fetch ? doc : treesaver.ui.ArticleManager.setActiveDocument(doc, null, index);
 };

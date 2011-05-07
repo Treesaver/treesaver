@@ -128,6 +128,14 @@ treesaver.ui.Index.prototype.getArticles = function () {
   return this.articles;
 };
 
+treesaver.ui.Index.prototype.getDocumentByIndex = function (index) {
+  return this.documents[index];
+};
+
+treesaver.ui.Index.prototype.getNumberOfDocuments = function () {
+  return this.documents.length;
+};
+
 treesaver.ui.Index.prototype.getDocumentIndex = function (doc) {
   var i = 0,
       result = -1;
