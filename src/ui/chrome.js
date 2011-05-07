@@ -165,7 +165,7 @@ treesaver.ui.Chrome = function(node) {
    * Cached reference to the next article DOM
    * @type {?Array.<Element>}
    */
-  this.nextArticle = null;
+  this.nextDocument = null;
 
   /**
    * Cached reference to the previous page DOM
@@ -177,7 +177,7 @@ treesaver.ui.Chrome = function(node) {
    * Cached reference to the previous article DOM
    * @type {?Array.<Element>}
    */
-  this.prevArticle = null;
+  this.prevDocument = null;
 };
 
 /**
@@ -198,9 +198,9 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
     this.currentURL = treesaver.template.getElementsByBindName('current-url', null, this.node);
     this.nextPage = treesaver.dom.getElementsByClassName('next', this.node);
-    this.nextArticle = treesaver.dom.getElementsByClassName('nextArticle', this.node);
+    this.nextDocument = treesaver.dom.getElementsByClassName('nextArticle', this.node);
     this.prevPage = treesaver.dom.getElementsByClassName('prev', this.node);
-    this.prevArticle = treesaver.dom.getElementsByClassName('prevArticle', this.node);
+    this.prevDocument = treesaver.dom.getElementsByClassName('prevArticle', this.node);
 
     this.scrollers = treesaver.dom.getElementsByClassName('scroll', this.node).
       map(function(el) {
@@ -262,9 +262,9 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.tocTemplate = null;
   this.sidebars = null;
   this.nextPage = null;
-  this.nextArticle = null;
+  this.nextDocument = null;
   this.prevPage = null;
-  this.prevArticle = null;
+  this.prevDocument = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -416,11 +416,11 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
       break;
 
     case 72: // h
-      treesaver.ui.ArticleManager.previousArticle();
+      treesaver.ui.ArticleManager.previousDocument();
       break;
 
     case 76: // l
-      treesaver.ui.ArticleManager.nextArticle();
+      treesaver.ui.ArticleManager.nextDocument();
       break;
 
     default: // Let the event through if not handled
@@ -521,12 +521,12 @@ treesaver.ui.Chrome.prototype.click = function(e) {
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'prevArticle')) {
-          treesaver.ui.ArticleManager.previousArticle();
+          treesaver.ui.ArticleManager.previousDocument();
 
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'nextArticle')) {
-          treesaver.ui.ArticleManager.nextArticle();
+          treesaver.ui.ArticleManager.nextDocument();
 
           handled = true;
         }
@@ -849,10 +849,10 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
     // Two finger swipe in the same direction is next/previous article
     if (Math.abs(touchData.deltaX2) >= SWIPE_THRESHOLD) {
       if (touchData.deltaX < 0 && touchData.deltaX2 < 0) {
-        actionTaken = treesaver.ui.ArticleManager.nextArticle();
+        actionTaken = treesaver.ui.ArticleManager.nextDocument();
       }
       else if (touchData.deltaX > 0 && touchData.deltaX2 > 0) {
-        actionTaken = treesaver.ui.ArticleManager.previousArticle();
+        actionTaken = treesaver.ui.ArticleManager.previousDocument();
       }
 
       if (!actionTaken) {
@@ -1258,12 +1258,12 @@ treesaver.ui.Chrome.prototype.updateNextPageState = function() {
  * Update the state of the next article elements.
  * @private
  */
-treesaver.ui.Chrome.prototype.updateNextArticleState = function() {
-  if (this.nextArticle) {  
-    var canGoToNextArticle = treesaver.ui.ArticleManager.canGoToNextArticle();
+treesaver.ui.Chrome.prototype.updateNextDocumentState = function() {
+  if (this.nextDocument) {
+    var canGoToNextDocument = treesaver.ui.ArticleManager.canGoToNextDocument();
 
-    this.nextArticle.forEach(function(el) {
-      this.setElementState(el, canGoToNextArticle);
+    this.nextDocument.forEach(function(el) {
+      this.setElementState(el, canGoToNextDocument);
     }, this);
   }
 };
@@ -1286,12 +1286,12 @@ treesaver.ui.Chrome.prototype.updatePreviousPageState = function() {
  * Update the state of the previous article elements.
  * @private
  */
-treesaver.ui.Chrome.prototype.updatePreviousArticleState = function() {
+treesaver.ui.Chrome.prototype.updatePreviousDocumentState = function() {
   if (this.prevArticle) {
-    var canGoToPreviousArticle = treesaver.ui.ArticleManager.canGoToPreviousArticle();
+    var canGoToPreviousDocument = treesaver.ui.ArticleManager.canGoToPreviousDocument();
 
     this.prevArticle.forEach(function(el) {
-      this.setElementState(el, canGoToPreviousArticle);
+      this.setElementState(el, canGoToPreviousDocument);
     }, this);
   }
 };
@@ -1335,9 +1335,9 @@ treesaver.ui.Chrome.prototype.selectPages = function() {
 
   // Update the previous/next buttons depending on the current state
   this.updateNextPageState();
-  this.updateNextArticleState();
+  this.updateNextDocumentState();
   this.updatePreviousPageState();
-  this.updatePreviousArticleState();
+  this.updatePreviousDocumentState();
 };
 
 /**

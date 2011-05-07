@@ -59,6 +59,12 @@ treesaver.uri.stringify = function (o) {
     return result;
 };
 
+treesaver.uri.isIndex = function (str) {
+  return /(index|default)\.(html?|php|asp|aspx)$/i.test(str) ||
+    (treesaver.config['DirectoryIndex'] &&
+      str.lastIndexOf(treesaver.config['DirectoryIndex']) === (str.length - treesaver.config['DirectoryIndex'].length));
+};
+
 treesaver.uri.stripHash = function (str) {
   var tmp = treesaver.uri.parse(str);
   tmp.anchor = null;

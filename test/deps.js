@@ -3,9 +3,12 @@ goog.addDependency("../../src/core.js", ['treesaver.core'], ['treesaver.debug', 
 goog.addDependency("../../src/modules.js", ['treesaver.modules'], []);
 goog.addDependency("../../src/init.js", ['treesaver'], ['treesaver.boot', 'treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.history', 'treesaver.html5']);
 goog.addDependency("../../src/externs/treesaver.js", [], []);
-goog.addDependency("../../src/ui/articlemanager.js", ['treesaver.ui.ArticleManager'], ['treesaver.debug', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.events', 'treesaver.network', 'treesaver.resources', 'treesaver.storage', 'treesaver.ui.Article', 'treesaver.uri']);
+goog.addDependency("../../src/ui/articlemanager.js", ['treesaver.ui.ArticleManager'], ['treesaver.debug', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.events', 'treesaver.network', 'treesaver.resources', 'treesaver.storage', 'treesaver.ui.Article', 'treesaver.ui.Document', 'treesaver.ui.Index', 'treesaver.uri']);
 goog.addDependency("../../src/ui/article.js", ['treesaver.ui.Article'], ['treesaver.array', 'treesaver.debug', 'treesaver.constants', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.events', 'treesaver.layout.BreakRecord', 'treesaver.layout.Content', 'treesaver.layout.ContentPosition', 'treesaver.layout.Grid', 'treesaver.layout.Page', 'treesaver.network', 'treesaver.scheduler', 'treesaver.uri']);
+goog.addDependency("../../src/ui/index.js", ['treesaver.ui.Index'], ['treesaver.json', 'treesaver.uri', 'treesaver.object', 'treesaver.network', 'treesaver.ui.TreeNode', 'treesaver.ui.Document']);
 goog.addDependency("../../src/ui/lightbox.js", ['treesaver.ui.LightBox'], ['treesaver.capabilities', 'treesaver.debug', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.layout.Container', 'treesaver.layout.Figure']);
+goog.addDependency("../../src/ui/document.js", ['treesaver.ui.Document'], ['treesaver.events', 'treesaver.ui.Article', 'treesaver.ui.TreeNode', 'treesaver.uri']);
+goog.addDependency("../../src/ui/treenode.js", ['treesaver.ui.TreeNode'], []);
 goog.addDependency("../../src/ui/chrome.js", ['treesaver.ui.Chrome'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.network', 'treesaver.scheduler', 'treesaver.template', 'treesaver.ui.ArticleManager', 'treesaver.ui.Scrollable']);
 goog.addDependency("../../src/ui/scrollable.js", ['treesaver.ui.Scrollable'], []);
 goog.addDependency("../../src/ui/statemanager.js", ['treesaver.ui.StateManager'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dom', 'treesaver.events', 'treesaver.resources', 'treesaver.ui.Chrome', 'treesaver.ui.LightBox']);
