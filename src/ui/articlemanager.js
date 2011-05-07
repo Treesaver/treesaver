@@ -26,6 +26,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.currentPosition = null;
   treesaver.ui.ArticleManager.currentPageIndex = -1;
   treesaver.ui.ArticleManager.currentDocumentIndex = -1;
+  treesaver.ui.ArticleManager.currentArticleIndex = 0;
   treesaver.ui.ArticleManager.currentTransitionDirection = null;
   treesaver.ui.ArticleManager.currentPageWidth = null;
 
@@ -82,8 +83,11 @@ treesaver.ui.ArticleManager.unload = function() {
   // Clear out state
   treesaver.ui.ArticleManager.currentDocument = null;
   treesaver.ui.ArticleManager.currentPosition = null;
-  treesaver.ui.ArticleManager.currentPageIndex = null;
+  treesaver.ui.ArticleManager.currentPageIndex = -1;
+  treesaver.ui.ArticleManager.currentDocumentIndex = -1;
+  treesaver.ui.ArticleManager.currentArticleIndex = 0;
   treesaver.ui.ArticleManager.currentTransitionDirection = null;
+  treesaver.ui.ArticleManager.currentPageWidth = null;
 
   treesaver.ui.ArticleManager.loadingPageHTML = null;
   treesaver.ui.ArticleManager.loadingPageSize = null;
@@ -377,11 +381,11 @@ treesaver.ui.ArticleManager.canGoToNextPage = function() {
   if (treesaver.ui.ArticleManager.currentPageIndex !== -1) {
     // Do we know there are more pages left?
     if (treesaver.ui.ArticleManager.currentPageIndex <
-        treesaver.ui.ArticleManager.currentDocument.articles[0].pageCount - 1) {
+        treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].pageCount - 1) {
       return true;
     }
     else {
-      return treesaver.ui.ArticleManager.currentDocument.articles[0].paginationComplete &&
+      return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].paginationComplete &&
              treesaver.ui.ArticleManager.canGoToNextDocument();
     }
   }
@@ -425,8 +429,8 @@ treesaver.ui.ArticleManager.nextPage = function() {
 
   var new_index = treesaver.ui.ArticleManager.currentPageIndex + 1;
 
-  if (new_index >= treesaver.ui.ArticleManager.currentDocument.articles[0].pageCount) {
-    if (treesaver.ui.ArticleManager.currentDocument.articles[0].paginationComplete) {
+  if (new_index >= treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].pageCount) {
+    if (treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].paginationComplete) {
       // Go to the next article, if it exists
       if (treesaver.ui.ArticleManager.nextDocument()) {
         return true;
@@ -551,7 +555,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
     treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
 
   // Set the page size
-  if (treesaver.ui.ArticleManager.currentDocument.articles[0].setMaxPageSize(maxSize)) {
+  if (treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].setMaxPageSize(maxSize)) {
     // Re-layout is required, meaning our pageIndex is worthless
     treesaver.ui.ArticleManager.currentPageIndex = -1;
     // As is the page width
@@ -570,7 +574,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   // What is the base page?
   if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
     // Look up by position
-    treesaver.ui.ArticleManager.currentPageIndex = treesaver.ui.ArticleManager.currentDocument.articles[0].
+    treesaver.ui.ArticleManager.currentPageIndex = treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].
       getPageIndex(treesaver.ui.ArticleManager.currentPosition);
 
     if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
@@ -589,8 +593,8 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   if (startIndex < 0) {
     prevDocument = treesaver.ui.ArticleManager.previousDocument(false, true);
 
-    if (prevDocument && prevDocument.loaded && prevDocument.articles[0].paginationComplete) {
-      pages = prevDocument.articles[0].getPages(startIndex, -startIndex);
+    if (prevDocument && prevDocument.loaded && prevDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].paginationComplete) {
+      pages = prevDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].getPages(startIndex, -startIndex);
     }
     else {
       // Previous article isn't there or isn't ready
@@ -608,7 +612,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   }
 
   // Fetch the other pages
-  pages = pages.concat(treesaver.ui.ArticleManager.currentDocument.articles[0].
+  pages = pages.concat(treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].
       getPages(startIndex, missingPageCount));
 
   missingPageCount = pageCount - pages.length;
@@ -620,14 +624,14 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
     if (nextDocument) {
       if (!nextDocument.loaded) {
         nextDocument.load();
-        nextDocument.articles[0].setMaxPageSize(maxSize);
+        nextDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].setMaxPageSize(maxSize);
         pages.length = pageCount;
       } else {
-        if (!nextDocument.articles[0].maxPageSize) {
-          nextDocument.articles[0].setMaxPageSize(maxSize);
+        if (!nextDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].maxPageSize) {
+          nextDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].setMaxPageSize(maxSize);
         }
 
-        pages = pages.concat(nextDocument.articles[0].getPages(0, missingPageCount));
+        pages = pages.concat(nextDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].getPages(0, missingPageCount));
       }
     }
     else {
@@ -639,7 +643,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   // there isn't a next article
   for (i = buffer, len = pages.length; i < len; i += 1) {
     if (!pages[i]) {
-      if (!treesaver.ui.ArticleManager.currentDocument.articles[0].error) {
+      if (!treesaver.ui.ArticleManager.currentDocument.error) {
         pages[i] = treesaver.ui.ArticleManager._createLoadingPage();
       }
       else {
@@ -660,7 +664,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   if (!treesaver.ui.ArticleManager.currentPageWidth) {
     // Set only if it's a real page
     treesaver.ui.ArticleManager.currentPageWidth =
-      treesaver.ui.ArticleManager.currentDocument.articles[0].getPageWidth();
+      treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].getPageWidth();
   }
 
   // Clone any duplicates so we always have unique nodes
@@ -696,7 +700,7 @@ treesaver.ui.ArticleManager.getCurrentPageNumber = function() {
  * @return {number}
  */
 treesaver.ui.ArticleManager.getCurrentPageCount = function() {
-  return treesaver.ui.ArticleManager.currentDocument.articles[0].pageCount || 1;
+  return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].pageCount || 1;
 };
 
 /**
@@ -730,7 +734,7 @@ treesaver.ui.ArticleManager.getFigure = function(el) {
   }
 
   // TODO: Refactor this
-  return treesaver.ui.ArticleManager.currentDocument.articles[0].content.figures[figureIndex];
+  return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticleIndex].content.figures[figureIndex];
 };
 
 /**
