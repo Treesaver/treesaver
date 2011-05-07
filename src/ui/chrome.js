@@ -302,7 +302,7 @@ treesaver.ui.Chrome.events = {
 treesaver.ui.Chrome.watchedEvents = [
   treesaver.ui.ArticleManager.events.TOCUPDATED,
   treesaver.ui.ArticleManager.events.PAGESCHANGED,
-  treesaver.ui.ArticleManager.events.ARTICLECHANGED,
+  treesaver.ui.ArticleManager.events.DOCUMENTCHANGED,
   'keydown',
   'click',
   'mousewheel',
@@ -340,7 +340,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     this.updateTOCDelayed();
     return this.selectPagesDelayed();
 
-  case treesaver.ui.ArticleManager.events.ARTICLECHANGED:
+  case treesaver.ui.ArticleManager.events.DOCUMENTCHANGED:
     this.updateTOCActive(e);
     return this.updatePageURL(e);
 
@@ -574,7 +574,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
         }
 
         url = treesaver.network.absoluteURL(el.href);
-        if (!treesaver.ui.ArticleManager.goToArticleByURL(url)) {
+        if (!treesaver.ui.ArticleManager.goToDocumentByURL(url)) {
           // The URL is not an article, let the navigation happen normally
           return;
         }
@@ -1377,10 +1377,10 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
     // because we receive the article changed event (which is
     // normally used to update the active TOC) before the TOC
     // changed event.
-    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
-      article: treesaver.ui.ArticleManager.currentArticle,
-      'url': treesaver.ui.ArticleManager.currentArticle.url,
-      'path': treesaver.ui.ArticleManager.currentArticle.path
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.DOCUMENTCHANGED, {
+      'document': treesaver.ui.ArticleManager.currentDocument,
+      'url': treesaver.ui.ArticleManager.currentDocument.url,
+      'path': treesaver.ui.ArticleManager.currentDocument.path
     });
   }
 };

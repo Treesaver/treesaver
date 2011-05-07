@@ -492,7 +492,7 @@ treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
  */
 treesaver.ui.ArticleManager.canGoToNextDocument = function() {
   return treesaver.ui.ArticleManager.currentDocumentIndex !== -1 &&
-          treesaver.ui.ArticleManager.currentDocumentIndex < treesaver.ui.ArticleManager.getNumberOfDocuments() - 1;
+          treesaver.ui.ArticleManager.currentDocumentIndex < treesaver.ui.ArticleManager.index.getNumberOfDocuments() - 1;
 };
 
 /**
@@ -526,7 +526,7 @@ treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
 
   if (docs.length !== 0) {
     // Go to the first matching document
-    doc = index[0];
+    doc = docs[0];
 
     index = treesaver.ui.ArticleManager.index.getDocumentIndex(doc);
 
@@ -806,6 +806,7 @@ treesaver.ui.ArticleManager.setActiveDocument = function (doc, pos, index, noHis
     'url': doc.url,
     'path': doc.path
   });
+  return true;
 };
 
 /**
