@@ -54,10 +54,9 @@ $(function () {
 
   test('Construction', function () {
     var $content = $('.testonly.content'),
-        article = new treesaver.ui.Article(document.location.href, [], $content[0]);
+        article = new treesaver.ui.Article([], $content[0]);
 
     ok(article, 'Object constructed');
-    equals(article.url, document.location.href, 'Path stored');
   });
 
   //test('Async loading: Successful', function () {
@@ -139,7 +138,7 @@ $(function () {
 
   test('HTML content processing', function () {
     var articleNode = $('.testonly.content article')[0],
-        article = new treesaver.ui.Article('', [], articleNode.cloneNode(true)),
+        article = new treesaver.ui.Article([], articleNode.cloneNode(true)),
         tmp;
 
     // Passing the html into the constructor should auto-process
@@ -152,7 +151,7 @@ $(function () {
 
     // Make sure theme flag is properly extracted
     tmp.setAttribute('data-theme', 'theme');
-    article = new treesaver.ui.Article('', []);
+    article = new treesaver.ui.Article([]);
     console.log(tmp.outerHTML);
     ok(article.processHTML(tmp), 'Returns true on success');
     equals(article.theme, 'theme', 'Theme stored');
@@ -164,7 +163,7 @@ $(function () {
     //ok(article.content === tmp, 'Use previous results on repeat call');
 
     // Make sure error flag is set when we can't extract
-    article = new treesaver.ui.Article('', '', []);
+    article = new treesaver.ui.Article('', []);
     ok(!article.processHTML('<p>Hello</p>'), 'Returns false on failure');
     ok(article.error, 'Error flag on faulty HTML');
   });
@@ -204,7 +203,7 @@ $(function () {
 
   test('Pagination', function () {
     var $content = $('.testonly.content article')[0],
-        article = new treesaver.ui.Article('/path', [], $content),
+        article = new treesaver.ui.Article([], $content),
         grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
         pos;
 
@@ -241,7 +240,7 @@ $(function () {
 
   test('getPages', function () {
     var $content = $('.testonly.content article')[0],
-        article = new treesaver.ui.Article('/path', [], $content),
+        article = new treesaver.ui.Article([], $content),
         grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
         pages,
         page,
@@ -337,7 +336,7 @@ $(function () {
 
   test('getPageIndex', function () {
     var $content = $('.testonly.content'),
-        article = new treesaver.ui.Article('/path', []),
+        article = new treesaver.ui.Article([]),
         grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
         tests = [],
         pos,

@@ -37,27 +37,15 @@ $(function () {
 
     result = d.parse('<article></article>');
     equal(result.length, 1, 'one article returned');
-    equal(result[0].path, '/', 'path set to root');
-    equal(result[0].url, 'http://www.example.com/', 'url set correctly');
 
     result = d.parse('<article><article></article></article>');
     equal(result.length, 1, 'nested articles are ignored');
 
     result = d.parse('<article></article><article></article>');
     equal(result.length, 2, 'correctly extracted two articles');
-    equal(result[0].path, '/', 'first article path is set to root');
-    equal(result[0].url, 'http://www.example.com/', 'first article url is set to requestUrl');
-    equal(result[1].path, '/#_1', 'second (unnamed) article is has correct path');
-    equal(result[1].url, 'http://www.example.com/#_1', 'second (unnamed) article has correct url');
-
-    result = d.parse('<article id="test"></article>');
-    equal(result[0].path, '/#test', 'first (named) article received correct path');
-    equal(result[0].url, 'http://www.example.com/#test', 'first (named) article received correct url');
 
     result = d.parse('<article></article><article id="notes"></article>');
     equal(result.length, 2, 'two articles returned');
-    equal(result[0].path, '/', 'correct path for first (unnamed) article');
-    equal(result[1].path, '/#notes', 'correct path for second (named) article');
   });
 
   test('Document.load: simple', function () {

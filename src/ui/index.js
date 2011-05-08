@@ -33,8 +33,6 @@ treesaver.ui.Index = function (url) {
   this.documentMap = {};
   this.documentPositions = {};
   this.documents = [];
-
-  this.articles = [];
 };
 
 treesaver.ui.Index.prototype = new treesaver.ui.TreeNode();
@@ -88,11 +86,6 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
 
 treesaver.ui.Index.prototype.invalidate = function () {
   var index = 0;
-
-  this.articles = [];
-  this.walk(this.children, function (doc) {
-    this.articles = this.articles.concat(doc.articles);
-  }, this);
   
   this.documents = [];
   this.documentMap = {};
@@ -122,10 +115,6 @@ treesaver.ui.Index.prototype.walk = function (entries, fn, scope) {
   return entries.every(function (entry) {
     return fn.call(scope, entry) !== false && this.walk(entry.children, fn);
   }, this);
-};
-
-treesaver.ui.Index.prototype.getArticles = function () {
-  return this.articles;
 };
 
 treesaver.ui.Index.prototype.getDocumentByIndex = function (index) {

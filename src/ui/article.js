@@ -28,7 +28,7 @@ goog.require('treesaver.uri');
  * @param {!Array.<treesaver.layout.Grid>} grids
  * @param {string=} html
  */
-treesaver.ui.Article = function(url, grids, node) {
+treesaver.ui.Article = function(grids, node) {
   /**
    * @type {?string}
    */
@@ -38,16 +38,6 @@ treesaver.ui.Article = function(url, grids, node) {
    * @type {treesaver.layout.Content} The content of this article
    */
   this.content = null;
-
-  /**
-   * @type {!string}
-   */
-  this.url = url;
-
-  /**
-   * @type {!string}
-   */
-  this.path = treesaver.uri.parse(url)['relative'];
 
   /**
    * @type {treesaver.layout.BreakRecord}

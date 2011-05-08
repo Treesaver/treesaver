@@ -24,6 +24,13 @@ treesaver.ui.Document = function (url, children, meta) {
   this.articles = [];
 
   /**
+   * Maps identifiers to articles
+   */
+  this.articleMap = {};
+
+  this.anchorMap = [];
+
+  /**
    * @type {boolean}
    */
   this.loaded = false;
@@ -81,10 +88,15 @@ treesaver.ui.Document.prototype.parse = function (text) {
     // `_<position>`, but not for the first article (which can always be
     // referenced by the requestUrl.)
     var identifier = articleNode.getAttribute('id') || (index === 0 ? null : ('_' + index)),
-        articleUrl = identifier === null ? this.url : (this.url + '#' + identifier);
+        // TODO: get rid of the global reference to ArticleManager
+        article = new treesaver.ui.Article(treesaver.ui.ArticleManager.grids_, articleNode);
 
-    // TODO: get rid of the global reference to ArticleManager
-    return new treesaver.ui.Article(articleUrl, treesaver.ui.ArticleManager.grids_, articleNode);
+    if (identifier) {
+      this.articleMap[identifier] = index;
+      this.anchorMap[index] = identifier;
+    }
+
+    return article;
   }, this);
 };
 
@@ -108,6 +120,22 @@ treesaver.ui.Document.prototype.equals = function (o) {
   } else {
     return url === this.url;
   }
+};
+
+treesaver.ui.Document.prototype.getArticle = function (index) {
+  return this.articles[index] || null;
+};
+
+treesaver.ui.Document.prototype.getNumberOfArticles = function () {
+  return this.articles.length;
+};
+
+treesaver.ui.Document.prototype.getArticleAnchor = function (index) {
+  return this.anchorMap[index] || null;
+};
+
+treesaver.ui.Document.prototype.getArticleIndex = function (anchor) {
+  return this.articleMap[anchor] || 0;
 };
 
 treesaver.ui.Document.prototype.load = function () {

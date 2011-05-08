@@ -29,16 +29,16 @@ $(function () {
 
     // OK, now add a <link> that points here
     $('<link rel="index" href="http://test.com/" class="testonly" />').appendTo($('head'));
-    equals(treesaver.ui.ArticleManager.getTOCLocation(), 'http://test.com/', 'Absolute URL maintained');
+    equals(treesaver.ui.ArticleManager.getIndexUrl(), 'http://test.com/', 'Absolute URL maintained');
 
     $('link[rel*=index]').attr('href', '/');
-    equals(treesaver.ui.ArticleManager.getTOCLocation(), root, 'Root URL');
+    equals(treesaver.ui.ArticleManager.getIndexUrl(), root, 'Root URL');
 
     $('link[rel*=index]').attr('href', '/hello');
-    equals(treesaver.ui.ArticleManager.getTOCLocation(), root + 'hello', 'Absolute path');
+    equals(treesaver.ui.ArticleManager.getIndexUrl(), root + 'hello', 'Absolute path');
 
     $('link[rel*=index]').attr('href', 'hello');
-    equals(treesaver.ui.ArticleManager.getTOCLocation(), root + basename + '/hello', 'Relative path');
+    equals(treesaver.ui.ArticleManager.getIndexUrl(), root + basename + '/hello', 'Relative path');
   });
 
   test('loadingPage', function () {
