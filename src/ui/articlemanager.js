@@ -60,7 +60,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.index.load();
 
   // Set the initial document to active
-  treesaver.ui.ArticleManager.setActiveDocument(treesaver.ui.ArticleManager.initialDocument, 0, null, true);
+  treesaver.ui.ArticleManager.setCurrentDocument(treesaver.ui.ArticleManager.initialDocument, 0, null, true);
 
   // Set up the loading & error pages
   treesaver.ui.ArticleManager.initLoadingPage();
@@ -270,7 +270,7 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
     if (index || index === 0) {
       position = e['state'].position;
 
-      treesaver.ui.setActiveDocument(treesaver.ui.ArticleManager.index.getDocumentByIndex(index), 0, position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null, index, true);
+      treesaver.ui.setCurrentDocument(treesaver.ui.ArticleManager.index.getDocumentByIndex(index), 0, position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null, index, true);
     } else {
       treesaver.ui.ArticleManager.goToDocumentByURL(e['state'].url);
     }
@@ -278,7 +278,7 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
     // Assume initial article
     index = treesaver.ui.ArticleManager.index.getDocumentIndex(treesaver.ui.ArticleManager.initialDocument);
 
-    treesaver.ui.ArticleManager.setActiveDocument(treesaver.ui.ArticleManager.initialDocument, 0, null, index);
+    treesaver.ui.ArticleManager.setCurrentDocument(treesaver.ui.ArticleManager.initialDocument, 0, null, index);
   }
 };
 
@@ -351,7 +351,7 @@ treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
     // articles it has...
   }
 
-  return fetch ? doc : treesaver.ui.ArticleManager.setActiveDocument(doc, articleIndex, end ? treesaver.layout.ContentPosition.END : null, index);
+  return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articleIndex, end ? treesaver.layout.ContentPosition.END : null, index);
 };
 
 treesaver.ui.ArticleManager.previousArticle = function (end, fetch) {
@@ -364,7 +364,7 @@ treesaver.ui.ArticleManager.previousArticle = function (end, fetch) {
         index = treesaver.ui.ArticleManager.currentDocumentIndex,
         doc = treesaver.ui.ArticleManager.currentDocument;
 
-    return fetch ? doc : treesaver.ui.ArticleManager.setActiveDocument(doc, articleIndex, end ? treesaver.layout.ContentPosition.END : null, index);
+    return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articleIndex, end ? treesaver.layout.ContentPosition.END : null, index);
   } else {
     return treesaver.ui.ArticleManager.previousDocument(end, fetch);
   }
@@ -483,7 +483,7 @@ treesaver.ui.ArticleManager.nextDocument = function (fetch) {
   var index = treesaver.ui.ArticleManager.currentDocumentIndex + 1,
       doc = treesaver.ui.ArticleManager.index.getDocumentByIndex(index);
 
-  return fetch ? doc : treesaver.ui.ArticleManager.setActiveDocument(doc, 0, null, index);
+  return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, 0, null, index);
 };
 
 treesaver.ui.ArticleManager.nextArticle = function (fetch) {
@@ -496,7 +496,7 @@ treesaver.ui.ArticleManager.nextArticle = function (fetch) {
         index = treesaver.ui.ArticleManager.currentDocumentIndex,
         doc = treesaver.ui.ArticleManager.currentDocument;
 
-    return fetch ? doc : treesaver.ui.ArticleManager.setActiveDocument(doc, articleIndex, null, index);
+    return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articleIndex, null, index);
   } else {
     return treesaver.ui.ArticleManager.nextDocument(fetch);
   }
@@ -578,7 +578,7 @@ treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
 
     if (index !== -1) {
       // FIXME: This might point to an article we know nothing about...
-      return treesaver.ui.ArticleManager.setActiveDocument(doc, doc.getArticleIndex(articleAnchor), null, index);
+      return treesaver.ui.ArticleManager.setCurrentDocument(doc, doc.getArticleIndex(articleAnchor), null, index);
     }
   }
   return false;
@@ -790,7 +790,7 @@ treesaver.ui.ArticleManager.redirectToDocument = function (doc) {
   }
 };
 
-treesaver.ui.ArticleManager.setActiveDocument = function (doc, articleIndex, pos, index, noHistory) {
+treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articleIndex, pos, index, noHistory) {
   var articleAnchor = null,
       url = null,
       path = null;
