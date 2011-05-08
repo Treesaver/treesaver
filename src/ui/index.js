@@ -113,7 +113,7 @@ treesaver.ui.Index.prototype.invalidate = function () {
  */
 treesaver.ui.Index.prototype.walk = function (entries, fn, scope) {
   return entries.every(function (entry) {
-    return fn.call(scope, entry) !== false && this.walk(entry.children, fn);
+    return fn.call(scope, entry) !== false && this.walk(entry.children, fn, scope);
   }, this);
 };
 
