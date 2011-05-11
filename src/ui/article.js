@@ -116,8 +116,6 @@ treesaver.ui.Article = function(grids, node) {
  * @type {Object.<string, string>}
  */
 treesaver.ui.Article.events = {
-  LOADFAILED: 'treesaver.loadfailed',
-  LOADED: 'treesaver.loaded',
   PAGINATIONERROR: 'treesaver.paginationerror',
   PAGINATIONPROGRESS: 'treesaver.paginationprogress'
 };

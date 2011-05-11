@@ -219,8 +219,8 @@ treesaver.ui.ArticleManager.transitionDirection = {
  * @type {Array.<string>}
  */
 treesaver.ui.ArticleManager.watchedEvents = [
-  treesaver.ui.Article.events.LOADED,
-  treesaver.ui.Article.events.LOADFAILED,
+  treesaver.ui.Document.events.LOADED,
+  treesaver.ui.Document.events.LOADFAILED,
   treesaver.ui.Article.events.PAGINATIONPROGRESS
 ];
 
@@ -236,7 +236,7 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
     return;
   }
 
-  if (e.type === treesaver.ui.Article.events.LOADED) {
+  if (e.type === treesaver.ui.Document.events.LOADED) {
     // TODO
     // If it's the current article, kick off pagination?
     // If it's the next, kick it off too?
