@@ -90,7 +90,7 @@ treesaver.ui.Index.prototype.invalidate = function () {
   this.documents = [];
   this.documentMap = {};
   this.documentPositions = {};
-  index = 0;
+
   this.walk(this.children, function (doc) {
     if (this.documentMap[doc.url]) {
       this.documentMap[doc.url].push(doc);
@@ -198,7 +198,7 @@ treesaver.ui.Index.prototype.load = function () {
   // Don't try loading if we do not have a proper URL
   if (!this.url) {
     treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADFAILED, {
-          index: this
+      index: this
     });
     return;
   }
