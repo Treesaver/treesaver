@@ -7,11 +7,16 @@ goog.require('treesaver.network');
 goog.require('treesaver.ui.TreeNode');
 goog.require('treesaver.ui.Document');
 
-
+/**
+ * Class representing the index file (i.e. the table of contents for documents.)
+ * @constructor
+ * @extends {treesaver.ui.TreeNode}
+ * @param {?string} url The url the index was loaded from.
+ */
 treesaver.ui.Index = function (url) {
 
   /**
-   * @type {!string}
+   * @type {?string}
    */
   this.url = url;
 
@@ -30,8 +35,20 @@ treesaver.ui.Index = function (url) {
    */
   this.loading = false;
 
+  /**
+   * @type {!Object}
+   */
   this.documentMap = {};
+
+  /**
+   * @type {!Object}
+   */
   this.documentPositions = {};
+
+  /**
+   * Linear list of documents. This is used as a cache. You can invalidate and repopulate the cache by calling invalidate().
+   * @type {!Array.<treesaver.ui.Document>}
+   */
   this.documents = [];
 };
 
@@ -49,6 +66,8 @@ treesaver.ui.Index.events = {
 /**
  * Parses an index entry and returns a new Document instance.
  * @private
+ * @param {!Object} entry
+ * @return {?treesaver.ui.Document}
  */
 treesaver.ui.Index.prototype.parseEntry = function(entry) {
   var url = entry['url'],
@@ -72,7 +91,7 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
   });
 
   // Create a new document
-  doc = new treesaver.ui.Document(url, [], meta);
+  doc = new treesaver.ui.Document(url, meta);
 
   // Depth first traversal of any children, and add them
   if (children && Array.isArray(children)) {
@@ -84,12 +103,16 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
   return doc;
 };
 
+/**
+ * Invalidate the document cache and repopulates it. This
+ * should be called after manually modifying the index.
+ */
 treesaver.ui.Index.prototype.invalidate = function () {
   var index = 0;
   
   this.documents = [];
   this.documentMap = {};
-  this.documentPositions = {};
+  this.documentPositions = {};// TODO: Maybe generalize caching. There seems to be a pattern here.
 
   this.walk(this.children, function (doc) {
     if (this.documentMap[doc.url]) {
@@ -109,55 +132,78 @@ treesaver.ui.Index.prototype.invalidate = function () {
 };
 
 /**
+ * Depth first walk through the index.
+ *
  * @private
+ * @param {Array.<treesaver.ui.TreeNode>} children
+ * @param {!function(!treesaver.ui.TreeNode)} fn Callback to call for each node. Return false to exit the traversal early.
+ * @param {Object=} scope Scope bound to the callback.
  */
-treesaver.ui.Index.prototype.walk = function (entries, fn, scope) {
-  return entries.every(function (entry) {
+treesaver.ui.Index.prototype.walk = function (children, fn, scope) {
+  return children.every(function (entry) {
     return fn.call(scope, entry) !== false && this.walk(entry.children, fn, scope);
   }, this);
 };
 
+/**
+ * Return the document at `index`.
+ * @param {!number} index
+ * @return {?treesaver.ui.Document}
+ */
 treesaver.ui.Index.prototype.getDocumentByIndex = function (index) {
   return this.documents[index];
 };
 
+/**
+ * Returns the total number of documents in this index.
+ * @return {!number}
+ */
 treesaver.ui.Index.prototype.getNumberOfDocuments = function () {
   return this.documents.length;
 };
 
+/**
+ * Returns the document index of the given document (the position in a depth first traversal of the document hierarchy.)
+ * @param {!treesaver.ui.Document} doc
+ * @return {!number}
+ */
 treesaver.ui.Index.prototype.getDocumentIndex = function (doc) {
-  var i = 0,
-      result = -1;
-  this.walk(this.children, function (d) {
+  var result = -1;
+
+  this.documents.every(function (d, i) {
     if (d.equals(doc)) {
       result = i;
       return false;
     }
-    i += 1;
+    return true;
   });
-  return result;
-};
 
-treesaver.ui.Index.prototype.getDocuments = function () {
-  var result = [];
-  this.walk(this.children, function (doc) {
-    result.push(doc);
-  });
-  return result;
-};
-
-treesaver.ui.Index.prototype.get = function (url) {
-  var result = [];
-  this.walk(this.children, function (doc) {
-    if (doc.equals(url)) {
-      result.push(doc);
-    }
-  });
   return result;
 };
 
 /**
+ * Returns the linear ordering of documents as extracted from a depth first traversal of the document hierarchy.
+ * @return {!Array.<treesaver.ui.Document>}
+ */
+treesaver.ui.Index.prototype.getDocuments = function () {
+  return this.documents;
+};
+
+/**
+ * Returns all documents matching the given URL.
+ * @param {!string} url
+ * @return {Array.<treesaver.ui.Document>}
+ */
+treesaver.ui.Index.prototype.get = function (url) {
+  return this.documents.filter(function (doc) {
+    return doc.equals(url);
+  });
+};
+
+/**
  * Parses a string or array as the document index.
+ * @private
+ * @param {!string|!Array} index
  */
 treesaver.ui.Index.prototype.parse = function (index) {
   var result = [];
@@ -175,7 +221,7 @@ treesaver.ui.Index.prototype.parse = function (index) {
     }
   }
 
-  if (!Array.isArray(index)) {
+  if (!Array.isArray(/** @type {!Object} */ (index))) {
     treesaver.debug.warn('Document index should be an array of objects.');
     return [];
   }  
@@ -185,10 +231,14 @@ treesaver.ui.Index.prototype.parse = function (index) {
   }, this);
 };
 
-// TODO: Maybe generalize caching. There seems to be a pattern here.
+/**
+ * Load the index file through XHR if it hasn't already been loaded.
+ */
 treesaver.ui.Index.prototype.load = function () {
   var that = this,
       cached_text = null;
+
+  // TODO: Maybe generalize caching. There seems to be a pattern here.
 
   // Only load once
   if (this.loading) {

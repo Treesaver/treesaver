@@ -43,7 +43,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   }
 
   // TODO: Store hash, so we can use it to jump directly to an article
-  treesaver.ui.ArticleManager.initialDocument = new treesaver.ui.Document(treesaver.uri.stripHash(document.location.href), [], {});
+  treesaver.ui.ArticleManager.initialDocument = new treesaver.ui.Document(treesaver.uri.stripHash(document.location.href), {});
 
   if (initialHTML) {
     treesaver.ui.ArticleManager.initialDocument.articles = treesaver.ui.ArticleManager.initialDocument.parse(initialHTML);
@@ -61,7 +61,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.index.load();
 
   // Set the initial document to active
-  treesaver.ui.ArticleManager.setCurrentDocument(treesaver.ui.ArticleManager.initialDocument, treesaver.ui.ArticlePosition.BEGINNING, null, true);
+  treesaver.ui.ArticleManager.setCurrentDocument(treesaver.ui.ArticleManager.initialDocument, treesaver.ui.ArticlePosition.BEGINNING, null, 0, true);
 
   // Set up the loading & error pages
   treesaver.ui.ArticleManager.initLoadingPage();
@@ -249,7 +249,7 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
   if (e.type === treesaver.ui.Article.events.LOADFAILED &&
       e.article === treesaver.ui.ArticleManager.currentDocument) {
     // The current article failed to load, redirect to it
-    treesaver.ui.ArticleManager._redirectToArticle(treesaver.ui.ArticleManager.currentDocument);
+    treesaver.ui.ArticleManager.redirectToDocument(treesaver.ui.ArticleManager.currentDocument);
 
     return;
   }
@@ -294,6 +294,11 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
   }
 };
 
+/**
+ * Returns the URL of the index file if available in the initial page.
+ * @private
+ * @return {?string}
+ */
 treesaver.ui.ArticleManager.getIndexUrl = function () {
   var link = treesaver.dom.getElementsByProperty('rel', 'index', 'link')[0];
 
@@ -328,14 +333,18 @@ treesaver.ui.ArticleManager.canGoToPreviousPage = function() {
   }
 };
 
+/**
+ * Returns true if it is possible to go to a previous article.
+ * @return {!boolean}
+ */
 treesaver.ui.ArticleManager.canGoToPreviousArticle = function () {
   return !!treesaver.ui.ArticleManager.currentArticlePosition.index || treesaver.ui.ArticleManager.canGoToPreviousDocument();
 };
 
 /**
- * Is there a previous article to go to?
+ * Is there a previous document to go to?
  *
- * @return {boolean}
+ * @return {!boolean}
  */
 treesaver.ui.ArticleManager.canGoToPreviousDocument = function () {
   return treesaver.ui.ArticleManager.currentDocumentIndex >= 1;
@@ -345,7 +354,7 @@ treesaver.ui.ArticleManager.canGoToPreviousDocument = function () {
  * Go to the beginning of previous document in the flow
  * @param {boolean=} end Go to the end of the document.
  * @param {boolean=} fetch Only return the document, don't move.
- * @return {treesaver.ui.Document} False if there is no next document.
+ * @return {treesaver.ui.Document} null if there is no next document.
  */
 treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
   if (!treesaver.ui.ArticleManager.canGoToPreviousDocument()) {
@@ -365,6 +374,11 @@ treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
   return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
 };
 
+/**
+ * Go to or fetch the previous article or document.
+ * @param {boolean=} end Whether to go to the end of the previous article or document.
+ * @param {boolean=} fetch Whether to go to the previous article (or document) or fetch it without navigating to it.
+ */
 treesaver.ui.ArticleManager.previousArticle = function (end, fetch) {
   if (!treesaver.ui.ArticleManager.canGoToPreviousArticle()) {
     return null;
@@ -497,6 +511,10 @@ treesaver.ui.ArticleManager.nextDocument = function (fetch) {
   return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, treesaver.ui.ArticlePosition.BEGINNING, null, index);
 };
 
+/**
+ * Go to or fetch the next article or document.
+ * @param {boolean=} fetch Whether to go to the next article (or document) or fetch it without navigating to it.
+ */
 treesaver.ui.ArticleManager.nextArticle = function (fetch) {
   if (!treesaver.ui.ArticleManager.canGoToNextArticle()) {
     return null;
@@ -800,7 +818,7 @@ treesaver.ui.ArticleManager.getFigure = function(el) {
 /**
  * Redirects the browser to the URL for the given document
  * @private
- * @param {!treesaver.ui.Article} article
+ * @param {!treesaver.ui.Document} doc
  */
 treesaver.ui.ArticleManager.redirectToDocument = function (doc) {
   if (treesaver.network.isOnline()) {
@@ -810,6 +828,13 @@ treesaver.ui.ArticleManager.redirectToDocument = function (doc) {
   }
 };
 
+/**
+ * @param {!treesaver.ui.Document} doc The document to set as current. Will be loaded if necessary.
+ * @param {!treesaver.ui.ArticlePosition} articlePosition The article position within the document. Can be used to set the last article of a document as current, or jump to a specific article within a document.
+ * @param {?treesaver.layout.ContentPosition} pos The position within an article.
+ * @param {!number} index The index at which the document should be placed.
+ * @param {boolean=} noHistory Whether to modify the history or not.
+ */
 treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition, pos, index, noHistory) {
   var articleAnchor = null,
       url = null,

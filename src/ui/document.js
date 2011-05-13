@@ -5,17 +5,33 @@ goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.TreeNode');
 goog.require('treesaver.uri');
 
-// TODO: Remove children parameter? Not necessary now that we have appendChild, etc.
-treesaver.ui.Document = function (url, children, meta) {
+/**
+ * Class representing "documents" which are usually HTML pages that contain one or
+ * more (top level) articles.
+ * @constructor
+ * @extends {treesaver.ui.TreeNode}
+ * @param {!string} url The url of this document.
+ * @param {?Object=} meta Meta-data for this document such as title, author, etc.
+ */
+treesaver.ui.Document = function (url, meta) {
   if (!url) {
     treesaver.debug.error('Document must have an URL');
     return;
   }
 
+  /**
+   * @type {!string}
+   */
   this.url = url;
 
+  /**
+   * @type {!string}
+   */
   this.path = treesaver.uri.parse(url)['relative'];
 
+  /**
+   * @type {!Object}
+   */
   this.meta = meta || {};
 
   /**
@@ -25,9 +41,14 @@ treesaver.ui.Document = function (url, children, meta) {
 
   /**
    * Maps identifiers to articles
+   * @type {!Object}
    */
   this.articleMap = {};
 
+  /**
+   * Maps article positions to anchors
+   * @type {Array.<!string>}
+   */
   this.anchorMap = [];
 
   /**
@@ -53,7 +74,7 @@ treesaver.ui.Document = function (url, children, meta) {
   /**
    * @type {!Array.<treesaver.ui.Document>}
    */
-  this.children = children || [];
+  this.children = [];
 };
 
 treesaver.ui.Document.CACHE_STORAGE_PREFIX = 'cache:';
@@ -65,6 +86,12 @@ treesaver.ui.Document.events = {
 
 treesaver.ui.Document.prototype = new treesaver.ui.TreeNode();
 
+/**
+ * Parse the content of a document, creating articles where necessary.
+ *
+ * @param {!string} text The HTML text of a document.
+ * @return {Array.<!treesaver.ui.Article>} A list of Article instances that were extracted from the text.
+ */
 treesaver.ui.Document.prototype.parse = function (text) {
   var node = document.createElement('div'),
       articles = [];
@@ -88,7 +115,7 @@ treesaver.ui.Document.prototype.parse = function (text) {
     // `_<position>`, but not for the first article (which can always be
     // referenced by the requestUrl.)
     var identifier = articleNode.getAttribute('id') || (index === 0 ? null : ('_' + index)),
-        // TODO: get rid of the global reference to ArticleManager
+        // FIXME: get rid of the global reference to ArticleManager
         article = new treesaver.ui.Article(treesaver.ui.ArticleManager.grids_, articleNode);
 
     if (identifier) {
@@ -100,6 +127,13 @@ treesaver.ui.Document.prototype.parse = function (text) {
   }, this);
 };
 
+/**
+ * Tests for document equality. This usually comes down to comparing their URLs. There is a
+ * special exception for when the document is a directory index file.
+ *
+ * @param {!treesaver.ui.Document|!string} o A document to compare against, or a url.
+ * @return {boolean} True if this document equals `o`.
+ */
 treesaver.ui.Document.prototype.equals = function (o) {
   var url = o;
 
@@ -122,22 +156,44 @@ treesaver.ui.Document.prototype.equals = function (o) {
   }
 };
 
+/**
+ * Returns the article at the given index.
+ * @param {!number} index
+ * @return {?treesaver.ui.Article}
+ */
 treesaver.ui.Document.prototype.getArticle = function (index) {
   return this.articles[index] || null;
 };
 
+/**
+ * Returns the number of articles in this Document. Does not include any child documents.
+ * @return {!number}
+ */
 treesaver.ui.Document.prototype.getNumberOfArticles = function () {
   return this.articles.length;
 };
 
+/**
+ * Returns the anchor at the given article index.
+ * @param {!number} index
+ * @return {?string} The anchor or null if the article does not exist or does not have an anchor.
+ */
 treesaver.ui.Document.prototype.getArticleAnchor = function (index) {
   return this.anchorMap[index] || null;
 };
 
+/**
+ * Returns the article index for the given anchor.
+ * @param {!string} anchor
+ * @return {!number} The index for the given anchor, or zero (the first article, which is a sensible fallback when the anchor is not found.)
+ */
 treesaver.ui.Document.prototype.getArticleIndex = function (anchor) {
   return this.articleMap[anchor] || 0;
 };
 
+/**
+ * Load this document by an XHR, if it hasn't already been loaded.
+ */
 treesaver.ui.Document.prototype.load = function () {
   var that = this,
       cached_text = null;

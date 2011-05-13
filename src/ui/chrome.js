@@ -1158,7 +1158,9 @@ treesaver.ui.Chrome.prototype.updatePageURL = function(e) {
  */
 treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
   if (this.toc) {
-    var tocEntries = /*treesaver.ui.ArticleManager.getCurrentTOC()*/ [],
+    // FIXME:!!!
+/*
+    var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
         tocElements = treesaver.template.getElementsByBindName('article', null, this.toc),
         i = 0;
 
@@ -1172,7 +1174,7 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
         i += 1;
       }
     });
-
+*/
     // Refresh the size of scrollable areas (often used with TOC)
     // TODO: Figure out better separate here?
     this.scrollers.forEach(function(s) { s.refreshDimensions(); });
@@ -1352,10 +1354,10 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
     var tocEntries = /*treesaver.ui.ArticleManager.getCurrentTOC()*/ [],
         newToc = /** @type {!Element} */ (this.tocTemplate.cloneNode(true)),
         tocParent = this.toc.parentNode;
-
+/*
     tocEntries = tocEntries.filter(function(entry) {
       return !entry.flags['hidden'];
-    });
+    });*/
 
     // Format the TOC entries to fit our TOC template format.
     tocEntries = tocEntries.map(function(entry) {

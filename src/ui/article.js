@@ -23,10 +23,8 @@ goog.require('treesaver.uri');
  * A chunk of content
  *
  * @constructor
- * @param {!string} url
- * @param {!string} title
  * @param {!Array.<treesaver.layout.Grid>} grids
- * @param {string=} html
+ * @param {?Element} node
  */
 treesaver.ui.Article = function(grids, node) {
   /**
@@ -121,7 +119,7 @@ treesaver.ui.Article.events = {
 };
 
 /**
- * @param {?string} html  HTML for the article. Must be an article node.
+ * @param {?Element} article_node  The article node containing the content for this article.
  */
 treesaver.ui.Article.prototype.processHTML = function(article_node) {
   if (article_node.nodeName !== 'ARTICLE') {
