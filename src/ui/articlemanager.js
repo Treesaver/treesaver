@@ -58,6 +58,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 
   // Append the initial document, so that we have at least something in case loading the index takes a long time or fails.
   treesaver.ui.ArticleManager.index.appendChild(treesaver.ui.ArticleManager.initialDocument);
+  treesaver.ui.ArticleManager.index.invalidate();
   treesaver.ui.ArticleManager.index.load();
 
   // Set the initial document to active
@@ -597,7 +598,8 @@ treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
   var articleAnchor = treesaver.uri.parse(url)['anchor'],
       docs = treesaver.ui.ArticleManager.index.get(treesaver.uri.stripHash(url)),
       doc,
-      index = -1;
+      index = -1,
+      articlePosition = null;
 
   if (docs.length !== 0) {
     // Go to the first matching document
@@ -605,8 +607,15 @@ treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
 
     index = treesaver.ui.ArticleManager.index.getDocumentIndex(doc);
 
+    // If the document is loaded and we have an anchor, we can just look up the desired article index
+    if (doc.loaded && articleAnchor) {
+      articlePosition = new treesaver.ui.ArticlePosition(doc.getArticleIndex(articleAnchor));
+    } else {
+      articlePosition = new treesaver.ui.ArticlePosition(0, articleAnchor);
+    }
+
     if (index !== -1) {
-      return treesaver.ui.ArticleManager.setCurrentDocument(doc, new treesaver.ui.ArticlePosition(0, articleAnchor), null, index);
+      return treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, null, index);
     }
   }
   return false;
@@ -625,22 +634,19 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   treesaver.ui.ArticleManager.currentTransitionDirection = treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
 
   if (treesaver.ui.ArticleManager.currentArticlePosition.atEnding()) {
-    treesaver.ui.ArticleManager.currentArticlePosition.index = treesaver.ui.ArticleManager.currentDocument.articles.length - 1;
+    treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.articles.length - 1);
   } else if (treesaver.ui.ArticleManager.currentArticlePosition.isAnchor()) {
     // This will return 0 (meaning the first article) if the anchor is not found.
-    treesaver.ui.ArticleManager.currentArticlePosition.index = treesaver.ui.ArticleManager.currentDocument.getArticleIndex(treesaver.ui.ArticleManager.currentArticlePosition.anchor);
-    treesaver.ui.ArticleManager.currentArticlePosition.anchor = null;
+    treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.getArticleIndex(treesaver.ui.ArticleManager.currentArticlePosition.anchor));
   }
 
   // Set the page size
-  treesaver.ui.ArticleManager.currentDocument.articles.forEach(function (article) {
-    if (article.setMaxPageSize(maxSize)) {
+  if (treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].setMaxPageSize(maxSize)) {
       // Re-layout is required, meaning our pageIndex is worthless
       treesaver.ui.ArticleManager.currentPageIndex = -1;
       // As is the page width
       treesaver.ui.ArticleManager.currentPageWidth = 0;
-    }
-  });
+  }
 
   // First, let's implement a single page
   var pages = [],
@@ -674,6 +680,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
     prevDocument = treesaver.ui.ArticleManager.previousArticle(false, true);
 
     if (prevDocument && prevDocument === treesaver.ui.ArticleManager.currentDocument) {
+      prevDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index - 1].setMaxPageSize(maxSize);
       pages = prevDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index - 1].getPages(startIndex, -startIndex);
     } else if (prevDocument && prevDocument.loaded && prevDocument.articles[prevDocument.articles.length - 1].paginationComplete) {
       pages = prevDocument.articles[prevDocument.articles.length - 1].getPages(startIndex, -startIndex);
@@ -852,7 +859,8 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
     if (index !== treesaver.ui.ArticleManager.currentDocumentIndex) {
       // Same document, but different index
       treesaver.ui.ArticleManager.currentDocumentIndex = index;
-    } else if (articlePosition && !treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
+    } else if (!treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
+      // Same document, but different article
       var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
 
       // Adjust the transition direction
@@ -897,7 +905,7 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
   treesaver.ui.ArticleManager._setPosition(pos);
   // Changing document/article always changes the current page index
   treesaver.ui.ArticleManager.currentPageIndex = -1;
-  treesaver.ui.ArticleManager.currentArticlePosition = articlePosition.atEnding() || articlePosition.isAnchor() ? articlePosition : treesaver.ui.ArticlePosition.BEGINNING;
+  treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
 
   if (!doc.loaded) {
     doc.load();
