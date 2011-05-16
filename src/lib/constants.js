@@ -19,13 +19,6 @@ var USE_MODULES = true;
 var SUPPORT_LEGACY = true;
 
 /**
- * Whether the microdata API should be supported
- *
- * @define {boolean}
- */
-var SUPPORT_MICRODATA = true;
-
-/**
  * Whether Internet Explorer should be supported
  *
  * @define {boolean}

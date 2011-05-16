@@ -8,17 +8,14 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');
-goog.require('treesaver.microdata');
 goog.require('treesaver.network');
 goog.require('treesaver.resources');
 goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
-
-/**
- * @const
- * @type {!string}
- */
-treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX = 'cache:';
+goog.require('treesaver.ui.ArticlePosition');
+goog.require('treesaver.ui.Document');
+goog.require('treesaver.ui.Index');
+goog.require('treesaver.uri');
 
 /**
  * Initialize all content
@@ -26,18 +23,14 @@ treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX = 'cache:';
  */
 treesaver.ui.ArticleManager.load = function(initialHTML) {
   // Initialize state
-  treesaver.ui.ArticleManager.currentArticle = null;
+  treesaver.ui.ArticleManager.currentDocument = null;
   treesaver.ui.ArticleManager.currentPosition = null;
   treesaver.ui.ArticleManager.currentPageIndex = -1;
-  treesaver.ui.ArticleManager.currentArticleIndex = null;
+  treesaver.ui.ArticleManager.currentDocumentIndex = -1;
+  treesaver.ui.ArticleManager.currentArticlePosition = treesaver.ui.ArticlePosition.BEGINNING;
   treesaver.ui.ArticleManager.currentTransitionDirection = null;
   treesaver.ui.ArticleManager.currentPageWidth = null;
 
-  // Data store
-  treesaver.ui.ArticleManager.articleOrder = [];
-  treesaver.ui.ArticleManager.articleMap = {};
-  treesaver.ui.ArticleManager.articles = {};
-  treesaver.ui.ArticleManager.toc = [];
   /**
    * @private
    */
@@ -49,35 +42,31 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
     return false;
   }
 
+  // TODO: Store hash, so we can use it to jump directly to an article
+  treesaver.ui.ArticleManager.initialDocument = new treesaver.ui.Document(treesaver.uri.stripHash(document.location.href), {});
+
+  if (initialHTML) {
+    treesaver.ui.ArticleManager.initialDocument.articles = treesaver.ui.ArticleManager.initialDocument.parse(initialHTML);
+    treesaver.ui.ArticleManager.initialDocument.loaded = true;
+  }
+
+  // Set up event listener for the index
+  treesaver.events.addListener(document, treesaver.ui.Index.events.LOADED, treesaver.ui.ArticleManager.onIndexLoad);
+
+  // Create an index instance. Note that getIndexUrl() may fail, causing the LOADFAILED handler to be called.
+  treesaver.ui.ArticleManager.index = new treesaver.ui.Index(treesaver.ui.ArticleManager.getIndexUrl());
+
+  // Append the initial document, so that we have at least something in case loading the index takes a long time or fails.
+  treesaver.ui.ArticleManager.index.appendChild(treesaver.ui.ArticleManager.initialDocument);
+  treesaver.ui.ArticleManager.index.invalidate();
+  treesaver.ui.ArticleManager.index.load();
+
+  // Set the initial document to active
+  treesaver.ui.ArticleManager.setCurrentDocument(treesaver.ui.ArticleManager.initialDocument, treesaver.ui.ArticlePosition.BEGINNING, null, 0, true);
+
   // Set up the loading & error pages
   treesaver.ui.ArticleManager.initLoadingPage();
   treesaver.ui.ArticleManager.initErrorPage();
-
-  treesaver.ui.ArticleManager.initialUrl = treesaver.network.stripHash(document.location.href);
-  treesaver.ui.ArticleManager.initialHTML = initialHTML;
-
-  // Set the display to the current article?
-  if (initialHTML) {
-    var initialArticle = new treesaver.ui.Article(treesaver.ui.ArticleManager.initialUrl,
-                                          document.title,
-                                          treesaver.ui.ArticleManager.grids_,
-                                          initialHTML);
-
-    if (!initialArticle.error) {
-      treesaver.ui.ArticleManager.articles[treesaver.ui.ArticleManager.initialUrl] = initialArticle;
-      treesaver.ui.ArticleManager._setArticle(initialArticle, null, 0, true);
-    }
-    else {
-      treesaver.debug.warn('Error in initial article');
-
-      // Unload and show plain content
-      treesaver.core.unload();
-    }
-  }
-  else {
-    treesaver.debug.warn('No initial article');
-    // What to do here?
-  }
 
   // Set up event handlers
   treesaver.ui.ArticleManager.watchedEvents.forEach(function(evt) {
@@ -86,10 +75,53 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 
   window['onpopstate'] = treesaver.ui.ArticleManager.onPopState;
 
-  // Download the table of contents
-  treesaver.ui.ArticleManager.generateTOC();
-
   return true;
+};
+
+/**
+ * Clear references and disconnect events
+ */
+treesaver.ui.ArticleManager.unload = function() {
+  // Clear out state
+  treesaver.ui.ArticleManager.currentDocument = null;
+  treesaver.ui.ArticleManager.currentPosition = null;
+  treesaver.ui.ArticleManager.currentPageIndex = -1;
+  treesaver.ui.ArticleManager.currentDocumentIndex = -1;
+  treesaver.ui.ArticleManager.currentArticlePosition = null;
+  treesaver.ui.ArticleManager.currentTransitionDirection = null;
+  treesaver.ui.ArticleManager.currentPageWidth = null;
+
+  treesaver.ui.ArticleManager.loadingPageHTML = null;
+  treesaver.ui.ArticleManager.loadingPageSize = null;
+
+  treesaver.events.removeListener(document, treesaver.ui.Index.events.LOADED, treesaver.ui.ArticleManager.onIndexLoad);
+
+  // Unhook events
+  treesaver.ui.ArticleManager.watchedEvents.forEach(function(evt) {
+    treesaver.events.removeListener(document, evt, treesaver.ui.ArticleManager.handleEvent);
+  });
+  window['onpopstate'] = null;
+};
+
+treesaver.ui.ArticleManager.onIndexLoad = function (e) {
+  var index = e.index,
+      docs = index.get(treesaver.ui.ArticleManager.initialDocument.url);
+
+  // Note that this may get called twice, once from the cache and once from the XHR response
+  if (docs.length) {
+    // Update the new index with the articles from the initial document, which we have already loaded.
+    docs.forEach(function (doc) {
+      doc.articles = treesaver.ui.ArticleManager.initialDocument.articles;
+      doc.loaded = true;
+    });
+
+    treesaver.ui.ArticleManager.currentDocumentIndex = index.getDocumentIndex(treesaver.ui.ArticleManager.initialDocument);
+  } else {
+    // Whoops, what happens here? We loaded a document, it has an index, but
+    // the index does not contain a reference to the document that referenced it.
+    // Emit an error for now.
+    treesaver.debug.error('onIndexLoad: found index, but the article that refers to the index is not present.');
+  }
 };
 
 /**
@@ -166,38 +198,12 @@ treesaver.ui.ArticleManager.initErrorPage = function() {
 };
 
 /**
- * Clear references and disconnect events
- */
-treesaver.ui.ArticleManager.unload = function() {
-  // Clear out state
-  treesaver.ui.ArticleManager.currentArticle = null;
-  treesaver.ui.ArticleManager.currentPosition = null;
-  treesaver.ui.ArticleManager.currentPageIndex = null;
-  treesaver.ui.ArticleManager.currentArticleIndex = null;
-  treesaver.ui.ArticleManager.currentTransitionDirection = null;
-
-  // Clear data store
-  treesaver.ui.ArticleManager.articleOrder = null;
-  treesaver.ui.ArticleManager.articleMap = null;
-  treesaver.ui.ArticleManager.articles = null;
-  treesaver.ui.ArticleManager.toc = null;
-
-  treesaver.ui.ArticleManager.loadingPageHTML = null;
-  treesaver.ui.ArticleManager.loadingPageSize = null;
-
-  // Unhook events
-  treesaver.ui.ArticleManager.watchedEvents.forEach(function(evt) {
-    treesaver.events.removeListener(document, evt, treesaver.ui.ArticleManager.handleEvent);
-  });
-  window['onpopstate'] = null;
-};
-
-/**
  * @type {Object.<string, string>}
  */
 treesaver.ui.ArticleManager.events = {
   TOCUPDATED: 'treesaver.tocupdated',
   ARTICLECHANGED: 'treesaver.articlechanged',
+  DOCUMENTCHANGED: 'treesaver.documentchanged',
   PAGESCHANGED: 'treesaver.pageschanged'
 };
 
@@ -215,8 +221,8 @@ treesaver.ui.ArticleManager.transitionDirection = {
  * @type {Array.<string>}
  */
 treesaver.ui.ArticleManager.watchedEvents = [
-  treesaver.ui.Article.events.LOADED,
-  treesaver.ui.Article.events.LOADFAILED,
+  treesaver.ui.Document.events.LOADED,
+  treesaver.ui.Document.events.LOADFAILED,
   treesaver.ui.Article.events.PAGINATIONPROGRESS
 ];
 
@@ -232,7 +238,7 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
     return;
   }
 
-  if (e.type === treesaver.ui.Article.events.LOADED) {
+  if (e.type === treesaver.ui.Document.events.LOADED) {
     // TODO
     // If it's the current article, kick off pagination?
     // If it's the next, kick it off too?
@@ -242,9 +248,9 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
   }
 
   if (e.type === treesaver.ui.Article.events.LOADFAILED &&
-      e.article === treesaver.ui.ArticleManager.currentArticle) {
+      e.article === treesaver.ui.ArticleManager.currentDocument) {
     // The current article failed to load, redirect to it
-    treesaver.ui.ArticleManager._redirectToArticle(treesaver.ui.ArticleManager.currentArticle);
+    treesaver.ui.ArticleManager.redirectToDocument(treesaver.ui.ArticleManager.currentDocument);
 
     return;
   }
@@ -254,214 +260,53 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
  * @param {!Event} e  Event with e.state for state storage.
  */
 treesaver.ui.ArticleManager.onPopState = function(e) {
+  var index = -1,
+      position = null;
+
   treesaver.debug.info('onPopState event received: ' +
       (e['state'] ? e['state'].url : 'No URL'));
 
   if (e['state']) {
-    var index = e['state'].index;
+    index = e['state'].index;
 
     if (index || index === 0) {
-      var position = e['state'].position;
+      position = e['state'].position;
 
-      treesaver.ui.ArticleManager._setArticle(treesaver.ui.ArticleManager.articleOrder[index],
-          position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null, index, true);
+      treesaver.ui.setCurrentDocument(
+        treesaver.ui.ArticleManager.index.getDocumentByIndex(index),
+        treesaver.ui.ArticlePosition.BEGINNING,
+        position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null,
+        index,
+        true
+      );
+    } else {
+      treesaver.ui.ArticleManager.goToDocumentByURL(e['state'].url);
     }
-    else {
-      treesaver.ui.ArticleManager.goToArticleByURL(e['state'].url);
-    }
-  }
-  else {
+  } else {
     // Assume initial article
-    treesaver.ui.ArticleManager.goToArticleByURL(treesaver.ui.ArticleManager.initialUrl);
+    index = treesaver.ui.ArticleManager.index.getDocumentIndex(treesaver.ui.ArticleManager.initialDocument);
+
+    treesaver.ui.ArticleManager.setCurrentDocument(
+      treesaver.ui.ArticleManager.initialDocument,
+      treesaver.ui.ArticlePosition.BEGINNING,
+      null,
+      index
+    );
   }
 };
 
 /**
- * Finds the URL of the Table of Contents, based on the <link rel="contents" />
- * element. If no such element exists, the current document is used.
- *
+ * Returns the URL of the index file if available in the initial page.
  * @private
- * @return {string}
+ * @return {?string}
  */
-treesaver.ui.ArticleManager.getTOCLocation = function() {
-  var link = treesaver.dom.getElementsByProperty('rel', 'contents', 'link')[0],
-      url;
+treesaver.ui.ArticleManager.getIndexUrl = function () {
+  var link = treesaver.dom.getElementsByProperty('rel', 'index', 'link')[0];
 
-  // Is the current document the index?
-  // Treat no TOC link as being a self-index
-  if (!link || link.getAttribute('rel').indexOf('self') !== -1 || treesaver.network.absoluteURL(link.href) == treesaver.ui.ArticleManager.initialUrl) {
-    url = treesaver.ui.ArticleManager.initialUrl;
+  if (!link) {
+    return null;
   }
-  else {
-    url = treesaver.network.absoluteURL(link.href);
-  }
-
-  return url;
-};
-
-/**
- * Create the data structure for holding articles
- * Download the table of contents for this issue asynchronously
- * @private
- */
-treesaver.ui.ArticleManager.generateTOC = function() {
-  var url = treesaver.ui.ArticleManager.getTOCLocation();
-
-  // We can use the original HTML if this is the index, and we are not
-  // running from an old cached version while online
-  if (url === treesaver.ui.ArticleManager.initialUrl &&
-      !(treesaver.network.loadedFromCache() && treesaver.network.isOnline())) {
-    // Current article is the up-to-date index
-    treesaver.ui.ArticleManager.findTOCLinks(treesaver.ui.ArticleManager.initialHTML, url);
-  }
-  else {
-    // In all other cases, fetch the article, then process
-    treesaver.network.get(url, treesaver.ui.ArticleManager.findTOCLinks);
-  }
-};
-
-/**
- * Search the string of HTML for links that indicate the table of
- * contents. Then update the internal TOC storage
- *
- * @private
- * @param {?string} html String of HTML which may contain links.
- * @param {string} toc_url URL of the TOC.
- */
-treesaver.ui.ArticleManager.findTOCLinks = function(html, toc_url) {
-  var initialArticleIsTOC = (toc_url === treesaver.ui.ArticleManager.initialUrl);
-
-  if (html) {
-    // Don't use storage when native
-    if (!WITHIN_IOS_WRAPPER) {
-      // Cache the result no matter what
-      treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url,
-          html, true);
-    }
-
-    // If the initial was loaded from the cache, we could have stale content in the DOM
-    if (initialArticleIsTOC && treesaver.network.loadedFromCache()) {
-      // Content would only be new if we are online
-      if (treesaver.network.isOnline()) {
-        // Re-process the current article with the updated content
-        treesaver.ui.ArticleManager.currentArticle.processHTML(html);
-        // Make sure chrome re-queries pages
-        treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
-      }
-    }
-  }
-  else {
-    // Don't use storage when native
-    if (!WITHIN_IOS_WRAPPER) {
-      // TOC failed to load, check the cache
-      html = treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + toc_url);
-    }
-
-    if (!html) {
-      // We don't have content for a TOC, so there is nothing more we can do
-      return;
-    }
-  }
-
-  var unique_urls = [],
-      foundTOC = false;
-
-  treesaver.ui.ArticleManager.parseTOC(/** @type {!string} */ (html));
-
-  treesaver.ui.ArticleManager.toc.forEach(function(item) {
-    var url,
-        article,
-        i;
-
-    // data-properties=self is used by the TOC to indicate its position in the article
-    // order. Make sure to use the TOC url we already computed in order to avoid
-    // duplicates such as '/' and '/index.html'.
-    if (item.flags['self']) {
-      url = toc_url;
-      item.fields.url = toc_url;
-      foundTOC = true;
-    }
-    else {
-      url = treesaver.network.absoluteURL(item.fields['url']);
-    }
-
-    article = treesaver.ui.ArticleManager.articles[url];
-    i = treesaver.ui.ArticleManager.articleOrder.length;
-
-    // Have we seen this URL before?
-    if (!article) {
-      // Have not seen the url, create a new article and store
-      article = new treesaver.ui.Article(url, item.fields['title'] || '', treesaver.ui.ArticleManager.grids_);
-      treesaver.ui.ArticleManager.articles[url] = article;
-    }
-
-    // Now store the indicies where the article occurs (since an article can appear
-    // multiple times)
-    if (!treesaver.ui.ArticleManager.articleMap[url]) {
-      // First time seeing the article
-      treesaver.ui.ArticleManager.articleMap[url] = [i];
-      unique_urls.push(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + url);
-
-      if (url === treesaver.ui.ArticleManager.initialUrl) {
-        // Current article is initial
-        treesaver.ui.ArticleManager.currentArticleIndex = i;
-      }
-    }
-    else {
-      // Add another occurence
-      treesaver.ui.ArticleManager.articleMap[url].push(i);
-    }
-
-    // Add into the order
-    treesaver.ui.ArticleManager.articleOrder.push(article);
-  });
-
-  // Clear out old article storage
-  if (!WITHIN_IOS_WRAPPER) {
-    treesaver.storage.clean(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX, unique_urls);
-  }
-
-  // TODO: Fire an event (let's chrome know it can display)
-  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.TOCUPDATED);
-};
-
-/**
- * Parse the TOC using the microdata API. Out of necessity we
- * append the container node to the document first, and remove
- * it afterwards.
- *
- * @param {!string} html The string to find TOC content in.
- * @private
- */
-treesaver.ui.ArticleManager.parseTOC = function(html) {
-  var container = document.createElement('div'),
-      items = [];
-
-  // Must have container connected to tree for HTML5 parsing in IE
-  if (SUPPORT_IE) {
-    container.className = 'offscreen';
-    document.body.appendChild(container);
-  }
-
-  container.innerHTML = html;
-  items = treesaver.microdata.getJSONItems(null, container);
-
-  treesaver.ui.ArticleManager.toc = items.map(function(item) {
-    var keys = Object.keys(item.properties),
-        result = {
-          fields: {},
-          flags: item.flags || {}
-        };
-    keys.forEach(function(key) {
-      result.fields[key] = item.properties[key][0];
-    });
-    return result;
-  });
-
-  // Remove from tree if using HTML5 shiv
-  if (SUPPORT_IE) {
-    document.body.removeChild(container);
-  }
+  return treesaver.network.absoluteURL(link.href);
 };
 
 /**
@@ -490,6 +335,68 @@ treesaver.ui.ArticleManager.canGoToPreviousPage = function() {
 };
 
 /**
+ * Returns true if it is possible to go to a previous article.
+ * @return {!boolean}
+ */
+treesaver.ui.ArticleManager.canGoToPreviousArticle = function () {
+  return !!treesaver.ui.ArticleManager.currentArticlePosition.index || treesaver.ui.ArticleManager.canGoToPreviousDocument();
+};
+
+/**
+ * Is there a previous document to go to?
+ *
+ * @return {!boolean}
+ */
+treesaver.ui.ArticleManager.canGoToPreviousDocument = function () {
+  return treesaver.ui.ArticleManager.currentDocumentIndex >= 1;
+};
+
+/**
+ * Go to the beginning of previous document in the flow
+ * @param {boolean=} end Go to the end of the document.
+ * @param {boolean=} fetch Only return the document, don't move.
+ * @return {treesaver.ui.Document} null if there is no next document.
+ */
+treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
+  if (!treesaver.ui.ArticleManager.canGoToPreviousDocument()) {
+    return null;
+  }
+
+  var index = treesaver.ui.ArticleManager.currentDocumentIndex - 1,
+      doc = treesaver.ui.ArticleManager.index.getDocumentByIndex(index),
+      articlePosition = null;
+
+  if (doc.loaded) {
+    articlePosition = new treesaver.ui.ArticlePosition(doc.getNumberOfArticles() - 1);
+  } else {
+    articlePosition = treesaver.ui.ArticlePosition.END;
+  }
+
+  return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
+};
+
+/**
+ * Go to or fetch the previous article or document.
+ * @param {boolean=} end Whether to go to the end of the previous article or document.
+ * @param {boolean=} fetch Whether to go to the previous article (or document) or fetch it without navigating to it.
+ */
+treesaver.ui.ArticleManager.previousArticle = function (end, fetch) {
+  if (!treesaver.ui.ArticleManager.canGoToPreviousArticle()) {
+    return null;
+  }
+
+  if (!!treesaver.ui.ArticleManager.currentArticlePosition.index) {
+    var articlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentArticlePosition.index - 1),
+        index = treesaver.ui.ArticleManager.currentDocumentIndex,
+        doc = treesaver.ui.ArticleManager.currentDocument;
+
+    return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
+  } else {
+    return treesaver.ui.ArticleManager.previousDocument(end, fetch);
+  }
+};
+
+/**
  * Go to the previous page in the current article. If we are at
  * the first page of the article, go to the last page of the previous
  * article
@@ -497,7 +404,7 @@ treesaver.ui.ArticleManager.canGoToPreviousPage = function() {
  */
 treesaver.ui.ArticleManager.previousPage = function() {
   if (goog.DEBUG) {
-    if (!treesaver.ui.ArticleManager.currentArticle) {
+    if (!treesaver.ui.ArticleManager.currentDocument) {
       treesaver.debug.error('Tried to go to previous article without an article');
       return false;
     }
@@ -554,23 +461,74 @@ treesaver.ui.ArticleManager.canGoToNextPage = function() {
   if (treesaver.ui.ArticleManager.currentPageIndex !== -1) {
     // Do we know there are more pages left?
     if (treesaver.ui.ArticleManager.currentPageIndex <
-        treesaver.ui.ArticleManager.currentArticle.pageCount - 1) {
+        treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].pageCount - 1) {
       return true;
+    } else {
+      return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].paginationComplete && treesaver.ui.ArticleManager.canGoToNextArticle();
     }
-    else {
-      return treesaver.ui.ArticleManager.currentArticle.paginationComplete &&
-             treesaver.ui.ArticleManager.canGoToNextArticle();
-    }
-  }
-  else {
+  } else {
     // Perhaps we're on the last page of the article?
     if (treesaver.ui.ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
       return treesaver.ui.ArticleManager.canGoToNextArticle();
-    }
-    else {
+    } else {
       // We have no idea what page we are on, so we don't know if we can advance
       return false;
     }
+  }
+};
+
+/**
+ * Is there a next article to go to?
+ *
+ * @return {boolean}
+ */
+treesaver.ui.ArticleManager.canGoToNextArticle = function() {
+  return (treesaver.ui.ArticleManager.currentArticlePosition.index < treesaver.ui.ArticleManager.currentDocument.getNumberOfArticles() - 1) ||
+            treesaver.ui.ArticleManager.canGoToNextDocument();
+};
+
+/**
+ * Is there a next document to go to?
+ * @return {boolean}
+ */
+treesaver.ui.ArticleManager.canGoToNextDocument = function() {
+  return treesaver.ui.ArticleManager.currentDocumentIndex !== -1 &&
+          treesaver.ui.ArticleManager.currentDocumentIndex < treesaver.ui.ArticleManager.index.getNumberOfDocuments() - 1;
+};
+
+/**
+ * Go to the beginning of next document in the flow
+ * @param {boolean=} fetch Only return the document, don't move.
+ * @return {treesaver.ui.Document} The next document.
+ */
+treesaver.ui.ArticleManager.nextDocument = function (fetch) {
+  if (!treesaver.ui.ArticleManager.canGoToNextDocument()) {
+    return null;
+  }
+
+  var index = treesaver.ui.ArticleManager.currentDocumentIndex + 1,
+      doc = treesaver.ui.ArticleManager.index.getDocumentByIndex(index);
+
+  return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, treesaver.ui.ArticlePosition.BEGINNING, null, index);
+};
+
+/**
+ * Go to or fetch the next article or document.
+ * @param {boolean=} fetch Whether to go to the next article (or document) or fetch it without navigating to it.
+ */
+treesaver.ui.ArticleManager.nextArticle = function (fetch) {
+  if (!treesaver.ui.ArticleManager.canGoToNextArticle()) {
+    return null;
+  }
+
+  if (treesaver.ui.ArticleManager.currentArticlePosition.index < treesaver.ui.ArticleManager.currentDocument.getNumberOfArticles() - 1) {
+    var articlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentArticlePosition.index + 1),
+        index = treesaver.ui.ArticleManager.currentDocumentIndex,
+        doc = treesaver.ui.ArticleManager.currentDocument;
+
+    return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, null, index);
+  } else {
+    return treesaver.ui.ArticleManager.nextDocument(fetch);
   }
 };
 
@@ -582,17 +540,15 @@ treesaver.ui.ArticleManager.canGoToNextPage = function() {
  */
 treesaver.ui.ArticleManager.nextPage = function() {
   if (goog.DEBUG) {
-    if (!treesaver.ui.ArticleManager.currentArticle) {
-      treesaver.debug.error('Tried to go to next page without an article');
+    if (!treesaver.ui.ArticleManager.currentDocument) {
+      treesaver.debug.error('Tried to go to next page without an document');
       return false;
     }
   }
 
   if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
     if (treesaver.ui.ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
-      if (treesaver.ui.ArticleManager.nextArticle()) {
-        return true;
-      }
+      return treesaver.ui.ArticleManager.nextArticle();
     }
 
     // We have no idea what page we're on, so we can't go to the next page
@@ -602,16 +558,10 @@ treesaver.ui.ArticleManager.nextPage = function() {
 
   var new_index = treesaver.ui.ArticleManager.currentPageIndex + 1;
 
-  if (new_index >= treesaver.ui.ArticleManager.currentArticle.pageCount) {
-    if (treesaver.ui.ArticleManager.currentArticle.paginationComplete) {
-      // Go to the next article, if it exists
-      if (treesaver.ui.ArticleManager.nextArticle()) {
-        return true;
-      }
-
-      // It doesn't exist, so just stay on the current page
-      // No change in state, can return now
-      return false;
+  if (new_index >= treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].pageCount) {
+    if (treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].paginationComplete) {
+      // Go to the next article or document, if it exists
+      return treesaver.ui.ArticleManager.nextArticle();
     }
 
     // We know there will be a next page, but we don't know
@@ -637,62 +587,6 @@ treesaver.ui.ArticleManager.nextPage = function() {
 };
 
 /**
- * Is there a previous article to go to?
- *
- * @return {boolean}
- */
-treesaver.ui.ArticleManager.canGoToPreviousArticle = function() {
-  return !!treesaver.ui.ArticleManager.currentArticleIndex;
-};
-
-/**
- * Go to the beginning of previous article in the flow
- * @param {boolean=} end Go to the end of the article.
- * @param {boolean=} fetch Only return the article, don't move.
- * @return {treesaver.ui.Article} False if there is no next article.
- */
-treesaver.ui.ArticleManager.previousArticle = function(end, fetch) {
-  if (!treesaver.ui.ArticleManager.canGoToPreviousArticle()) {
-    return null;
-  }
-
-  var index = treesaver.ui.ArticleManager.currentArticleIndex - 1,
-      article = treesaver.ui.ArticleManager.articleOrder[index];
-
-  return fetch ? article :
-    treesaver.ui.ArticleManager._setArticle(article, end ? treesaver.layout.ContentPosition.END : null, index);
-};
-
-/**
- * Is there a next article to go to?
- *
- * @return {boolean}
- */
-treesaver.ui.ArticleManager.canGoToNextArticle = function() {
-  return !!((treesaver.ui.ArticleManager.currentArticleIndex ||
-          treesaver.ui.ArticleManager.currentArticleIndex === 0) &&
-          treesaver.ui.ArticleManager.currentArticleIndex <
-          treesaver.ui.ArticleManager.articleOrder.length - 1);
-};
-
-/**
- * Go to the beginning of next article in the flow
- * @param {boolean=} fetch Only return the article, don't move.
- * @return {treesaver.ui.Article} The next article.
- */
-treesaver.ui.ArticleManager.nextArticle = function(fetch) {
-  if (!treesaver.ui.ArticleManager.canGoToNextArticle()) {
-    return null;
-  }
-
-  var index = treesaver.ui.ArticleManager.currentArticleIndex + 1,
-      article = treesaver.ui.ArticleManager.articleOrder[index];
-
-  return fetch ? article :
-    treesaver.ui.ArticleManager._setArticle(article, null, index);
-};
-
-/**
  * Go to the article with the given URL, if it exists. Return false if
  * it does not exist
  *
@@ -700,16 +594,31 @@ treesaver.ui.ArticleManager.nextArticle = function(fetch) {
  * @param {treesaver.layout.ContentPosition=} pos
  * @return {boolean} True if successful.
  */
-treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
-  var index = treesaver.ui.ArticleManager._getArticleIndex(url),
-      article;
+treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
+  var articleAnchor = treesaver.uri.parse(url)['anchor'],
+      docs = treesaver.ui.ArticleManager.index.get(treesaver.uri.stripHash(url)),
+      doc,
+      index = -1,
+      articlePosition = null;
 
-  if (!index && index !== 0) {
-    return false;
+  if (docs.length !== 0) {
+    // Go to the first matching document
+    doc = docs[0];
+
+    index = treesaver.ui.ArticleManager.index.getDocumentIndex(doc);
+
+    // If the document is loaded and we have an anchor, we can just look up the desired article index
+    if (doc.loaded && articleAnchor) {
+      articlePosition = new treesaver.ui.ArticlePosition(doc.getArticleIndex(articleAnchor));
+    } else {
+      articlePosition = new treesaver.ui.ArticlePosition(0, articleAnchor);
+    }
+
+    if (index !== -1) {
+      return treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, null, index);
+    }
   }
-
-  article = treesaver.ui.ArticleManager.articleOrder[index];
-  return treesaver.ui.ArticleManager._setArticle(article, null, index);
+  return false;
 };
 
 /**
@@ -722,21 +631,27 @@ treesaver.ui.ArticleManager.goToArticleByURL = function(url, pos) {
  */
 treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   // Fetching pages resets our transition direction
-  treesaver.ui.ArticleManager.currentTransitionDirection =
-    treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
+  treesaver.ui.ArticleManager.currentTransitionDirection = treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
+
+  if (treesaver.ui.ArticleManager.currentArticlePosition.atEnding()) {
+    treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.articles.length - 1);
+  } else if (treesaver.ui.ArticleManager.currentArticlePosition.isAnchor()) {
+    // This will return 0 (meaning the first article) if the anchor is not found.
+    treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.getArticleIndex(treesaver.ui.ArticleManager.currentArticlePosition.anchor));
+  }
 
   // Set the page size
-  if (treesaver.ui.ArticleManager.currentArticle.setMaxPageSize(maxSize)) {
-    // Re-layout is required, meaning our pageIndex is worthless
-    treesaver.ui.ArticleManager.currentPageIndex = -1;
-    // As is the page width
-    treesaver.ui.ArticleManager.currentPageWidth = 0;
+  if (treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].setMaxPageSize(maxSize)) {
+      // Re-layout is required, meaning our pageIndex is worthless
+      treesaver.ui.ArticleManager.currentPageIndex = -1;
+      // As is the page width
+      treesaver.ui.ArticleManager.currentPageWidth = 0;
   }
 
   // First, let's implement a single page
   var pages = [],
-      prevArticle,
-      nextArticle,
+      nextDocument,
+      prevDocument,
       startIndex,
       pageCount = 2 * buffer + 1,
       missingPageCount,
@@ -745,7 +660,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   // What is the base page?
   if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
     // Look up by position
-    treesaver.ui.ArticleManager.currentPageIndex = treesaver.ui.ArticleManager.currentArticle.
+    treesaver.ui.ArticleManager.currentPageIndex = treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].
       getPageIndex(treesaver.ui.ArticleManager.currentPosition);
 
     if (treesaver.ui.ArticleManager.currentPageIndex === -1) {
@@ -762,12 +677,14 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   startIndex = treesaver.ui.ArticleManager.currentPageIndex - buffer;
 
   if (startIndex < 0) {
-    prevArticle = treesaver.ui.ArticleManager.previousArticle(false, true);
+    prevDocument = treesaver.ui.ArticleManager.previousArticle(false, true);
 
-    if (prevArticle && prevArticle.content && prevArticle.paginationComplete) {
-      pages = prevArticle.getPages(startIndex, -startIndex);
-    }
-    else {
+    if (prevDocument && prevDocument === treesaver.ui.ArticleManager.currentDocument) {
+      prevDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index - 1].setMaxPageSize(maxSize);
+      pages = prevDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index - 1].getPages(startIndex, -startIndex);
+    } else if (prevDocument && prevDocument.loaded && prevDocument.articles[prevDocument.articles.length - 1].paginationComplete) {
+      pages = prevDocument.articles[prevDocument.articles.length - 1].getPages(startIndex, -startIndex);
+    } else {
       // Previous article isn't there or isn't ready
       for (i = 0, len = -startIndex; i < len; i += 1) {
         // Don't show loading page, looks weird in the UI and we're not loading
@@ -777,36 +694,33 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
 
     missingPageCount = pageCount + startIndex;
     startIndex = 0;
-  }
-  else {
+  } else {
     missingPageCount = pageCount;
   }
 
   // Fetch the other pages
-  pages = pages.concat(treesaver.ui.ArticleManager.currentArticle.
+  pages = pages.concat(treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].
       getPages(startIndex, missingPageCount));
 
   missingPageCount = pageCount - pages.length;
 
-  // Do we need to get pages from the next article?
+  // Do we need to get pages from the next document or article?
   if (missingPageCount) {
-    nextArticle = treesaver.ui.ArticleManager.nextArticle(true);
+    nextDocument = treesaver.ui.ArticleManager.nextArticle(true);
 
-    if (nextArticle) {
-      if (!nextArticle.content) {
-        treesaver.ui.ArticleManager._loadArticle(nextArticle);
-        // Set size only on first load so pagination can happen
-        nextArticle.setMaxPageSize(maxSize);
-        // Expand array. Will fill in loading pages below
+    // The next article could either be in this document (a document with more than one article), or in the next document
+    if (nextDocument && nextDocument === treesaver.ui.ArticleManager.currentDocument) {
+        nextDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index + 1].setMaxPageSize(maxSize);
+        pages = pages.concat(nextDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index + 1].getPages(0, missingPageCount));
+    } else if (nextDocument) {
+      if (!nextDocument.loaded) {
+        nextDocument.load();
         pages.length = pageCount;
+      } else {
+        nextDocument.articles[0].setMaxPageSize(maxSize);
+        pages = pages.concat(nextDocument.articles[0].getPages(0, missingPageCount));
       }
-      else {
-        // Always grab starting at the first page
-        pages = pages.
-          concat(nextArticle.getPages(0, missingPageCount));
-      }
-    }
-    else {
+    } else {
       // No next article = leave blank
     }
   }
@@ -815,10 +729,9 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   // there isn't a next article
   for (i = buffer, len = pages.length; i < len; i += 1) {
     if (!pages[i]) {
-      if (!treesaver.ui.ArticleManager.currentArticle.error) {
+      if (!treesaver.ui.ArticleManager.currentDocument.error) {
         pages[i] = treesaver.ui.ArticleManager._createLoadingPage();
-      }
-      else {
+      } else {
         pages[i] = treesaver.ui.ArticleManager._createErrorPage();
       }
     }
@@ -836,7 +749,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   if (!treesaver.ui.ArticleManager.currentPageWidth) {
     // Set only if it's a real page
     treesaver.ui.ArticleManager.currentPageWidth =
-      treesaver.ui.ArticleManager.currentArticle.getPageWidth();
+      treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].getPageWidth();
   }
 
   // Clone any duplicates so we always have unique nodes
@@ -856,7 +769,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
  * @return {string}
  */
 treesaver.ui.ArticleManager.getCurrentUrl = function() {
-  return treesaver.ui.ArticleManager.currentArticle.url;
+  return treesaver.ui.ArticleManager.currentDocument.url;
 };
 
 /**
@@ -872,7 +785,7 @@ treesaver.ui.ArticleManager.getCurrentPageNumber = function() {
  * @return {number}
  */
 treesaver.ui.ArticleManager.getCurrentPageCount = function() {
-  return treesaver.ui.ArticleManager.currentArticle.pageCount || 1;
+  return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].pageCount || 1;
 };
 
 /**
@@ -906,231 +819,136 @@ treesaver.ui.ArticleManager.getFigure = function(el) {
   }
 
   // TODO: Refactor this
-  return treesaver.ui.ArticleManager.currentArticle.content.figures[figureIndex];
-};
-
-
-/**
- * Get the current TOC.
- * @return {!Array.<Object>} An array of microdata items
- * representing the TOC.
- */
-treesaver.ui.ArticleManager.getCurrentTOC = function() {
-  return treesaver.ui.ArticleManager.toc || [];
+  return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].content.figures[figureIndex];
 };
 
 /**
+ * Redirects the browser to the URL for the given document
  * @private
- * @param {!string} url
- * @param {boolean=} fwd
- * @return {?number}
+ * @param {!treesaver.ui.Document} doc
  */
-treesaver.ui.ArticleManager._getArticleIndex = function(url, fwd) {
-  var locations = treesaver.ui.ArticleManager.articleMap[url],
-      i, index;
-
-  if (!locations || !locations.length) {
-    return null;
-  }
-  else if (locations.length === 1) {
-    return locations[0];
-  }
-  else {
-    i = locations.length - 1;
-    while (i >= 0) {
-      index = locations[i];
-
-      if (index === treesaver.ui.ArticleManager.currentArticleIndex) {
-        return index;
-      }
-
-      if (index < treesaver.ui.ArticleManager.currentArticleIndex) {
-        return fwd && i !== locations.length - 1 ? locations[i + 1]
-                                                          : index;
-      }
-
-      i -= 1;
-    }
-
-    return index;
-  }
-};
-
-/**
- * Redirects the browser to the URL for the given article
- * @private
- * @param {!treesaver.ui.Article} article
- */
-treesaver.ui.ArticleManager._redirectToArticle = function(article) {
+treesaver.ui.ArticleManager.redirectToDocument = function (doc) {
   if (treesaver.network.isOnline()) {
-    // TODO: Any clean up not in unload?
-    document.location = article.url;
-  }
-  else {
-    treesaver.debug.error('Tried to redirect to an article while offline');
+    document.location = doc.url;
+  } else {
+    treesaver.debug.error('Tried to redirect to a document while offline');
   }
 };
 
 /**
- * Load the content for an article
- * @private
- * @param {!treesaver.ui.Article} article
+ * @param {!treesaver.ui.Document} doc The document to set as current. Will be loaded if necessary.
+ * @param {!treesaver.ui.ArticlePosition} articlePosition The article position within the document. Can be used to set the last article of a document as current, or jump to a specific article within a document.
+ * @param {?treesaver.layout.ContentPosition} pos The position within an article.
+ * @param {!number} index The index at which the document should be placed.
+ * @param {boolean=} noHistory Whether to modify the history or not.
  */
-treesaver.ui.ArticleManager._loadArticle = function(article) {
-  // Don't try to load multiple times (duh)
-  if (article.loading) {
-    return;
-  }
+treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition, pos, index, noHistory) {
+  var articleAnchor = null,
+      url = null,
+      path = null;
 
-  // Set flag so we don't try to paginate, etc before content loads
-  article.loading = true;
-
-  if (!WITHIN_IOS_WRAPPER) {
-    var cached_text =
-      /** @type {?string} */
-      (treesaver.storage.get(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url));
-
-    if (cached_text) {
-      article.processHTML(cached_text);
-
-      // Only for article manager?
-      // TODO: Don't use events for this?
-      treesaver.events.fireEvent(document, treesaver.ui.Article.events.LOADED, { article: article });
-    }
-  }
-
-  treesaver.debug.info('loadArticle: Downloading article: ' + article.url);
-
-  treesaver.network.get(article.url, function(text) {
-    article.loading = false;
-
-    if (!text) {
-      if (WITHIN_IOS_WRAPPER || !cached_text) {
-        treesaver.debug.info('loadArticle: Load failed, no content: ' + article.url);
-        // Fire event
-        article.loadFailed = true;
-        // TODO: Don't use events for this?
-        treesaver.events.fireEvent(document, treesaver.ui.Article.events.LOADFAILED,
-          { article: article });
-        return;
-      }
-      else {
-        // Stick with cached content
-        treesaver.debug.log('Using cached content for article: ' + article.url);
-      }
-    }
-    else if (WITHIN_IOS_WRAPPER || cached_text !== text) {
-      if (!WITHIN_IOS_WRAPPER) {
-        treesaver.debug.log('Fetched content newer than cache for article: ' + article.url);
-
-        // Save the HTML in the cache
-        treesaver.storage.set(treesaver.ui.ArticleManager.CACHE_STORAGE_PREFIX + article.url,
-            text, true);
-      }
-
-      treesaver.debug.log('Processing HTML content for article: ' + article.url);
-
-      article.processHTML(text);
-
-      // Only for article manager?
-      // TODO: Don't use events for this?
-      treesaver.events.fireEvent(document, treesaver.ui.Article.events.LOADED, { article: article });
-    }
-    else {
-      treesaver.debug.log('Fetched content same as cached');
-    }
-  });
-};
-
-/**
- * Move to the supplied article
- * @private
- * @param {!treesaver.ui.Article} article
- * @param {treesaver.layout.ContentPosition} pos
- * @param {number=} index
- * @param {boolean=} noHistory
- * @return {boolean} True if successful.
- */
-treesaver.ui.ArticleManager._setArticle = function(article, pos, index, noHistory) {
-  // TODO: Assert not null
-  if (!article) {
+  if (!doc) {
     return false;
   }
 
-  // Check if it's the same as the current article
-  if (treesaver.ui.ArticleManager.currentArticle === article) {
-    // Might be an index change, in which case we should still update
-    // the index
-    if (index === treesaver.ui.ArticleManager.currentArticleIndex) {
-      // Same article and index, nothing to do but still counts as a success
-      return true;
+  articleAnchor = doc.getArticleAnchor(articlePosition && articlePosition.index || 0) || articlePosition.isAnchor() && articlePosition.anchor;
+  url = doc.url + (articleAnchor ? '#' + articleAnchor : '');
+  path = doc.path + (articleAnchor ? '#' + articleAnchor: '');
+
+  if (doc.equals(treesaver.ui.ArticleManager.currentDocument)) {
+    if (index !== treesaver.ui.ArticleManager.currentDocumentIndex) {
+      // Same document, but different index
+      treesaver.ui.ArticleManager.currentDocumentIndex = index;
+    } else if (!treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
+      // Same document, but different article
+      var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
+
+      // Adjust the transition direction
+      treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentArticlePosition.index > articlePosition.index) ?
+      treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
+
+      // Update the article position
+      treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
+
+      treesaver.ui.ArticleManager._setPosition(pos);
+      treesaver.ui.ArticleManager.currentPageIndex = -1;
+
+      // Update the browser URL, but only if we are supposed to
+      if (!noHistory) {
+        treesaver.history.pushState({
+          index: index,
+          url: url,
+          position: pos
+        }, doc.meta['title'], path);
+      } else {
+        treesaver.history.replaceState({
+          index: index,
+          url: url,
+          position: pos
+        }, doc.meta['title'], path);
+      }
+
+      // Fire the ARTICLECHANGED event
+      treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
+      treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
+        'article': article
+      });
     }
-    else {
-      // TODO: What should UI do with an index change?
-    }
+    return true;
   }
 
-  // Change the window/tab title
-  if (article.title) {
-    document.title = article.title;
+  if (doc.meta['title']) {
+    document.title = doc.meta['title'];
   }
 
-  treesaver.ui.ArticleManager.currentArticle = article;
-  // Setting article changes position and pageIndex
+  treesaver.ui.ArticleManager.currentDocument = doc;
   treesaver.ui.ArticleManager._setPosition(pos);
+  // Changing document/article always changes the current page index
   treesaver.ui.ArticleManager.currentPageIndex = -1;
+  treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
 
-  // Load the article, if it hasn't been loaded already
-  if (!article.loaded) {
-    treesaver.ui.ArticleManager._loadArticle(article);
-  }
-  else if (article.error) {
-    // Article didn't load successfully on previous attempt
-    treesaver.ui.ArticleManager._redirectToArticle(article);
-    return false;
+  if (!doc.loaded) {
+    doc.load();
+  } else if (doc.error) {
+    treesaver.ui.ArticleManager.redirectToDocument(doc);
   }
 
-  // Set the index
   if (index || index === 0) {
     // Set the transition direction (assume not neutral)
-    treesaver.ui.ArticleManager.currentTransitionDirection =
-      (treesaver.ui.ArticleManager.currentArticleIndex > index) ?
-      treesaver.ui.ArticleManager.transitionDirection.BACKWARD :
-      treesaver.ui.ArticleManager.transitionDirection.FORWARD;
+    treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentDocumentIndex > index) ?
+      treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
 
-    treesaver.ui.ArticleManager.currentArticleIndex = index;
-  }
-  else {
-    treesaver.ui.ArticleManager.currentTransitionDirection =
-      treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
-    treesaver.ui.ArticleManager.currentArticleIndex =
-      treesaver.ui.ArticleManager._getArticleIndex(article.url);
+    treesaver.ui.ArticleManager.currentDocumentIndex = index;
+  } else {
+    treesaver.ui.ArticleManager.currentTransitionDirection = treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
+    treesaver.ui.ArticleManager.currentDocumentIndex = treesaver.ui.ArticleManager.index.getDocumentIndex(doc.url);
   }
 
   // Update the browser URL, but only if we are supposed to
   if (!noHistory) {
     treesaver.history.pushState({
       index: index,
-      url: article.url,
+      url: url,
       position: pos
-    }, article.title, article.path);
-  }
-  else {
+    }, doc.meta['title'], path);
+  } else {
     treesaver.history.replaceState({
       index: index,
-      url: article.url,
+      url: url,
       position: pos
-    }, article.title, article.path);
+    }, doc.meta['title'], path);
   }
 
   // Fire events
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
-  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
-    article: article,
-    'url': article.url,
-    'path': article.path
+  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.DOCUMENTCHANGED, {
+    'document': doc,
+    'url': url,
+    'path': path
   });
-
+  treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
+    'article': treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition && articlePosition.index || 0)
+  });
   return true;
 };
 
@@ -1185,10 +1003,10 @@ treesaver.ui.ArticleManager._createErrorPage = function() {
 if (WITHIN_IOS_WRAPPER) {
   goog.exportSymbol('treesaver.canGoToNextPage', treesaver.ui.ArticleManager.canGoToNextPage);
   goog.exportSymbol('treesaver.canGoToPreviousPage', treesaver.ui.ArticleManager.canGoToPreviousPage);
-  goog.exportSymbol('treesaver.canGoToNextArticle', treesaver.ui.ArticleManager.canGoToNextArticle);
-  goog.exportSymbol('treesaver.canGoToPreviousArticle', treesaver.ui.ArticleManager.canGoToPreviousArticle);
+  goog.exportSymbol('treesaver.canGoToNextDocument', treesaver.ui.ArticleManager.canGoToNextDocument);
+  goog.exportSymbol('treesaver.canGoToPreviousDocument', treesaver.ui.ArticleManager.canGoToPreviousDocument);
   goog.exportSymbol('treesaver.getCurrentUrl', treesaver.ui.ArticleManager.getCurrentUrl);
   goog.exportSymbol('treesaver.getCurrentPageNumber', treesaver.ui.ArticleManager.getCurrentPageNumber);
   goog.exportSymbol('treesaver.getCurrentPageCount', treesaver.ui.ArticleManager.getCurrentPageCount);
-  goog.exportSymbol('treesaver.goToArticleByURL', treesaver.ui.ArticleManager.goToArticleByURL);
+  goog.exportSymbol('treesaver.goToDocumentByURL', treesaver.ui.ArticleManager.goToDocumentByURL);
 }

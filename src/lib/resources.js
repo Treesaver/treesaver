@@ -53,6 +53,24 @@ treesaver.resources.load = function(callback) {
 };
 
 /**
+ * @type {RegExp}
+ */
+treesaver.resources.bodyRegExp = /<body>\s*([\s\S]+?)\s*<\/body>/i;
+
+/**
+ * Find and return any text within a <title>
+ * @param {?string} html
+ * @return {?string}
+ */
+treesaver.resources.extractBody = function(html) {
+  var res = treesaver.resources.bodyRegExp.exec(html);
+  if (res && res[1]) {
+    return res[1];
+  }
+  return null;
+};
+
+/**
  *
  * @param {string} html
  */
@@ -61,39 +79,36 @@ treesaver.resources.processResourceFile = function(html) {
   treesaver.resources.container_ = document.createElement('div');
 
   if (html) {
-    var div = document.createElement('div');
-    // Prevent any layout
-    div.style.display = 'none';
+    var body = treesaver.resources.extractBody(html);
+    if (body) {
+      var div = document.createElement('div');
+      // Prevent any layout
+      div.style.display = 'none';
 
-    // Must attach element into the tree to avoid parsing issues from
-    // HTML5 shiv in IE using innerHTML
-    if (SUPPORT_IE) {
-      document.documentElement.appendChild(div);
-    }
-
-    // Parse the HTML
-    div.innerHTML = html;
-
-    // Grab all the direct <div> children and place them into the container
-    treesaver.array.toArray(div.childNodes).forEach(function(child) {
-      if (child.nodeType === 1 && child.nodeName.toLowerCase() === 'div') {
-        treesaver.resources.container_.appendChild(child);
-      } else if (child.nodeType === 1 && child.nodeName.toLowerCase() === 'body') {
-        // FIXME: Find a better way to deal with the inconsistencies between browsers
-        // when appending a document to an element.
-        treesaver.array.toArray(child.childNodes).forEach(function(bodyChild) {
-          if (bodyChild.nodeType === 1 && bodyChild.nodeName.toLowerCase() === 'div') {
-            treesaver.resources.container_.appendChild(bodyChild);
-          }
-        });
+      // Must attach element into the tree to avoid parsing issues from
+      // HTML5 shiv in IE using innerHTML
+      if (SUPPORT_IE) {
+        document.documentElement.appendChild(div);
       }
-    });
 
-    // Clean up
-    if (SUPPORT_IE) {
-      document.documentElement.removeChild(div);
-    }
-    div.innerHTML = '';
+      // Parse the HTML
+      div.innerHTML = body;
+
+      // Grab all the direct <div> children and place them into the container
+      treesaver.array.toArray(div.childNodes).forEach(function(child) {
+        if (child.nodeType === 1 && child.nodeName.toLowerCase() === 'div') {
+          treesaver.resources.container_.appendChild(child);
+        }
+      });
+
+      // Clean up
+      if (SUPPORT_IE) {
+        document.documentElement.removeChild(div);
+      }
+      div.innerHTML = '';
+    } else {
+      treesaver.debug.error('Body not found in resource file');
+    } 
   }
   else {
     treesaver.debug.error('Could not load resource file');

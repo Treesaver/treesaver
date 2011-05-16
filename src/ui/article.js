@@ -17,17 +17,16 @@ goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Page');
 goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
+goog.require('treesaver.uri');
 
 /**
  * A chunk of content
  *
  * @constructor
- * @param {!string} url
- * @param {!string} title
  * @param {!Array.<treesaver.layout.Grid>} grids
- * @param {string=} html
+ * @param {?Element} node
  */
-treesaver.ui.Article = function(url, title, grids, html) {
+treesaver.ui.Article = function(grids, node) {
   /**
    * @type {?string}
    */
@@ -37,21 +36,6 @@ treesaver.ui.Article = function(url, title, grids, html) {
    * @type {treesaver.layout.Content} The content of this article
    */
   this.content = null;
-
-  /**
-   * @type {!string}
-   */
-  this.url = url;
-
-  /**
-   * @type {!string}
-   */
-  this.path = treesaver.network.urlToPath(url);
-
-  /**
-   * @type {string}
-   */
-  this.title = title;
 
   /**
    * @type {treesaver.layout.BreakRecord}
@@ -120,8 +104,8 @@ treesaver.ui.Article = function(url, title, grids, html) {
   this.grids = grids;
 
   // Automatically process the HTML, if any was given to us
-  if (html) {
-    this.processHTML(html);
+  if (node) {
+    this.processHTML(node);
   }
 };
 
@@ -130,48 +114,28 @@ treesaver.ui.Article = function(url, title, grids, html) {
  * @type {Object.<string, string>}
  */
 treesaver.ui.Article.events = {
-  LOADFAILED: 'treesaver.loadfailed',
-  LOADED: 'treesaver.loaded',
   PAGINATIONERROR: 'treesaver.paginationerror',
   PAGINATIONPROGRESS: 'treesaver.paginationprogress'
 };
 
 /**
- * @type {RegExp}
+ * @param {?Element} article_node  The article node containing the content for this article.
  */
-treesaver.ui.Article.titleRegExp = /<title>\s*(.+?)\s*<\/title>/i;
+treesaver.ui.Article.prototype.processHTML = function(article_node) {
+  if (article_node.nodeName !== 'ARTICLE') {
+    treesaver.debug.error('Could not find article content: ' + article_node.innerHTML);
 
-/**
- * Find and return any text within a <title>
- * @param {?string} html
- * @return {?string}
- */
-treesaver.ui.Article.extractTitle = function(html) {
-  var res = treesaver.ui.Article.titleRegExp.exec(html);
-  if (res && res[1]) {
-    return res[1];
+    this.error = true;
+
+    return false;
   }
-  return null;
-};
 
-/**
- * @param {?string} html  HTML for the article. May be just the
- *                        <article> node, or an entire .html page.
- */
-treesaver.ui.Article.prototype.processHTML = function(html) {
   // Content is here, so we're loaded
   this.loaded = true;
 
   // Container used for manipulation and finding things
   var fake_grid = document.createElement('div'),
-      fake_column = document.createElement('div'),
-      article_node,
-      title = treesaver.ui.Article.extractTitle(html);
-
-  // Grab the title, while we've got the HTML on hand
-  if (title) {
-    this.title = /** @type {!string} */ (title);
-  }
+      fake_column = document.createElement('div');
 
   // Set up a temporary container for layout
   fake_grid.style.display = 'none';
@@ -181,24 +145,6 @@ treesaver.ui.Article.prototype.processHTML = function(html) {
   // Container needs to be in tree for measuring, and for
   // IE HTML5 shiv to work properly as well
   document.body.appendChild(fake_grid);
-  fake_grid.innerHTML = html;
-
-  // Look for just the content node
-  article_node = document.getElementById('ts_content') ||
-                 treesaver.dom.getElementsByTagName('article', fake_grid)[0];
-
-  if (!article_node) {
-    treesaver.debug.error('Could not find article content in HTML: ' + html);
-
-    // Cleanup before exiting in error
-    document.body.removeChild(fake_grid);
-
-    // TODO: Fire event?
-    // this.error currently used for mis-loaded doc, does it matter?
-    this.error = true;
-
-    return false;
-  }
 
   // Remove any ID so CSS styles don't affect the elements within
   article_node.removeAttribute('id');

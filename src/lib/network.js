@@ -180,61 +180,6 @@ treesaver.network['handleEvent'] = function(e) {
 };
 
 /**
- * @param {!string} url
- * @return {!string} path.
- */
-treesaver.network.urlToPath = function(url) {
-  var a,
-      div,
-      path;
-
-  if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
-    // IE7 has buggy behavior here if you set the href property,
-    // so we have to use innerHTML to get the real absolute URL
-    div = document.createElement('div');
-    div.style.display = 'none';
-    document.body.appendChild(div);
-    div.innerHTML = '<a href="' + url + '"></a>';
-    a = /** @type {!Element} */ (div.firstChild);
-  }
-  else {
-    a = document.createElement('a');
-    a.href = url;
-  }
-
-  // TODO: Verify that pathname is supported everywhere
-  path = a['pathname'];
-
-  if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
-    // Compiler's not smart enough to know that div will be set here
-    document.body.removeChild(/** @type {!Element} */ (div));
-    div.removeChild(a);
-  }
-
-  // IE & Opera sometimes don't prefix the path with '/'
-  if (path.charAt(0) !== '/') {
-    path = '/' + path;
-  }
-
-  return path;
-};
-
-/**
- * @param {!string} url
- * @return {!string} The url without the hash.
- */
-treesaver.network.stripHash = function(url) {
-  var hash_index = url.indexOf('#');
-
-  if (hash_index === -1) {
-    return url;
-  }
-  else {
-    return url.substr(0, hash_index);
-  }
-};
-
-/**
  * @private
  * @const
  * @type {!RegExp}
