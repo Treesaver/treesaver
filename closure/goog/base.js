@@ -79,20 +79,13 @@ goog.LOCALE = 'en';  // default to en
 
 
 /**
- * Indicates whether or not we can call 'eval' directly to eval code in the
- * global scope. Set to a Boolean by the first call to goog.globalEval (which
- * empirically tests whether eval works for globals). @see goog.globalEval
- * @type {?boolean}
- * @private
- */
-goog.evalWorksForGlobals_ = null;
-
-
-/**
- * Creates object stubs for a namespace. When present in a file, goog.provide
- * also indicates that the file defines the indicated object. Calls to
- * goog.provide are resolved by the compiler if --closure_pass is set.
- * @param {string} name name of the object that this file defines.
+ * Creates object stubs for a namespace.  The presence of one or more
+ * goog.provide() calls indicate that the file defines the given
+ * objects/namespaces.  Build tools also scan for provide/require statements
+ * to discern dependencies, build dependency files (see deps.js), etc.
+ * @see goog.require
+ * @param {string} name Namespace provided by this file in the form
+ *     "goog.package.part".
  */
 goog.provide = function(name) {
   if (!COMPILED) {
@@ -120,18 +113,6 @@ goog.provide = function(name) {
 
 
 /**
- * Check if the given name has been goog.provided. This will return false for
- * names that are available only as implicit namespaces.
- * @param {string} name name of the object to look for.
- * @return {boolean} Whether the name has been provided.
- * @private
- */
-goog.isProvided_ = function(name) {
-  return !goog.implicitNamespaces_[name] && !!goog.getObjectByName(name);
-};
-
-
-/**
  * Marks that the current file should only be used for testing, and never for
  * live code in production.
  * @param {string=} opt_message Optional message to add to the error that's
@@ -147,6 +128,18 @@ goog.setTestOnly = function(opt_message) {
 
 
 if (!COMPILED) {
+
+  /**
+   * Check if the given name has been goog.provided. This will return false for
+   * names that are available only as implicit namespaces.
+   * @param {string} name name of the object to look for.
+   * @return {boolean} Whether the name has been provided.
+   * @private
+   */
+  goog.isProvided_ = function(name) {
+    return !goog.implicitNamespaces_[name] && !!goog.getObjectByName(name);
+  };
+
   /**
    * Namespaces implicitly defined by goog.provide. For example,
    * goog.provide('goog.events.Event') implicitly declares
@@ -271,14 +264,49 @@ goog.addDependency = function(relPath, provides, requires) {
 };
 
 
+
+
+// NOTE(user): The debug DOM loader was included in base.js as an orignal
+// way to do "debug-mode" development.  The dependency system can sometimes
+// be confusing, as can the debug DOM loader's asyncronous nature.
+//
+// With the DOM loader, a call to goog.require() is not blocking -- the
+// script will not load until some point after the current script.  If a
+// namespace is needed at runtime, it needs to be defined in a previous
+// script, or loaded via require() with its registered dependencies.
+// User-defined namespaces may need their own deps file.  See http://go/js_deps,
+// http://go/genjsdeps, or, externally, DepsWriter.
+// http://code.google.com/closure/library/docs/depswriter.html
+//
+// Because of legacy clients, the DOM loader can't be easily removed from
+// base.js.  Work is being done to make it disableable or replaceable for
+// different environments (DOM-less JavaScript interpreters like Rhino or V8,
+// for example). See bootstrap/ for more information.
+
+
+/**
+ * @define {boolean} Whether to enable the debug loader.
+ *
+ * If enabled, a call to goog.require() will attempt to load the namespace by
+ * appending a script tag to the DOM (if the namespace has been registered).
+ *
+ * If disabled, goog.require() will simply assert that the namespace has been
+ * provided (and depend on the fact that some outside tool correctly ordered
+ * the script).
+ */
+goog.ENABLE_DEBUG_LOADER = true;
+
+
 /**
  * Implements a system for the dynamic resolution of dependencies
  * that works in parallel with the BUILD system. Note that all calls
  * to goog.require will be stripped by the JSCompiler when the
  * --closure_pass option is used.
- * @param {string} rule Rule to include, in the form goog.package.part.
+ * @see goog.provide
+ * @param {string} name Namespace to include (as was given in goog.provide())
+ *     in the form "goog.package.part".
  */
-goog.require = function(rule) {
+goog.require = function(name) {
 
   // if the object already exists we do not need do do anything
   // TODO(user): If we start to support require based on file name this has
@@ -287,21 +315,27 @@ goog.require = function(rule) {
   // TODO(user): If we implement dynamic load after page load we should probably
   //            not remove this code for the compiled output
   if (!COMPILED) {
-    if (goog.getObjectByName(rule)) {
+    if (goog.isProvided_(name)) {
       return;
     }
-    var path = goog.getPathFromDeps_(rule);
-    if (path) {
-      goog.included_[path] = true;
-      goog.writeScripts_();
-    } else {
-      var errorMessage = 'goog.require could not find: ' + rule;
-      if (goog.global.console) {
-        goog.global.console['error'](errorMessage);
-      }
 
-        throw Error(errorMessage);
+    if (goog.ENABLE_DEBUG_LOADER) {
+      var path = goog.getPathFromDeps_(name);
+      if (path) {
+        goog.included_[path] = true;
+        goog.writeScripts_();
+        return;
+      }
     }
+
+    var errorMessage = 'goog.require could not find: ' + name;
+    if (goog.global.console) {
+      goog.global.console['error'](errorMessage);
+    }
+
+
+      throw Error(errorMessage);
+
   }
 };
 
@@ -393,7 +427,7 @@ goog.addSingletonGetter = function(ctor) {
 };
 
 
-if (!COMPILED) {
+if (!COMPILED && goog.ENABLE_DEBUG_LOADER) {
   /**
    * Object used to keep track of urls that have already been added. This
    * record allows the prevention of circular dependencies.
@@ -1170,6 +1204,16 @@ goog.globalEval = function(script) {
     throw Error('goog.globalEval not available');
   }
 };
+
+
+/**
+ * Indicates whether or not we can call 'eval' directly to eval code in the
+ * global scope. Set to a Boolean by the first call to goog.globalEval (which
+ * empirically tests whether eval works for globals). @see goog.globalEval
+ * @type {?boolean}
+ * @private
+ */
+goog.evalWorksForGlobals_ = null;
 
 
 /**
