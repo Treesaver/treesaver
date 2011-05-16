@@ -187,8 +187,8 @@ if (SUPPORT_IE && (!('addEventListener' in document))) {
 
   /**
    * @private
-   * @param {Element} obj
-   * @param {string} type
+   * @param {!*} obj
+   * @param {!string} type
    * @return {!function()}
    */
   treesaver.events.createMasterHandler_ = function(obj, type) {

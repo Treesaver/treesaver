@@ -4,8 +4,7 @@ if (!Object.keys) {
   /**
    * Returns the keys in an object.
    *
-   * @param {!Object} o The object to return the keys for.
-   * @return {!Array.<string>} An array of the keys.
+   * Note: Annotation removed for closure (present in externs)
    */
   Object.keys = function(o) {
     var result = [];
@@ -22,7 +21,7 @@ if (!Object.keys) {
  * Test whether or not a value is an object.
  *
  * @param {!Object} value The object to test.
- * @return {!boolean} True if the value is an object, false otherwise.
+ * @return {boolean} True if the value is an object, false otherwise.
  */
 treesaver.object.isObject = function(value) {
   return Object.prototype.toString.apply(value) === '[object Object]';

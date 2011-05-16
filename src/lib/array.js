@@ -110,22 +110,21 @@ if (!Array.isArray) {
   /**
    * Test Array-ness.
    *
-   * @param {!Object} value Test if value is an array.
-   * @return {!boolean} True if the given value is an array, false otherwise.
+   * NOTE: Type annotation removed due to closure compiler errors
    */
   Array.isArray = function(value) {
-    return Object.prototype.toString.apply(value) === '[object Array]';
+    return Object.prototype.toString.apply(/** @type {Object} */(value)) === '[object Array]';
   };
 }
 
 /**
  * Convert array-like things to an array
  *
- * @param {!Object} obj
+ * @param {*} obj
  * @return {!Array}
  */
 treesaver.array.toArray = function(obj) {
-  return Array.prototype.slice.call(obj, 0);
+  return Array.prototype.slice.call(/** @type {Object} */(obj), 0);
 };
 
 /**

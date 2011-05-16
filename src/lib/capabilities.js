@@ -366,7 +366,10 @@ if ('createElementNS' in document) {
    * @const
    * @type {boolean}
    */
-  treesaver.capabilities.SUPPORTS_SVG = 'createSVGRect' in document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  treesaver.capabilities.SUPPORTS_SVG =
+    // Don't bother with SVG in IE7/8
+    'createElementNS' in document &&
+    'createSVGRect' in document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
   /**
    * Whether the browser supports SMIL
@@ -374,7 +377,8 @@ if ('createElementNS' in document) {
    * @const
    * @type {boolean}
    */
-  treesaver.capabilities.SUPPORTS_SMIL = /SVG/.test(document.createElementNS('http://www.w3.org/2000/svg', 'animate').toString());
+  treesaver.capabilities.SUPPORTS_SMIL = treesaver.capabilities.SUPPORTS_SVG &&
+    /SVG/.test(document.createElementNS('http://www.w3.org/2000/svg', 'animate').toString());
 
   /**
    * Whether the browser supports SVG clip paths
@@ -382,10 +386,8 @@ if ('createElementNS' in document) {
    * @const
    * @type {boolean}
    */
-  treesaver.capabilities.SUPPORTS_SVGCLIPPATHS = /SVG/.test(document.createElementNS('http://www.w3.org/2000/svg', 'clipPath').toString());
-} else {
-  // Don't bother with SVG in IE7/8
-  treesaver.capabilities.SUPPORTS_SVG = treesaver.capabilities.SUPPORTS_SMIL = treesaver.capabilities.SUPPORTS_SVGCLIPPATHS = false;
+  treesaver.capabilities.SUPPORTS_SVGCLIPPATHS = treesaver.capabilities.SUPPORTS_SVG &&
+    /SVG/.test(document.createElementNS('http://www.w3.org/2000/svg', 'clipPath').toString());
 }
 
 treesaver.capabilities.SUPPORTS_INLINESVG = (function() {

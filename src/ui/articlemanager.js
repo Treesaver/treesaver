@@ -23,16 +23,21 @@ goog.require('treesaver.uri');
  */
 treesaver.ui.ArticleManager.load = function(initialHTML) {
   // Initialize state
-  treesaver.ui.ArticleManager.currentDocument = null;
-  treesaver.ui.ArticleManager.currentPosition = null;
   treesaver.ui.ArticleManager.currentPageIndex = -1;
   treesaver.ui.ArticleManager.currentDocumentIndex = -1;
   treesaver.ui.ArticleManager.currentArticlePosition = treesaver.ui.ArticlePosition.BEGINNING;
-  treesaver.ui.ArticleManager.currentTransitionDirection = null;
-  treesaver.ui.ArticleManager.currentPageWidth = null;
+  // Initial values are meaningless, just annotate here
+  /** @type {treesaver.ui.Document} */
+  treesaver.ui.ArticleManager.currentDocument;
+  /** @type {treesaver.layout.ContentPosition} */
+  treesaver.ui.ArticleManager.currentPosition;
+  /** @type {treesaver.ui.ArticleManager.transitionDirection} */
+  treesaver.ui.ArticleManager.currentTransitionDirection;
+  /** @type {number} */
+  treesaver.ui.ArticleManager.currentPageWidth;
 
   /**
-   * @private
+   * TODO: Mark this as private once again when reference from document.js is removed
    */
   treesaver.ui.ArticleManager.grids_ = treesaver.ui.ArticleManager.getGrids_();
 
@@ -88,8 +93,9 @@ treesaver.ui.ArticleManager.unload = function() {
   treesaver.ui.ArticleManager.currentPageIndex = -1;
   treesaver.ui.ArticleManager.currentDocumentIndex = -1;
   treesaver.ui.ArticleManager.currentArticlePosition = null;
-  treesaver.ui.ArticleManager.currentTransitionDirection = null;
-  treesaver.ui.ArticleManager.currentPageWidth = null;
+  // Invalid clearing for type. TODO: Decide if this is even worth clearing on unload
+  //treesaver.ui.ArticleManager.currentTransitionDirection = null;
+  //treesaver.ui.ArticleManager.currentPageWidth = null;
 
   treesaver.ui.ArticleManager.loadingPageHTML = null;
   treesaver.ui.ArticleManager.loadingPageSize = null;
@@ -261,19 +267,22 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
  */
 treesaver.ui.ArticleManager.onPopState = function(e) {
   var index = -1,
-      position = null;
+      position = null,
+      doc;
 
   treesaver.debug.info('onPopState event received: ' +
       (e['state'] ? e['state'].url : 'No URL'));
 
   if (e['state']) {
     index = e['state'].index;
+    doc = (index || index === 0) ? 
+      treesaver.ui.ArticleManager.index.getDocumentByIndex(index) : null;
 
-    if (index || index === 0) {
+    if (doc) {
       position = e['state'].position;
 
-      treesaver.ui.setCurrentDocument(
-        treesaver.ui.ArticleManager.index.getDocumentByIndex(index),
+      treesaver.ui.ArticleManager.setCurrentDocument(
+        doc,
         treesaver.ui.ArticlePosition.BEGINNING,
         position ? new treesaver.layout.ContentPosition(position.block, position.figure, position.overhang) : null,
         index,
@@ -388,7 +397,7 @@ treesaver.ui.ArticleManager.previousArticle = function (end, fetch) {
   if (!!treesaver.ui.ArticleManager.currentArticlePosition.index) {
     var articlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentArticlePosition.index - 1),
         index = treesaver.ui.ArticleManager.currentDocumentIndex,
-        doc = treesaver.ui.ArticleManager.currentDocument;
+        doc = /** @type {!treesaver.ui.Document} */ (treesaver.ui.ArticleManager.currentDocument);
 
     return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
   } else {
@@ -507,7 +516,7 @@ treesaver.ui.ArticleManager.nextDocument = function (fetch) {
   }
 
   var index = treesaver.ui.ArticleManager.currentDocumentIndex + 1,
-      doc = treesaver.ui.ArticleManager.index.getDocumentByIndex(index);
+      doc = /** @type {!treesaver.ui.Document} */ (treesaver.ui.ArticleManager.index.getDocumentByIndex(index));
 
   return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, treesaver.ui.ArticlePosition.BEGINNING, null, index);
 };
@@ -524,7 +533,7 @@ treesaver.ui.ArticleManager.nextArticle = function (fetch) {
   if (treesaver.ui.ArticleManager.currentArticlePosition.index < treesaver.ui.ArticleManager.currentDocument.getNumberOfArticles() - 1) {
     var articlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentArticlePosition.index + 1),
         index = treesaver.ui.ArticleManager.currentDocumentIndex,
-        doc = treesaver.ui.ArticleManager.currentDocument;
+        doc = /** @type {!treesaver.ui.Document} */ (treesaver.ui.ArticleManager.currentDocument);
 
     return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, null, index);
   } else {
@@ -603,7 +612,7 @@ treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
 
   if (docs.length !== 0) {
     // Go to the first matching document
-    doc = docs[0];
+    doc = /** @type {!treesaver.ui.Document} */ (docs[0]);
 
     index = treesaver.ui.ArticleManager.index.getDocumentIndex(doc);
 
@@ -637,7 +646,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
     treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.articles.length - 1);
   } else if (treesaver.ui.ArticleManager.currentArticlePosition.isAnchor()) {
     // This will return 0 (meaning the first article) if the anchor is not found.
-    treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.getArticleIndex(treesaver.ui.ArticleManager.currentArticlePosition.anchor));
+    treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.getArticleIndex(/** @type {string} */(treesaver.ui.ArticleManager.currentArticlePosition.anchor)));
   }
 
   // Set the page size
@@ -798,7 +807,7 @@ treesaver.ui.ArticleManager.getCurrentPageWidth = function() {
 
 /**
  * Get the current transition direction
- * @return {number}
+ * @return {treesaver.ui.ArticleManager.transitionDirection}
  */
 treesaver.ui.ArticleManager.getCurrentTransitionDirection = function() {
   return treesaver.ui.ArticleManager.currentTransitionDirection;
@@ -921,7 +930,7 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
     treesaver.ui.ArticleManager.currentDocumentIndex = index;
   } else {
     treesaver.ui.ArticleManager.currentTransitionDirection = treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
-    treesaver.ui.ArticleManager.currentDocumentIndex = treesaver.ui.ArticleManager.index.getDocumentIndex(doc.url);
+    treesaver.ui.ArticleManager.currentDocumentIndex = treesaver.ui.ArticleManager.index.getDocumentIndex(doc);
   }
 
   // Update the browser URL, but only if we are supposed to

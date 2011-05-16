@@ -131,7 +131,7 @@ treesaver.ui.Document.prototype.parse = function (text) {
  * Tests for document equality. This usually comes down to comparing their URLs. There is a
  * special exception for when the document is a directory index file.
  *
- * @param {!treesaver.ui.Document|!string} o A document to compare against, or a url.
+ * @param {treesaver.ui.Document|string} o A document to compare against, or a url.
  * @return {boolean} True if this document equals `o`.
  */
 treesaver.ui.Document.prototype.equals = function (o) {
@@ -144,7 +144,7 @@ treesaver.ui.Document.prototype.equals = function (o) {
   if (typeof o !== 'string' && o.url) {
     url = o.url;
   }
-  
+
   if (treesaver.uri.isIndex(url) && treesaver.uri.isIndex(this.url)) {
     return url === this.url;
   } else if (treesaver.uri.isIndex(url)) {

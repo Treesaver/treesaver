@@ -21,7 +21,7 @@ treesaver.ui.StateManager.state_;
 /**
  * Storage for all the chromes
  *
- * @type {!Array.<treesaver.ui.Chrome>}
+ * @type {Array.<treesaver.ui.Chrome>}
  */
 treesaver.ui.StateManager.chromes_;
 
