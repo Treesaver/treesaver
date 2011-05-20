@@ -75,6 +75,11 @@ treesaver.ui.Document = function (url, meta) {
    * @type {!Array.<treesaver.ui.Document>}
    */
   this.children = [];
+
+  /**
+   * @type {?string}
+   */
+  this.title = null;
 };
 
 treesaver.ui.Document.CACHE_STORAGE_PREFIX = 'cache:';
@@ -83,6 +88,8 @@ treesaver.ui.Document.events = {
   LOADFAILED: 'treesaver.loadfailed',
   LOADED: 'treesaver.loaded'
 };
+
+treesaver.ui.Document.titleRegExp = /<title>\s*(.+?)\s*<\/title>/i;
 
 treesaver.ui.Document.prototype = new treesaver.ui.TreeNode();
 
@@ -192,6 +199,21 @@ treesaver.ui.Document.prototype.getArticleIndex = function (anchor) {
 };
 
 /**
+ * Extract the document title from a string of HTML text.
+ * @private
+ * @param {!string} text
+ * @return {?string}
+ */
+treesaver.ui.Document.prototype.extractTitle = function (text) {
+  var res = treesaver.ui.Document.titleRegExp.exec(text);
+
+  if (res && res[1]) {
+    return res[1];
+  }
+  return null;
+};
+
+/**
  * Load this document by an XHR, if it hasn't already been loaded.
  */
 treesaver.ui.Document.prototype.load = function () {
@@ -211,6 +233,7 @@ treesaver.ui.Document.prototype.load = function () {
     if (cached_text) {
       treesaver.debug.log('Document.load: Processing cached HTML content for document: ' + this.url);
       this.articles = this.parse(cached_text);
+      this.title = this.extractTitle(cached_text);
       this.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADED, {
@@ -248,6 +271,7 @@ treesaver.ui.Document.prototype.load = function () {
 
       treesaver.debug.log('Document.load: Processing HTML content for document: ' + that.url);
       that.articles = that.parse(text);
+      that.title = that.extractTitle(text);
       that.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADED, {

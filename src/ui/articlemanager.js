@@ -47,6 +47,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 
   if (initialHTML) {
     treesaver.ui.ArticleManager.initialDocument.articles = treesaver.ui.ArticleManager.initialDocument.parse(initialHTML);
+    treesaver.ui.ArticleManager.initialDocument.title = document.title;
     treesaver.ui.ArticleManager.initialDocument.loaded = true;
   }
 
@@ -105,7 +106,8 @@ treesaver.ui.ArticleManager.unload = function() {
 
 treesaver.ui.ArticleManager.onIndexLoad = function (e) {
   var index = e.index,
-      docs = index.get(treesaver.ui.ArticleManager.initialDocument.url);
+      docs = index.get(treesaver.ui.ArticleManager.initialDocument.url),
+      doc = null;
 
   // Note that this may get called twice, once from the cache and once from the XHR response
   if (docs.length) {
@@ -116,6 +118,12 @@ treesaver.ui.ArticleManager.onIndexLoad = function (e) {
     });
 
     treesaver.ui.ArticleManager.currentDocumentIndex = index.getDocumentIndex(treesaver.ui.ArticleManager.initialDocument);
+
+    // Fix up the document title, which may have been updated with information from the index file
+    doc = index.getDocumentByIndex(treesaver.ui.ArticleManager.currentDocumentIndex);
+    doc.title = treesaver.ui.ArticleManager.initialDocument.title;
+    treesaver.ui.ArticleManager.initialDocument.meta = doc.meta;
+    document.title = doc.meta['title'] || doc.title;
   } else {
     // Whoops, what happens here? We loaded a document, it has an index, but
     // the index does not contain a reference to the document that referenced it.
@@ -239,6 +247,7 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
   }
 
   if (e.type === treesaver.ui.Document.events.LOADED) {
+    document.title = treesaver.ui.ArticleManager.currentDocument.meta['title'] || treesaver.ui.ArticleManager.currentDocument.title;
     // TODO
     // If it's the current article, kick off pagination?
     // If it's the next, kick it off too?
@@ -897,9 +906,7 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
     return true;
   }
 
-  if (doc.meta['title']) {
-    document.title = doc.meta['title'];
-  }
+  document.title = doc.meta['title'] || doc.title;
 
   treesaver.ui.ArticleManager.currentDocument = doc;
   treesaver.ui.ArticleManager._setPosition(pos);
@@ -930,13 +937,13 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
       index: index,
       url: url,
       position: pos
-    }, doc.meta['title'], path);
+    }, doc.meta['title'] || '', path);
   } else {
     treesaver.history.replaceState({
       index: index,
       url: url,
       position: pos
-    }, doc.meta['title'], path);
+    }, doc.meta['title'] || '', path);
   }
 
   // Fire events
@@ -949,6 +956,7 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
     'article': treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition && articlePosition.index || 0)
   });
+
   return true;
 };
 
