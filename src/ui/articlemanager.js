@@ -209,7 +209,6 @@ treesaver.ui.ArticleManager.initErrorPage = function() {
  * @type {Object.<string, string>}
  */
 treesaver.ui.ArticleManager.events = {
-  TOCUPDATED: 'treesaver.tocupdated',
   ARTICLECHANGED: 'treesaver.articlechanged',
   DOCUMENTCHANGED: 'treesaver.documentchanged',
   PAGESCHANGED: 'treesaver.pageschanged'
@@ -798,6 +797,22 @@ treesaver.ui.ArticleManager.getCurrentPageCount = function() {
 };
 
 /**
+ * Return the document number (1-based) of the current document.
+ * @return {number}
+ */
+treesaver.ui.ArticleManager.getCurrentDocumentNumber = function () {
+  return (treesaver.ui.ArticleManager.currentDocumentIndex + 1) || 1;
+};
+
+/**
+ * Return the number of documents in the index.
+ * @return {number}
+ */
+treesaver.ui.ArticleManager.getDocumentCount = function () {
+  return treesaver.ui.ArticleManager.index.getNumberOfDocuments();
+};
+
+/**
  * Get the number of pages in the current article
  * @return {number}
  */
@@ -1016,5 +1031,7 @@ if (WITHIN_IOS_WRAPPER) {
   goog.exportSymbol('treesaver.getCurrentUrl', treesaver.ui.ArticleManager.getCurrentUrl);
   goog.exportSymbol('treesaver.getCurrentPageNumber', treesaver.ui.ArticleManager.getCurrentPageNumber);
   goog.exportSymbol('treesaver.getCurrentPageCount', treesaver.ui.ArticleManager.getCurrentPageCount);
+  goog.exportSymbol('treesaver.getCurrentDocumentNumber', treesaver.ui.ArticleManager.getCurrentDocumentNumber);
+  goog.exportSymbol('treesaver.getDocumentCount', treesaver.ui.ArticleManager.getDocumentCount);
   goog.exportSymbol('treesaver.goToDocumentByURL', treesaver.ui.ArticleManager.goToDocumentByURL);
 }

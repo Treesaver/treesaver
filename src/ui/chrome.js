@@ -11,8 +11,8 @@ goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
-goog.require('treesaver.template');
 goog.require('treesaver.ui.ArticleManager');
+goog.require('treesaver.ui.Index');
 goog.require('treesaver.ui.Scrollable');
 
 /**
@@ -88,34 +88,10 @@ treesaver.ui.Chrome = function(node) {
   this.viewer = null;
 
   /**
-   * Cached reference to page number DOM
-   * @type {?Array.<Element>}
-   */
-  this.pageNum = null;
-
-  /**
-   * Cached reference to page count DOM
-   * @type {?Array.<Element>}
-   */
-  this.pageCount = null;
-
-  /**
    * Cached reference to page width DOM
    * @type {?Array.<Element>}
    */
   this.pageWidth = null;
-
-  /**
-   * Cached reference to the TOC DOM
-   * @type {?Element}
-   */
-  this.toc = null;
-
-  /**
-   * Cached reference to the TOC Template DOM
-   * @type {?Element}
-   */
-  this.tocTemplate = null;
 
   /**
    * @type {?Array.<treesaver.layout.Page>}
@@ -143,12 +119,6 @@ treesaver.ui.Chrome = function(node) {
    * @type {?treesaver.ui.LightBox}
    */
   this.lightBox = null;
-
-  /*
-   * Cached reference to article url DOM
-   * @type {?Array.<Element>}
-   */
-  this.currentURL = null;
 
   /**
    * @type {?Array.<Element>}
@@ -184,23 +154,27 @@ treesaver.ui.Chrome = function(node) {
  * @return {!Element} The activated node.
  */
 treesaver.ui.Chrome.prototype.activate = function() {
-  var toc = [],
-      tocTemplates = [];
-
   if (!this.active) {
     this.active = true;
 
     this.node = treesaver.dom.createElementFromHTML(this.html);
     // Store references to the portions of the UI we must update
     this.viewer = treesaver.dom.getElementsByClassName('viewer', this.node)[0];
-    this.pageNum = treesaver.template.getElementsByBindName('pagenumber', null, this.node);
-    this.pageCount = treesaver.template.getElementsByBindName('pagecount', null, this.node);
     this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
-    this.currentURL = treesaver.template.getElementsByBindName('current-url', null, this.node);
     this.nextPage = treesaver.dom.getElementsByClassName('next', this.node);
     this.nextArticle = treesaver.dom.getElementsByClassName('nextArticle', this.node);
     this.prevPage = treesaver.dom.getElementsByClassName('prev', this.node);
     this.prevArticle = treesaver.dom.getElementsByClassName('prevArticle', this.node);
+
+    this.locationElements = treesaver.dom.getElementsByProperty('data-template', 'location', null, this.node);
+    this.locationTemplates = this.locationElements.map(function (el) {
+      return el.innerHTML;
+    });
+
+    this.indexElements = treesaver.dom.getElementsByProperty('data-template', 'index', null, this.node);
+    this.indexTemplates = this.indexElements.map(function (el) {
+      return el.innerHTML;
+    });
 
     this.scrollers = treesaver.dom.getElementsByClassName('scroll', this.node).
       map(function(el) {
@@ -209,15 +183,6 @@ treesaver.ui.Chrome.prototype.activate = function() {
 
     this.menus = treesaver.dom.getElementsByClassName('menu', this.node);
     this.sidebars = treesaver.dom.getElementsByClassName('sidebar', this.node);
-
-    toc = treesaver.template.getElementsByBindName('toc', null, this.node);
-
-    // TODO: We might want to do something smarter than just selecting the first
-    // TOC template.
-    if (toc.length >= 1) {
-      this.toc = /** @type {!Element} */ (toc[0]);
-      this.tocTemplate = /** @type {!Element} */ (this.toc.cloneNode(true));
-    }
 
     this.pages = [];
 
@@ -253,13 +218,8 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   // Make sure to drop references
   this.node = null;
   this.viewer = null;
-  this.pageNum = null;
-  this.pageCount = null;
   this.pageWidth = null;
   this.menus = null;
-  this.currentURL = null;
-  this.toc = null;
-  this.tocTemplate = null;
   this.sidebars = null;
   this.nextPage = null;
   this.nextArticle = null;
@@ -300,7 +260,7 @@ treesaver.ui.Chrome.events = {
  * @type {Array.<string>}
  */
 treesaver.ui.Chrome.watchedEvents = [
-  treesaver.ui.ArticleManager.events.TOCUPDATED,
+  treesaver.ui.Index.events.UPDATED,
   treesaver.ui.ArticleManager.events.PAGESCHANGED,
   treesaver.ui.ArticleManager.events.DOCUMENTCHANGED,
   'keydown',
@@ -336,13 +296,14 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
   case treesaver.ui.ArticleManager.events.PAGESCHANGED:
     return this.selectPagesDelayed();
 
-  case treesaver.ui.ArticleManager.events.TOCUPDATED:
+  case treesaver.ui.Index.events.UPDATED:
     this.updateTOCDelayed();
     return this.selectPagesDelayed();
 
   case treesaver.ui.ArticleManager.events.DOCUMENTCHANGED:
     this.updateTOCActive(e);
-    return this.updatePageURL(e);
+    this.updateLocation();
+    return;
 
   case 'mouseover':
     return this.mouseOver(e);
@@ -1138,73 +1099,31 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
 };
 
 /**
- * Update any URL bindings to the active article in the Chrome.
- * @private
- * @param {!Event} e The article changed event.
- */
-treesaver.ui.Chrome.prototype.updatePageURL = function(e) {
-  this.currentURL.forEach(function(el) {
-    treesaver.template.expand({
-        'current-url': e.url
-      }, el);
-  });
-};
-
-/**
  * Update the TOC's 'current' class.
  *
  * @private
  * @param {!{ url: string }} e The TOC update event.
  */
 treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
-  if (this.toc) {
-    // FIXME:!!!
-/*
-    var tocEntries = treesaver.ui.ArticleManager.getCurrentTOC(),
-        tocElements = treesaver.template.getElementsByBindName('article', null, this.toc),
-        i = 0;
+  // FIXME: Set active flag
 
-    tocEntries.forEach(function(entry, index) {
-      if (!entry.flags['hidden'] && tocElements[i]) {
-        if (index === treesaver.ui.ArticleManager.currentArticleIndex) {
-          treesaver.dom.addClass(tocElements[i], 'current');
-        } else {
-          treesaver.dom.removeClass(tocElements[i], 'current');
-        }
-        i += 1;
-      }
+  // Refresh the size of scrollable areas (often used with TOC)
+  // TODO: Figure out better separate here?
+  this.scrollers.forEach(function(s) { s.refreshDimensions(); });
+};
+
+treesaver.ui.Chrome.prototype.updateLocation = function () {
+  this.locationElements.forEach(function (el, i) {
+    var template = this.locationTemplates[i];
+
+    el.innerHTML = Mustache.to_html(template, {
+      pagenumber: treesaver.ui.ArticleManager.getCurrentPageNumber(),
+      pagecount: treesaver.ui.ArticleManager.getCurrentPageCount(),
+      url: treesaver.ui.ArticleManager.getCurrentUrl(),
+      documentnumber: treesaver.ui.ArticleManager.getCurrentDocumentNumber(),
+      documentcount: treesaver.ui.ArticleManager.getDocumentCount()
     });
-*/
-    // Refresh the size of scrollable areas (often used with TOC)
-    // TODO: Figure out better separate here?
-    this.scrollers.forEach(function(s) { s.refreshDimensions(); });
-  }
-};
-
-/**
- * Update the text of elements bound to the current page index
- * @private
- * @param {number} index
- */
-treesaver.ui.Chrome.prototype.updatePageIndex = function(index) {
-  this.pageNum.forEach(function(el) {
-    treesaver.template.expand({
-        'pagenumber': index
-      }, el);
-  });
-};
-
-/**
- * Update the text of elements bound to the page count
- * @private
- * @param {number} count
- */
-treesaver.ui.Chrome.prototype.updatePageCount = function(count) {
-  this.pageCount.forEach(function(el) {
-    treesaver.template.expand({
-      'pagecount': count
-    }, el);
-  });
+  }, this);
 };
 
 /**
@@ -1333,7 +1252,8 @@ treesaver.ui.Chrome.prototype.selectPages = function() {
   this.layoutPages(direction);
 
   // Update our field display in the chrome (page count/index changes)
-  this.updateFields();
+  this.updateLocation();
+  this.updatePageWidth(treesaver.ui.ArticleManager.getCurrentPageWidth());
 
   // Update the previous/next buttons depending on the current state
   this.updateNextPageState();
@@ -1350,41 +1270,17 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
   // Stop any running TOC updates
   treesaver.scheduler.clear('updateTOC');
 
-  if (this.toc) {
-    var tocEntries = /*treesaver.ui.ArticleManager.getCurrentTOC()*/ [],
-        newToc = /** @type {!Element} */ (this.tocTemplate.cloneNode(true)),
-        tocParent = this.toc.parentNode;
-/*
-    tocEntries = tocEntries.filter(function(entry) {
-      return !entry.flags['hidden'];
-    });*/
+  var toc = {
+    children: treesaver.ui.ArticleManager.index.children.map(function (child) {
+      return child.meta;
+    })
+  };
 
-    // Format the TOC entries to fit our TOC template format.
-    tocEntries = tocEntries.map(function(entry) {
-      return {
-        'article': entry.fields
-      };
-    });
+  this.indexElements.forEach(function (el, i) {
+    var template = this.indexTemplates[i];
 
-    // Expand the template using the cloned template.
-    treesaver.template.expand({
-      'toc': tocEntries
-    }, newToc);
-
-    // And finally replace the old TOC with the new one.
-    tocParent.replaceChild(newToc, this.toc);
-    this.toc = newToc;
-
-    // Update the TOC active item. We do this explicitly here
-    // because we receive the article changed event (which is
-    // normally used to update the active TOC) before the TOC
-    // changed event.
-    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.DOCUMENTCHANGED, {
-      'document': treesaver.ui.ArticleManager.currentDocument,
-      'url': treesaver.ui.ArticleManager.currentDocument.url,
-      'path': treesaver.ui.ArticleManager.currentDocument.path
-    });
-  }
+    el.innerHTML = Mustache.to_html(template, toc);
+  }, this);
 };
 
 /**
@@ -1552,15 +1448,6 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
       treesaver.dimensions.setOffsetX(page.node, this.pagePositions[i] + offset);
     }
   }, this);
-};
-
-/**
- * Update the display of fields like the page count
- */
-treesaver.ui.Chrome.prototype.updateFields = function() {
-  this.updatePageIndex(treesaver.ui.ArticleManager.getCurrentPageNumber());
-  this.updatePageCount(treesaver.ui.ArticleManager.getCurrentPageCount());
-  this.updatePageWidth(treesaver.ui.ArticleManager.getCurrentPageWidth());
 };
 
 /**
