@@ -68,13 +68,6 @@ treesaver.layout.Content = function(el) {
   // Now we're ready to create our objects, re-use the processChildren
   // function because it does exactly what we need
   treesaver.layout.Block.processChildren(this, el, this.lineHeight, indices);
-
-  /**
-   * Dictionary of fields and values that can be populated
-   * in a grid
-   * @type {Object.<string, string>}
-   */
-  this.fields = {};
 };
 
 if (goog.DEBUG) {

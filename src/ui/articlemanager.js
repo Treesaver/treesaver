@@ -781,6 +781,14 @@ treesaver.ui.ArticleManager.getCurrentUrl = function() {
 };
 
 /**
+ * Returns the current document
+ * @return {treesaver.ui.Document}
+ */
+treesaver.ui.ArticleManager.getCurrentDocument = function () {
+  return treesaver.ui.ArticleManager.currentDocument;
+};
+
+/**
  * Get the page number (1-based) of the current page
  * @return {number}
  */

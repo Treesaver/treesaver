@@ -10,7 +10,7 @@
       </div>
 
       <div class="controls">
-        <span data-template="location">Page {{pagenumber}} of {{pagecount}}</span>
+        <span data-template="position">Page {{pagenumber}} of {{pagecount}}</span>
         <button class="prev">Previous</button>
         <button class="next">Next</button>
 
@@ -19,7 +19,7 @@
           <ul>
             <li><a href="http://www.treesaver.net/">About treesaver</a></li>
             <!-- FIXME: we need some custom encoding here.-->
-            <li data-template="location"><a href="http://twitter.com/?status={{url}}" target="external">Tweet this!</a></li>
+            <li data-template="position"><a href="http://twitter.com/?status={{url}}" target="external">Tweet this!</a></li>
             <li><a href="index.html">Table of contents</a></li>
             <li><a href="#" class="nextArticle">Next article</a></li>
             <li><a href="#" class="prevArticle">Previous article</a></li>
@@ -51,7 +51,11 @@
     </div>
 
     <div class="grid cols-2">
-      <div data-bind="article-title"></div>
+      <div data-template="document">
+        {{#title}}
+          {{title}}
+        {{/title}}
+      </div>
       <div class="container title cols-2" data-sizes="title"></div>
       <div class="container cols-3 bottom" data-sizes="two"></div>
       <div class="column"></div>
@@ -59,7 +63,11 @@
     </div>
 
     <div class="grid cols-3">
-      <div data-bind="article-title"></div>
+      <div data-template="document">
+        {{#title}}
+          {{title}}
+        {{/title}}
+      </div>
       <div class="container title cols-3" data-sizes="title"></div>
       <div class="container cols-3 bottom" data-sizes="three"></div>
       <div class="column"></div>

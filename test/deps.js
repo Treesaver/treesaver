@@ -11,14 +11,13 @@ goog.addDependency("../../../src/ui/articleposition.js", ['treesaver.ui.ArticleP
 goog.addDependency("../../../src/ui/lightbox.js", ['treesaver.ui.LightBox'], ['treesaver.capabilities', 'treesaver.debug', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.layout.Container', 'treesaver.layout.Figure']);
 goog.addDependency("../../../src/ui/document.js", ['treesaver.ui.Document'], ['treesaver.events', 'treesaver.ui.Article', 'treesaver.ui.TreeNode', 'treesaver.uri']);
 goog.addDependency("../../../src/ui/treenode.js", ['treesaver.ui.TreeNode'], []);
-goog.addDependency("../../../src/ui/chrome.js", ['treesaver.ui.Chrome'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.network', 'treesaver.scheduler', 'treesaver.template', 'treesaver.ui.ArticleManager', 'treesaver.ui.Scrollable']);
+goog.addDependency("../../../src/ui/chrome.js", ['treesaver.ui.Chrome'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.network', 'treesaver.scheduler', 'treesaver.ui.ArticleManager', 'treesaver.ui.Index', 'treesaver.ui.Scrollable']);
 goog.addDependency("../../../src/ui/scrollable.js", ['treesaver.ui.Scrollable'], []);
 goog.addDependency("../../../src/ui/statemanager.js", ['treesaver.ui.StateManager'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dom', 'treesaver.events', 'treesaver.resources', 'treesaver.ui.Chrome', 'treesaver.ui.LightBox']);
 goog.addDependency("../../../src/lib/object.js", ['treesaver.object'], []);
 goog.addDependency("../../../src/lib/dimensions.js", ['treesaver.dimensions'], ['treesaver.capabilities', 'treesaver.css', 'treesaver.constants']);
 goog.addDependency("../../../src/lib/scheduler.js", ['treesaver.scheduler'], []);
 goog.addDependency("../../../src/lib/uri.js", ['treesaver.uri'], []);
-goog.addDependency("../../../src/lib/template.js", ['treesaver.template'], ['treesaver.array', 'treesaver.dom', 'treesaver.object', 'treesaver.string']);
 goog.addDependency("../../../src/lib/boot.js", ['treesaver.boot'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dom', 'treesaver.domready', 'treesaver.events', 'treesaver.modules', 'treesaver.resources', 'treesaver.scheduler', 'treesaver.scriptloader']);
 goog.addDependency("../../../src/lib/html5.js", ['treesaver.html5'], ['treesaver.constants']);
 goog.addDependency("../../../src/lib/array.js", ['treesaver.array'], ['treesaver.constants']);
@@ -37,7 +36,7 @@ goog.addDependency("../../../src/lib/history.js", ['treesaver.history'], ['trees
 goog.addDependency("../../../src/lib/debug.js", ['treesaver.debug'], ['treesaver.scheduler']);
 goog.addDependency("../../../src/lib/dom.js", ['treesaver.dom'], ['treesaver.array', 'treesaver.capabilities', 'treesaver.constants']);
 goog.addDependency("../../../src/lib/capabilities.js", ['treesaver.capabilities'], ['treesaver.array', 'treesaver.constants', 'treesaver.debug']);
-goog.addDependency("../../../src/layout/figure.js", ['treesaver.layout.Figure'], ['treesaver.array', 'treesaver.capabilities', 'treesaver.dom', 'treesaver.layout.FigureSize', 'treesaver.string', 'treesaver.template']);
+goog.addDependency("../../../src/layout/figure.js", ['treesaver.layout.Figure'], ['treesaver.array', 'treesaver.capabilities', 'treesaver.dom', 'treesaver.layout.FigureSize', 'treesaver.string']);
 goog.addDependency("../../../src/layout/contentposition.js", ['treesaver.layout.ContentPosition'], []);
 goog.addDependency("../../../src/layout/figuresize.js", ['treesaver.layout.FigureSize'], ['treesaver.dom']);
 goog.addDependency("../../../src/layout/grid.js", ['treesaver.layout.Grid'], ['treesaver.array', 'treesaver.capabilities', 'treesaver.debug', 'treesaver.dom', 'treesaver.dimensions', 'treesaver.layout.Block', 'treesaver.layout.BreakRecord', 'treesaver.layout.Column', 'treesaver.layout.Container', 'treesaver.layout.Figure']);
