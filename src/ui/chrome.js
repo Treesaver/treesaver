@@ -301,7 +301,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
     return this.selectPagesDelayed();
 
   case treesaver.ui.ArticleManager.events.DOCUMENTCHANGED:
-    this.updateTOCActive(e);
+    this.updateTOCActive();
     this.updateLocation();
     return;
 
@@ -1102,10 +1102,34 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
  * Update the TOC's 'current' class.
  *
  * @private
- * @param {!{ url: string }} e The TOC update event.
  */
-treesaver.ui.Chrome.prototype.updateTOCActive = function(e) {
-  // FIXME: Set active flag
+treesaver.ui.Chrome.prototype.updateTOCActive = function() {
+  var currentUrl = treesaver.ui.ArticleManager.getCurrentUrl();
+
+  this.indexElements.forEach(function (el) {
+    var anchors = treesaver.dom.getElementsByProperty('href', null, 'a', el).filter(function (a) {
+          // The anchors in the TOC may be relative URLs so we need to create absolute
+          // ones when comparing to the currentUrl, which is always absolute.
+          return treesaver.network.absoluteURL(a.href) === currentUrl;
+        }),
+        children = [];
+
+    if (anchors.length) {
+      children = treesaver.array.toArray(el.children);
+
+      children.forEach(function (c) {
+        var containsUrl = anchors.some(function (a) {
+             return c.contains(a);
+            });
+
+        if (containsUrl) {
+          treesaver.dom.addClass(c, 'current');
+        } else {
+          treesaver.dom.removeClass(c, 'current');
+        }
+      });
+    }
+  });
 
   // Refresh the size of scrollable areas (often used with TOC)
   // TODO: Figure out better separate here?
@@ -1281,6 +1305,8 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
 
     el.innerHTML = Mustache.to_html(template, toc);
   }, this);
+
+  this.updateTOCActive();
 };
 
 /**
