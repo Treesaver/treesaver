@@ -148,6 +148,30 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Array.<Element>}
    */
   this.prevArticle = null;
+
+  /**
+   * Cached references to the position templates elements
+   * @type {?Array.<Element>}
+   */
+  this.positionElements = [];
+
+  /**
+   * Cached reference to the original position templates
+   * @type {?Array.<string>}
+   */
+  this.positionTemplates = [];
+
+  /**
+   * Cached references to the index templates elements
+   * @type {?Array.<Element>}
+   */
+  this.indexElements = [];
+
+  /**
+   * Cached reference to the original index templates
+   * @type {?Array.<string>}
+   */
+  this.indexTemplates = [];
 };
 
 /**
@@ -166,8 +190,8 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.prevPage = treesaver.dom.getElementsByClassName('prev', this.node);
     this.prevArticle = treesaver.dom.getElementsByClassName('prevArticle', this.node);
 
-    this.locationElements = treesaver.dom.getElementsByProperty('data-template', 'location', null, this.node);
-    this.locationTemplates = this.locationElements.map(function (el) {
+    this.positionElements = treesaver.dom.getElementsByProperty('data-template', 'position', null, this.node);
+    this.positionTemplates = this.positionElements.map(function (el) {
       return el.innerHTML;
     });
 
@@ -225,6 +249,10 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.nextArticle = null;
   this.prevPage = null;
   this.prevArticle = null;
+  this.positionElements = null;
+  this.positionTemplates = null;
+  this.indexElements = null;
+  this.indexTemplates = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -302,7 +330,7 @@ treesaver.ui.Chrome.prototype['handleEvent'] = function(e) {
 
   case treesaver.ui.ArticleManager.events.DOCUMENTCHANGED:
     this.updateTOCActive();
-    this.updateLocation();
+    this.updatePosition();
     return;
 
   case 'mouseover':
@@ -1136,9 +1164,9 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function() {
   this.scrollers.forEach(function(s) { s.refreshDimensions(); });
 };
 
-treesaver.ui.Chrome.prototype.updateLocation = function () {
-  this.locationElements.forEach(function (el, i) {
-    var template = this.locationTemplates[i];
+treesaver.ui.Chrome.prototype.updatePosition = function () {
+  this.positionElements.forEach(function (el, i) {
+    var template = this.positionTemplates[i];
 
     el.innerHTML = Mustache.to_html(template, {
       pagenumber: treesaver.ui.ArticleManager.getCurrentPageNumber(),
@@ -1276,7 +1304,7 @@ treesaver.ui.Chrome.prototype.selectPages = function() {
   this.layoutPages(direction);
 
   // Update our field display in the chrome (page count/index changes)
-  this.updateLocation();
+  this.updatePosition();
   this.updatePageWidth(treesaver.ui.ArticleManager.getCurrentPageWidth());
 
   // Update the previous/next buttons depending on the current state
