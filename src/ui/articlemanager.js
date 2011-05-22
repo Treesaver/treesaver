@@ -793,7 +793,11 @@ treesaver.ui.ArticleManager.getCurrentPageNumber = function() {
  * @return {number}
  */
 treesaver.ui.ArticleManager.getCurrentPageCount = function() {
-  return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].pageCount || 1;
+  if (treesaver.ui.ArticleManager.currentArticlePosition === treesaver.ui.ArticlePosition.END) {
+    return 1;
+  } else {
+    return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].pageCount || 1;
+  }
 };
 
 /**
