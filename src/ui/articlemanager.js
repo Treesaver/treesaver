@@ -255,8 +255,8 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
     return;
   }
 
-  if (e.type === treesaver.ui.Article.events.LOADFAILED &&
-      e.article === treesaver.ui.ArticleManager.currentDocument) {
+  if (e.type === treesaver.ui.Document.events.LOADFAILED &&
+      e.document === treesaver.ui.ArticleManager.currentDocument) {
     // The current article failed to load, redirect to it
     treesaver.ui.ArticleManager.redirectToDocument(treesaver.ui.ArticleManager.currentDocument);
 
