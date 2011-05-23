@@ -67,6 +67,10 @@ treesaver.layout.Page = function(content, grids, br) {
   treesaver.dimensions.setCssPx(this.node, 'width', this.size.w);
   treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
+  treesaver.dom.getElementsByProperty('data-template', 'document', null, this.node).forEach(function (el) {
+    el.innerHTML = Mustache.to_html(el.innerHTML, content.doc.meta);
+  });
+
   // Containers
   treesaver.dom.getElementsByClassName('container', this.node).forEach(function(containerNode, i) {
     var mapping = best.containers[i],

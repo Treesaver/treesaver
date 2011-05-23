@@ -123,7 +123,7 @@ treesaver.ui.Document.prototype.parse = function (text) {
     // referenced by the requestUrl.)
     var identifier = articleNode.getAttribute('id') || (index === 0 ? null : ('_' + index)),
         // FIXME: get rid of the global reference to ArticleManager
-        article = new treesaver.ui.Article(treesaver.ui.ArticleManager.grids_, articleNode);
+        article = new treesaver.ui.Article(treesaver.ui.ArticleManager.grids_, articleNode, this);
 
     if (identifier) {
       this.articleMap[identifier] = index;

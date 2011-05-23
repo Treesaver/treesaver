@@ -26,7 +26,7 @@ goog.require('treesaver.uri');
  * @param {!Array.<treesaver.layout.Grid>} grids
  * @param {?Element} node
  */
-treesaver.ui.Article = function(grids, node) {
+treesaver.ui.Article = function(grids, node, doc) {
   /**
    * @type {?string}
    */
@@ -103,6 +103,12 @@ treesaver.ui.Article = function(grids, node) {
    */
   this.grids = grids;
 
+  /**
+   * Reference to the parent document.
+   * @type {!treesaver.ui.Document}
+   */
+  this.doc = doc;
+
   // Automatically process the HTML, if any was given to us
   if (node) {
     this.processHTML(node);
@@ -174,7 +180,7 @@ treesaver.ui.Article.prototype.processHTML = function(article_node) {
   fake_grid.style.display = 'block';
 
   // Construct
-  this.content = new treesaver.layout.Content(fake_column);
+  this.content = new treesaver.layout.Content(fake_column, this.doc);
 
   // Clean up the DOM
   document.body.removeChild(fake_grid);
