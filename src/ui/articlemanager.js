@@ -113,17 +113,15 @@ treesaver.ui.ArticleManager.onIndexLoad = function (e) {
   if (docs.length) {
     // Update the new index with the articles from the initial document, which we have already loaded.
     docs.forEach(function (doc) {
-      doc.articles = treesaver.ui.ArticleManager.initialDocument.articles;
-      doc.loaded = true;
+      treesaver.ui.ArticleManager.initialDocument.meta = doc.meta;
+      treesaver.ui.ArticleManager.initialDocument.children = doc.children;
+
+      doc.parent.replaceChild(treesaver.ui.ArticleManager.initialDocument, doc);
     });
 
     treesaver.ui.ArticleManager.currentDocumentIndex = index.getDocumentIndex(treesaver.ui.ArticleManager.initialDocument);
 
-    // Fix up the document title, which may have been updated with information from the index file
-    doc = index.getDocumentByIndex(treesaver.ui.ArticleManager.currentDocumentIndex);
-    doc.title = treesaver.ui.ArticleManager.initialDocument.title;
-    treesaver.ui.ArticleManager.initialDocument.meta = doc.meta;
-    document.title = doc.meta['title'] || doc.title;
+    document.title = treesaver.ui.ArticleManager.initialDocument.meta['title'] || treesaver.ui.ArticleManager.initialDocument.title;
   } else {
     // Whoops, what happens here? We loaded a document, it has an index, but
     // the index does not contain a reference to the document that referenced it.

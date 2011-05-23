@@ -111,7 +111,7 @@ treesaver.ui.Index.prototype.invalidate = function () {
   
   this.documents = [];
   this.documentMap = {};
-  this.documentPositions = {};// TODO: Maybe generalize caching. There seems to be a pattern here.
+  this.documentPositions = {};
 
   this.walk(this.children, function (doc) {
     if (this.documentMap[doc.url]) {
@@ -193,14 +193,19 @@ treesaver.ui.Index.prototype.getDocuments = function () {
 };
 
 /**
- * Returns all documents matching the given URL.
+ * Returns all documents matching the given URL in the live index.
  * @param {!string} url
  * @return {Array.<treesaver.ui.Document>}
  */
 treesaver.ui.Index.prototype.get = function (url) {
-  return this.documents.filter(function (doc) {
-    return doc.equals(url);
-  });
+  var result = [];
+
+  this.walk(this.children, function (doc) {
+    if (doc.equals(url)) {
+      result.push(doc);
+    }
+  }, this);
+  return result;
 };
 
 /**
