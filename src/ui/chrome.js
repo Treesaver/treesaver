@@ -1119,7 +1119,7 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
   // Refresh the size of scrollable areas
   this.scrollers.forEach(function(s) { s.refreshDimensions(); });
 
-  if (treesaver.ui.ArticleManager.currentArticle) {
+  if (treesaver.ui.ArticleManager.currentDocument) {
     // Re-query for pages later
     this.selectPagesDelayed();
     this.updateTOCDelayed();
