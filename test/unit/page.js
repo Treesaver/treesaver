@@ -42,24 +42,6 @@ $(function () {
     }
   });
 
-  test('fillField', function () {
-    var field_grid_node = $('.grids .grid.fields')[0],
-        fields = {
-          title: 'My title',
-          byline: '<a href="#">Author Name</a>',
-          unused: 'This is not used'
-        };
-
-    $(field_grid_node).find('[data-bind]').each(function () {
-      treesaver.layout.Page.fillField(this, fields);
-    })
-
-    equals($(field_grid_node).find('[data-bind]').length, 3, 'Output nodes preserved');
-    equals($(field_grid_node).find('[data-bind=title]').html(), fields.title, 'Title field');
-    equals($(field_grid_node).find('[data-bind=byline]').html(), '&lt;a href="#"&gt;Author Name&lt;/a&gt;', 'Byline innerText is escaped.');
-    equals($(field_grid_node).find('[data-bind=bogus]').html(), '', 'Bogus field unchanged');
-  });
-
   // TODO: fillContainers
   test('fillContainer - Basics', function () {
     var $page = $('<div class="page fillContainer testonly"></div>').css({ height: 1000, position: 'relative'}).appendTo('body'),
