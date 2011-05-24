@@ -889,45 +889,42 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
   url = doc.url + (articleAnchor ? '#' + articleAnchor : '');
   path = doc.path + (articleAnchor ? '#' + articleAnchor: '');
 
-  if (doc.equals(treesaver.ui.ArticleManager.currentDocument)) {
-    if (index !== treesaver.ui.ArticleManager.currentDocumentIndex) {
-      // Same document, but different index
-      treesaver.ui.ArticleManager.currentDocumentIndex = index;
-    } else if (!treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
-      // Same document, but different article
-      var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
+  if (doc.equals(treesaver.ui.ArticleManager.currentDocument) &&
+      index !== treesaver.ui.ArticleManager.currentDocumentIndex &&
+      !treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
+    // Same document, but different article
+    var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
 
-      // Adjust the transition direction
-      treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentArticlePosition.index > articlePosition.index) ?
-      treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
+    // Adjust the transition direction
+    treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentArticlePosition.index > articlePosition.index) ?
+    treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
 
-      // Update the article position
-      treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
+    // Update the article position
+    treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
 
-      treesaver.ui.ArticleManager._setPosition(pos);
-      treesaver.ui.ArticleManager.currentPageIndex = -1;
+    treesaver.ui.ArticleManager._setPosition(pos);
+    treesaver.ui.ArticleManager.currentPageIndex = -1;
 
-      // Update the browser URL, but only if we are supposed to
-      if (!noHistory) {
-        treesaver.history.pushState({
-          index: index,
-          url: url,
-          position: pos
-        }, doc.meta['title'], path);
-      } else {
-        treesaver.history.replaceState({
-          index: index,
-          url: url,
-          position: pos
-        }, doc.meta['title'], path);
-      }
-
-      // Fire the ARTICLECHANGED event
-      treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
-      treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
-        'article': article
-      });
+    // Update the browser URL, but only if we are supposed to
+    if (!noHistory) {
+      treesaver.history.pushState({
+        index: index,
+        url: url,
+        position: pos
+      }, doc.meta['title'], path);
+    } else {
+      treesaver.history.replaceState({
+        index: index,
+        url: url,
+        position: pos
+      }, doc.meta['title'], path);
     }
+
+    // Fire the ARTICLECHANGED event
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
+      'article': article
+    });
     return true;
   }
 
