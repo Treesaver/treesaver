@@ -13,8 +13,8 @@ options(
     src_dir = HOME_DIR / 'src',
     test_dir = HOME_DIR / 'test',
     tmp_dir = HOME_DIR / '.tmp',
-    closure_dir = HOME_DIR / 'closure',
-    closure_compiler = HOME_DIR / 'closure/compiler.jar',
+    closure_dir = HOME_DIR / 'lib/closure',
+    closure_compiler = HOME_DIR / 'lib/closure/compiler.jar',
     closure_lint = 'gjslint',
     closure_fix_lint = 'fixjsstyle',
     tag = sh('git describe --abbrev=0', capture=True).replace('\n', ''),
@@ -25,8 +25,8 @@ options(
 options(
     modules_file = options.src_dir / 'modules.json',
     externs_dir = options.src_dir / 'externs',
-    calcdeps = HOME_DIR / 'closure/bin/calcdeps.py',
-    depswriter = HOME_DIR / 'closure/bin/build/depswriter.py',
+    calcdeps = HOME_DIR / 'lib/closure/bin/calcdeps.py',
+    depswriter = HOME_DIR / 'lib/closure/bin/build/depswriter.py',
 )
 
 # Closure compiler options
@@ -341,7 +341,37 @@ def compile(args):
 
         contents = target_file.text()
 
+        if i == 0:
+          prepend_mustache(target_file)
+    else:
+      prepend_mustache(options.build_dir / single_filename)
+
     size()
+
+def prepend_mustache(filename):
+    """Prepend the minified Mustache library to the given file"""
+
+    # TODO: This should probably be generalized once we have more than one
+    # external library.
+    sh('java -jar %s %s' % (
+        options.closure_compiler,
+        ' --compilation_level SIMPLE_OPTIMIZATIONS --js lib/mustache/mustache.js --js_output_file=build/mustache.js'
+    ))
+
+    tmp_name = "%s.tmp" % filename
+
+    sh('mv %s %s && mv %s %s && cat %s >> %s && rm %s' % (
+      (filename),
+      (tmp_name),
+
+      'build/mustache.js',
+      (filename),
+
+      (tmp_name),
+      (filename),
+
+      (tmp_name)
+  ))
 
 @task
 def size():

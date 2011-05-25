@@ -52,6 +52,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 
   if (initialHTML) {
     treesaver.ui.ArticleManager.initialDocument.articles = treesaver.ui.ArticleManager.initialDocument.parse(initialHTML);
+    treesaver.ui.ArticleManager.initialDocument.title = document.title;
     treesaver.ui.ArticleManager.initialDocument.loaded = true;
   }
 
@@ -111,17 +112,22 @@ treesaver.ui.ArticleManager.unload = function() {
 
 treesaver.ui.ArticleManager.onIndexLoad = function (e) {
   var index = e.index,
-      docs = index.get(treesaver.ui.ArticleManager.initialDocument.url);
+      docs = index.get(treesaver.ui.ArticleManager.initialDocument.url),
+      doc = null;
 
   // Note that this may get called twice, once from the cache and once from the XHR response
   if (docs.length) {
     // Update the new index with the articles from the initial document, which we have already loaded.
     docs.forEach(function (doc) {
-      doc.articles = treesaver.ui.ArticleManager.initialDocument.articles;
-      doc.loaded = true;
+      treesaver.ui.ArticleManager.initialDocument.meta = doc.meta;
+      treesaver.ui.ArticleManager.initialDocument.children = doc.children;
+
+      doc.parent.replaceChild(treesaver.ui.ArticleManager.initialDocument, doc);
     });
 
     treesaver.ui.ArticleManager.currentDocumentIndex = index.getDocumentIndex(treesaver.ui.ArticleManager.initialDocument);
+
+    document.title = treesaver.ui.ArticleManager.initialDocument.meta['title'] || treesaver.ui.ArticleManager.initialDocument.title;
   } else {
     // Whoops, what happens here? We loaded a document, it has an index, but
     // the index does not contain a reference to the document that referenced it.
@@ -207,7 +213,6 @@ treesaver.ui.ArticleManager.initErrorPage = function() {
  * @type {Object.<string, string>}
  */
 treesaver.ui.ArticleManager.events = {
-  TOCUPDATED: 'treesaver.tocupdated',
   ARTICLECHANGED: 'treesaver.articlechanged',
   DOCUMENTCHANGED: 'treesaver.documentchanged',
   PAGESCHANGED: 'treesaver.pageschanged'
@@ -245,6 +250,7 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
   }
 
   if (e.type === treesaver.ui.Document.events.LOADED) {
+    document.title = treesaver.ui.ArticleManager.currentDocument.meta['title'] || treesaver.ui.ArticleManager.currentDocument.title;
     // TODO
     // If it's the current article, kick off pagination?
     // If it's the next, kick it off too?
@@ -253,8 +259,8 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
     return;
   }
 
-  if (e.type === treesaver.ui.Article.events.LOADFAILED &&
-      e.article === treesaver.ui.ArticleManager.currentDocument) {
+  if (e.type === treesaver.ui.Document.events.LOADFAILED &&
+      e.document === treesaver.ui.ArticleManager.currentDocument) {
     // The current article failed to load, redirect to it
     treesaver.ui.ArticleManager.redirectToDocument(treesaver.ui.ArticleManager.currentDocument);
 
@@ -782,6 +788,14 @@ treesaver.ui.ArticleManager.getCurrentUrl = function() {
 };
 
 /**
+ * Returns the current document
+ * @return {treesaver.ui.Document}
+ */
+treesaver.ui.ArticleManager.getCurrentDocument = function () {
+  return treesaver.ui.ArticleManager.currentDocument;
+};
+
+/**
  * Get the page number (1-based) of the current page
  * @return {number}
  */
@@ -794,7 +808,27 @@ treesaver.ui.ArticleManager.getCurrentPageNumber = function() {
  * @return {number}
  */
 treesaver.ui.ArticleManager.getCurrentPageCount = function() {
-  return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].pageCount || 1;
+  if (treesaver.ui.ArticleManager.currentArticlePosition === treesaver.ui.ArticlePosition.END) {
+    return 1;
+  } else {
+    return treesaver.ui.ArticleManager.currentDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index].pageCount || 1;
+  }
+};
+
+/**
+ * Return the document number (1-based) of the current document.
+ * @return {number}
+ */
+treesaver.ui.ArticleManager.getCurrentDocumentNumber = function () {
+  return (treesaver.ui.ArticleManager.currentDocumentIndex + 1) || 1;
+};
+
+/**
+ * Return the number of documents in the index.
+ * @return {number}
+ */
+treesaver.ui.ArticleManager.getDocumentCount = function () {
+  return treesaver.ui.ArticleManager.index.getNumberOfDocuments();
 };
 
 /**
@@ -864,51 +898,46 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
   url = doc.url + (articleAnchor ? '#' + articleAnchor : '');
   path = doc.path + (articleAnchor ? '#' + articleAnchor: '');
 
-  if (doc.equals(treesaver.ui.ArticleManager.currentDocument)) {
-    if (index !== treesaver.ui.ArticleManager.currentDocumentIndex) {
-      // Same document, but different index
-      treesaver.ui.ArticleManager.currentDocumentIndex = index;
-    } else if (!treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
-      // Same document, but different article
-      var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
+  if (doc.equals(treesaver.ui.ArticleManager.currentDocument) &&
+      index !== treesaver.ui.ArticleManager.currentDocumentIndex &&
+      !treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
+    // Same document, but different article
+    var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
 
-      // Adjust the transition direction
-      treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentArticlePosition.index > articlePosition.index) ?
-      treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
+    // Adjust the transition direction
+    treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentArticlePosition.index > articlePosition.index) ?
+    treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
 
-      // Update the article position
-      treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
+    // Update the article position
+    treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
 
-      treesaver.ui.ArticleManager._setPosition(pos);
-      treesaver.ui.ArticleManager.currentPageIndex = -1;
+    treesaver.ui.ArticleManager._setPosition(pos);
+    treesaver.ui.ArticleManager.currentPageIndex = -1;
 
-      // Update the browser URL, but only if we are supposed to
-      if (!noHistory) {
-        treesaver.history.pushState({
-          index: index,
-          url: url,
-          position: pos
-        }, doc.meta['title'], path);
-      } else {
-        treesaver.history.replaceState({
-          index: index,
-          url: url,
-          position: pos
-        }, doc.meta['title'], path);
-      }
-
-      // Fire the ARTICLECHANGED event
-      treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
-      treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
-        'article': article
-      });
+    // Update the browser URL, but only if we are supposed to
+    if (!noHistory) {
+      treesaver.history.pushState({
+        index: index,
+        url: url,
+        position: pos
+      }, doc.meta['title'], path);
+    } else {
+      treesaver.history.replaceState({
+        index: index,
+        url: url,
+        position: pos
+      }, doc.meta['title'], path);
     }
+
+    // Fire the ARTICLECHANGED event
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
+    treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
+      'article': article
+    });
     return true;
   }
 
-  if (doc.meta['title']) {
-    document.title = doc.meta['title'];
-  }
+  document.title = doc.meta['title'] || doc.title;
 
   treesaver.ui.ArticleManager.currentDocument = doc;
   treesaver.ui.ArticleManager._setPosition(pos);
@@ -939,13 +968,13 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
       index: index,
       url: url,
       position: pos
-    }, doc.meta['title'], path);
+    }, doc.meta['title'] || '', path);
   } else {
     treesaver.history.replaceState({
       index: index,
       url: url,
       position: pos
-    }, doc.meta['title'], path);
+    }, doc.meta['title'] || '', path);
   }
 
   // Fire events
@@ -958,6 +987,7 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
     'article': treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition && articlePosition.index || 0)
   });
+
   return true;
 };
 
@@ -1017,5 +1047,7 @@ if (WITHIN_IOS_WRAPPER) {
   goog.exportSymbol('treesaver.getCurrentUrl', treesaver.ui.ArticleManager.getCurrentUrl);
   goog.exportSymbol('treesaver.getCurrentPageNumber', treesaver.ui.ArticleManager.getCurrentPageNumber);
   goog.exportSymbol('treesaver.getCurrentPageCount', treesaver.ui.ArticleManager.getCurrentPageCount);
+  goog.exportSymbol('treesaver.getCurrentDocumentNumber', treesaver.ui.ArticleManager.getCurrentDocumentNumber);
+  goog.exportSymbol('treesaver.getDocumentCount', treesaver.ui.ArticleManager.getDocumentCount);
   goog.exportSymbol('treesaver.goToDocumentByURL', treesaver.ui.ArticleManager.goToDocumentByURL);
 }

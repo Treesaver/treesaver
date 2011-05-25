@@ -7,7 +7,6 @@ goog.require('treesaver.dom');
 //goog.require('treesaver.layout.Block');
 goog.require('treesaver.layout.FigureSize'); // trim
 goog.require('treesaver.string');
-goog.require('treesaver.template');
 
 /**
  * A figure element
@@ -41,13 +40,6 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
    */
   this.zoomable = treesaver.dom.hasClass(el, 'zoomable');
 
-  /**
-   * Temporarily holds any content templates
-   * @private
-   * @type {Array.<!Element>}
-   */
-  this.templates = [];
-
   // Go through and process our sizes
   treesaver.array.toArray(el.childNodes).forEach(function(childNode) {
     if (childNode.nodeType !== 1) {
@@ -71,9 +63,6 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
     // Remove the fallback from figure sizes
     delete this.sizes['fallback'];
   }
-
-  // No longer needed
-  delete this.templates;
 };
 
 /**

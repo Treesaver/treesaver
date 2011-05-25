@@ -119,33 +119,33 @@ p {
   bottom: 0;
 }
 
-.article.template {
+.toc .article {
   padding: 5px 10px;
   clear: both;
 }
 
-.article.template .thumb {
+.toc .article .thumb {
   float: left;
   margin: 0 5px 5px 0;
   width: 40px;
   height: 40px;
 }
 
-.article.template h3 {
+.toc .article h3 {
   margin: 0;
 }
 
-.article.template h3 a {
+.toc .article h3 a {
   display: block;
   color: #fff;
   text-decoration: none;
 }
 
-.article.template p {
+.toc .article p {
   margin: 0;
 }
 
-.article.template {
+.toc .article {
   color: #cce;
 }
 
@@ -284,14 +284,14 @@ h2 a:hover {
   background: #667;
 }
 
-p[itemprop=byline], .toc .byline {
+.byline {
   margin: 0;
   color: #778;
   font-family: Sans-Serif;
   font-size: 12px;
 }
 
-p[itemprop=abstract], .toc .abstract {
+.abstract {
   margin-top: 0;
 }
 

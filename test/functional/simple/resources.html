@@ -10,7 +10,7 @@
       </div>
 
       <div class="controls">
-        <span>Page <span data-bind="pagenumber">0</span> of <span data-bind="pagecount">0</span></span>
+        <span data-template="position">Page {{pagenumber}} of {{pagecount}}</span>
         <button class="prev">Previous</button>
         <button class="next">Next</button>
 
@@ -18,7 +18,8 @@
           <button>Menu</button>
           <ul>
             <li><a href="http://www.treesaver.net/">About treesaver</a></li>
-            <li><a data-href="http://twitter.com/?status={{current-url}}" data-bind="current-url:href" target="external">Tweet this!</a></li>
+            <!-- FIXME: we need some custom encoding here.-->
+            <li data-template="position"><a href="http://twitter.com/?status={{url}}" target="external">Tweet this!</a></li>
             <li><a href="index.html">Table of contents</a></li>
             <li><a href="#" class="nextArticle">Next article</a></li>
             <li><a href="#" class="prevArticle">Previous article</a></li>
@@ -27,12 +28,16 @@
       </div>
 
       <div class="sidebar">
-        <div class="toc" data-bind="toc">
-          <div class="template article" data-bind="article">
-            <img class="thumb" data-bind="thumb:src"/>
-            <h3><a data-bind="url:href title">Article Title</a></h3>
-            <p class="byline" data-bind="byline"></p>
-          </div>
+        <div class="toc" data-template="index">
+          {{#children}}
+            {{^hidden}}
+              <div class="article">
+                <img class="thumb" src="{{thumb}}"/>
+                <h3><a href="{{url}}">{{title}}</a></h3>
+                <p class="byline">{{byline}}</p>
+              </div>
+            {{/hidden}}
+          {{/children}}
         </div>
         <button class="open-sidebar">Open</button>
         <button class="close-sidebar">Close</button>
@@ -46,7 +51,11 @@
     </div>
 
     <div class="grid cols-2">
-      <div data-bind="article-title"></div>
+      <div data-template="document">
+        {{#title}}
+          {{title}}
+        {{/title}}
+      </div>
       <div class="container title cols-2" data-sizes="title"></div>
       <div class="container cols-3 bottom" data-sizes="two"></div>
       <div class="column"></div>
@@ -54,7 +63,11 @@
     </div>
 
     <div class="grid cols-3">
-      <div data-bind="article-title"></div>
+      <div data-template="document">
+        {{#title}}
+          {{title}}
+        {{/title}}
+      </div>
       <div class="container title cols-3" data-sizes="title"></div>
       <div class="container cols-3 bottom" data-sizes="three"></div>
       <div class="column"></div>

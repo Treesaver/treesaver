@@ -60,7 +60,8 @@ treesaver.ui.Index.CACHE_STORAGE_PREFIX = 'cache:';
 
 treesaver.ui.Index.events = {
   LOADFAILED: 'treesaver.index.loadfailed',
-  LOADED: 'treesaver.index.loaded'
+  LOADED: 'treesaver.index.loaded',
+  UPDATED: 'treesaver.index.updated'
 };
 
 /**
@@ -83,11 +84,9 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
   // Resolve this URL, and strip the hash if necessary
   url = treesaver.uri.stripHash(treesaver.network.absoluteURL(url));
 
-  // Copy all meta fields into a new object (except url and children)
+  // Copy all meta fields into a new object
   Object.keys(entry).forEach(function (key) {
-    if (key !== 'url' && key !== 'children') {
-      meta[key] = entry[key];
-    }
+    meta[key] = entry[key];
   });
 
   // Create a new document
@@ -112,7 +111,7 @@ treesaver.ui.Index.prototype.invalidate = function () {
   
   this.documents = [];
   this.documentMap = {};
-  this.documentPositions = {};// TODO: Maybe generalize caching. There seems to be a pattern here.
+  this.documentPositions = {};
 
   this.walk(this.children, function (doc) {
     if (this.documentMap[doc.url]) {
@@ -129,6 +128,10 @@ treesaver.ui.Index.prototype.invalidate = function () {
     }
     index += 1;
   }, this);
+
+  treesaver.events.fireEvent(document, treesaver.ui.Index.events.UPDATED, {
+    index: this
+  });
 };
 
 /**
@@ -190,14 +193,19 @@ treesaver.ui.Index.prototype.getDocuments = function () {
 };
 
 /**
- * Returns all documents matching the given URL.
+ * Returns all documents matching the given URL in the live index.
  * @param {!string} url
  * @return {Array.<treesaver.ui.Document>}
  */
 treesaver.ui.Index.prototype.get = function (url) {
-  return this.documents.filter(function (doc) {
-    return doc.equals(url);
-  });
+  var result = [];
+
+  this.walk(this.children, function (doc) {
+    if (doc.equals(url)) {
+      result.push(doc);
+    }
+  }, this);
+  return result;
 };
 
 /**
@@ -262,11 +270,12 @@ treesaver.ui.Index.prototype.load = function () {
       treesaver.debug.log('Index.load: Processing cached content for index: ' + this.url);
       this.children = this.parse(cached_text);
       this.loaded = true;
-      this.invalidate();
 
       treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADED, {
         index: this
       });
+
+      this.invalidate();
     }
   }
 
@@ -300,11 +309,12 @@ treesaver.ui.Index.prototype.load = function () {
       treesaver.debug.log('Index.load: Processing content for index: ' + that.url);
       that.children = that.parse(text);
       that.loaded = true;
-      that.invalidate();
 
       treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADED, {
         index: that
       });
+
+      that.invalidate();
     } else {
       treesaver.debug.log('Index.load: Fetched index same as cached');
     }

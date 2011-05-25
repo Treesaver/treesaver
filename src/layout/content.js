@@ -15,8 +15,9 @@ goog.require('treesaver.layout.Block');
  *
  * @constructor
  * @param {!Element} el HTML node which contains all content.
+ * @param {!treesaver.ui.Document} The parent document that owns this content chunk.
  */
-treesaver.layout.Content = function(el) {
+treesaver.layout.Content = function(el, doc) {
   var indices = {
     index: 0,
     figureIndex: 0
@@ -65,16 +66,14 @@ treesaver.layout.Content = function(el) {
    */
   this.blocks = [];
 
+  /**
+   * @type {!treesaver.ui.Document}
+   */
+  this.doc = doc;
+
   // Now we're ready to create our objects, re-use the processChildren
   // function because it does exactly what we need
   treesaver.layout.Block.processChildren(this, el, this.lineHeight, indices);
-
-  /**
-   * Dictionary of fields and values that can be populated
-   * in a grid
-   * @type {Object.<string, string>}
-   */
-  this.fields = {};
 };
 
 if (goog.DEBUG) {

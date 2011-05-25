@@ -1,12 +1,19 @@
 [
   {
-    "url": "index.html"
+    "url": "index.html",
+    "hidden": true
   },
   {
-    "url": "one.html"
+    "url": "one.html",
+    "title": "Article One",
+    "thumb": "openroad-thumb.jpg",
+    "byline": "John Doe"
   },
   {
-    "url": "two.html"
+    "url": "two.html",
+    "title": "Article Two",
+    "thumb": "river-thumb.jpg",
+    "byline": "Jane Doe"
   }
 ]
 

@@ -67,18 +67,9 @@ treesaver.layout.Page = function(content, grids, br) {
   treesaver.dimensions.setCssPx(this.node, 'width', this.size.w);
   treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
-  // Fill in fields
-  Object.keys(content.fields || {}).forEach(function(key) {
-    var fields = treesaver.template.getElementsByBindName(key, null, this.node);
-
-    fields.forEach(function(node) {
-      var view = {};
-
-      view[key] = content.fields[key];
-
-      treesaver.layout.Page.fillField(node, view);
-    });
-  }, this);
+  treesaver.dom.getElementsByProperty('data-template', 'document', null, this.node).forEach(function (el) {
+    el.innerHTML = Mustache.to_html(el.innerHTML, content.doc.meta);
+  });
 
   // Containers
   treesaver.dom.getElementsByClassName('container', this.node).forEach(function(containerNode, i) {
@@ -910,16 +901,6 @@ treesaver.layout.Page.computeOverhang = function(br, lastBlock, colHeight, heigh
   }
 
   return colHeight;
-};
-
-/**
- * Fill in the data field for this node
- * @param {!Element} node
- * @param {!Object} fields
- */
-treesaver.layout.Page.fillField = function(node, fields) {
-  // The field name to put in this element
-  treesaver.template.expand(fields, node);
 };
 
 /**
