@@ -538,9 +538,6 @@ treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
 
   var i, childNode;
 
-  // Cast for compiler type checks
-  node = /** @type {Element} */ (node);
-
   // Remove IDs, since we can end up with more than one copy of an element
   // in the tree (across column splits, etc)
   node.removeAttribute('id');

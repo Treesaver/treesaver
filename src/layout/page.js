@@ -78,7 +78,7 @@ treesaver.layout.Page = function(content, grids, br) {
 
     if (mapping) {
       figureIndex = mapping.figureIndex;
-      figure = content.figures[figureIndex];
+      figure = /** @type {!treesaver.layout.Figure} */ (content.figures[figureIndex]);
       success = treesaver.layout.Page.fillContainer(containerNode, figure, mapping,
         content.lineHeight);
 

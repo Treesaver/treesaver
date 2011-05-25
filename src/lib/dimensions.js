@@ -58,14 +58,14 @@ treesaver.dimensions.inSizeRange = function(range, size) {
 
 /**
  *
- * @param {treesaver.dimensions.SizeRange} a
- * @param {treesaver.dimensions.Metrics} b
+ * @param {treesaver.dimensions.SizeRange} range
+ * @param {treesaver.dimensions.Metrics} metrics
  * @param {boolean} outer
  * @return {treesaver.dimensions.SizeRange}
  */
-treesaver.dimensions.mergeSizeRange = function(a, b, outer) {
-  a = a || {};
-  b = b || {};
+treesaver.dimensions.mergeSizeRange = function(range, metrics, outer) {
+  var a = range || {},
+      b = metrics || {};
 
   var bpHeight = outer ? b.bpHeight || (b.outerH ? b.outerH - b.h : 0) : 0,
       bpWidth = outer ? b.bpWidth || (b.outerW ? b.outerW - b.w : 0) : 0;

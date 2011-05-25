@@ -222,7 +222,7 @@ treesaver.ui.Index.prototype.parse = function (index) {
 
   if (typeof index === 'string') {
     try {
-      index = treesaver.json.parse(index);
+      index = /** @type {!Array} */ (treesaver.json.parse(index));
     } catch (e) {
       treesaver.debug.warn('Tried to parse TOC index file, but failed: ' + e);
       return [];
@@ -232,8 +232,8 @@ treesaver.ui.Index.prototype.parse = function (index) {
   if (!Array.isArray(/** @type {!Object} */ (index))) {
     treesaver.debug.warn('Document index should be an array of objects.');
     return [];
-  }  
-  
+  }
+
   return index.map(function (entry) {
     return this.appendChild(this.parseEntry(entry));
   }, this);

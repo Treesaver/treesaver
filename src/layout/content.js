@@ -15,7 +15,7 @@ goog.require('treesaver.layout.Block');
  *
  * @constructor
  * @param {!Element} el HTML node which contains all content.
- * @param {!treesaver.ui.Document} The parent document that owns this content chunk.
+ * @param {!treesaver.ui.Document} doc The parent document that owns this content chunk.
  */
 treesaver.layout.Content = function(el, doc) {
   var indices = {
