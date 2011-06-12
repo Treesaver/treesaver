@@ -64,7 +64,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 
   // Append the initial document, so that we have at least something in case loading the index takes a long time or fails.
   treesaver.ui.ArticleManager.index.appendChild(treesaver.ui.ArticleManager.initialDocument);
-  treesaver.ui.ArticleManager.index.invalidate();
+  treesaver.ui.ArticleManager.index.update();
   treesaver.ui.ArticleManager.index.load();
 
   // Set the initial document to active

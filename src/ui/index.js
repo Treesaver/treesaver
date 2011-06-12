@@ -46,7 +46,7 @@ treesaver.ui.Index = function (url) {
   this.documentPositions = {};
 
   /**
-   * Linear list of documents. This is used as a cache. You can invalidate and repopulate the cache by calling invalidate().
+   * Linear list of documents. This is used as a cache. You can invalidate and repopulate the cache by calling update().
    * @type {!Array.<treesaver.ui.Document>}
    */
   this.documents = [];
@@ -103,10 +103,10 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
 };
 
 /**
- * Invalidate the document cache and repopulates it. This
+ * Updates the document cache and repopulates it. This
  * should be called after manually modifying the index.
  */
-treesaver.ui.Index.prototype.invalidate = function () {
+treesaver.ui.Index.prototype.update = function () {
   var index = 0;
   
   this.documents = [];
@@ -275,7 +275,7 @@ treesaver.ui.Index.prototype.load = function () {
         index: this
       });
 
-      this.invalidate();
+      this.update();
     }
   }
 
@@ -314,7 +314,7 @@ treesaver.ui.Index.prototype.load = function () {
         index: that
       });
 
-      that.invalidate();
+      that.update();
     } else {
       treesaver.debug.log('Index.load: Fetched index same as cached');
     }

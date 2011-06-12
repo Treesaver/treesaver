@@ -10,21 +10,21 @@ treesaver.addListener(document, treesaver.ui.Index.events.LOADED, function (even
     index.appendChild(new treesaver.ui.Document('one.html', {
       title: 'Article One'
     }));
-    index.invalidate();
+    index.update();
   });
 
   two.addEventListener('click', function () {
     index.appendChild(new treesaver.ui.Document('two.html', {
       title: 'Article Two'
     }));
-    index.invalidate();
+    index.update();
   });
 
   three.addEventListener('click', function () {
     index.appendChild(new treesaver.ui.Document('three.html', {
       title: 'Article Three'
     }));
-    index.invalidate();
+    index.update();
   });
 
   dynamic.addEventListener('click', function () {
@@ -45,7 +45,7 @@ treesaver.addListener(document, treesaver.ui.Index.events.LOADED, function (even
     // Append the document as usual
     index.appendChild(doc);
 
-    // Invalidate the index
-    index.invalidate();
+    // Update the index
+    update.invalidate();
   });
 });
