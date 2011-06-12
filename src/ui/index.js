@@ -130,7 +130,7 @@ treesaver.ui.Index.prototype.update = function () {
   }, this);
 
   treesaver.events.fireEvent(document, treesaver.ui.Index.events.UPDATED, {
-    index: this
+    'index': this
   });
 };
 
@@ -256,7 +256,7 @@ treesaver.ui.Index.prototype.load = function () {
   // Don't try loading if we do not have a proper URL
   if (!this.url) {
     treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADFAILED, {
-      index: this
+      'index': this
     });
     return;
   }
@@ -272,7 +272,7 @@ treesaver.ui.Index.prototype.load = function () {
       this.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADED, {
-        index: this
+        'index': this
       });
 
       this.update();
@@ -291,7 +291,7 @@ treesaver.ui.Index.prototype.load = function () {
         that.loaded = false;
 
         treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADFAILED, {
-          index: that
+          'index': that
         });
         return;
       } else {
@@ -311,7 +311,7 @@ treesaver.ui.Index.prototype.load = function () {
       that.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADED, {
-        index: that
+        'index': that
       });
 
       that.update();

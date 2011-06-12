@@ -173,6 +173,14 @@ treesaver.ui.Document.prototype.getArticle = function (index) {
 };
 
 /**
+ * Manually set the articles for this Document.
+ * @param {Array.<treesaver.ui.Article>} articles
+ */
+treesaver.ui.Document.prototype.setArticles = function (articles) {
+  this.articles = articles;
+};
+
+/**
  * Returns the number of articles in this Document. Does not include any child documents.
  * @return {!number}
  */
@@ -237,7 +245,7 @@ treesaver.ui.Document.prototype.load = function () {
       this.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADED, {
-        document: this
+        'document': this
       });
     }
   }
@@ -254,7 +262,7 @@ treesaver.ui.Document.prototype.load = function () {
         that.loaded = false;
 
         treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADFAILED, {
-          document: that
+          'document': that
         });
         return;
       } else {
@@ -275,10 +283,14 @@ treesaver.ui.Document.prototype.load = function () {
       that.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Document.events.LOADED, {
-        document: that
+        'document': that
       });
     } else {
       treesaver.debug.log('Document.load: Fetched document content same as cached');
     }
   });
 };
+
+goog.exportSymbol('treesaver.Document', treesaver.ui.Document);
+goog.exportSymbol('treesaver.Document.prototype.setArticles', treesaver.ui.Document.prototype.setArticles);
+goog.exportSymbol('treesaver.Document.prototype.parse', treesaver.ui.Document.prototype.parse);

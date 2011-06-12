@@ -1,4 +1,4 @@
-treesaver.addListener(document, treesaver.ui.Index.events.LOADED, function (event) {
+treesaver.addListener(document, 'treesaver.index.loaded', function (event) {
   var index = event.index,
       one = document.getElementsByClassName('one')[0],
       two = document.getElementsByClassName('two')[0],
@@ -7,28 +7,28 @@ treesaver.addListener(document, treesaver.ui.Index.events.LOADED, function (even
       counter = 4;
 
   one.addEventListener('click', function () {
-    index.appendChild(new treesaver.ui.Document('one.html', {
+    index.appendChild(new treesaver.Document('one.html', {
       title: 'Article One'
     }));
     index.update();
   });
 
   two.addEventListener('click', function () {
-    index.appendChild(new treesaver.ui.Document('two.html', {
+    index.appendChild(new treesaver.Document('two.html', {
       title: 'Article Two'
     }));
     index.update();
   });
 
   three.addEventListener('click', function () {
-    index.appendChild(new treesaver.ui.Document('three.html', {
+    index.appendChild(new treesaver.Document('three.html', {
       title: 'Article Three'
     }));
     index.update();
   });
 
   dynamic.addEventListener('click', function () {
-    var doc = new treesaver.ui.Document('dynamic_' + counter + '.html', {
+    var doc = new treesaver.Document('dynamic_' + counter + '.html', {
       title: 'Article ' + counter
     });
 
@@ -38,7 +38,7 @@ treesaver.addListener(document, treesaver.ui.Index.events.LOADED, function (even
 
     // Manually assign the articles by parsing a HTML string. You can dynamically retrieve this
     // through an XHR request.
-    doc.articles = doc.parse('<article><h1>Article ' + counter + '</h1><p>This is article number: ' + counter + '</p></article>');
+    doc.setArticles(doc.parse('<article><h1>Article ' + counter + '</h1><p>This is article number: ' + counter + '</p></article>'));
 
     counter += 1;
 
@@ -46,6 +46,6 @@ treesaver.addListener(document, treesaver.ui.Index.events.LOADED, function (even
     index.appendChild(doc);
 
     // Update the index
-    update.invalidate();
+    index.update();
   });
 });
