@@ -181,6 +181,14 @@ treesaver.ui.Document.prototype.setArticles = function (articles) {
 };
 
 /**
+ * Retrieve the meta data for this Document.
+ * @return {!Object}
+ */
+treesaver.ui.Document.prototype.getMeta = function () {
+  return this.meta;
+};
+
+/**
  * Returns the number of articles in this Document. Does not include any child documents.
  * @return {!number}
  */
@@ -294,3 +302,4 @@ treesaver.ui.Document.prototype.load = function () {
 goog.exportSymbol('treesaver.Document', treesaver.ui.Document);
 goog.exportSymbol('treesaver.Document.prototype.setArticles', treesaver.ui.Document.prototype.setArticles);
 goog.exportSymbol('treesaver.Document.prototype.parse', treesaver.ui.Document.prototype.parse);
+goog.exportSymbol('treesaver.Document.prototype.getMeta', treesaver.ui.Document.prototype.getMeta);
