@@ -1048,6 +1048,7 @@ if (WITHIN_IOS_WRAPPER) {
   goog.exportSymbol('treesaver.getCurrentPageNumber', treesaver.ui.ArticleManager.getCurrentPageNumber);
   goog.exportSymbol('treesaver.getCurrentPageCount', treesaver.ui.ArticleManager.getCurrentPageCount);
   goog.exportSymbol('treesaver.getCurrentDocumentNumber', treesaver.ui.ArticleManager.getCurrentDocumentNumber);
+  goog.exportSymbol('treesaver.getCurrentDocument', treesaver.ui.ArticleManager.getCurrentDocument);
   goog.exportSymbol('treesaver.getDocumentCount', treesaver.ui.ArticleManager.getDocumentCount);
   goog.exportSymbol('treesaver.goToDocumentByURL', treesaver.ui.ArticleManager.goToDocumentByURL);
 }
