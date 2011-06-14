@@ -1169,12 +1169,12 @@ treesaver.ui.Chrome.prototype.updatePosition = function () {
     var template = this.positionTemplates[i];
 
     el.innerHTML = Mustache.to_html(template, {
-      pagenumber: treesaver.ui.ArticleManager.getCurrentPageNumber(),
-      pagecount: treesaver.ui.ArticleManager.getCurrentPageCount(),
-      url: treesaver.ui.ArticleManager.getCurrentUrl(),
-      documentnumber: treesaver.ui.ArticleManager.getCurrentDocumentNumber(),
-      documentcount: treesaver.ui.ArticleManager.getDocumentCount(),
-      currentdocument: treesaver.ui.ArticleManager.getCurrentDocument().meta
+      'pagenumber': treesaver.ui.ArticleManager.getCurrentPageNumber(),
+      'pagecount': treesaver.ui.ArticleManager.getCurrentPageCount(),
+      'url': treesaver.ui.ArticleManager.getCurrentUrl(),
+      'documentnumber': treesaver.ui.ArticleManager.getCurrentDocumentNumber(),
+      'documentcount': treesaver.ui.ArticleManager.getDocumentCount(),
+      'currentdocument': treesaver.ui.ArticleManager.getCurrentDocument().meta
     });
   }, this);
 };
