@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <body>
+    <div class="chrome">
+      <div class="viewer">
+      </div>
+
+      <div class="controls">
+        <span data-template="position">Page {{pagenumber}} of {{pagecount}}</span>
+        <button class="prev">Previous</button>
+        <button class="next">Next</button>
+      </div>
+
+      <div class="toc" data-template="index">
+        {{#children}}
+          {{^visited}}
+            <div class="article">
+              <h3><a href="{{url}}">{{title}}</a></h3>
+            </div>
+          {{/visited}}
+          {{#visited}}
+            <div class="article">
+              <h3><a href="{{url}}">{{title}}</a> (visited)</h3>
+            </div>
+          {{/visited}}
+        {{/children}}
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="column"></div>
+    </div>
+  </body>
+</html>
