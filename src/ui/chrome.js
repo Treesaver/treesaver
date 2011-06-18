@@ -172,6 +172,18 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Array.<string>}
    */
   this.indexTemplates = [];
+
+  /**
+   * Cached references to the current-document template elements
+   * @type {?Array.<Element>}
+   */
+  this.currentDocumentElements = [];
+
+  /**
+   * Cached reference to the original current-document templates
+   * @type {?Array.<string>}
+   */
+  this.currentDocumentTemplates = [];
 };
 
 /**
@@ -197,6 +209,11 @@ treesaver.ui.Chrome.prototype.activate = function() {
 
     this.indexElements = treesaver.dom.getElementsByProperty('data-template', 'index', null, this.node);
     this.indexTemplates = this.indexElements.map(function (el) {
+      return el.innerHTML;
+    });
+
+    this.currentDocumentElements = treesaver.dom.getElementsByProperty('data-template', 'currentdocument', null, this.node);
+    this.currentDocumentTemplates = this.currentDocumentElements.map(function (el) {
       return el.innerHTML;
     });
 
@@ -253,6 +270,8 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.positionTemplates = null;
   this.indexElements = null;
   this.indexTemplates = null;
+  this.currentDocumentElements = null;
+  this.currentDocumentTemplates = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
@@ -1173,9 +1192,16 @@ treesaver.ui.Chrome.prototype.updatePosition = function () {
       'pagecount': treesaver.ui.ArticleManager.getCurrentPageCount(),
       'url': treesaver.ui.ArticleManager.getCurrentUrl(),
       'documentnumber': treesaver.ui.ArticleManager.getCurrentDocumentNumber(),
-      'documentcount': treesaver.ui.ArticleManager.getDocumentCount(),
-      'currentdocument': treesaver.ui.ArticleManager.getCurrentDocument().meta
+      'documentcount': treesaver.ui.ArticleManager.getDocumentCount()
     });
+  }, this);
+};
+
+treesaver.ui.Chrome.prototype.updateCurrentDocument = function () {
+  this.currentDocumentElements.forEach(function (el, i) {
+    var template = this.currentDocumentTemplates[i];
+
+    el.innerHTML = Mustache.to_html(template, treesaver.ui.ArticleManager.getCurrentDocument().meta);
   }, this);
 };
 
@@ -1306,6 +1332,7 @@ treesaver.ui.Chrome.prototype.selectPages = function() {
 
   // Update our field display in the chrome (page count/index changes)
   this.updatePosition();
+  this.updateCurrentDocument();
   this.updatePageWidth(treesaver.ui.ArticleManager.getCurrentPageWidth());
 
   // Update the previous/next buttons depending on the current state
