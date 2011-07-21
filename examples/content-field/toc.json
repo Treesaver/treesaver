@@ -1,0 +1,33 @@
+[
+  {
+    "url": "index.html",
+    "type": "none"
+  },
+  {
+    "url": "world.html",
+    "title": "World News",
+    "type": "world-news",
+    "publication": {
+      "time": "2011-07-21",
+      "name": "The Daily Example"
+    }    
+  },
+  {
+    "url": "local.html",
+    "title": "Local News",
+    "type": "local-news",
+    "publication": {
+      "time": "2011-07-20",
+      "name": "Example Of The World"
+    }
+  },
+  {
+    "url": "sport.html",
+    "title": "Sports",
+    "type": "sports",
+    "publication": {
+      "time": "2011-07-21",
+      "name": "The Example Times"
+    }
+  }
+]

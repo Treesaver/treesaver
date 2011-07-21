@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <body>
+    <div class="chrome">
+      <div class="viewer">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div data-template="document">
+        <div class="{{type}}">
+          <header>
+            <!-- This is a conditional, it will only be evaluated if the JSON
+                 file has a title property for this document. The index.html
+                 page does not have a title property in the JSON so no title
+                 will be displayed. -->
+            {{#title}}
+              {{title}}
+            {{/title}}
+          </header>
+          <div class="column"></div>
+          <footer>
+            <!-- Again a conditional, but this time it checks for the availability
+                 of an object. If it is found, it enters a new scope and makes the
+                 properties at that level available. -->
+            {{#publication}}
+              {{name}}, {{time}}
+            {{/publication}}
+          </footer>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

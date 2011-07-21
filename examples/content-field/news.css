@@ -1,0 +1,47 @@
+h1 {
+  color: white;
+  padding: 20px;
+}
+
+/**
+ * Section colouring
+ */
+.none h1 {
+  color: black;
+}
+
+.world-news h1 {
+  background-color: green;
+}
+
+.local-news h1 {
+  background-color: red;
+}
+
+.sports h1 {
+  background-color: black;
+}
+
+/**
+ * Content fields
+ */
+.column {
+  top: 40px;
+  bottom: 40px;
+}
+
+header {
+  position: absolute;
+  top: 0px;
+  background-color: black;
+  color: white;
+  width: 100%;
+}
+
+footer {
+  position: absolute;
+  bottom: 0px;
+  background-color: LightGray;
+  color: DarkGray;
+  width: 100%;
+}
