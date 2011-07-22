@@ -171,15 +171,15 @@ treesaver.ui.Index.prototype.getNumberOfDocuments = function () {
  * @return {!number}
  */
 treesaver.ui.Index.prototype.getDocumentIndex = function (doc) {
-  var result = -1;
+  var result = -1,
+      i = 0;
 
-  this.documents.every(function (d, i) {
+  this.walk(this.children, function (d) {
     if (d.equals(doc)) {
       result = i;
-      return false;
     }
-    return true;
-  });
+    i += 1;
+  }, this);
 
   return result;
 };
