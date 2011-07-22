@@ -262,6 +262,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageWidth = null;
   this.menus = null;
   this.sidebars = null;
+  this.scrollers = null;
   this.nextPage = null;
   this.nextArticle = null;
   this.prevPage = null;
