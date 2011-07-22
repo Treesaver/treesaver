@@ -158,15 +158,21 @@ treesaver.layout.Figure.prototype.getSize = function(size) {
  * Retrieve the largest figureSize that fits within the allotted space
  *
  * @param {!treesaver.dimensions.Size} maxSize
+ * @param {boolean=} isLightbox True if display is for a lightbox
  * @return {?{name: string, figureSize: treesaver.layout.FigureSize}} Null if none fit
  */
-treesaver.layout.Figure.prototype.getLargestSize = function(maxSize) {
-  var maxW = -Infinity,
-      maxH = -Infinity,
+treesaver.layout.Figure.prototype.getLargestSize = function(maxSize, isLightbox) {
+  var maxArea = -Infinity,
       max,
-      current;
+      current,
+      sizes = this.sizes;
 
-  for (current in this.sizes) {
+  if (isLightbox && this.sizes["lightbox"]) {
+    // Only look at lightbox figures
+    sizes = { "lightbox": this.sizes["lightbox"] };
+  }
+
+  for (current in sizes) {
     this.sizes[current].forEach(function(figureSize) {
       if (!figureSize.meetsRequirements()) {
         // Not eligible
@@ -179,11 +185,14 @@ treesaver.layout.Figure.prototype.getLargestSize = function(maxSize) {
         return;
       }
 
+      var area = figureSize.minW * figureSize.minH;
+
       // TODO: How to estimate dimensions when no info is provided?
-      if ((!figureSize.minW || figureSize.minW >= maxW) &&
-          (!figureSize.minH || figureSize.minH >= maxH)) {
-        maxW = figureSize.minW;
-        maxH = figureSize.minH;
+      //
+      // Use this current size only if it's bigger than the one we
+      // found before (based on area)
+      if (area >= maxArea) {
+        maxArea = area;
         max = {
           name: current,
           figureSize: figureSize

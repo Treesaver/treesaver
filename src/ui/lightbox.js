@@ -118,7 +118,7 @@ treesaver.ui.LightBox.prototype.getMaxSize = function() {
  * @param {!treesaver.layout.Figure} figure
  */
 treesaver.ui.LightBox.prototype.showFigure = function(figure) {
-  var largest = figure.getLargestSize(this.getMaxSize()),
+  var largest = figure.getLargestSize(this.getMaxSize(), true),
       w = treesaver.dimensions.getOffsetWidth(this.container.offsetParent),
       h = treesaver.dimensions.getOffsetHeight(this.container.offsetParent);
 
