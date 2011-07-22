@@ -115,6 +115,12 @@ treesaver.ui.Document.prototype.parse = function (text) {
     return treesaver.dom.getAncestor(article, 'article') === null;
   });
 
+  // We don't have any articles so we'll just copy the entire body and call it an article
+  if (articles.length === 0) {
+    articles.push(document.createElement('article'));
+    articles[0].innerHTML = node.innerHTML;
+  }
+
   // Next we try to find a unique URL for each article
   return articles.map(function (articleNode, index) {
     // If the article has an identifier use it. Otherwise we automatically
