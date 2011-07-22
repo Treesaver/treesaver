@@ -70,9 +70,11 @@ treesaver.layout.FigureSize.prototype.applySize = function(container, name) {
   container.innerHTML = this.html;
 
   // Find any cloaked images
-  treesaver.dom.getElementsByProperty('data-src', null, 'img', container).
-    forEach(function(e) {
-      e.setAttribute('src', e.getAttribute('data-src'));
+  ['img', 'iframe', 'video'].forEach(function(tagName) {
+    treesaver.dom.getElementsByProperty('data-src', null, tagName, container).
+      forEach(function(e) {
+        e.setAttribute('src', e.getAttribute('data-src'));
+    });
   });
 };
 
