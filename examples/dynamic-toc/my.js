@@ -11,21 +11,21 @@ treesaver.addListener(document, 'treesaver.index.loaded', function (event) {
       title: 'Article One'
     }));
     index.update();
-  });
+  }, false);
 
   two.addEventListener('click', function () {
     index.appendChild(new treesaver.Document('two.html', {
       title: 'Article Two'
     }));
     index.update();
-  });
+  }, false);
 
   three.addEventListener('click', function () {
     index.appendChild(new treesaver.Document('three.html', {
       title: 'Article Three'
     }));
     index.update();
-  });
+  }, false);
 
   dynamic.addEventListener('click', function () {
     var doc = new treesaver.Document('dynamic_' + counter + '.html', {
@@ -47,5 +47,5 @@ treesaver.addListener(document, 'treesaver.index.loaded', function (event) {
 
     // Update the index
     index.update();
-  });
+  }, false);
 });
