@@ -35,10 +35,16 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   this.optional = !treesaver.dom.hasClass(el, 'required');
 
   /**
-   * Does the figure support zooming/lightboxing?.
+   * Does the figure support zooming/lightboxing?
    * @type {boolean}
    */
   this.zoomable = treesaver.dom.hasClass(el, 'zoomable');
+
+  /**
+   * Does the figure support scrolling?
+   * @type {boolean}
+   */
+  this.scrollable = treesaver.dom.hasClass(el, 'scroll');
 
   // Go through and process our sizes
   treesaver.array.toArray(el.childNodes).forEach(function(childNode) {

@@ -51,6 +51,12 @@ treesaver.ui.Chrome = function(node) {
   this.scrollers = [];
 
   /**
+   * Scrollers located within the currently displayed pages
+   * @type {Array.<Element>}
+   */
+  this.inPageScrollers = [];
+
+  /**
    * @type {?Element}
    */
   this.node = null;
@@ -263,6 +269,7 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.menus = null;
   this.sidebars = null;
   this.scrollers = null;
+  this.inPageScrollers = null;
   this.nextPage = null;
   this.nextArticle = null;
   this.prevPage = null;
@@ -719,7 +726,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     this.touchData_.startX2 = e.touches[1].pageX;
   }
 
-  this.scrollers.forEach(function(s) {
+  this.scrollers.concat(this.inPageScrollers).forEach(function(s) {
     if (s.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
       this.touchData_.scroller = s;
     }
@@ -1395,6 +1402,10 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
       if (!page.node) {
         page.activate();
       }
+
+      // Collect scrollers from each displayed page
+      this.inPageScrollers = page.scrollers.concat(this.inPageScrollers || []);
+      this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
 
       if (page.node.parentNode !== this.viewer) {
         if (direction === treesaver.ui.ArticleManager.transitionDirection.BACKWARD) {
