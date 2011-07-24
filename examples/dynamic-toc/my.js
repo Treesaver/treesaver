@@ -6,28 +6,28 @@ treesaver.addListener(document, 'treesaver.index.loaded', function (event) {
       dynamic = document.getElementsByClassName('dynamic')[0],
       counter = 4;
 
-  one.addEventListener('click', function () {
+  treesaver.addListener(one, 'click', function () {
     index.appendChild(new treesaver.Document('one.html', {
       title: 'Article One'
     }));
     index.update();
-  }, false);
+  });
 
-  two.addEventListener('click', function () {
+  treesaver.addListener(two, 'click', function () {
     index.appendChild(new treesaver.Document('two.html', {
       title: 'Article Two'
     }));
     index.update();
-  }, false);
+  });
 
-  three.addEventListener('click', function () {
+  treesaver.addListener(three, 'click', function () {
     index.appendChild(new treesaver.Document('three.html', {
       title: 'Article Three'
     }));
     index.update();
-  }, false);
+  });
 
-  dynamic.addEventListener('click', function () {
+  treesaver.addListener(dynamic, 'click', function () {
     var doc = new treesaver.Document('dynamic_' + counter + '.html', {
       title: 'Article ' + counter
     });
@@ -47,5 +47,5 @@ treesaver.addListener(document, 'treesaver.index.loaded', function (event) {
 
     // Update the index
     index.update();
-  }, false);
+  });
 });
