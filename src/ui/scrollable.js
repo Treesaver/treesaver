@@ -103,8 +103,6 @@ treesaver.ui.Scrollable.prototype.cropOffset = function(x, y) {
 treesaver.ui.Scrollable.prototype.setOffset = function(x, y, set) {
   var cropped = this.cropOffset(this.scrollPosX + x, this.scrollPosY + y);
 
-  console.log('CroppedX: ' + cropped.x);
-
   if (set) {
     this.scrollPosX = cropped.x;
     this.scrollPosY = cropped.y;
