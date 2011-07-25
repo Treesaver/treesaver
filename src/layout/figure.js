@@ -163,6 +163,9 @@ treesaver.layout.Figure.prototype.getSize = function(size) {
  */
 treesaver.layout.Figure.prototype.getLargestSize = function(maxSize, isLightbox) {
   var maxArea = -Infinity,
+      availArea = maxSize.w * maxSize.h,
+      closest,
+      closestArea = Infinity,
       max,
       current,
       sizes = this.sizes;
@@ -179,13 +182,24 @@ treesaver.layout.Figure.prototype.getLargestSize = function(maxSize, isLightbox)
         return;
       }
 
+      var area = figureSize.minW * figureSize.minH;
+
       if ((figureSize.minW && figureSize.minW > maxSize.w) ||
           (figureSize.minH && figureSize.minH > maxSize.h)) {
         // Too big
+        if (!max && this.scrollable) {
+          // If nothing fits yet, find something at least near
+          if (area <= closestArea) {
+            closestArea = area;
+            closest = {
+              name: current,
+              figureSize: figureSize
+            };
+          }
+        }
+
         return;
       }
-
-      var area = figureSize.minW * figureSize.minH;
 
       // TODO: How to estimate dimensions when no info is provided?
       //
@@ -198,10 +212,10 @@ treesaver.layout.Figure.prototype.getLargestSize = function(maxSize, isLightbox)
           figureSize: figureSize
         };
       }
-    });
+    }, this);
   }
 
-  return max;
+  return max || closest;
 };
 
 /**

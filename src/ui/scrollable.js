@@ -61,6 +61,7 @@ treesaver.ui.Scrollable.prototype.scrollPosY;
  * Refresh the viewport and content sizes based on current DOM measurements
  */
 treesaver.ui.Scrollable.prototype.refreshDimensions = function() {
+  // TODO: Consider setting position:absolute in order to get correct width?
   this.viewportSize = treesaver.dimensions.getSize(this.node);
   this.contentSize = treesaver.dimensions.getSize(this.contentContainer);
   this.scrollPosX = this.scrollPosX || 0;
@@ -102,9 +103,11 @@ treesaver.ui.Scrollable.prototype.cropOffset = function(x, y) {
 treesaver.ui.Scrollable.prototype.setOffset = function(x, y, set) {
   var cropped = this.cropOffset(this.scrollPosX + x, this.scrollPosY + y);
 
+  console.log('CroppedX: ' + cropped.x);
+
   if (set) {
-    this.scrollPosY = cropped.y;
     this.scrollPosX = cropped.x;
+    this.scrollPosY = cropped.y;
   }
 
   treesaver.dimensions.setOffset(/** @type {!Element} */ (this.contentContainer), -cropped.x, -cropped.y);

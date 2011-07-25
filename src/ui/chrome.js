@@ -698,6 +698,8 @@ treesaver.ui.Chrome.prototype.touchData_;
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchStart = function(e) {
+  var target = treesaver.ui.Chrome.findTarget_(e.target);
+
   if (!treesaver.boot.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
     return;
   }
@@ -706,8 +708,8 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  // Lightbox active? Hide it
-  if (this.lightBoxActive) {
+  // Lightbox active? Hide it only if it can't scroll
+  if (this.lightBoxActive && !this.lightBox.scroller) {
     this.hideLightBox();
     return;
   }
@@ -726,8 +728,13 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     this.touchData_.startX2 = e.touches[1].pageX;
   }
 
-  this.scrollers.concat(this.inPageScrollers).forEach(function(s) {
-    if (s.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
+  // Chrome Scrollers
+  this.scrollers.
+    // Plus scrollers of page content
+    concat(this.inPageScrollers).
+    // Plus the lightbox scroller (if there)
+    concat(this.lightBox ? this.lightBox.scroller : []).forEach(function(s) {
+    if (s.node.contains(target)) {
       this.touchData_.scroller = s;
     }
   }, this);
@@ -764,7 +771,7 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     Math.abs(this.touchData_.deltaX) >= SWIPE_THRESHOLD;
 
   if (this.touchData_.scroller) {
-    this.touchData_.scroller.setOffset(this.touchData_.deltaX, -this.touchData_.deltaY);
+    this.touchData_.scroller.setOffset(-this.touchData_.deltaX, -this.touchData_.deltaY);
   }
   else if (this.touchData_.swipe) {
     this.pageOffset = this.touchData_.deltaX;
@@ -803,7 +810,7 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   e.preventDefault();
 
   if (touchData.scroller && touchData.lastMove) {
-    touchData.scroller.setOffset(touchData.deltaX, -touchData.deltaY, true);
+    touchData.scroller.setOffset(-touchData.deltaX, -touchData.deltaY, true);
   }
   else if (touchData.touchCount === 1) {
     // No move means we create a click
