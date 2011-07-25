@@ -113,6 +113,9 @@ treesaver.ui.LightBox.prototype.getMaxSize = function() {
     }
   }
 
+  // Compiler cast
+  this.container = /** @type {!Element} */ (this.container);
+
   // TODO: Query only needed properties
   var metrics = new treesaver.dimensions.Metrics(this.container);
 
@@ -155,7 +158,9 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
       contentH = Math.min(containerSize.h, contentH);
       treesaver.dimensions.setCssPx(this.container, 'width', contentW);
       treesaver.dimensions.setCssPx(this.container, 'height', contentH);
-      treesaver.ui.Scrollable.initDom(this.container.firstChild);
+      // Temporary compiler cast here. Need to ensure there is always at least an element
+      // from the figure (should be true, but good to sanity check)
+      treesaver.ui.Scrollable.initDom(/** @type {!Element} */ (this.container.firstChild));
       this.scroller = new treesaver.ui.Scrollable(this.container);
       this.scroller.refreshDimensions();
     }
