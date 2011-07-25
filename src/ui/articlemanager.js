@@ -68,7 +68,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.index.load();
 
   // Set the initial document to active
-  treesaver.ui.ArticleManager.setCurrentDocument(treesaver.ui.ArticleManager.initialDocument, treesaver.ui.ArticlePosition.BEGINNING, null, 0, true);
+  treesaver.ui.ArticleManager.setCurrentDocument(treesaver.ui.ArticleManager.initialDocument, treesaver.ui.ArticlePosition.BEGINNING, null, null, true);
 
   // Set up the loading & error pages
   treesaver.ui.ArticleManager.initLoadingPage();
