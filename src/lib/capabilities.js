@@ -426,6 +426,15 @@ treesaver.capabilities.SUPPORTS_APPLICATIONCACHE =
   !WITHIN_IOS_WRAPPER && 'applicationCache' in window;
 
 /**
+ * Whether the page was loaded from the home screen
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.IS_FULLSCREEN = WITHIN_IOS_WRAPPER ||
+  window.navigator.standalone;
+
+/**
  * Whether the browser supports CSS transforms
  *
  * @const
@@ -528,6 +537,7 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
       p(treesaver.capabilities.SUPPORTS_FLASH) + 'flash',
       p(treesaver.capabilities.SUPPORTS_ORIENTATION) + 'orientation',
+      p(treesaver.capabilities.IS_FULLSCREEN) + 'fullscreen',
       p(treesaver.capabilities.IS_LEGACY) + 'legacy',
       p(treesaver.capabilities.IS_MOBILE) + 'mobile',
       p(treesaver.capabilities.IS_SMALL_SCREEN) + 'smallscreen',
