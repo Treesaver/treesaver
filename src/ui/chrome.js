@@ -1439,31 +1439,32 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
   var prevPage = this.pages[0],
       currentPage = this.pages[1],
       nextPage = this.pages[2],
-      leftMarginEdge,
-      rightMarginEdge,
-      leftMargin = Math.max(currentPage.size.marginRight, nextPage ? nextPage.size.marginLeft : 0),
-      rightMargin = Math.max(currentPage.size.marginLeft, prevPage ? prevPage.size.marginRight : 0),
+      leftPageEdge,
+      rightPageEdge,
+      leftMargin = Math.max(currentPage.size.marginLeft, prevPage ? prevPage.size.marginRight : 0),
+      rightMargin = Math.max(currentPage.size.marginRight, nextPage ? nextPage.size.marginLeft : 0),
       oldOffset = this.pageOffset;
 
   // Mark the master page
   currentPage.node.setAttribute('id', 'currentPage');
 
   // Center the first page
-  leftMarginEdge = (this.pageArea.w - currentPage.size.outerW) / 2 - leftMargin;
-  rightMarginEdge = leftMarginEdge + currentPage.size.outerW + leftMargin + rightMargin;
+  leftPageEdge = (this.pageArea.w - currentPage.size.outerW) / 2;
+  rightPageEdge = leftPageEdge + currentPage.size.outerW;
 
   // Register the positions of each page
   this.pagePositions = [];
-  this.pagePositions[1] = leftMarginEdge;
+  // Absolute positioning uses margin box, so account for left margin
+  this.pagePositions[1] = leftPageEdge - currentPage.size.marginLeft;
 
   if (prevPage) {
-    this.pagePositions[0] = leftMarginEdge -
+    this.pagePositions[0] = leftPageEdge - leftMargin -
       (prevPage.size.outerW + prevPage.size.marginLeft);
     prevPage.node.setAttribute('id', 'previousPage');
   }
 
   if (nextPage) {
-    this.pagePositions[2] = rightMarginEdge - nextPage.size.marginLeft;
+    this.pagePositions[2] = rightPageEdge + rightMargin - nextPage.size.marginLeft;
     nextPage.node.setAttribute('id', 'nextPage');
   }
 
