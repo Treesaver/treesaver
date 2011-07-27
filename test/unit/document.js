@@ -46,6 +46,9 @@ $(function () {
 
     result = d.parse('<article></article><article id="notes"></article>');
     equal(result.length, 2, 'two articles returned');
+
+    result = d.parse('<h1>Article without article</h1>');
+    equal(result.length, 1, 'no article is parsed as one article');
   });
 
   test('Document.load: simple', function () {
