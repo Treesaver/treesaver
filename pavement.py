@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import shutil
 from paver.easy import *
 from paver.path import path
 from hashlib import md5
@@ -12,6 +13,7 @@ options(
     build_dir = HOME_DIR / 'build',
     src_dir = HOME_DIR / 'src',
     test_dir = HOME_DIR / 'test',
+    lib_dir = HOME_DIR / 'lib',
     tmp_dir = HOME_DIR / '.tmp',
     closure_dir = HOME_DIR / 'lib/closure',
     closure_compiler = HOME_DIR / 'lib/closure/compiler.jar',
@@ -126,8 +128,10 @@ def debug(args):
 
         outfile.write_text(contents)
 
+        prepend_lib(options.lib_dir / 'mustache/mustache.js', outfile, False)
+
     else:
-        for jsfile in options.src_dir.files('*.js'):
+        for i, jsfile in enumerate(options.src_dir.files('*.js')):
             outfile = options.build_dir / jsfile.basename()
             js = sh('python %s -i %s -p % s -p %s -o %s --output_file %s' % (
                 options.calcdeps,
@@ -143,6 +147,9 @@ def debug(args):
             contents = outfile.text().replace('COMPILED = false', 'COMPILED = true', 1)
 
             outfile.write_text(contents)
+
+            if i == 0:
+              prepend_lib(options.lib_dir / 'mustache/mustache.js', outfile, False)
 
 @task
 @consume_args
@@ -344,35 +351,37 @@ def compile(args):
         contents = target_file.text()
 
         if i == 0:
-          prepend_mustache(target_file)
+          prepend_lib(options.lib_dir / 'mustache/mustache.js', target_file)
     else:
-      prepend_mustache(options.build_dir / single_filename)
+      prepend_lib(options.lib_dir / 'mustache/mustache.js', options.build_dir / single_filename)
 
     size()
 
-def prepend_mustache(filename):
-    """Prepend the minified Mustache library to the given file"""
+def prepend_lib(source_file, target_file, minify = True):
+    """Minify (using SIMPLE_OPTIMIZATIONS) and prepend source_file to target_file."""
 
-    # TODO: This should probably be generalized once we have more than one
-    # external library.
-    sh('java -jar %s %s' % (
-        options.closure_compiler,
-        ' --compilation_level SIMPLE_OPTIMIZATIONS --js lib/mustache/mustache.js --js_output_file=build/mustache.js'
-    ))
+    tmp_source = options.build_dir / path.basename(source_file)
+    tmp_name = "%s.tmp" % target_file
 
-    tmp_name = "%s.tmp" % filename
+    if minify:
+      sh('java -jar %s %s' % (
+          options.closure_compiler,
+          ' --compilation_level SIMPLE_OPTIMIZATIONS --js %s --js_output_file=%s' % (source_file, tmp_source)
+      ))
+    else:
+      shutil.copy(source_file, tmp_source)
 
     sh('mv %s %s && mv %s %s && cat %s >> %s && rm %s' % (
-      (filename),
-      (tmp_name),
+      target_file,
+      tmp_name,
 
-      'build/mustache.js',
-      (filename),
+      tmp_source,
+      target_file,
 
-      (tmp_name),
-      (filename),
+      tmp_name,
+      target_file,
 
-      (tmp_name)
+      tmp_name
   ))
 
 @task
