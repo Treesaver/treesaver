@@ -882,7 +882,7 @@ treesaver.ui.ArticleManager.redirectToDocument = function (doc) {
  * @param {!treesaver.ui.Document} doc The document to set as current. Will be loaded if necessary.
  * @param {!treesaver.ui.ArticlePosition} articlePosition The article position within the document. Can be used to set the last article of a document as current, or jump to a specific article within a document.
  * @param {?treesaver.layout.ContentPosition} pos The position within an article.
- * @param {!number} index The index at which the document should be placed.
+ * @param {?number} index The index at which the document should be placed.
  * @param {boolean=} noHistory Whether to modify the history or not.
  */
 treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition, pos, index, noHistory) {
