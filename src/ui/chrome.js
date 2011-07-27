@@ -300,7 +300,9 @@ treesaver.ui.Chrome.prototype.stopDelayedFunctions = function() {
  */
 treesaver.ui.Chrome.events = {
   ACTIVE: 'treesaver.active',
-  IDLE: 'treesaver.idle'
+  IDLE: 'treesaver.idle',
+  SIDEBARACTIVE: 'treesaver.sidebaractive',
+  SIDEBARINACTIVE: 'treesaver.sidebarinactive'
 };
 
 /**
@@ -986,6 +988,7 @@ treesaver.ui.Chrome.prototype.isMenuActive = function(menu) {
  * Show sidebar
  */
 treesaver.ui.Chrome.prototype.sidebarActive = function(sidebar) {
+  treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.SIDEBARACTIVE, sidebar);
   treesaver.dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
 };
 
@@ -993,6 +996,9 @@ treesaver.ui.Chrome.prototype.sidebarActive = function(sidebar) {
  * Hide sidebar
  */
 treesaver.ui.Chrome.prototype.sidebarInactive = function(sidebar) {
+  if (this.isSidebarActive(sidebar)) {
+    treesaver.events.fireEvent(document, treesaver.ui.Chrome.events.SIDEBARINACTIVE, sidebar);
+  }
   treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
 };
 
