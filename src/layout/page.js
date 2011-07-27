@@ -208,6 +208,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     lineHeight) {
   var size, figureSize,
       containerHeight, sibling,
+      metrics,
       maxContainerHeight,
       anchoredTop = true;
 
@@ -245,7 +246,9 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     container.style.bottom = 'auto';
   }
 
-  containerHeight = treesaver.dimensions.getOffsetHeight(container);
+  // TODO: Query only needed properties
+  metrics = new treesaver.dimensions.Metrics(container);
+  containerHeight = metrics.outerH;
 
   // Did not fit :(
   // TODO: Use something better than parent height
@@ -254,6 +257,9 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     if (figure.scrollable) {
       // Occupy the entire space, and let the excess scroll
       containerHeight = maxContainerHeight;
+
+      // Fix the height (prevents overflow in case of mis-measuring)
+      treesaver.dimensions.setCssPx(container, 'height', containerHeight - metrics.bpHeight);
     }
     else {
       // Not scrollable, can't be displayed
@@ -279,9 +285,6 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
       containerHeight = treesaver.dimensions.roundUp(containerHeight, lineHeight);
     }
   }
-
-  // Fix the height (prevents overflow in case of mis-measuring)
-  treesaver.dimensions.setCssPx(container, 'height', containerHeight);
 
   // Set scrolling class on parent node, so the chrome can pick it up
   if (figure.scrollable) {
