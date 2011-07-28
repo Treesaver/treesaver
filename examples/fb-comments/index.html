@@ -1,0 +1,72 @@
+<!doctype html>
+<html class="no-js no-treesaver">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,height=device-height,initial-scale=1,minimum-scale=1,maximum-scale=1">
+    <title>Treesaver - Facebook comments</title>
+    <link rel="resources" href="resources.html">
+    <link rel="index" href="toc.json" type="application/json">
+    <link rel="stylesheet" href="../treesaver.css">
+    <script src="../../lib/mustache/mustache.js"></script>
+    <script src="../../lib/closure/goog/base.js"></script>
+    <script src="../../test/deps.js"></script>
+    <script>
+      goog.require('treesaver');
+    </script>
+    <script src="comments.js"></script>
+    <style>
+      .sidebar {
+        position: absolute;
+        width: 400px;
+        left: -400px;
+        top: 0;
+        bottom: 0;
+        border: 1px solid black;
+        overflow: visible;
+      }
+
+      /* Position the left sidebar correctly when it is active */
+      .sidebar-active.sidebar {
+        left: 0;
+        overflow: auto;
+      }
+
+      /* Hide the close button when the sidebar is not active */
+      .sidebar .close-sidebar {
+        display: none;
+      }
+
+      /* Show the close button when the sidebar is active */
+      .sidebar-active.sidebar .close-sidebar {
+        display: block;
+      }
+
+      /* Hide the open button when the sidebar is active */
+      .sidebar-active.sidebar .open-sidebar {
+        display: none;
+      }
+      
+      /* Show the open button when the sidebar is not active. We have to position it
+         relative to its parent (which we positioned at -250px. This is just one way to
+         hide a sidebar. You can also use CSS animations to show a sidebar. */
+      .sidebar .open-sidebar {
+        display: block;
+        position: absolute;
+        left: 400px;
+        top: 0px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <article>
+      <h1>Table Of Contents</h1>
+      <ul>
+        <li><a href="one.html">Article One</a></li>
+        <li><a href="two.html">Article Two</a></li>
+        <li><a href="three.html">Article Three</a></li>
+      </ul>
+    </article>
+    <script src="http://connect.facebook.net/en_US/all.js#xfbml=1"></script>
+  </body>
+</html>

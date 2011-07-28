@@ -46,6 +46,9 @@ $(function () {
 
     result = d.parse('<article></article><article id="notes"></article>');
     equal(result.length, 2, 'two articles returned');
+
+    result = d.parse('<h1>Article without article</h1>');
+    equal(result.length, 1, 'no article is parsed as one article');
   });
 
   test('Document.load: simple', function () {
@@ -97,14 +100,14 @@ $(function () {
           if (i === 1) {
             equal(doc.articles.length, 1, 'length set correct on first call');
           } else if (i === 2) {
-            equal(doc.articles.length, 0, 'no articles found due to corrupt cache');
+            equal(doc.articles.length, 1, 'one corrupted article found');
           } else if (i === 3) {
             equal(doc.articles.length, 1, 'correct again after retrieving up to date content');
           }
 
           if (i === 1) {
             // corrupt the cache
-            treesaver.storage.set(treesaver.ui.Document.CACHE_STORAGE_PREFIX + 'http://www.example.com/2', 'corrupt the cache');
+            treesaver.storage.set(treesaver.ui.Document.CACHE_STORAGE_PREFIX + 'http://www.example.com/2', 'corrupt');
           } else if (i === 3) {
             treesaver.events.removeListener(document, treesaver.ui.Document.events.LOADED, handler);
           }
