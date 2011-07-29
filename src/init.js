@@ -34,11 +34,11 @@ else {
  */
 treesaver.VERSION = 'dev';
 
-goog.exportSymbol('treesaver.VERSION', treesaver.VERSION);
+goog.exportSymbol('treesaver.VERSION', treesaver.VERSION, window);
 
 /**
  * A global configuration object. Use only as a last resort.
  */
 treesaver.config = {};
 
-goog.exportSymbol('treesaver.config', treesaver.config);
+goog.exportSymbol('treesaver.config', treesaver.config, window);

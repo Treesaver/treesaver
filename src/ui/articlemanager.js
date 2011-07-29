@@ -1040,15 +1040,15 @@ treesaver.ui.ArticleManager._createErrorPage = function() {
 
 // Expose functions when hosted within iOS wrapper
 if (WITHIN_IOS_WRAPPER) {
-  goog.exportSymbol('treesaver.canGoToNextPage', treesaver.ui.ArticleManager.canGoToNextPage);
-  goog.exportSymbol('treesaver.canGoToPreviousPage', treesaver.ui.ArticleManager.canGoToPreviousPage);
-  goog.exportSymbol('treesaver.canGoToNextDocument', treesaver.ui.ArticleManager.canGoToNextDocument);
-  goog.exportSymbol('treesaver.canGoToPreviousDocument', treesaver.ui.ArticleManager.canGoToPreviousDocument);
-  goog.exportSymbol('treesaver.getCurrentUrl', treesaver.ui.ArticleManager.getCurrentUrl);
-  goog.exportSymbol('treesaver.getCurrentPageNumber', treesaver.ui.ArticleManager.getCurrentPageNumber);
-  goog.exportSymbol('treesaver.getCurrentPageCount', treesaver.ui.ArticleManager.getCurrentPageCount);
-  goog.exportSymbol('treesaver.getCurrentDocumentNumber', treesaver.ui.ArticleManager.getCurrentDocumentNumber);
-  goog.exportSymbol('treesaver.getCurrentDocument', treesaver.ui.ArticleManager.getCurrentDocument);
-  goog.exportSymbol('treesaver.getDocumentCount', treesaver.ui.ArticleManager.getDocumentCount);
-  goog.exportSymbol('treesaver.goToDocumentByURL', treesaver.ui.ArticleManager.goToDocumentByURL);
+  goog.exportSymbol('treesaver.canGoToNextPage', treesaver.ui.ArticleManager.canGoToNextPage, window);
+  goog.exportSymbol('treesaver.canGoToPreviousPage', treesaver.ui.ArticleManager.canGoToPreviousPage, window);
+  goog.exportSymbol('treesaver.canGoToNextDocument', treesaver.ui.ArticleManager.canGoToNextDocument, window);
+  goog.exportSymbol('treesaver.canGoToPreviousDocument', treesaver.ui.ArticleManager.canGoToPreviousDocument, window);
+  goog.exportSymbol('treesaver.getCurrentUrl', treesaver.ui.ArticleManager.getCurrentUrl, window);
+  goog.exportSymbol('treesaver.getCurrentPageNumber', treesaver.ui.ArticleManager.getCurrentPageNumber, window);
+  goog.exportSymbol('treesaver.getCurrentPageCount', treesaver.ui.ArticleManager.getCurrentPageCount, window);
+  goog.exportSymbol('treesaver.getCurrentDocumentNumber', treesaver.ui.ArticleManager.getCurrentDocumentNumber, window);
+  goog.exportSymbol('treesaver.getCurrentDocument', treesaver.ui.ArticleManager.getCurrentDocument, window);
+  goog.exportSymbol('treesaver.getDocumentCount', treesaver.ui.ArticleManager.getDocumentCount, window);
+  goog.exportSymbol('treesaver.goToDocumentByURL', treesaver.ui.ArticleManager.goToDocumentByURL, window);
 }

@@ -326,11 +326,11 @@ if (WITHIN_IOS_WRAPPER) {
   };
 
   goog.exportSymbol('treesaver.nextPage',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.nextPage));
+    activeFunctionWrapper(treesaver.ui.ArticleManager.nextPage), window);
   goog.exportSymbol('treesaver.previousPage',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.previousPage));
+    activeFunctionWrapper(treesaver.ui.ArticleManager.previousPage), window);
   goog.exportSymbol('treesaver.nextArticle',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.nextArticle));
+    activeFunctionWrapper(treesaver.ui.ArticleManager.nextArticle), window);
   goog.exportSymbol('treesaver.previousArticle',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.previousArticle));
+    activeFunctionWrapper(treesaver.ui.ArticleManager.previousArticle), window);
 }
