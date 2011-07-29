@@ -1420,10 +1420,6 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
         page.activate();
       }
 
-      // Collect scrollers from each displayed page
-      this.inPageScrollers = page.scrollers.concat(this.inPageScrollers || []);
-      this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
-
       if (page.node.parentNode !== this.viewer) {
         if (direction === treesaver.ui.ArticleManager.transitionDirection.BACKWARD) {
           this.viewer.insertBefore(page.node, this.viewer.firstChild);
@@ -1432,6 +1428,11 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
           this.viewer.appendChild(page.node);
         }
       }
+
+      // Collect scrollers from each displayed page
+      this.inPageScrollers = page.scrollers.concat(this.inPageScrollers || []);
+      // Measure now that it is in the tree
+      this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
     }
   }, this);
 };
