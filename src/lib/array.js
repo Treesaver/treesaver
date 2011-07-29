@@ -110,10 +110,13 @@ if (!Array.isArray) {
   /**
    * Test Array-ness.
    *
-   * NOTE: Type annotation removed due to closure compiler errors
+   * @param {*} arr
+   * @return {boolean}
+   * NOTE: Suppress warnings about duplication from built-in externs
+   * @suppress {duplicate}
    */
-  Array.isArray = function(value) {
-    return Object.prototype.toString.apply(/** @type {Object} */(value)) === '[object Array]';
+  Array.isArray = function(arr) {
+    return Object.prototype.toString.apply(/** @type {Object} */(arr)) === '[object Array]';
   };
 }
 
