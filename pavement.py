@@ -252,7 +252,7 @@ def compile(args):
         ' --jscomp_error '.join(options.compiler_errors),
         ' --jscomp_warning '.join(options.compiler_warnings),
         # Don't leak global variables
-        """--output_wrapper '(function(){"use strict";%output%}());'""",
+        """--output_wrapper '(function(){%output%}());'""",
         # Not sure why compiler doesn't do this automatically
         '--define="COMPILED=true"',
 
