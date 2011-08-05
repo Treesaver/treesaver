@@ -700,7 +700,8 @@ treesaver.ui.Chrome.prototype.touchData_;
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchStart = function(e) {
-  var target = treesaver.ui.Chrome.findTarget_(e.target);
+  var target = treesaver.ui.Chrome.findTarget_(e.target),
+      x, y, now;
 
   if (!treesaver.boot.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
     return;
@@ -716,13 +717,23 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     return;
   }
 
+  x = e.touches[0].pageX;
+  y = e.touches[0].pageY;
+  now = goog.now();
+
   this.touchData_ = {
-    startTime: goog.now(),
-    deltaTime: 0,
-    startX: e.touches[0].pageX,
-    startY: e.touches[0].pageY,
+    startX: x,
+    startY: y,
+    startTime: now,
+    lastX: x,
+    lastY: y,
+    lastTime: now,
     deltaX: 0,
     deltaY: 0,
+    deltaTime: 0,
+    totalX: 0,
+    totalY: 0,
+    totalTime: 0,
     touchCount: e.touches.length
   };
 
@@ -736,7 +747,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     concat(this.inPageScrollers).
     // Plus the lightbox scroller (if there)
     concat(this.lightBox ? this.lightBox.scroller : []).forEach(function(s) {
-    if (s.node.contains(target)) {
+    if (s.contains(target)) {
       this.touchData_.scroller = s;
     }
   }, this);
@@ -750,7 +761,10 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchMove = function(e) {
-  if (!this.touchData_) {
+  var touchData = this.touchData_,
+      now, x, y;
+
+  if (!touchData) {
     // No touch info, nothing to do
     return;
   }
@@ -759,33 +773,41 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  this.touchData_.lastMove = goog.now();
-  this.touchData_.lastX = e.touches[0].pageX;
-  this.touchData_.lastY = e.touches[0].pageY;
-  this.touchData_.deltaTime = this.touchData_.lastMove - this.touchData_.startTime;
-  this.touchData_.deltaX = this.touchData_.lastX - this.touchData_.startX;
-  this.touchData_.deltaY = this.touchData_.lastY - this.touchData_.startY;
-  this.touchData_.touchCount = Math.min(e.touches.length, this.touchData_.touchCount);
-  this.touchData_.swipe =
-    // One-finger only
-    this.touchData_.touchCount === 1 &&
-    // Finger has to move far enough
-    Math.abs(this.touchData_.deltaX) >= SWIPE_THRESHOLD;
+  now = goog.now();
+  x = e.touches[0].pageX;
+  y = e.touches[0].pageY;
 
-  if (this.touchData_.scroller) {
-    this.touchData_.scroller.setOffset(-this.touchData_.deltaX, -this.touchData_.deltaY);
+  touchData.deltaTime = touchData.lastMove - now;
+  touchData.deltaX = x - touchData.lastX;
+  touchData.deltaY = y - touchData.lastY;
+  touchData.lastMove = now;
+  touchData.lastX = e.touches[0].pageX;
+  touchData.lastY = e.touches[0].pageY;
+  touchData.totalTime += touchData.deltaTime;
+  touchData.totalX += touchData.deltaX;
+  touchData.totalY += touchData.deltaY;
+  touchData.touchCount = Math.min(e.touches.length, touchData.touchCount);
+  touchData.swipe =
+    // One-finger only
+    touchData.touchCount === 1 &&
+    // Finger has to move far enough
+    Math.abs(touchData.totalX) >= SWIPE_THRESHOLD &&
+    // But not too vertical
+    Math.abs(touchData.totalX) * 2 > Math.abs(touchData.totalY);
+
+  if (touchData.scroller && (touchData.didScroll ||
+      (touchData.scroller.hasHorizontal() || !touchData.swipe))) {
+    touchData.didScroll = touchData.didScroll || touchData.scroller.hasHorizontal() ||
+      Math.abs(touchData.totalY) >= SWIPE_THRESHOLD;
+    touchData.scroller.setOffset(-touchData.deltaX, -touchData.deltaY);
   }
-  else if (this.touchData_.swipe) {
-    this.pageOffset = this.touchData_.deltaX;
-    this._updatePagePositions(true);
-  }
-  else if (this.pageOffset) {
-    this.animationStart = goog.now();
-    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
-  }
-  else if (this.touchData_.touchCount === 2) {
+  else if (touchData.touchCount === 2) {
     // Track second finger changes
-    this.touchData_.deltaX2 = e.touches[1].pageX - this.touchData_.startX2;
+    touchData.totalX2 = e.touches[1].pageX - touchData.startX2;
+  }
+  else {
+    this.pageOffset = touchData.totalX;
+    this._updatePagePositions(true);
   }
 };
 
@@ -811,8 +833,7 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  if (touchData.scroller && touchData.lastMove) {
-    touchData.scroller.setOffset(-touchData.deltaX, -touchData.deltaY, true);
+  if (touchData.didScroll) {
   }
   else if (touchData.touchCount === 1) {
     // No move means we create a click
@@ -847,10 +868,8 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
       actionTaken = true;
     }
     // Check for a swipe
-    // Also allow for users to swipe down in order to go to next page. This is a
-    // common mistake made when users first interact with a paged UI
-    else if (touchData.swipe || touchData.deltaY <= -SWIPE_THRESHOLD) {
-      if (touchData.swipe && touchData.deltaX > 0) {
+    else if (touchData.swipe) {
+      if (touchData.totalX > 0) {
         actionTaken = treesaver.ui.ArticleManager.previousPage();
       }
       else {
@@ -872,11 +891,11 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   }
   else if (touchData.touchCount === 2) {
     // Two finger swipe in the same direction is next/previous article
-    if (Math.abs(touchData.deltaX2) >= SWIPE_THRESHOLD) {
-      if (touchData.deltaX < 0 && touchData.deltaX2 < 0) {
+    if (Math.abs(touchData.totalX2) >= SWIPE_THRESHOLD) {
+      if (touchData.totalX < 0 && touchData.totalX2 < 0) {
         actionTaken = treesaver.ui.ArticleManager.nextArticle();
       }
-      else if (touchData.deltaX > 0 && touchData.deltaX2 > 0) {
+      else if (touchData.totalX > 0 && touchData.totalX2 > 0) {
         actionTaken = treesaver.ui.ArticleManager.previousArticle();
       }
 
