@@ -819,7 +819,10 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   // Hold onto a reference before clearing
   var touchData = this.touchData_,
       // Flag to track whether we need to reset positons, etc
-      actionTaken = false;
+      actionTaken = false,
+      target = treesaver.ui.Chrome.findTarget_(e.target),
+      // Lightbox is an honorary viewer
+      withinViewer = this.lightBoxActive || this.viewer.contains(target);
 
   // Clear out touch data
   this.touchCancel(e);
@@ -834,14 +837,18 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   e.preventDefault();
 
   if (touchData.didScroll) {
+    if (withinViewer) {
+      // Scrolling in viewer means idle
+      this.setUiIdle_();
+    }
+    else {
+      // Scrolling within the chrome should keep UI active
+      this.setUiActive_();
+    }
   }
   else if (touchData.touchCount === 1) {
     // No move means we create a click
     if (!touchData.lastMove) {
-      // Lightbox is honorary viewer
-      var target = treesaver.ui.Chrome.findTarget_(e.target),
-          withinViewer = this.lightBoxActive || this.viewer.contains(target);
-
       // TODO: Currently this code is OK since the IE browsers don't support
       // touch. However, perhaps Windows Phone 7 will and needs a fix with
       // IE7? Need to integrate this into treesaver.events

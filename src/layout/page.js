@@ -210,6 +210,7 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
       containerHeight, sibling,
       metrics,
       maxContainerHeight,
+      scrollNodes,
       anchoredTop = true;
 
   size = map.size;
@@ -286,12 +287,21 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     }
   }
 
-  // Set scrolling class on parent node, so the chrome can pick it up
-  if (figure.scrollable) {
-    treesaver.dom.addClass(container, 'scroll');
+  // Is part of the content scrollable?
+  scrollNodes = treesaver.dom.getElementsByClassName('scroll', container);
+
+  // Scrolling setup
+  if (scrollNodes.length || figure.scrollable) {
+    // Set scrolling class on parent node, so the chrome can pick it up
+    if (!scrollNodes.length) {
+      treesaver.dom.addClass(container, 'scroll');
+      scrollNodes = [container];
+    }
 
     // Initialize DOM for scrolling
-    treesaver.ui.Scrollable.initDom(container);
+    scrollNodes.forEach(function (scrollNode) {
+      treesaver.ui.Scrollable.initDom(scrollNode);
+    });
   }
 
   // Go through this containers siblings, adjusting their sizes
