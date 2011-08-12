@@ -4,6 +4,7 @@ goog.require('treesaver.json');
 goog.require('treesaver.uri');
 goog.require('treesaver.object');
 goog.require('treesaver.network');
+goog.require('treesaver.storage');
 goog.require('treesaver.ui.TreeNode');
 goog.require('treesaver.ui.Document');
 

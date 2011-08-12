@@ -1,6 +1,7 @@
 goog.provide('treesaver.ui.Document');
 
 goog.require('treesaver.events');
+goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.TreeNode');
 goog.require('treesaver.uri');

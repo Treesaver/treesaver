@@ -10,7 +10,6 @@ goog.require('treesaver.dom');
 goog.require('treesaver.events');
 goog.require('treesaver.network');
 goog.require('treesaver.resources');
-goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.ArticlePosition');
 goog.require('treesaver.ui.Document');
