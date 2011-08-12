@@ -3,6 +3,7 @@ goog.provide('treesaver.layout.Page');
 goog.require('treesaver.array');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
+goog.require('treesaver.scheduler');
 goog.require('treesaver.layout.BreakRecord');
 goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Block');
@@ -977,6 +978,12 @@ treesaver.layout.Page.prototype.activate = function() {
 treesaver.layout.Page.prototype.deactivate = function() {
   this.active = false;
   this.scrollers = null;
+
+  // Dispose images properly to avoid memory leaks
+  treesaver.dom.getElementsByTagName('img', this.node).
+    forEach(treesaver.dom.disposeImg);
+
+  // Lose page reference
   this.node = null;
 };
 

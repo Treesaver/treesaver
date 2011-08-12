@@ -418,6 +418,36 @@ treesaver.dom.getAncestor = function (el, tagName) {
   return null;
 };
 
+
+/**
+ * Temporary storage for <img> DOM elements before disposal
+ *
+ * @private
+ * @type {Array.<Element>}
+ */
+treesaver.dom.imgCache_ = [];
+
+/**
+ * Helper for disposing of images in order to avoid memory leaks in iOS
+ *
+ * @param {!Element} img
+ */
+treesaver.dom.disposeImg = function(img) {
+  treesaver.dom.imgCache_.push(img);
+
+  // Clear out <img> src before unload due to iOS hw-accel bugs
+  // Set source to empty gif
+  img.setAttribute('src', 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=');
+
+  // Pause to let collection happen
+  treesaver.scheduler.limit(treesaver.dom.clearImgCache_, 3000, [], 'clearImgCache');
+};
+
+treesaver.dom.clearImgCache_ = function() {
+  // Lose all references
+  treesaver.dom.imgCache_ = [];
+};
+
 /**
  * Temporary element used for DOM operations
  *

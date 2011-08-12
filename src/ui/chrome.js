@@ -1431,11 +1431,14 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
   old_pages.forEach(function(page) {
     // Only deactivate pages we're not about to use again
     if (page) {
+      var node = page.node;
       if (this.pages.indexOf(page) === -1) {
-        if (page.node && page.node.parentNode === this.viewer) {
-          this.viewer.removeChild(page.node);
-        }
+        // Deactivate before disconnecting from DOM tree
         page.deactivate();
+
+        if (node && node.parentNode === this.viewer) {
+          this.viewer.removeChild(node);
+        }
       }
     }
   }, this);
