@@ -264,7 +264,7 @@ treesaver.ui.Index.prototype.load = function () {
 
   this.loading = true;
 
-  if (!WITHIN_IOS_WRAPPER) {
+  if (!treesaver.capabilities.IS_NATIVE_APP) {
     cached_text = /** @type {?string} */ (treesaver.storage.get(treesaver.ui.Index.CACHE_STORAGE_PREFIX + this.url));
 
     if (cached_text) {
@@ -286,7 +286,7 @@ treesaver.ui.Index.prototype.load = function () {
     that.loading = false;
 
     if (!text) {
-      if (WITHIN_IOS_WRAPPER || !cached_text) {
+      if (treesaver.capabilities.IS_NATIVE_APP || !cached_text) {
         treesaver.debug.info('Index.load: Load failed, no index found at: ' + that.url);
         that.loadFailed = true;
         that.loaded = false;
@@ -299,8 +299,8 @@ treesaver.ui.Index.prototype.load = function () {
         // Stick with cached content
         treesaver.debug.log('Index.load: Using cached content for index: ' + that.url);
       }
-    } else if (WITHIN_IOS_WRAPPER || cached_text !== text) {
-      if (!WITHIN_IOS_WRAPPER) {
+    } else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
+      if (!treesaver.capabilities.IS_NATIVE_APP) {
         treesaver.debug.log('Index.load: Fetched content newer than cache for index: ' + that.url);
 
         // Save the HTML in the cache

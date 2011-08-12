@@ -231,7 +231,7 @@ treesaver.ui.StateManager.onOrientationChange = function() {
  * @return {{ w: number, h: number }}
  */
 treesaver.ui.StateManager.getAvailableSize_ = function() {
-  if (WITHIN_IOS_WRAPPER || !treesaver.boot.inContainedMode) {
+  if (treesaver.capabilities.IS_NATIVE_APP || !treesaver.boot.inContainedMode) {
     if (window.pageYOffset || window.pageXOffset) {
       window.scrollTo(0, 1);
     }
@@ -310,7 +310,7 @@ treesaver.ui.StateManager.checkState = function() {
 };
 
 // Expose special functions for use by the native app wrappers
-if (WITHIN_IOS_WRAPPER) {
+if (treesaver.capabilities.IS_NATIVE_APP) {
   // UI is shown/hidden based on the active and idle events fired by the
   // currently visible chrome.
   //
