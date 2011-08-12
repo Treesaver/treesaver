@@ -79,7 +79,10 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
     treesaver.events.addListener(document, evt, treesaver.ui.ArticleManager.handleEvent);
   });
 
-  window['onpopstate'] = treesaver.ui.ArticleManager.onPopState;
+  // No history when in native app
+  if (!WITHIN_IOS_WRAPPER) {
+    window['onpopstate'] = treesaver.ui.ArticleManager.onPopState;
+  }
 
   return true;
 };
