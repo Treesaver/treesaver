@@ -7,7 +7,6 @@ goog.provide('treesaver.capabilities');
 
 goog.require('treesaver.array'); // array.some
 goog.require('treesaver.constants');
-goog.require('treesaver.debug');
 // Avoid circular dependency
 // goog.require('treesaver.network');
 // goog.require('treesaver.dimensions');
@@ -303,15 +302,11 @@ treesaver.capabilities.SUPPORTS_FLASH = !treesaver.capabilities.IS_NATIVE_APP &&
     return !!window.navigator.plugins['Shockwave Flash'];
   }
   else if (SUPPORT_IE && 'ActiveXObject' in window) {
-    treesaver.debug.warn('Using ActiveX detection for Flash');
-
     try {
       // Throws exception if not in registry
       return !!(new window.ActiveXObject('ShockwaveFlash.ShockwaveFlash.7'));
     }
     catch (e) {
-      treesaver.debug.warn('ActiveX Flash detection failed with exception:' + e);
-
       // Instantiation failed
       return false;
     }
@@ -602,8 +597,6 @@ treesaver.capabilities.updateClasses = function() {
 
     // Add the non-mutable capabilities on the body
     className += ' ' + treesaver.capabilities.caps_.join(' ');
-
-    treesaver.debug.info('Capability classes: ' + className);
   }
 
   // Now, remove values of mutable capabilities

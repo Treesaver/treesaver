@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.debug');
 
+goog.require('treesaver.capabilities');
 goog.require('treesaver.scheduler');
 
 /**

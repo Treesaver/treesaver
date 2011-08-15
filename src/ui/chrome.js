@@ -555,20 +555,21 @@ treesaver.ui.Chrome.prototype.click = function(e) {
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'sidebar') ||
-                treesaver.dom.hasClass(el, 'open-sidebar')) {
+                 treesaver.dom.hasClass(el, 'open-sidebar') ||
+                 treesaver.dom.hasClass(el, 'toggle-sidebar') ||
+                 treesaver.dom.hasClass(el, 'close-sidebar')) {
 
-          nearestSidebar = this.getNearestSidebar(el);
+          if ((nearestSidebar = this.getNearestSidebar(el))) {
+            if (treesaver.dom.hasClass(el, 'sidebar') || treesaver.dom.hasClass(el, 'open-sidebar')) {
+              this.sidebarActive(nearestSidebar);
+            }
+            else if (treesaver.dom.hasClass(el, 'toggle-sidebar')) {
+              this.sidebarToggle(nearestSidebar);
+            }
+            else {
+              this.sidebarInactive(nearestSidebar);
+            }
 
-          if (nearestSidebar && !this.isSidebarActive(nearestSidebar)) {
-            this.sidebarActive(nearestSidebar);
-          }
-          handled = true;
-        }
-        else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
-          nearestSidebar = this.getNearestSidebar(el);
-
-          if (nearestSidebar && this.isSidebarActive(nearestSidebar)) {
-            this.sidebarInactive(nearestSidebar);
             handled = true;
           }
         }
@@ -1045,6 +1046,18 @@ treesaver.ui.Chrome.prototype.sidebarInactive = function(sidebar) {
     });
   }
   treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+};
+
+/**
+ * Toggle sidebar state
+ */
+treesaver.ui.Chrome.prototype.sidebarToggle = function(sidebar) {
+  if (this.isSidebarActive(sidebar)) {
+    this.sidebarInactive(sidebar);
+  }
+  else {
+    this.sidebarActive(sidebar);
+  }
 };
 
 /**
