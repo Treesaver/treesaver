@@ -60,9 +60,13 @@ treesaver.uri.stringify = function (o) {
 };
 
 treesaver.uri.isIndex = function (str) {
-  return /(index|default)\.(html?|php|asp|aspx)$/i.test(str) ||
-    (treesaver.config['DirectoryIndex'] &&
-      str.lastIndexOf(treesaver.config['DirectoryIndex']) === (str.length - treesaver.config['DirectoryIndex'].length));
+  var url = treesaver.uri.parse(str);
+
+  if (url.file) {
+    return (/^(index|default)\.(html?|php|asp|aspx)$/i.test(url.file) || (treesaver.config['DirectoryIndex'] && treesaver.config['DirectoryIndex'] === url.file));
+  } else {
+    return false;
+  }
 };
 
 treesaver.uri.stripHash = function (str) {
