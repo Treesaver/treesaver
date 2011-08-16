@@ -107,16 +107,38 @@ treesaver.network.unload = function() {
 };
 
 /**
+ * Internal storage for online status, since it can be set manually
+ *
+ * @private
+ * @type {boolean}
+ */
+treesaver.network.onlineStatus_ = 'onLine' in window.navigator ?
+  // TODO: What's a good fallback option here? IE8, and recent FF/WebKit support
+  // navigator.onLine, so perhaps we just don't worry about this too much
+  window.navigator.onLine : true;
+
+/**
  * @return {boolean} True if browser has an internet connection.
  */
 treesaver.network.isOnline = function() {
-  if ('onLine' in window.navigator) {
-    return window.navigator.onLine;
-  }
+  return treesaver.network.onlineStatus_;
+};
 
-  // TODO: What's a good option here? IE8, and recent FF/WebKit support
-  // navigator.onLine, so perhaps we just don't worry about this too much
-  return true;
+/**
+ * Sets the online status
+ *
+ * @param {boolean} onLine True if should behave as if online
+ */
+treesaver.network.setOnlineStatus = function(onLine) {
+  treesaver.network.onlineStatus_ = onLine;
+
+  // TODO: Refactor this and create an event handler in capabilities, some
+  // `capabilitiesChanged` event perhaps?
+  treesaver.capabilities.updateClasses();
+
+  // Fire Treesaver event
+  treesaver.events.fireEvent(window,
+    onLine ? treesaver.network.events.ONLINE : treesaver.network.events.OFFLINE);
 };
 
 /**
@@ -146,19 +168,15 @@ treesaver.network['handleEvent'] = function(e) {
   case 'online':
     treesaver.debug.info('Application online');
 
-    // TODO: Refactor this and create an event handler in capabilities
-    treesaver.capabilities.updateClasses();
+    treesaver.network.setOnlineStatus(true);
 
-    treesaver.events.fireEvent(window, treesaver.network.events.ONLINE);
     return;
 
   case 'offline':
     treesaver.debug.info('Application offline');
 
-    // TODO: Refactor this and create an event handler in capabilities
-    treesaver.capabilities.updateClasses();
+    treesaver.network.setOnlineStatus(true);
 
-    treesaver.events.fireEvent(window, treesaver.network.events.OFFLINE);
     return;
 
   case 'updateready':
@@ -167,7 +185,7 @@ treesaver.network['handleEvent'] = function(e) {
     // New version of cached element is ready, hot swap
     window.applicationCache.swapCache();
 
-    // Force reload of app in order to get new JS and content?
+    // TODO: Force reload of app in order to get new JS and content?
 
     return;
 
@@ -315,3 +333,7 @@ treesaver.network.requestTimeout_ = function requestTimeout_(request) {
   request.xhr.abort();
   treesaver.network.requestError_(request);
 };
+
+if (WITHIN_IOS_WRAPPER) {
+  goog.exportSymbol('treesaver.setOnlineStatus', treesaver.network.setOnlineStatus, window);
+}
