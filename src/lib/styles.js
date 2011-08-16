@@ -32,15 +32,15 @@ if (treesaver.dom.getElementsByTagName('head').length) {
   // Offscreen
   treesaver.styles.insertRule('.offscreen',
     'position:absolute;top:-200%;right:-200%;visibility:hidden;');
-  // Grids & Scrollers
+  // Grids
   treesaver.styles.insertRule('.viewer .grid', 'top:50%');
   if (treesaver.capabilities.SUPPORTS_CSSTRANSITIONS) {
-    treesaver.styles.insertRule('.grid',
-      'transition:transform cubic-bezier(0,0,0.25,1) ' + MAX_ANIMATION_DURATION / 1000 + 's');
+    treesaver.styles.insertRule('.grid.ts-animate',
+      'transition:transform cubic-bezier(0.33,0.33,0.66,1) ' + MAX_ANIMATION_DURATION / 1000 + 's');
     if (treesaver.capabilities.cssPrefix) {
-      treesaver.styles.insertRule('.grid',
+      treesaver.styles.insertRule('.grid.ts-animate',
         treesaver.capabilities.cssPrefix + 'transition:' +
-        treesaver.capabilities.cssPrefix + 'transform cubic-bezier(0,0,0.25,1) ' +
+        treesaver.capabilities.cssPrefix + 'transform cubic-bezier(0.33,0.33,0.66,1) ' +
         MAX_ANIMATION_DURATION / 1000 + 's'
       );
     }

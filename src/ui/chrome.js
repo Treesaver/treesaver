@@ -922,7 +922,7 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   if (!actionTaken) {
     this.animationStart = goog.now();
     this.pageOffset = 0;
-    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+    this._updatePagePositions();
   }
 };
 
@@ -1551,11 +1551,7 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
     this.pageOffset = 0;
   }
 
-  if (treesaver.capabilities.SUPPORTS_CSSTRANSITIONS && this.pageOffset) {
-    this.pageOffset = 0;
-  }
-
-  this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+  this._updatePagePositions();
 };
 
 /**
