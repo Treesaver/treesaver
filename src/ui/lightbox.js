@@ -10,6 +10,7 @@ goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.layout.Container');
 goog.require('treesaver.layout.Figure');
+goog.require('treesaver.ui.Scrollable');
 
 /**
  * Lightbox
@@ -65,6 +66,11 @@ treesaver.ui.LightBox = function(node) {
    * @type {?Element}
    */
   this.container = null;
+
+  /**
+   * @type {?treesaver.ui.Scrollable}
+   */
+  this.scroller;
 };
 
 /**
@@ -107,9 +113,15 @@ treesaver.ui.LightBox.prototype.getMaxSize = function() {
     }
   }
 
+  // Compiler cast
+  this.container = /** @type {!Element} */ (this.container);
+
+  // TODO: Query only needed properties
+  var metrics = new treesaver.dimensions.Metrics(this.container);
+
   return {
-    w: treesaver.dimensions.getOffsetWidth(this.container),
-    h: treesaver.dimensions.getOffsetHeight(this.container)
+    w: metrics.w,
+    h: metrics.h
   };
 };
 
@@ -118,9 +130,11 @@ treesaver.ui.LightBox.prototype.getMaxSize = function() {
  * @param {!treesaver.layout.Figure} figure
  */
 treesaver.ui.LightBox.prototype.showFigure = function(figure) {
-  var largest = figure.getLargestSize(this.getMaxSize()),
-      w = treesaver.dimensions.getOffsetWidth(this.container.offsetParent),
-      h = treesaver.dimensions.getOffsetHeight(this.container.offsetParent);
+  var containerSize = this.getMaxSize(),
+      largest = figure.getLargestSize(containerSize, true),
+      screenW = treesaver.dimensions.getOffsetWidth(this.container.offsetParent),
+      screenH = treesaver.dimensions.getOffsetHeight(this.container.offsetParent),
+      contentW, contentH, metrics;
 
   // TODO: Provide name for sizing via CSS?
 
@@ -131,9 +145,32 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
     largest.figureSize.applySize(this.container, largest.name);
     this.container.style.bottom = 'auto';
     this.container.style.right = 'auto';
-    treesaver.dimensions.setCssPx(this.container, 'left', (w - treesaver.dimensions.getOffsetWidth(this.container)) / 2);
-    treesaver.dimensions.setCssPx(this.container, 'top', (h - treesaver.dimensions.getOffsetHeight(this.container)) / 2);
-    // TODO: What if the figure is too large?
+
+    // What's the size of the content?
+    // TODO: Refactor to query only needed properties
+    metrics = new treesaver.dimensions.Metrics(this.container);
+    contentW = metrics.w;
+    contentH = metrics.h;
+
+    // Clamp in case of scrolling
+    if (figure.scrollable) {
+      contentW = Math.min(containerSize.w, contentW);
+      contentH = Math.min(containerSize.h, contentH);
+      treesaver.dimensions.setCssPx(this.container, 'width', contentW);
+      treesaver.dimensions.setCssPx(this.container, 'height', contentH);
+      // Temporary compiler cast here. Need to ensure there is always at least an element
+      // from the figure (should be true, but good to sanity check)
+      treesaver.ui.Scrollable.initDom(/** @type {!Element} */ (this.container.firstChild));
+      this.scroller = new treesaver.ui.Scrollable(this.container);
+      this.scroller.refreshDimensions();
+    }
+    else {
+      // TODO: What if the figure is too large and not scrolling?
+    }
+
+    // Center the container on the screen (use offsetWidth to include border/padding)
+    treesaver.dimensions.setCssPx(this.container, 'left', (screenW - contentW - metrics.bpWidth) / 2);
+    treesaver.dimensions.setCssPx(this.container, 'top', (screenH - contentH - metrics.bpHeight) / 2);
     return true;
   }
   else {

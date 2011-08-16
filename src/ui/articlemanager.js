@@ -10,7 +10,6 @@ goog.require('treesaver.dom');
 goog.require('treesaver.events');
 goog.require('treesaver.network');
 goog.require('treesaver.resources');
-goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.ArticlePosition');
 goog.require('treesaver.ui.Document');
@@ -79,7 +78,10 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
     treesaver.events.addListener(document, evt, treesaver.ui.ArticleManager.handleEvent);
   });
 
-  window['onpopstate'] = treesaver.ui.ArticleManager.onPopState;
+  // No history when in native app
+  if (!WITHIN_IOS_WRAPPER) {
+    window['onpopstate'] = treesaver.ui.ArticleManager.onPopState;
+  }
 
   return true;
 };

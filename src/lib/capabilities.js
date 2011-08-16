@@ -7,7 +7,6 @@ goog.provide('treesaver.capabilities');
 
 goog.require('treesaver.array'); // array.some
 goog.require('treesaver.constants');
-goog.require('treesaver.debug');
 // Avoid circular dependency
 // goog.require('treesaver.network');
 // goog.require('treesaver.dimensions');
@@ -74,7 +73,6 @@ treesaver.capabilities.SUPPORTS_TREESAVER = !SUPPORT_LEGACY || (
     (SUPPORT_IE && 'attachEvent' in document && !('addEventListener' in document)))
 );
 
-
 /**
  * Is this browser IE8 running in IE7 compat mode?
  *
@@ -85,12 +83,21 @@ treesaver.capabilities.IS_IE8INIE7 = SUPPORT_IE &&
   'documentMode' in document && document.documentMode <= 7;
 
 /**
+ * Are we running within a native app?
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.IS_NATIVE_APP = WITHIN_IOS_WRAPPER ||
+  !!window.TS_WITHIN_NATIVE_IOS_APP;
+
+/**
  * Is the browser running on a mobile device?
  *
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.IS_MOBILE = WITHIN_IOS_WRAPPER ||
+treesaver.capabilities.IS_MOBILE = treesaver.capabilities.IS_NATIVE_APP ||
   treesaver.capabilities.BROWSER_OS === 'android' ||
   /mobile/.test(treesaver.capabilities.ua_);
 
@@ -117,7 +124,7 @@ treesaver.capabilities.IS_SMALL_SCREEN =
  * @type {string}
  */
 treesaver.capabilities.BROWSER_NAME = (function() {
-  if (WITHIN_IOS_WRAPPER) {
+  if (treesaver.capabilities.IS_NATIVE_APP) {
     return 'safari';
   }
 
@@ -269,7 +276,7 @@ treesaver.capabilities.mediaQuerySupported_ = function(queryName, testPrefix) {
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_ORIENTATION = WITHIN_IOS_WRAPPER ||
+treesaver.capabilities.SUPPORTS_ORIENTATION = treesaver.capabilities.IS_NATIVE_APP ||
   'orientation' in window;
 
 /**
@@ -278,7 +285,7 @@ treesaver.capabilities.SUPPORTS_ORIENTATION = WITHIN_IOS_WRAPPER ||
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_TOUCH = WITHIN_IOS_WRAPPER ||
+treesaver.capabilities.SUPPORTS_TOUCH = treesaver.capabilities.IS_NATIVE_APP ||
   'createTouch' in document ||
   // Android doesn't expose createTouch, use quick hack
   /android/.test(treesaver.capabilities.ua_);
@@ -289,21 +296,17 @@ treesaver.capabilities.SUPPORTS_TOUCH = WITHIN_IOS_WRAPPER ||
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_FLASH = !WITHIN_IOS_WRAPPER && (function() {
+treesaver.capabilities.SUPPORTS_FLASH = !treesaver.capabilities.IS_NATIVE_APP && (function() {
   if (!!window.navigator.plugins && window.navigator.plugins.length) {
     // Non-IE browsers are pretty simple
     return !!window.navigator.plugins['Shockwave Flash'];
   }
   else if (SUPPORT_IE && 'ActiveXObject' in window) {
-    treesaver.debug.warn('Using ActiveX detection for Flash');
-
     try {
       // Throws exception if not in registry
       return !!(new window.ActiveXObject('ShockwaveFlash.ShockwaveFlash.7'));
     }
     catch (e) {
-      treesaver.debug.warn('ActiveX Flash detection failed with exception:' + e);
-
       // Instantiation failed
       return false;
     }
@@ -423,7 +426,16 @@ treesaver.capabilities.SUPPORTS_LOCALSTORAGE =
  * @type {boolean}
  */
 treesaver.capabilities.SUPPORTS_APPLICATIONCACHE =
-  !WITHIN_IOS_WRAPPER && 'applicationCache' in window;
+  !treesaver.capabilities.IS_NATIVE_APP && 'applicationCache' in window;
+
+/**
+ * Whether the page was loaded from the home screen
+ *
+ * @const
+ * @type {boolean}
+ */
+treesaver.capabilities.IS_FULLSCREEN = treesaver.capabilities.IS_NATIVE_APP ||
+  window.navigator.standalone;
 
 /**
  * Whether the browser supports CSS transforms
@@ -431,7 +443,7 @@ treesaver.capabilities.SUPPORTS_APPLICATIONCACHE =
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_CSSTRANSFORMS = WITHIN_IOS_WRAPPER ||
+treesaver.capabilities.SUPPORTS_CSSTRANSFORMS = treesaver.capabilities.IS_NATIVE_APP ||
   treesaver.capabilities.cssPropertySupported_('transformProperty') ||
   // Browsers used WebkitTransform instead of WebkitTransformProperty
   treesaver.capabilities.cssPropertySupported_('transform', true, true);
@@ -442,7 +454,7 @@ treesaver.capabilities.SUPPORTS_CSSTRANSFORMS = WITHIN_IOS_WRAPPER ||
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D = WITHIN_IOS_WRAPPER ||
+treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D = treesaver.capabilities.IS_NATIVE_APP ||
   (function() {
     var result = treesaver.capabilities.cssPropertySupported_('perspectiveProperty') ||
       treesaver.capabilities.cssPropertySupported_('perspective', true, true);
@@ -464,7 +476,7 @@ treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D = WITHIN_IOS_WRAPPER ||
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_CSSTRANSITIONS = WITHIN_IOS_WRAPPER ||
+treesaver.capabilities.SUPPORTS_CSSTRANSITIONS = treesaver.capabilities.IS_NATIVE_APP ||
   treesaver.capabilities.cssPropertySupported_('transitionProperty', true);
 
 /**
@@ -528,11 +540,12 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_TREESAVER) + 'treesaver',
       p(treesaver.capabilities.SUPPORTS_FLASH) + 'flash',
       p(treesaver.capabilities.SUPPORTS_ORIENTATION) + 'orientation',
+      p(treesaver.capabilities.IS_FULLSCREEN) + 'fullscreen',
       p(treesaver.capabilities.IS_LEGACY) + 'legacy',
       p(treesaver.capabilities.IS_MOBILE) + 'mobile',
       p(treesaver.capabilities.IS_SMALL_SCREEN) + 'smallscreen',
       p(treesaver.network.loadedFromCache()) + 'cached',
-      p(WITHIN_IOS_WRAPPER) + 'nativeapp',
+      p(treesaver.capabilities.IS_NATIVE_APP) + 'nativeapp',
       // Browser/platform info
       'browser-' + treesaver.capabilities.BROWSER_NAME,
       'os-' + treesaver.capabilities.BROWSER_OS
@@ -584,8 +597,6 @@ treesaver.capabilities.updateClasses = function() {
 
     // Add the non-mutable capabilities on the body
     className += ' ' + treesaver.capabilities.caps_.join(' ');
-
-    treesaver.debug.info('Capability classes: ' + className);
   }
 
   // Now, remove values of mutable capabilities

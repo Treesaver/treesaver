@@ -35,10 +35,16 @@ treesaver.layout.Figure = function(el, baseLineHeight, indices) {
   this.optional = !treesaver.dom.hasClass(el, 'required');
 
   /**
-   * Does the figure support zooming/lightboxing?.
+   * Does the figure support zooming/lightboxing?
    * @type {boolean}
    */
   this.zoomable = treesaver.dom.hasClass(el, 'zoomable');
+
+  /**
+   * Does the figure support scrolling?
+   * @type {boolean}
+   */
+  this.scrollable = treesaver.dom.hasClass(el, 'scroll');
 
   // Go through and process our sizes
   treesaver.array.toArray(el.childNodes).forEach(function(childNode) {
@@ -101,7 +107,7 @@ treesaver.layout.Figure.prototype.processFallback = function processFallback(htm
   if (this.zoomable) {
     treesaver.dom.addClass(fallbackNode, 'zoomable');
     fallbackNode.setAttribute('data-figureindex', this.figureIndex);
-    if (WITHIN_IOS_WRAPPER || treesaver.capabilities.SUPPORTS_TOUCH) {
+    if (treesaver.capabilities.IS_NATIVE_APP || treesaver.capabilities.SUPPORTS_TOUCH) {
       // Need dummy handler in order to get bubbled events
       fallbackNode.setAttribute('onclick', 'void(0)');
     }
@@ -152,41 +158,64 @@ treesaver.layout.Figure.prototype.getSize = function(size) {
  * Retrieve the largest figureSize that fits within the allotted space
  *
  * @param {!treesaver.dimensions.Size} maxSize
+ * @param {boolean=} isLightbox True if display is for a lightbox
  * @return {?{name: string, figureSize: treesaver.layout.FigureSize}} Null if none fit
  */
-treesaver.layout.Figure.prototype.getLargestSize = function(maxSize) {
-  var maxW = -Infinity,
-      maxH = -Infinity,
+treesaver.layout.Figure.prototype.getLargestSize = function(maxSize, isLightbox) {
+  var maxArea = -Infinity,
+      availArea = maxSize.w * maxSize.h,
+      closest,
+      closestArea = Infinity,
       max,
-      current;
+      current,
+      sizes = this.sizes;
 
-  for (current in this.sizes) {
+  if (isLightbox && this.sizes["lightbox"]) {
+    // Only look at lightbox figures
+    sizes = { "lightbox": this.sizes["lightbox"] };
+  }
+
+  for (current in sizes) {
     this.sizes[current].forEach(function(figureSize) {
       if (!figureSize.meetsRequirements()) {
         // Not eligible
         return;
       }
 
+      var area = figureSize.minW * figureSize.minH;
+
       if ((figureSize.minW && figureSize.minW > maxSize.w) ||
           (figureSize.minH && figureSize.minH > maxSize.h)) {
         // Too big
+        if (!max && this.scrollable) {
+          // If nothing fits yet, find something at least near
+          if (area <= closestArea) {
+            closestArea = area;
+            closest = {
+              name: current,
+              figureSize: figureSize
+            };
+          }
+        }
+
         return;
       }
 
       // TODO: How to estimate dimensions when no info is provided?
-      if ((!figureSize.minW || figureSize.minW >= maxW) &&
-          (!figureSize.minH || figureSize.minH >= maxH)) {
-        maxW = figureSize.minW;
-        maxH = figureSize.minH;
+      //
+      // Use this current size only if it's bigger than the one we
+      // found before (based on area)
+      if (area >= maxArea) {
+        maxArea = area;
         max = {
           name: current,
           figureSize: figureSize
         };
       }
-    });
+    }, this);
   }
 
-  return max;
+  return max || closest;
 };
 
 /**

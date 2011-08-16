@@ -63,7 +63,9 @@ treesaver.ui.StateManager.load = function() {
   // Setup checkstate timer
   treesaver.scheduler.repeat(treesaver.ui.StateManager.checkState, CHECK_STATE_INTERVAL, Infinity, [], 'checkState');
 
-  if (treesaver.capabilities.SUPPORTS_ORIENTATION && !treesaver.boot.inContainedMode) {
+  if (treesaver.capabilities.SUPPORTS_ORIENTATION &&
+      !treesaver.boot.inContainedMode &&
+      !treesaver.capabilities.IS_FULLSCREEN) {
     treesaver.events.addListener(window, 'orientationchange',
       treesaver.ui.StateManager.onOrientationChange);
 
@@ -71,7 +73,7 @@ treesaver.ui.StateManager.load = function() {
     treesaver.scheduler.delay(function() {
       // IE's window.scrollTo is some kind of weird function without an apply()
       // so we have to wrap this call within a wrapper to avoid nasty errors
-      window.scrollTo(0, 1);
+      window.scrollTo(0, 0);
     }, 100);
   }
 
@@ -210,8 +212,12 @@ treesaver.ui.StateManager.onOrientationChange = function() {
       'width=device-width, height=device-height');
   }
 
-  // Hide the address bar on the iPhone
-  window.scrollTo(0, 1);
+  // Hide the address bar on iOS & others
+  if (treesaver.capabilities.SUPPORTS_ORIENTATION &&
+      !treesaver.boot.inContainedMode &&
+      !treesaver.capabilities.IS_FULLSCREEN) {
+    window.scrollTo(0, 1);
+  }
 
   // TODO: Update classes for styling?
 
@@ -225,7 +231,7 @@ treesaver.ui.StateManager.onOrientationChange = function() {
  * @return {{ w: number, h: number }}
  */
 treesaver.ui.StateManager.getAvailableSize_ = function() {
-  if (WITHIN_IOS_WRAPPER || !treesaver.boot.inContainedMode) {
+  if (treesaver.capabilities.IS_NATIVE_APP || !treesaver.boot.inContainedMode) {
     if (window.pageYOffset || window.pageXOffset) {
       window.scrollTo(0, 1);
     }
@@ -304,7 +310,7 @@ treesaver.ui.StateManager.checkState = function() {
 };
 
 // Expose special functions for use by the native app wrappers
-if (WITHIN_IOS_WRAPPER) {
+if (treesaver.capabilities.IS_NATIVE_APP) {
   // UI is shown/hidden based on the active and idle events fired by the
   // currently visible chrome.
   //

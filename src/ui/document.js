@@ -1,6 +1,7 @@
 goog.provide('treesaver.ui.Document');
 
 goog.require('treesaver.events');
+goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
 goog.require('treesaver.ui.TreeNode');
 goog.require('treesaver.uri');
@@ -249,7 +250,7 @@ treesaver.ui.Document.prototype.load = function () {
 
   this.loading = true;
 
-  if (!WITHIN_IOS_WRAPPER) {
+  if (!treesaver.capabilities.IS_NATIVE_APP) {
     cached_text = /** @type {?string} */ (treesaver.storage.get(treesaver.ui.Document.CACHE_STORAGE_PREFIX + this.url));
 
     if (cached_text) {
@@ -270,7 +271,7 @@ treesaver.ui.Document.prototype.load = function () {
     that.loading = false;
 
     if (!text) {
-      if (WITHIN_IOS_WRAPPER || !cached_text) {
+      if (treesaver.capabilities.IS_NATIVE_APP || !cached_text) {
         treesaver.debug.info('Document.load: Load failed, no content: ' + that.url);
         that.loadFailed = true;
         that.loaded = false;
@@ -283,8 +284,8 @@ treesaver.ui.Document.prototype.load = function () {
         // Stick with cached content
         treesaver.debug.log('Document.load: Using cached content for document: ' + that.url);
       }
-    } else if (WITHIN_IOS_WRAPPER || cached_text !== text) {
-      if (!WITHIN_IOS_WRAPPER) {
+    } else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
+      if (!treesaver.capabilities.IS_NATIVE_APP) {
         treesaver.debug.log('Document.load: Fetched content newer than cache for document: ' + that.url);
 
         // Save the HTML in the cache

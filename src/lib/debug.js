@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.debug');
 
+goog.require('treesaver.capabilities');
 goog.require('treesaver.scheduler');
 
 /**
@@ -13,7 +14,7 @@ goog.require('treesaver.scheduler');
  */
 treesaver.debug.messageQueue_ = [];
 
-if (goog.DEBUG && WITHIN_IOS_WRAPPER) {
+if (goog.DEBUG && treesaver.capabilities.IS_NATIVE_APP) {
   // Outputs items from the queue at a limited rate, because the logging
   // "API" used can't handle many messages at once (will merge into one)
   treesaver.scheduler.repeat(function() {

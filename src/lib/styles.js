@@ -32,25 +32,17 @@ if (treesaver.dom.getElementsByTagName('head').length) {
   // Offscreen
   treesaver.styles.insertRule('.offscreen',
     'position:absolute;top:-200%;right:-200%;visibility:hidden;');
-  // Grids & Scrollers
-  treesaver.styles.insertRule('.grid', 'top:50%');
+  // Grids
+  treesaver.styles.insertRule('.viewer .grid', 'top:50%');
   if (treesaver.capabilities.SUPPORTS_CSSTRANSITIONS) {
-    treesaver.styles.insertRule('.grid, .scroll-container',
-      'transition:transform cubic-bezier(0,0,0.25,1) ' + MAX_ANIMATION_DURATION / 1000 + 's');
+    treesaver.styles.insertRule('.grid.ts-animate',
+      'transition:transform cubic-bezier(0.33,0.33,0.66,1) ' + MAX_ANIMATION_DURATION / 1000 + 's');
     if (treesaver.capabilities.cssPrefix) {
-      treesaver.styles.insertRule('.grid, .scroll-container',
+      treesaver.styles.insertRule('.grid.ts-animate',
         treesaver.capabilities.cssPrefix + 'transition:' +
-        treesaver.capabilities.cssPrefix + 'transform cubic-bezier(0,0,0.25,1) ' +
+        treesaver.capabilities.cssPrefix + 'transform cubic-bezier(0.33,0.33,0.66,1) ' +
         MAX_ANIMATION_DURATION / 1000 + 's'
       );
-    }
-    if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D) {
-      treesaver.styles.insertRule('.grid, .scroll-container',
-          'backface-visibility:hidden');
-      if (treesaver.capabilities.cssPrefix) {
-        treesaver.styles.insertRule('.grid, .scroll-container',
-          treesaver.capabilities.cssPrefix + 'backface-visibility:hidden');
-      }
     }
   }
 }

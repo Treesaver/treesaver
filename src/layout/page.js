@@ -3,9 +3,11 @@ goog.provide('treesaver.layout.Page');
 goog.require('treesaver.array');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
+goog.require('treesaver.scheduler');
 goog.require('treesaver.layout.BreakRecord');
 goog.require('treesaver.layout.Grid');
 goog.require('treesaver.layout.Block');
+goog.require('treesaver.ui.Scrollable');
 
 /**
   * Page class
@@ -91,7 +93,7 @@ treesaver.layout.Page = function(content, grids, br) {
         if (figure.zoomable) {
           treesaver.dom.addClass(containerNode, 'zoomable');
           containerNode.setAttribute('data-figureindex', figureIndex);
-          if (WITHIN_IOS_WRAPPER || treesaver.capabilities.SUPPORTS_TOUCH) {
+          if (treesaver.capabilities.IS_NATIVE_APP || treesaver.capabilities.SUPPORTS_TOUCH) {
             // Need dummy handler in order to get bubbled events
             containerNode.setAttribute('onclick', 'void(0)');
           }
@@ -177,15 +179,21 @@ treesaver.layout.Page = function(content, grids, br) {
      */
     this.active = false;
 
+    /**
+     * Store references to scrollable objects
+     * TODO: This should really live within the Chrome?
+     * @type {Array.<treesaver.ui.Scrollable>}
+     */
+    this.scrollables;
+
+
     // Increment page number
     br.pageNumber += 1;
   }
 
   // Cleanup
-  host.removeChild(this.node);
-  this.node = null;
+  this.deactivate();
   document.body.removeChild(host);
-  host = null;
 };
 
 /**
@@ -199,7 +207,9 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     lineHeight) {
   var size, figureSize,
       containerHeight, sibling,
+      metrics,
       maxContainerHeight,
+      scrollNodes,
       anchoredTop = true;
 
   size = map.size;
@@ -236,30 +246,61 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     container.style.bottom = 'auto';
   }
 
-  containerHeight = treesaver.dimensions.getOffsetHeight(container);
+  // TODO: Query only needed properties
+  metrics = new treesaver.dimensions.Metrics(container);
+  containerHeight = metrics.outerH;
 
   // Did not fit :(
   // TODO: Use something better than parent height
   if (containerHeight > maxContainerHeight) {
-    treesaver.debug.info('Container failure: ' + containerHeight + ':' + maxContainerHeight);
+    // Make an exception for scrollable figures
+    if (figure.scrollable) {
+      // Occupy the entire space, and let the excess scroll
+      containerHeight = maxContainerHeight;
 
-    if (goog.DEBUG) {
-      container.setAttribute('data-containerHeight', containerHeight);
-      container.setAttribute('data-maxHeight', maxContainerHeight);
-      container.setAttribute('data-attemptedSize', size);
+      // Fix the height (prevents overflow in case of mis-measuring)
+      treesaver.dimensions.setCssPx(container, 'height', containerHeight - metrics.bpHeight);
     }
+    else {
+      // Not scrollable, can't be displayed
+      treesaver.debug.info('Container failure: ' + containerHeight + ':' + maxContainerHeight);
 
-    // Revert after failure
-    figureSize.revertSize(container, size);
+      if (goog.DEBUG) {
+        container.setAttribute('data-containerHeight', containerHeight);
+        container.setAttribute('data-maxHeight', maxContainerHeight);
+        container.setAttribute('data-attemptedSize', size);
+      }
 
-    // TODO: Return style.bottom & style.top to originals?
+      // Revert after failure
+      figureSize.revertSize(container, size);
 
-    return false;
+      // TODO: Return style.bottom & style.top to originals?
+
+      return false;
+    }
+  }
+  else {
+    // Round to nearest for column adjustment to maintain grid
+    if (lineHeight && containerHeight % lineHeight) {
+      containerHeight = treesaver.dimensions.roundUp(containerHeight, lineHeight);
+    }
   }
 
-  // Round to nearest for column adjustment to maintain grid
-  if (lineHeight && containerHeight % lineHeight) {
-    containerHeight = treesaver.dimensions.roundUp(containerHeight, lineHeight);
+  // Is part of the content scrollable?
+  scrollNodes = treesaver.dom.getElementsByClassName('scroll', container);
+
+  // Scrolling setup
+  if (scrollNodes.length || figure.scrollable) {
+    // Set scrolling class on parent node, so the chrome can pick it up
+    if (!scrollNodes.length) {
+      treesaver.dom.addClass(container, 'scroll');
+      scrollNodes = [container];
+    }
+
+    // Initialize DOM for scrolling
+    scrollNodes.forEach(function (scrollNode) {
+      treesaver.ui.Scrollable.initDom(scrollNode);
+    });
   }
 
   // Go through this containers siblings, adjusting their sizes
@@ -916,6 +957,13 @@ treesaver.layout.Page.prototype.activate = function() {
   // Re-hydrate the HTML
   this.node = treesaver.dom.createElementFromHTML(this.html);
 
+  // Create Scrollables
+  // TODO: Refactor / share code w/ Chrome
+  this.scrollers = treesaver.dom.getElementsByClassName('scroll', this.node).
+    map(function(el) {
+      return new treesaver.ui.Scrollable(el);
+    });
+
   // Flag
   this.active = true;
 
@@ -927,6 +975,13 @@ treesaver.layout.Page.prototype.activate = function() {
  */
 treesaver.layout.Page.prototype.deactivate = function() {
   this.active = false;
+  this.scrollers = null;
+
+  // Dispose images properly to avoid memory leaks
+  treesaver.dom.getElementsByTagName('img', this.node).
+    forEach(treesaver.dom.disposeImg);
+
+  // Lose page reference
   this.node = null;
 };
 

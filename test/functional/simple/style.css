@@ -82,41 +82,49 @@ p {
  * Sidebar
  */
 .sidebar {
-  position: absolute;
-  background: #445;
-  border-right: 2px solid #334;
-  color: #fff;
-  width: 12em;
-  left: -12em;
-  top: 0;
-  bottom: 0;
+  /*position: absolute;*/
+  /*background: #445;*/
+  /*border-right: 2px solid #334;*/
+  /*color: #fff;*/
+  /*width: 12em;*/
+  /*left: -12em;*/
+  /*top: 0;*/
+  /*bottom: 0;*/
   z-index: 20;
   font-family: sans-serif;
 }
 
+.sidebar-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  padding: 5px 10px;
+  background: #445;
+  display: none;
+}
+
+.active .sidebar-controls, .sidebar-active .sidebar-controls {
+  display: block;
+}
+
+.toc {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 12em;
+  z-index: 15;
+  background: #445;
+  display: none;
+}
+
+.sidebar-active .toc {
+  display: block;
+}
+
 .sidebar-active.sidebar {
   left: 0;
-}
-
-.sidebar .close-sidebar {
-  display: none;
-}
-
-.sidebar-active.sidebar .close-sidebar {
-  display: block;
-  position: absolute;
-  bottom: 0;
-}
-
-.sidebar-active.sidebar .open-sidebar {
-  display: none;
-}
-
-.sidebar .open-sidebar {
-  display: block;
-  position: absolute;
-  left: 12em;
-  bottom: 0;
 }
 
 .toc .article {

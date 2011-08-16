@@ -51,6 +51,12 @@ treesaver.ui.Chrome = function(node) {
   this.scrollers = [];
 
   /**
+   * Scrollers located within the currently displayed pages
+   * @type {Array.<Element>}
+   */
+  this.inPageScrollers = [];
+
+  /**
    * @type {?Element}
    */
   this.node = null;
@@ -262,6 +268,8 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageWidth = null;
   this.menus = null;
   this.sidebars = null;
+  this.scrollers = null;
+  this.inPageScrollers = null;
   this.nextPage = null;
   this.nextArticle = null;
   this.prevPage = null;
@@ -547,20 +555,21 @@ treesaver.ui.Chrome.prototype.click = function(e) {
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'sidebar') ||
-                treesaver.dom.hasClass(el, 'open-sidebar')) {
+                 treesaver.dom.hasClass(el, 'open-sidebar') ||
+                 treesaver.dom.hasClass(el, 'toggle-sidebar') ||
+                 treesaver.dom.hasClass(el, 'close-sidebar')) {
 
-          nearestSidebar = this.getNearestSidebar(el);
+          if ((nearestSidebar = this.getNearestSidebar(el))) {
+            if (treesaver.dom.hasClass(el, 'sidebar') || treesaver.dom.hasClass(el, 'open-sidebar')) {
+              this.sidebarActive(nearestSidebar);
+            }
+            else if (treesaver.dom.hasClass(el, 'toggle-sidebar')) {
+              this.sidebarToggle(nearestSidebar);
+            }
+            else {
+              this.sidebarInactive(nearestSidebar);
+            }
 
-          if (nearestSidebar && !this.isSidebarActive(nearestSidebar)) {
-            this.sidebarActive(nearestSidebar);
-          }
-          handled = true;
-        }
-        else if (treesaver.dom.hasClass(el, 'close-sidebar')) {
-          nearestSidebar = this.getNearestSidebar(el);
-
-          if (nearestSidebar && this.isSidebarActive(nearestSidebar)) {
-            this.sidebarInactive(nearestSidebar);
             handled = true;
           }
         }
@@ -692,6 +701,10 @@ treesaver.ui.Chrome.prototype.touchData_;
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchStart = function(e) {
+  var target = treesaver.ui.Chrome.findTarget_(e.target),
+      withinViewer = this.viewer.contains(target),
+      x, y, now;
+
   if (!treesaver.boot.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
     return;
   }
@@ -700,28 +713,44 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  // Lightbox active? Hide it
-  if (this.lightBoxActive) {
+  // Lightbox active? Hide it only if it can't scroll
+  if (this.lightBoxActive && !this.lightBox.scroller) {
     this.hideLightBox();
     return;
   }
 
+  x = e.touches[0].pageX;
+  y = e.touches[0].pageY;
+  now = goog.now();
+
   this.touchData_ = {
-    startTime: goog.now(),
-    deltaTime: 0,
-    startX: e.touches[0].pageX,
-    startY: e.touches[0].pageY,
+    startX: x,
+    startY: y,
+    startTime: now,
+    lastX: x,
+    lastY: y,
+    lastTime: now,
     deltaX: 0,
     deltaY: 0,
-    touchCount: e.touches.length
+    deltaTime: 0,
+    totalX: 0,
+    totalY: 0,
+    totalTime: 0,
+    touchCount: e.touches.length,
+    withinViewer: withinViewer
   };
 
   if (this.touchData_.touchCount === 2) {
     this.touchData_.startX2 = e.touches[1].pageX;
   }
 
-  this.scrollers.forEach(function(s) {
-    if (s.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
+  // Chrome Scrollers
+  this.scrollers.
+    // Plus scrollers of page content
+    concat(this.inPageScrollers).
+    // Plus the lightbox scroller (if there)
+    concat(this.lightBox ? this.lightBox.scroller : []).forEach(function(s) {
+    if (s.contains(target)) {
       this.touchData_.scroller = s;
     }
   }, this);
@@ -735,7 +764,10 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchMove = function(e) {
-  if (!this.touchData_) {
+  var touchData = this.touchData_,
+      now, x, y;
+
+  if (!touchData) {
     // No touch info, nothing to do
     return;
   }
@@ -744,33 +776,46 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  this.touchData_.lastMove = goog.now();
-  this.touchData_.lastX = e.touches[0].pageX;
-  this.touchData_.lastY = e.touches[0].pageY;
-  this.touchData_.deltaTime = this.touchData_.lastMove - this.touchData_.startTime;
-  this.touchData_.deltaX = this.touchData_.lastX - this.touchData_.startX;
-  this.touchData_.deltaY = this.touchData_.lastY - this.touchData_.startY;
-  this.touchData_.touchCount = Math.min(e.touches.length, this.touchData_.touchCount);
-  this.touchData_.swipe =
-    // One-finger only
-    this.touchData_.touchCount === 1 &&
-    // Finger has to move far enough
-    Math.abs(this.touchData_.deltaX) >= SWIPE_THRESHOLD;
+  now = goog.now();
+  x = e.touches[0].pageX;
+  y = e.touches[0].pageY;
 
-  if (this.touchData_.scroller) {
-    this.touchData_.scroller.setOffset(this.touchData_.deltaX, -this.touchData_.deltaY);
+  touchData.deltaTime = touchData.lastMove - now;
+  touchData.deltaX = x - touchData.lastX;
+  touchData.deltaY = y - touchData.lastY;
+  touchData.lastMove = now;
+  touchData.lastX = e.touches[0].pageX;
+  touchData.lastY = e.touches[0].pageY;
+  touchData.totalTime += touchData.deltaTime;
+  touchData.totalX += touchData.deltaX;
+  touchData.totalY += touchData.deltaY;
+  touchData.touchCount = Math.min(e.touches.length, touchData.touchCount);
+  touchData.swipe =
+    // One-finger only
+    touchData.touchCount === 1 &&
+    // Finger has to move far enough
+    Math.abs(touchData.totalX) >= SWIPE_THRESHOLD &&
+    // But not too vertical
+    Math.abs(touchData.totalX) * 2 > Math.abs(touchData.totalY);
+
+  if (touchData.scroller && (touchData.didScroll ||
+      (touchData.scroller.hasHorizontal() || !touchData.swipe))) {
+    touchData.didScroll = touchData.didScroll || touchData.scroller.hasHorizontal() ||
+      Math.abs(touchData.totalY) >= SWIPE_THRESHOLD;
+    touchData.scroller.setOffset(-touchData.deltaX, -touchData.deltaY);
+
+    if (!touchData.withinViewer) {
+      // Scrolling outside viewer means active, in case of long scroll
+      this.setUiActive_();
+    }
   }
-  else if (this.touchData_.swipe) {
-    this.pageOffset = this.touchData_.deltaX;
-    this._updatePagePositions(true);
-  }
-  else if (this.pageOffset) {
-    this.animationStart = goog.now();
-    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
-  }
-  else if (this.touchData_.touchCount === 2) {
+  else if (touchData.touchCount === 2) {
     // Track second finger changes
-    this.touchData_.deltaX2 = e.touches[1].pageX - this.touchData_.startX2;
+    touchData.totalX2 = e.touches[1].pageX - touchData.startX2;
+  }
+  else {
+    this.pageOffset = touchData.totalX;
+    this._updatePagePositions(true);
   }
 };
 
@@ -782,7 +827,10 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   // Hold onto a reference before clearing
   var touchData = this.touchData_,
       // Flag to track whether we need to reset positons, etc
-      actionTaken = false;
+      actionTaken = false,
+      target = treesaver.ui.Chrome.findTarget_(e.target),
+      // Lightbox is an honorary viewer
+      withinViewer = this.lightBoxActive || this.viewer.contains(target);
 
   // Clear out touch data
   this.touchCancel(e);
@@ -796,16 +844,19 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   e.stopPropagation();
   e.preventDefault();
 
-  if (touchData.scroller && touchData.lastMove) {
-    touchData.scroller.setOffset(touchData.deltaX, -touchData.deltaY, true);
+  if (touchData.didScroll) {
+    if (withinViewer) {
+      // Scrolling in viewer means idle
+      this.setUiIdle_();
+    }
+    else {
+      // Scrolling within the chrome should keep UI active
+      this.setUiActive_();
+    }
   }
   else if (touchData.touchCount === 1) {
     // No move means we create a click
     if (!touchData.lastMove) {
-      // Lightbox is honorary viewer
-      var target = treesaver.ui.Chrome.findTarget_(e.target),
-          withinViewer = this.lightBoxActive || this.viewer.contains(target);
-
       // TODO: Currently this code is OK since the IE browsers don't support
       // touch. However, perhaps Windows Phone 7 will and needs a fix with
       // IE7? Need to integrate this into treesaver.events
@@ -832,10 +883,8 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
       actionTaken = true;
     }
     // Check for a swipe
-    // Also allow for users to swipe down in order to go to next page. This is a
-    // common mistake made when users first interact with a paged UI
-    else if (touchData.swipe || touchData.deltaY <= -SWIPE_THRESHOLD) {
-      if (touchData.swipe && touchData.deltaX > 0) {
+    else if (touchData.swipe) {
+      if (touchData.totalX > 0) {
         actionTaken = treesaver.ui.ArticleManager.previousPage();
       }
       else {
@@ -857,11 +906,11 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   }
   else if (touchData.touchCount === 2) {
     // Two finger swipe in the same direction is next/previous article
-    if (Math.abs(touchData.deltaX2) >= SWIPE_THRESHOLD) {
-      if (touchData.deltaX < 0 && touchData.deltaX2 < 0) {
+    if (Math.abs(touchData.totalX2) >= SWIPE_THRESHOLD) {
+      if (touchData.totalX < 0 && touchData.totalX2 < 0) {
         actionTaken = treesaver.ui.ArticleManager.nextArticle();
       }
-      else if (touchData.deltaX > 0 && touchData.deltaX2 > 0) {
+      else if (touchData.totalX > 0 && touchData.totalX2 > 0) {
         actionTaken = treesaver.ui.ArticleManager.previousArticle();
       }
 
@@ -880,7 +929,7 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
   if (!actionTaken) {
     this.animationStart = goog.now();
     this.pageOffset = 0;
-    this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+    this._updatePagePositions();
   }
 };
 
@@ -1004,6 +1053,18 @@ treesaver.ui.Chrome.prototype.sidebarInactive = function(sidebar) {
     });
   }
   treesaver.dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+};
+
+/**
+ * Toggle sidebar state
+ */
+treesaver.ui.Chrome.prototype.sidebarToggle = function(sidebar) {
+  if (this.isSidebarActive(sidebar)) {
+    this.sidebarInactive(sidebar);
+  }
+  else {
+    this.sidebarActive(sidebar);
+  }
 };
 
 /**
@@ -1390,11 +1451,14 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
   old_pages.forEach(function(page) {
     // Only deactivate pages we're not about to use again
     if (page) {
+      var node = page.node;
       if (this.pages.indexOf(page) === -1) {
-        if (page.node && page.node.parentNode === this.viewer) {
-          this.viewer.removeChild(page.node);
-        }
+        // Deactivate before disconnecting from DOM tree
         page.deactivate();
+
+        if (node && node.parentNode === this.viewer) {
+          this.viewer.removeChild(node);
+        }
       }
     }
   }, this);
@@ -1413,6 +1477,11 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
           this.viewer.appendChild(page.node);
         }
       }
+
+      // Collect scrollers from each displayed page
+      this.inPageScrollers = page.scrollers.concat(this.inPageScrollers || []);
+      // Measure now that it is in the tree
+      this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
     }
   }, this);
 };
@@ -1430,31 +1499,32 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
   var prevPage = this.pages[0],
       currentPage = this.pages[1],
       nextPage = this.pages[2],
-      leftMarginEdge,
-      rightMarginEdge,
-      leftMargin = Math.max(currentPage.size.marginRight, nextPage ? nextPage.size.marginLeft : 0),
-      rightMargin = Math.max(currentPage.size.marginLeft, prevPage ? prevPage.size.marginRight : 0),
+      leftPageEdge,
+      rightPageEdge,
+      leftMargin = Math.max(currentPage.size.marginLeft, prevPage ? prevPage.size.marginRight : 0),
+      rightMargin = Math.max(currentPage.size.marginRight, nextPage ? nextPage.size.marginLeft : 0),
       oldOffset = this.pageOffset;
 
   // Mark the master page
   currentPage.node.setAttribute('id', 'currentPage');
 
   // Center the first page
-  leftMarginEdge = (this.pageArea.w - currentPage.size.outerW) / 2 - leftMargin;
-  rightMarginEdge = leftMarginEdge + currentPage.size.outerW + leftMargin + rightMargin;
+  leftPageEdge = (this.pageArea.w - currentPage.size.outerW) / 2;
+  rightPageEdge = leftPageEdge + currentPage.size.outerW;
 
   // Register the positions of each page
   this.pagePositions = [];
-  this.pagePositions[1] = leftMarginEdge;
+  // Absolute positioning uses margin box, so account for left margin
+  this.pagePositions[1] = leftPageEdge - currentPage.size.marginLeft;
 
   if (prevPage) {
-    this.pagePositions[0] = leftMarginEdge -
+    this.pagePositions[0] = leftPageEdge - leftMargin -
       (prevPage.size.outerW + prevPage.size.marginLeft);
     prevPage.node.setAttribute('id', 'previousPage');
   }
 
   if (nextPage) {
-    this.pagePositions[2] = rightMarginEdge - nextPage.size.marginLeft;
+    this.pagePositions[2] = rightPageEdge + rightMargin - nextPage.size.marginLeft;
     nextPage.node.setAttribute('id', 'nextPage');
   }
 
@@ -1488,11 +1558,7 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
     this.pageOffset = 0;
   }
 
-  if (treesaver.capabilities.SUPPORTS_CSSTRANSITIONS && this.pageOffset) {
-    this.pageOffset = 0;
-  }
-
-  this._updatePagePositions(treesaver.capabilities.SUPPORTS_CSSTRANSITIONS);
+  this._updatePagePositions();
 };
 
 /**
