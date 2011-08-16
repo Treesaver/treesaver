@@ -17,7 +17,7 @@ goog.addDependency("../../../src/layout/grid.js", ['treesaver.layout.Grid'], ['t
 goog.addDependency("../../../src/layout/page.js", ['treesaver.layout.Page'], ['treesaver.array', 'treesaver.dimensions', 'treesaver.dom', 'treesaver.scheduler', 'treesaver.layout.BreakRecord', 'treesaver.layout.Grid', 'treesaver.layout.Block', 'treesaver.ui.Scrollable']);
 goog.addDependency("../../../src/lib/array.js", ['treesaver.array'], ['treesaver.constants']);
 goog.addDependency("../../../src/lib/boot.js", ['treesaver.boot'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dom', 'treesaver.domready', 'treesaver.events', 'treesaver.modules', 'treesaver.resources', 'treesaver.scheduler', 'treesaver.scriptloader']);
-goog.addDependency("../../../src/lib/capabilities.js", ['treesaver.capabilities'], ['treesaver.array', 'treesaver.constants', 'treesaver.debug']);
+goog.addDependency("../../../src/lib/capabilities.js", ['treesaver.capabilities'], ['treesaver.array', 'treesaver.constants']);
 goog.addDependency("../../../src/lib/constants.js", ['treesaver.constants'], []);
 goog.addDependency("../../../src/lib/css.js", ['treesaver.css'], []);
 goog.addDependency("../../../src/lib/debug.js", ['treesaver.debug'], ['treesaver.capabilities', 'treesaver.scheduler']);

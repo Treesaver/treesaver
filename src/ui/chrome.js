@@ -702,6 +702,7 @@ treesaver.ui.Chrome.prototype.touchData_;
  */
 treesaver.ui.Chrome.prototype.touchStart = function(e) {
   var target = treesaver.ui.Chrome.findTarget_(e.target),
+      withinViewer = this.viewer.contains(target),
       x, y, now;
 
   if (!treesaver.boot.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
@@ -735,7 +736,8 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     totalX: 0,
     totalY: 0,
     totalTime: 0,
-    touchCount: e.touches.length
+    touchCount: e.touches.length,
+    withinViewer: withinViewer
   };
 
   if (this.touchData_.touchCount === 2) {
@@ -801,6 +803,11 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     touchData.didScroll = touchData.didScroll || touchData.scroller.hasHorizontal() ||
       Math.abs(touchData.totalY) >= SWIPE_THRESHOLD;
     touchData.scroller.setOffset(-touchData.deltaX, -touchData.deltaY);
+
+    if (!touchData.withinViewer) {
+      // Scrolling outside viewer means active, in case of long scroll
+      this.setUiActive_();
+    }
   }
   else if (touchData.touchCount === 2) {
     // Track second finger changes
