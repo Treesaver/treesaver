@@ -193,9 +193,7 @@ treesaver.layout.Page = function(content, grids, br) {
 
   // Cleanup
   this.deactivate();
-  host.removeChild(this.node);
   document.body.removeChild(host);
-  host = null;
 };
 
 /**
