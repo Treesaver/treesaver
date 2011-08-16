@@ -234,8 +234,16 @@ treesaver.ui.Index.prototype.parse = function (index) {
     return [];
   }
 
-  return index.map(function (entry) {
-    return this.appendChild(this.parseEntry(entry));
+  result = index.map(function (entry) {
+    return this.parseEntry(entry);
+  }, this);
+
+  result = result.filter(function (entry) {
+    return entry !== null;
+  });
+
+  return result.map(function (entry) {
+    return this.appendChild(entry);
   }, this);
 };
 
