@@ -210,17 +210,17 @@ treesaver.ui.Chrome.prototype.activate = function() {
 
     this.positionElements = treesaver.dom.getElementsByProperty('data-template', 'position', null, this.node);
     this.positionTemplates = this.positionElements.map(function (el) {
-      return el.innerHTML;
+      return Handlebars.compile(el.innerHTML);
     });
 
     this.indexElements = treesaver.dom.getElementsByProperty('data-template', 'index', null, this.node);
     this.indexTemplates = this.indexElements.map(function (el) {
-      return el.innerHTML;
+      return Handlebars.compile(el.innerHTML);
     });
 
     this.currentDocumentElements = treesaver.dom.getElementsByProperty('data-template', 'currentdocument', null, this.node);
     this.currentDocumentTemplates = this.currentDocumentElements.map(function (el) {
-      return el.innerHTML;
+      return Handlebars.compile(el.innerHTML);
     });
 
     this.scrollers = treesaver.dom.getElementsByClassName('scroll', this.node).
@@ -1258,7 +1258,7 @@ treesaver.ui.Chrome.prototype.updatePosition = function () {
   this.positionElements.forEach(function (el, i) {
     var template = this.positionTemplates[i];
 
-    el.innerHTML = Mustache.to_html(template, {
+    el.innerHTML = template({
       'pagenumber': treesaver.ui.ArticleManager.getCurrentPageNumber(),
       'pagecount': treesaver.ui.ArticleManager.getCurrentPageCount(),
       'url': treesaver.ui.ArticleManager.getCurrentUrl(),
@@ -1272,7 +1272,7 @@ treesaver.ui.Chrome.prototype.updateCurrentDocument = function () {
   this.currentDocumentElements.forEach(function (el, i) {
     var template = this.currentDocumentTemplates[i];
 
-    el.innerHTML = Mustache.to_html(template, treesaver.ui.ArticleManager.getCurrentDocument().meta);
+    el.innerHTML = template(treesaver.ui.ArticleManager.getCurrentDocument().meta);
   }, this);
 };
 
@@ -1430,7 +1430,7 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
   this.indexElements.forEach(function (el, i) {
     var template = this.indexTemplates[i];
 
-    el.innerHTML = Mustache.to_html(template, toc);
+    el.innerHTML = template(toc);
   }, this);
 
   this.updateTOCActive();
