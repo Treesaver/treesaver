@@ -216,7 +216,7 @@ treesaver.ui.StateManager.onOrientationChange = function() {
   if (treesaver.capabilities.SUPPORTS_ORIENTATION &&
       !treesaver.boot.inContainedMode &&
       !treesaver.capabilities.IS_FULLSCREEN) {
-    window.scrollTo(0, 1);
+    window.scrollTo(0, 0);
   }
 
   // TODO: Update classes for styling?
@@ -233,7 +233,7 @@ treesaver.ui.StateManager.onOrientationChange = function() {
 treesaver.ui.StateManager.getAvailableSize_ = function() {
   if (treesaver.capabilities.IS_NATIVE_APP || !treesaver.boot.inContainedMode) {
     if (window.pageYOffset || window.pageXOffset) {
-      window.scrollTo(0, 1);
+      window.scrollTo(0, 0);
     }
 
     // IE9+ and all other browsers
