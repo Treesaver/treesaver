@@ -52,7 +52,7 @@ Dual-licensed under MIT and GPLv2
 
 Yes, the code looks verbose and kind of like Java. That is because it follows the Google Closure style. This is in order to get better compression via the Closure Compiler. [UglifyJS](http://github.com/mishoo/UglifyJS) shows a lot of potential, and merits investigation.
 
-Although Google Closure style and compiler are used, note that Treesaver does *not* use the [Closure Library](http://code.google.com/closure/library/).
+Although Google Closure style and compiler are used, note that Treesaver does *not* use the [Closure Library](http://code.google.com/closure/library/) (other than a few functions in `base.js` which are used for dependency management and are not present in production).
 
 ### Contributors
 
