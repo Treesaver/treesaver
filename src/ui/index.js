@@ -72,10 +72,22 @@ treesaver.ui.Index.events = {
  * @return {?treesaver.ui.Document}
  */
 treesaver.ui.Index.prototype.parseEntry = function(entry) {
-  var url = entry['url'],
-      children = entry['children'],
+  var url = null,
+      children = null,
       meta = {},
       doc = null;
+
+  if (typeof entry === 'string') {
+    url = entry;
+  } else {
+    url = entry['url'];
+    children = entry['children'];
+
+    // Copy all fields into a new object
+    Object.keys(entry).forEach(function (key) {
+      meta[key] = entry[key];
+    });
+  }
   
   if (!url) {
     treesaver.debug.warn('Ignored document index entry without URL');
@@ -84,11 +96,6 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
 
   // Resolve this URL, and strip the hash if necessary
   url = treesaver.uri.stripHash(treesaver.network.absoluteURL(url));
-
-  // Copy all meta fields into a new object
-  Object.keys(entry).forEach(function (key) {
-    meta[key] = entry[key];
-  });
 
   // Create a new document
   doc = new treesaver.ui.Document(url, meta);
@@ -231,7 +238,7 @@ treesaver.ui.Index.prototype.parse = function (index) {
   }
 
   if (!Array.isArray(/** @type {!Object} */ (index))) {
-    treesaver.debug.warn('Document index should be an array of objects.');
+    treesaver.debug.warn('Document index should be an array of objects or URL strings.');
     return [];
   }
 
