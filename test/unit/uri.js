@@ -489,6 +489,17 @@ $(function () {
     });
   });
 
+  test('isIndex', function () {
+    ok(treesaver.uri.isIndex('index.html'));
+    ok(treesaver.uri.isIndex('default.html'));
+    ok(treesaver.uri.isIndex('index.php'));
+    ok(treesaver.uri.isIndex('default.asp'));
+    ok(treesaver.uri.isIndex('default.aspx'));
+    ok(treesaver.uri.isIndex('http://www.example.com/index.html'));
+    ok(!treesaver.uri.isIndex('some-index.html'));
+    ok(!treesaver.uri.isIndex('http://www.example.com/'));
+  });
+
   test('stringify', function () {
     var tests = ["http:", "https://", "http://host", "http://host/", "http://host.com", "http://subdomain.host.com", "http://host.com:81", "http://user@host.com", "http://user@host.com:81", "http://user:@host.com", "http://user:@host.com:81", "http://user:pass@host.com", "http://user:pass@host.com:81", "http://user:pass@host.com:81?query", "http://user:pass@host.com:81#anchor", "http://user:pass@host.com:81/", "http://user:pass@host.com:81/?query", "http://user:pass@host.com:81/#anchor", "http://user:pass@host.com:81/file.ext", "http://user:pass@host.com:81/directory", "http://user:pass@host.com:81/directory?query", "http://user:pass@host.com:81/directory#anchor", "http://user:pass@host.com:81/directory/", "http://user:pass@host.com:81/directory/?query", "http://user:pass@host.com:81/directory/#anchor", "http://user:pass@host.com:81/directory/sub.directory/", "http://user:pass@host.com:81/directory/sub.directory/file.ext", "http://user:pass@host.com:81/directory/file.ext?query", "http://user:pass@host.com:81/directory/file.ext?query=1&test=2", "http://user:pass@host.com:81/directory/file.ext?query=1#anchor", "//host.com", "//user:pass@host.com:81/direc.tory/file.ext?query=1&test=2#anchor", "/directory/sub.directory/file.ext?query=1&test=2#anchor", "/directory/", "/file.ext", "/?query", "/#anchor", "/", "?query", "?query=1&test=2#anchor", "#anchor", "path/to/file", "localhost", "192.168.1.1", "host.com", "host.com:81", "host.com:81/", "host.com?query", "host.com#anchor", "host.com/", "host.com/file.ext", "host.com/directory/?query", "host.com/directory/#anchor", "host.com/directory/file.ext", "host.com:81/direc.tory/file.ext?query=1&test=2#anchor", "user@host.com", "user@host.com:81", "user@host.com/", "user@host.com/file.ext", "user@host.com?query", "user@host.com#anchor", "user:pass@host.com:81/direc.tory/file.ext?query=1&test=2#anchor"];
 
