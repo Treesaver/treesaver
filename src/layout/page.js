@@ -70,7 +70,6 @@ treesaver.layout.Page = function(content, grids, br) {
   treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
   treesaver.dom.getElementsByProperty('data-template', 'document', null, this.node).forEach(function (el) {
-    // FIXME: cache the compiled template
     el.innerHTML = Handlebars.compile(el.innerHTML)(content.doc.meta);
   });
 
