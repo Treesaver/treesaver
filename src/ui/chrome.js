@@ -1485,6 +1485,9 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
       this.inPageScrollers = page.scrollers.concat(this.inPageScrollers);
       // Measure now that it is in the tree
       this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
+
+      page.node.setAttribute('id',
+        i === 0 ? 'previousPage' : i ===1 ? 'currentPage' : 'nextPage');
     }
   }, this);
 };
@@ -1502,33 +1505,25 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
   var prevPage = this.pages[0],
       currentPage = this.pages[1],
       nextPage = this.pages[2],
-      leftPageEdge,
-      rightPageEdge,
-      leftMargin = Math.max(currentPage.size.marginLeft, prevPage ? prevPage.size.marginRight : 0),
-      rightMargin = Math.max(currentPage.size.marginRight, nextPage ? nextPage.size.marginLeft : 0),
+      leftMargin, rightMargin,
+      halfPageWidth = currentPage.size.outerW/2,
       oldOffset = this.pageOffset;
 
-  // Mark the master page
-  currentPage.node.setAttribute('id', 'currentPage');
-
-  // Center the first page
-  leftPageEdge = (this.pageArea.w - currentPage.size.outerW) / 2;
-  rightPageEdge = leftPageEdge + currentPage.size.outerW;
-
   // Register the positions of each page
-  this.pagePositions = [];
-  // Absolute positioning uses margin box, so account for left margin
-  this.pagePositions[1] = leftPageEdge - currentPage.size.marginLeft;
+  // The main page is dead centered via CSS absolute positioning, so no work
+  // needs to be done
+  this.pagePositions = [0, 0, 0];
 
   if (prevPage) {
-    this.pagePositions[0] = leftPageEdge - leftMargin -
-      (prevPage.size.outerW + prevPage.size.marginLeft);
-    prevPage.node.setAttribute('id', 'previousPage');
+    leftMargin = Math.max(currentPage.size.marginLeft, prevPage.size.marginRight);
+    // Positioned to the left of the main page
+    this.pagePositions[0] = -(halfPageWidth + leftMargin + prevPage.size.outerW/2);
   }
 
   if (nextPage) {
-    this.pagePositions[2] = rightPageEdge + rightMargin - nextPage.size.marginLeft;
-    nextPage.node.setAttribute('id', 'nextPage');
+    rightMargin = Math.max(currentPage.size.marginRight, nextPage.size.marginLeft);
+    // Positioned to the right of the main page
+    this.pagePositions[2] = halfPageWidth + rightMargin + nextPage.size.outerW/2;
   }
 
   // Calculate any page offsets to use in animation
@@ -1537,23 +1532,17 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
 
     if (direction === treesaver.ui.ArticleManager.transitionDirection.BACKWARD) {
       this.pageOffset = nextPage ?
-          (this.pagePositions[1] - this.pagePositions[2]) : 0;
-
-      // We might have a previous offset from the page swipe that puts,
-      // us closer to the final destination
-      if (oldOffset) {
-        this.pageOffset += oldOffset;
-      }
+        (this.pagePositions[1] - this.pagePositions[2]) : 0;
     }
     else {
       this.pageOffset = prevPage ?
         (this.pagePositions[1] - this.pagePositions[0]) : 0;
+    }
 
-      // We might have a previous offset from the page swipe that puts,
-      // us closer to the final destination
-      if (oldOffset) {
-        this.pageOffset += oldOffset;
-      }
+    // We might have a previous offset from the page swipe that puts
+    // us closer to the final destination
+    if (oldOffset) {
+      this.pageOffset += oldOffset;
     }
   }
   else if (!this.pageOffset) {

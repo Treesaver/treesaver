@@ -152,8 +152,9 @@ treesaver.layout.Page = function(content, grids, br) {
     this.ignore = true;
   }
   else {
-    // Centers the page vertically with less work for us
+    // Centers the page vertically & horizontally with less work for us
     treesaver.dimensions.setCssPx(this.node, 'marginTop', -this.size.outerH / 2);
+    treesaver.dimensions.setCssPx(this.node, 'marginLeft', -this.size.outerW / 2);
 
     // Are we finished?
     br.finished = best.grid.scoringFlags['onlypage'] || br.atEnd(content);

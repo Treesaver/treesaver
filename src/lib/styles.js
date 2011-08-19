@@ -32,8 +32,8 @@ if (treesaver.dom.getElementsByTagName('head').length) {
   // Offscreen
   treesaver.styles.insertRule('.offscreen',
     'position:absolute;top:-200%;right:-200%;visibility:hidden;');
-  // Grids
-  treesaver.styles.insertRule('.viewer .grid', 'top:50%');
+  // Grids are centered in the viewer
+  treesaver.styles.insertRule('.viewer .grid', 'top:50%;left:50%;margin:0');
   if (treesaver.capabilities.SUPPORTS_CSSTRANSITIONS) {
     treesaver.styles.insertRule('.grid.ts-animate',
       'transition:transform cubic-bezier(0.33,0.33,0.66,1) ' + MAX_ANIMATION_DURATION / 1000 + 's');
