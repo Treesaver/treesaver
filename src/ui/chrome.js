@@ -1566,36 +1566,37 @@ treesaver.ui.Chrome.prototype._updatePagePositionsDelayed = function() {
  * @param {boolean=} preventAnimation
  */
 treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) {
-  var offset = this.pageOffset;
-
   if (!preventAnimation) {
-    // Pause tasks to keep animation smooth
-    treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
+    if (MAX_ANIMATION_DURATION) {
+      // Pause tasks to keep animation smooth
+      treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
 
-    var now = goog.now(),
-        percentRemaining = !preventAnimation ?
-          Math.max(0, (this.animationStart || 0) +
-            MAX_ANIMATION_DURATION - now) / MAX_ANIMATION_DURATION :
-          1,
-        ratio = -Math.cos(percentRemaining * Math.PI) / 2 + 0.5;
+      var now = goog.now(),
+          percentRemaining = Math.max(0, (this.animationStart || 0) +
+              MAX_ANIMATION_DURATION - now) / MAX_ANIMATION_DURATION,
+          ratio = -Math.cos(percentRemaining * Math.PI) / 2 + 0.5;
 
-    offset *= ratio;
+      this.pageOffset *= ratio;
 
-    if (Math.abs(offset) < 5) {
-      this.pageOffset = offset = 0;
-      // Re-enable other tasks
-      treesaver.scheduler.resume();
+      if (Math.abs(this.pageOffset) < 5) {
+        this.pageOffset = 0;
+        // Re-enable other tasks
+        treesaver.scheduler.resume();
+      }
+      else {
+        // Queue up another call in a bit
+        this._updatePagePositionsDelayed();
+      }
     }
     else {
-      // Queue up another call in a bit
-      this._updatePagePositionsDelayed();
+      this.pageOffset = 0;
     }
   }
 
   // Update position
   this.pages.forEach(function(page, i) {
     if (page && page.node) {
-      treesaver.dimensions.setOffsetX(page.node, this.pagePositions[i] + offset);
+      treesaver.dimensions.setOffsetX(page.node, this.pagePositions[i] + this.pageOffset);
     }
   }, this);
 };
