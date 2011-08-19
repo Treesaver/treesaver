@@ -1463,6 +1463,9 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
     }
   }, this);
 
+  // Reset scrollers
+  this.inPageScrollers = [];
+
   this.pages.forEach(function(page, i) {
     if (page) {
       if (!page.node) {
@@ -1479,7 +1482,7 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
       }
 
       // Collect scrollers from each displayed page
-      this.inPageScrollers = page.scrollers.concat(this.inPageScrollers || []);
+      this.inPageScrollers = page.scrollers.concat(this.inPageScrollers);
       // Measure now that it is in the tree
       this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
     }
