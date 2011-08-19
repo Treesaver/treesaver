@@ -44,5 +44,5 @@ treesaver.config = {};
 goog.exportSymbol('treesaver.config', treesaver.config, window);
 
 // Register Handlebars helpers
-Handlebars.registerHelper('encodeURIComponent', encodeURIComponent);
-Handlebars.registerHelper('encodeURI', encodeURI);
+Handlebars.registerHelper('encodeURIComponent', window.encodeURIComponent);
+Handlebars.registerHelper('encodeURI', window.encodeURI);

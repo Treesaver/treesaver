@@ -9,7 +9,7 @@ var Handlebars = {};
 Handlebars.VERSION = "1.0.beta.2";
 
 /**
- * @type {function(!string): function(!Object, ?Object)}
+ * @type {function(!string): function(!Object, Object=)}
  */
 Handlebars.compile = function (source) {};
 
