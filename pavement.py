@@ -128,7 +128,7 @@ def debug(args):
 
         outfile.write_text(contents)
 
-        prepend_lib(options.lib_dir / 'mustache/mustache.js', outfile, False)
+        prepend_lib(options.lib_dir / 'handlebars/handlebars.js', outfile, False)
 
     else:
         for i, jsfile in enumerate(options.src_dir.files('*.js')):
@@ -149,7 +149,7 @@ def debug(args):
             outfile.write_text(contents)
 
             if i == 0:
-              prepend_lib(options.lib_dir / 'mustache/mustache.js', outfile, False)
+              prepend_lib(options.lib_dir / 'handlebars/handlebars.js', outfile, False)
 
 @task
 @consume_args
@@ -351,9 +351,9 @@ def compile(args):
         contents = target_file.text()
 
         if i == 0:
-          prepend_lib(options.lib_dir / 'mustache/mustache.js', target_file)
+          prepend_lib(options.lib_dir / 'handlebars/handlebars.js', target_file)
     else:
-      prepend_lib(options.lib_dir / 'mustache/mustache.js', options.build_dir / single_filename)
+      prepend_lib(options.lib_dir / 'handlebars/handlebars.js', options.build_dir / single_filename)
 
     size()
 

@@ -7,7 +7,7 @@
     <link rel="resources" href="resources.html">
     <link rel="index" href="toc.php" type="application/json">
     <link rel="stylesheet" href="../treesaver.css">
-    <script src="../../lib/mustache/mustache.js"></script>
+    <script src="../../lib/handlebars/handlebars.js"></script>
     <script src="../../lib/closure/goog/base.js"></script>
     <script src="../../test/deps.js"></script>
     <script>

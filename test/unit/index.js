@@ -104,6 +104,15 @@ $(function () {
       ]);
     equal(result.length, 1, 'parsed one document');
     equal(result[0].meta['title'], 'Hello World', 'Meta data is extracted correctly');
+
+    result = i.parse([
+        'article1.html',
+        'article2.html'
+      ]);
+
+    equal(result.length, 2, 'parsed two documents');
+    equal(result[0].url, treesaver.network.absoluteURL('article1.html'));
+    equal(result[1].url, treesaver.network.absoluteURL('article2.html'));
   });
 
   test('Index.walk', function () {
