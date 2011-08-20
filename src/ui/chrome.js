@@ -629,6 +629,13 @@ treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
     return true;
   }
 
+  var target = treesaver.ui.Chrome.findTarget_(e.target);
+
+  // Is the mousewheel within a scrolling element? If so, ignore
+  if (this.isWithinScroller_(target)) {
+    return true;
+  }
+
   // Lightbox active? Hide it
   if (this.lightBoxActive) {
     this.hideLightBox();
@@ -744,16 +751,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     this.touchData_.startX2 = e.touches[1].pageX;
   }
 
-  // Chrome Scrollers
-  this.scrollers.
-    // Plus scrollers of page content
-    concat(this.inPageScrollers).
-    // Plus the lightbox scroller (if there)
-    concat(this.lightBox ? this.lightBox.scroller : []).forEach(function(s) {
-    if (s.contains(target)) {
-      this.touchData_.scroller = s;
-    }
-  }, this);
+  this.touchData_.scroller = this.isWithinScroller_(target);
 
   // Pause other work for better swipe performance
   treesaver.scheduler.pause([], 2 * SWIPE_TIME_LIMIT);
@@ -955,6 +953,30 @@ treesaver.ui.Chrome.prototype.mouseOver = function(e) {
     // Need to make sure UI is visible if a user is trying to click on it
     this.setUiActive_();
   }
+};
+
+/**
+ * Checks if the element is within one of our scrollable elements
+ * @private
+ * @param {Element} el
+ * @returns {?treesaver.ui.Scrollable}
+ */
+treesaver.ui.Chrome.prototype.isWithinScroller_ = function(el) {
+  var scroller,
+      // All the scrollers in the Chrome, first the chrome ones
+      allScrollers = this.scrollers.
+        // Plus scrollers of page content
+        concat(this.inPageScrollers).
+        // Plus the lightbox scroller (if there)
+        concat(this.lightBox ? this.lightBox.scroller : [])
+
+  allScrollers.forEach(function(s) {
+    if (s.contains(el)) {
+      scroller = s;
+    }
+  }, this);
+
+  return scroller;
 };
 
 /**
