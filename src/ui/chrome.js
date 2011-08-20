@@ -423,14 +423,14 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
     case 40:
     case 74: // j
     case 32: // Space
-      treesaver.ui.ArticleManager.nextPage();
+      this.nextPage_();
       break;
 
     case 33: // PageDown
     case 37: // Left & up
     case 38:
     case 75: // k
-      treesaver.ui.ArticleManager.previousPage();
+      this.previousPage_();
       break;
 
     case 72: // h
@@ -513,12 +513,12 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   // TODO: Once we have variable numbers of pages, this code will
   // need to change
   if (this.pages[0] && this.pages[0].node.contains(el)) {
-    treesaver.ui.ArticleManager.previousPage();
+    this.previousPage_();
 
     handled = true;
   }
   else if (this.pages[2] && this.pages[2].node.contains(el)) {
-    treesaver.ui.ArticleManager.nextPage();
+    this.nextPage_();
 
     handled = true;
   }
@@ -529,12 +529,12 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     while (!handled && el && el !== treesaver.boot.tsContainer) {
       if (!withinCurrentPage) {
         if (treesaver.dom.hasClass(el, 'prev')) {
-          treesaver.ui.ArticleManager.previousPage();
+          this.previousPage_();
 
           handled = true;
         }
         else if (treesaver.dom.hasClass(el, 'next')) {
-          treesaver.ui.ArticleManager.nextPage();
+          this.nextPage_();
 
           handled = true;
         }
@@ -660,10 +660,10 @@ treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
   e.stopPropagation();
 
   if (delta > 0) {
-    treesaver.ui.ArticleManager.previousPage();
+    this.previousPage_();
   }
   else {
-    treesaver.ui.ArticleManager.nextPage();
+    this.nextPage_();
   }
 
   // Mousewheel always deactivates UI
@@ -885,10 +885,10 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
     // Check for a swipe
     else if (touchData.swipe) {
       if (touchData.totalX > 0) {
-        actionTaken = treesaver.ui.ArticleManager.previousPage();
+        actionTaken = this.previousPage_();
       }
       else {
-        actionTaken = treesaver.ui.ArticleManager.nextPage();
+        actionTaken = this.nextPage_();
       }
 
       if (!actionTaken) {
@@ -954,6 +954,36 @@ treesaver.ui.Chrome.prototype.mouseOver = function(e) {
   if (!e.touches) {
     // Need to make sure UI is visible if a user is trying to click on it
     this.setUiActive_();
+  }
+};
+
+/**
+ * Go to the previous page
+ *
+ * @private
+ */
+treesaver.ui.Chrome.prototype.previousPage_ = function() {
+  if (treesaver.ui.ArticleManager.canGoToPreviousPage()) {
+    // Adjust the offset immediately for animation
+    this.layoutPages(-1);
+
+    // Now change the page in the article manager, etc
+    return treesaver.ui.ArticleManager.previousPage();
+  }
+};
+
+/**
+ * Go to the next page
+ *
+ * @private
+ */
+treesaver.ui.Chrome.prototype.nextPage_ = function() {
+  if (treesaver.ui.ArticleManager.canGoToNextPage()) {
+    // Adjust the offset immediately for animation
+    this.layoutPages(1);
+
+    // Now change the page in the article manager, etc
+    return treesaver.ui.ArticleManager.nextPage();
   }
 };
 
@@ -1391,15 +1421,12 @@ treesaver.ui.Chrome.prototype.updateTOCDelayed = function() {
 treesaver.ui.Chrome.prototype.selectPages = function() {
   this.stopDelayedFunctions();
 
-  // Save the direction
-  var direction = treesaver.ui.ArticleManager.getCurrentTransitionDirection();
-
   // Populate the pages
-  this.populatePages(direction);
+  this.populatePages();
 
   // Call layout even if pages didn't change since viewport size
   // can affect page positioning
-  this.layoutPages(direction);
+  this.layoutPages();
 
   // Update our field display in the chrome (page count/index changes)
   this.updatePosition();
@@ -1440,9 +1467,8 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
  * Populates the pages array for layout
  *
  * @private
- * @param {number} direction The direction to animate any transition.
  */
-treesaver.ui.Chrome.prototype.populatePages = function(direction) {
+treesaver.ui.Chrome.prototype.populatePages = function() {
   var old_pages = this.pages;
 
   // TODO: Master page width?
@@ -1468,17 +1494,12 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
 
   this.pages.forEach(function(page, i) {
     if (page) {
-      if (!page.node) {
-        page.activate();
-      }
+      var node = page.node || page.activate();
 
-      if (page.node.parentNode !== this.viewer) {
-        if (direction === treesaver.ui.ArticleManager.transitionDirection.BACKWARD) {
-          this.viewer.insertBefore(page.node, this.viewer.firstChild);
-        }
-        else {
-          this.viewer.appendChild(page.node);
-        }
+      // Is it in the viewer already?
+      if (!node.parentNode) {
+        // Insert into the tree, but make sure we display in the correct order
+        this.viewer.appendChild(node);
       }
 
       // Collect scrollers from each displayed page
@@ -1486,7 +1507,7 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
       // Measure now that it is in the tree
       this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
 
-      page.node.setAttribute('id',
+      node.setAttribute('id',
         i === 0 ? 'previousPage' : i ===1 ? 'currentPage' : 'nextPage');
     }
   }, this);
@@ -1494,9 +1515,9 @@ treesaver.ui.Chrome.prototype.populatePages = function(direction) {
 
 /**
  * Positions the current visible pages
- * @param {number} direction The direction to animate any transition.
+ * @param {number=} pageShift
  */
-treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
+treesaver.ui.Chrome.prototype.layoutPages = function(pageShift) {
   // For now, hard coded to show up to three pages, in the prev/current/next
   // configuration
   //
@@ -1526,28 +1547,42 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
     this.pagePositions[2] = halfPageWidth + rightMargin + nextPage.size.outerW/2;
   }
 
-  // Calculate any page offsets to use in animation
-  if (direction !== treesaver.ui.ArticleManager.transitionDirection.NEUTRAL) {
-    this.animationStart = goog.now();
-
-    if (direction === treesaver.ui.ArticleManager.transitionDirection.BACKWARD) {
-      this.pageOffset = nextPage ?
-        (this.pagePositions[1] - this.pagePositions[2]) : 0;
+  // TODO: Be much smarter about this
+  if (pageShift) {
+    if (pageShift > 0) {
+      // Shift everything to the left, making the next page the center
+      if (nextPage) {
+        pageShift = -this.pagePositions[2];
+      }
+      else {
+        // We don't know how large the next page will be, so guess it's the same
+        // as the current page
+        pageShift = -(currentPage.size.outerW + currentPage.size.marginRight);
+      }
     }
     else {
-      this.pageOffset = prevPage ?
-        (this.pagePositions[1] - this.pagePositions[0]) : 0;
+      // Shift everything to the right, making the previous page the center
+      if (prevPage) {
+        pageShift = -this.pagePositions[0];
+      }
+      else {
+        // Don't know how large previous page will be, guess same as current
+        pageShift = currentPage.size.outerW + currentPage.size.marginLeft;
+      }
     }
 
-    // We might have a previous offset from the page swipe that puts
-    // us closer to the final destination
-    if (oldOffset) {
-      this.pageOffset += oldOffset;
-    }
+    this.pagePositions = this.pagePositions.map(function(value) {
+      return value + pageShift;
+    });
+
+    this.animationStart = goog.now();
+    // Account for any existing offset, and keep page in same position when
+    // animation starts
+    this.pageOffset -= pageShift;
   }
-  else if (!this.pageOffset) {
+  else {
     // Can't let pageOffset be undefined, will throw errors in IE
-    this.pageOffset = 0;
+    this.pageOffset = this.pageOffset || 0;
   }
 
   this._updatePagePositions();
@@ -1558,7 +1593,7 @@ treesaver.ui.Chrome.prototype.layoutPages = function(direction) {
  * @private
  */
 treesaver.ui.Chrome.prototype._updatePagePositionsDelayed = function() {
-  treesaver.scheduler.queue(this.selectPages, [], 'animatePages', this);
+  treesaver.scheduler.queue(this._updatePagePositions, [], 'animatePages', this);
 };
 
 /**
@@ -1571,14 +1606,13 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
       // Pause tasks to keep animation smooth
       treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
 
-      var now = goog.now(),
-          percentRemaining = Math.max(0, (this.animationStart || 0) +
-              MAX_ANIMATION_DURATION - now) / MAX_ANIMATION_DURATION,
+      var percentRemaining = 1 - Math.max(0,
+            goog.now() - this.animationStart || 0) / MAX_ANIMATION_DURATION,
           ratio = -Math.cos(percentRemaining * Math.PI) / 2 + 0.5;
 
       this.pageOffset *= ratio;
 
-      if (Math.abs(this.pageOffset) < 5) {
+      if (Math.abs(this.pageOffset) < 1) {
         this.pageOffset = 0;
         // Re-enable other tasks
         treesaver.scheduler.resume();

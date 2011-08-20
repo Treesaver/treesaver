@@ -30,8 +30,6 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   treesaver.ui.ArticleManager.currentDocument;
   /** @type {treesaver.layout.ContentPosition} */
   treesaver.ui.ArticleManager.currentPosition;
-  /** @type {treesaver.ui.ArticleManager.transitionDirection} */
-  treesaver.ui.ArticleManager.currentTransitionDirection;
   /** @type {number} */
   treesaver.ui.ArticleManager.currentPageWidth;
 
@@ -97,7 +95,6 @@ treesaver.ui.ArticleManager.unload = function() {
   treesaver.ui.ArticleManager.currentDocumentIndex = -1;
   treesaver.ui.ArticleManager.currentArticlePosition = null;
   // Invalid clearing for type. TODO: Decide if this is even worth clearing on unload
-  //treesaver.ui.ArticleManager.currentTransitionDirection = null;
   //treesaver.ui.ArticleManager.currentPageWidth = null;
 
   treesaver.ui.ArticleManager.loadingPageHTML = null;
@@ -218,15 +215,6 @@ treesaver.ui.ArticleManager.events = {
   ARTICLECHANGED: 'treesaver.articlechanged',
   DOCUMENTCHANGED: 'treesaver.documentchanged',
   PAGESCHANGED: 'treesaver.pageschanged'
-};
-
-/**
- * @enum {number}
- */
-treesaver.ui.ArticleManager.transitionDirection = {
-  FORWARD: 1,
-  NEUTRAL: 0,
-  BACKWARD: -1
 };
 
 /**
@@ -458,10 +446,6 @@ treesaver.ui.ArticleManager.previousPage = function() {
   // Clear the internal position since we're on a new page
   treesaver.ui.ArticleManager.currentPosition = null;
 
-  // Set the transition direction
-  treesaver.ui.ArticleManager.currentTransitionDirection =
-    treesaver.ui.ArticleManager.transitionDirection.BACKWARD;
-
   // Fire the change event
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
 
@@ -593,10 +577,6 @@ treesaver.ui.ArticleManager.nextPage = function() {
   // Clear the internal position since we're on a new page
   treesaver.ui.ArticleManager.currentPosition = null;
 
-  // Set the transition direction
-  treesaver.ui.ArticleManager.currentTransitionDirection =
-    treesaver.ui.ArticleManager.transitionDirection.FORWARD;
-
   // Fire the change event
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.PAGESCHANGED);
 
@@ -647,9 +627,6 @@ treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
  * @return {Array.<?treesaver.layout.Page>} Array of pages, some may be null.
  */
 treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
-  // Fetching pages resets our transition direction
-  treesaver.ui.ArticleManager.currentTransitionDirection = treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
-
   if (treesaver.ui.ArticleManager.currentArticlePosition.atEnding()) {
     treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.articles.length - 1);
   } else if (treesaver.ui.ArticleManager.currentArticlePosition.isAnchor()) {
@@ -842,14 +819,6 @@ treesaver.ui.ArticleManager.getCurrentPageWidth = function() {
 };
 
 /**
- * Get the current transition direction
- * @return {treesaver.ui.ArticleManager.transitionDirection}
- */
-treesaver.ui.ArticleManager.getCurrentTransitionDirection = function() {
-  return treesaver.ui.ArticleManager.currentTransitionDirection;
-};
-
-/**
  * Get the figure that corresponds to the given element in the current
  * article
  *
@@ -906,10 +875,6 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
     // Same document, but different article
     var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
 
-    // Adjust the transition direction
-    treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentArticlePosition.index > articlePosition.index) ?
-    treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
-
     // Update the article position
     treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
 
@@ -954,13 +919,8 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
   }
 
   if (index || index === 0) {
-    // Set the transition direction (assume not neutral)
-    treesaver.ui.ArticleManager.currentTransitionDirection = (treesaver.ui.ArticleManager.currentDocumentIndex > index) ?
-      treesaver.ui.ArticleManager.transitionDirection.BACKWARD : treesaver.ui.ArticleManager.transitionDirection.FORWARD;
-
     treesaver.ui.ArticleManager.currentDocumentIndex = index;
   } else {
-    treesaver.ui.ArticleManager.currentTransitionDirection = treesaver.ui.ArticleManager.transitionDirection.NEUTRAL;
     treesaver.ui.ArticleManager.currentDocumentIndex = treesaver.ui.ArticleManager.index.getDocumentIndex(doc);
   }
 
