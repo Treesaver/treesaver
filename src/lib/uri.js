@@ -63,7 +63,7 @@ treesaver.uri.isIndex = function (str) {
   var url = treesaver.uri.parse(str);
 
   if (url.file) {
-    return (/^(index|default)\.(html?|php|asp|aspx)$/i.test(url.file) || (treesaver.config['DirectoryIndex'] && treesaver.config['DirectoryIndex'] === url.file));
+    return (/^(index|default)\.(html?|php|asp|aspx)$/i.test(url.file) || (treesaver.ui.ArticleManager.index.get('DirectoryIndex', 'index.html') === url.file));
   } else {
     return false;
   }

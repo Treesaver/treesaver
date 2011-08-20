@@ -111,7 +111,7 @@ treesaver.ui.ArticleManager.unload = function() {
 
 treesaver.ui.ArticleManager.onIndexLoad = function (e) {
   var index = e.index,
-      docs = index.get(treesaver.ui.ArticleManager.initialDocument.url),
+      docs = index.getDocuments(treesaver.ui.ArticleManager.initialDocument.url),
       doc = null;
 
   // Note that this may get called twice, once from the cache and once from the XHR response
@@ -593,7 +593,7 @@ treesaver.ui.ArticleManager.nextPage = function() {
  */
 treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
   var articleAnchor = treesaver.uri.parse(url)['anchor'],
-      docs = treesaver.ui.ArticleManager.index.get(treesaver.uri.stripHash(url)),
+      docs = treesaver.ui.ArticleManager.index.getDocuments(treesaver.uri.stripHash(url)),
       doc,
       index = -1,
       articlePosition = null;

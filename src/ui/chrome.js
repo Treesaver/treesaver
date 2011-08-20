@@ -190,6 +190,18 @@ treesaver.ui.Chrome = function(node) {
    * @type {?Array.<string>}
    */
   this.currentDocumentTemplates = [];
+
+  /**
+   * Cached references to the publication template elements
+   * @type {?Array.<Element>}
+   */
+  this.publicationElements = [];
+
+  /**
+   * Cached reference to the original publication templates
+   * @type {?Array.<string>}
+   */
+  this.publicationTemplates = [];
 };
 
 /**
@@ -220,6 +232,11 @@ treesaver.ui.Chrome.prototype.activate = function() {
 
     this.currentDocumentElements = treesaver.dom.getElementsByProperty('data-template', 'currentdocument', null, this.node);
     this.currentDocumentTemplates = this.currentDocumentElements.map(function (el) {
+      return el.innerHTML;
+    });
+
+    this.publicationElements = treesaver.dom.getElementsByProperty('data-template', 'publication', null, this.node);
+    this.publicationTemplates = this.publicationElements.map(function (el) {
       return el.innerHTML;
     });
 
@@ -1325,6 +1342,14 @@ treesaver.ui.Chrome.prototype.updatePosition = function () {
   }, this);
 };
 
+treesaver.ui.Chrome.prototype.updatePublication = function () {
+  this.publicationElements.forEach(function (el, i) {
+    var template = this.publicationTemplates[i];
+
+    el.innerHTML = Mustache.to_html(template, treesaver.ui.ArticleManager.index.meta);
+  }, this);
+};
+
 treesaver.ui.Chrome.prototype.updateCurrentDocument = function () {
   this.currentDocumentElements.forEach(function (el, i) {
     var template = this.currentDocumentTemplates[i];
@@ -1458,6 +1483,7 @@ treesaver.ui.Chrome.prototype.selectPages = function() {
   // Update our field display in the chrome (page count/index changes)
   this.updatePosition();
   this.updateCurrentDocument();
+  this.updatePublication();
   this.updatePageWidth(treesaver.ui.ArticleManager.getCurrentPageWidth());
 
   // Update the previous/next buttons depending on the current state
