@@ -1608,7 +1608,7 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
 
       var percentRemaining = 1 - Math.max(0,
             goog.now() - this.animationStart || 0) / MAX_ANIMATION_DURATION,
-          ratio = -Math.cos(percentRemaining * Math.PI) / 2 + 0.5;
+          ratio = (Math.pow((percentRemaining), 3));
 
       this.pageOffset *= ratio;
 
