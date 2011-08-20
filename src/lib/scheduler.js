@@ -45,7 +45,56 @@ treesaver.scheduler.taskWhitelist_ = null;
  *
  * @private
  */
-treesaver.scheduler.tickID_;
+treesaver.scheduler.tickID_ = -1;
+
+/**
+ * ID of the pausing task
+ *
+ * @private
+ */
+treesaver.scheduler.pauseTimeoutId_ = -1;
+
+/**
+ * Based on Paul Irish's requestAnimationFrame
+ *
+ * @private
+ */
+treesaver.scheduler.requestAnimationFrameFunction_ = function() {
+  return window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function(callback, element) {
+      return window.setTimeout(callback, treesaver.scheduler.TASK_INTERVAL);
+    }
+}();
+
+/**
+ * @private
+ */
+treesaver.scheduler.requestAnimationFrame_ = function(f, el) {
+  return treesaver.scheduler.requestAnimationFrameFunction_.call(window, f, el);
+};
+
+/**
+ * @private
+ */
+treesaver.scheduler.cancelAnimationFrameFunction_ = function() {
+  return window.cancelAnimationFrame ||
+    window.webkitCancelRequestAnimationFrame ||
+    window.mozCancelRequestAnimationFrame ||
+    window.oCancelRequestAnimationFrame ||
+    window.msCancelRequestAnimationFrame ||
+    window.clearTimeout;
+}();
+
+/**
+ * @private
+ */
+treesaver.scheduler.cancelAnimationFrame_ = function(id) {
+  return treesaver.scheduler.cancelAnimationFrameFunction_.call(window, id);
+};
 
 /**
  * Master callback for task execution
@@ -53,6 +102,8 @@ treesaver.scheduler.tickID_;
  */
 treesaver.scheduler.tick_ = function() {
   var now = goog.now();
+  // Clear out previous id
+  treesaver.scheduler.tickID_ = -1;
 
   treesaver.scheduler.tasks_.forEach(function(task, i) {
     // If the tick function is no longer on interval, prevent all task
@@ -101,9 +152,9 @@ treesaver.scheduler.tick_ = function() {
     task.fun.apply(task.obj, task.args);
   });
 
-  // Don't waste cycles if there's nothing in the queue
-  if (!treesaver.scheduler.tasks_.length) {
-    treesaver.scheduler.stopAll();
+  // Don't do anything if no tasks waiting
+  if (treesaver.scheduler.tasks_.length) {
+    treesaver.scheduler.start_();
   }
 };
 
@@ -155,12 +206,7 @@ treesaver.scheduler.addTask_ =
   task.removed = false;
 
   // Restart the tick callback if it's not active
-  if (!treesaver.scheduler.tickID_) {
-    treesaver.scheduler.tickID_ = window.setInterval(
-      treesaver.scheduler.tick_,
-      treesaver.scheduler.TASK_INTERVAL
-    );
-  }
+  treesaver.scheduler.start_();
 };
 
 /**
@@ -262,9 +308,9 @@ treesaver.scheduler.pause = function(whitelist, timeout) {
  */
 treesaver.scheduler.resume = function() {
   treesaver.scheduler.taskWhitelist_ = null;
-  if (treesaver.scheduler.pauseTimeoutId_) {
+  if (treesaver.scheduler.pauseTimeoutId_ !== -1) {
     window.clearTimeout(treesaver.scheduler.pauseTimeoutId_);
-    treesaver.scheduler.pauseTimeoutId_ = null;
+    treesaver.scheduler.pauseTimeoutId_ = -1;
   }
 };
 
@@ -285,19 +331,32 @@ treesaver.scheduler.clear = function(name) {
 };
 
 /**
+ * Start function processing again
+ * @private
+ */
+treesaver.scheduler.start_ = function() {
+  if (treesaver.scheduler.tickID_ === -1) {
+    treesaver.scheduler.tickID_ = treesaver.scheduler.requestAnimationFrame_(
+      treesaver.scheduler.tick_,
+      document.body
+    );
+  }
+};
+
+/**
  * Stop all functions from being executed, and clear out the queue
  */
 treesaver.scheduler.stopAll = function() {
   // Stop task
   if (treesaver.scheduler.tickID_) {
-    window.clearInterval(treesaver.scheduler.tickID_);
+    treesaver.scheduler.cancelAnimationFrame_(treesaver.scheduler.tickID_);
   }
 
   // Clear out any timeout
   treesaver.scheduler.resume();
 
   // Clear data stores
-  treesaver.scheduler.tickID_ = null;
+  treesaver.scheduler.tickID_ = -1;
   treesaver.scheduler.tasks_ = [];
   treesaver.scheduler.namedTasks_ = {};
 };
