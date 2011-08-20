@@ -1606,13 +1606,15 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
       // Pause tasks to keep animation smooth
       treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
 
-      var percentRemaining = 1 - Math.max(0,
-            goog.now() - this.animationStart || 0) / MAX_ANIMATION_DURATION,
-          ratio = (Math.pow((percentRemaining), 3));
+      // Percent of time left in animation
+      var t = 1 - (goog.now() - this.animationStart || 0) / MAX_ANIMATION_DURATION;
+      // Clamp into 0,1
+      t = Math.max(0, Math.min(1, t));
 
-      this.pageOffset *= ratio;
+      // Cubic easing
+      this.pageOffset *= Math.pow(t, 3);
 
-      if (Math.abs(this.pageOffset) < 1) {
+      if (Math.abs(this.pageOffset) <= 1) {
         this.pageOffset = 0;
         // Re-enable other tasks
         treesaver.scheduler.resume();
@@ -1623,8 +1625,13 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
       }
     }
     else {
+      // No animation means no offset to animate
       this.pageOffset = 0;
     }
+  }
+  else {
+    // Stop any animations that might be queued
+    treesaver.scheduler.clear('animatePages');
   }
 
   // Update position
