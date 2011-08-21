@@ -99,6 +99,13 @@ treesaver.ui.StateManager.unload = function() {
 };
 
 /**
+ * @type {Object.<string, string>}
+ */
+treesaver.ui.StateManager.events = {
+  CHROMECHANGED: 'treesaver.chromechanged'
+};
+
+/**
  * @private
  * @return {!Element}
  */
@@ -291,7 +298,6 @@ treesaver.ui.StateManager.checkState = function() {
         return;
       }
 
-      // TODO: Fire chrome change event?
       // Remove existing chrome
       treesaver.dom.clearChildren(treesaver.ui.StateManager.state_.chromeContainer);
       // Deactivate previous
@@ -302,6 +308,13 @@ treesaver.ui.StateManager.checkState = function() {
       // Activate and store
       treesaver.ui.StateManager.state_.chromeContainer.appendChild(newChrome.activate());
       treesaver.ui.StateManager.state_.chrome = newChrome;
+
+      // Fire chrome change event
+      treesaver.events.fireEvent(
+        document, treesaver.ui.StateManager.events.CHROMECHANGED, {
+          'node': newChrome.node
+        }
+      );
     }
 
     // Chrome handles page re-layout, if necessary
