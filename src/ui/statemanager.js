@@ -345,11 +345,11 @@ if (treesaver.capabilities.IS_NATIVE_APP) {
   };
 
   goog.exportSymbol('treesaver.nextPage',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.nextPage), window);
+    activeFunctionWrapper(treesaver.ui.ArticleManager.nextPage));
   goog.exportSymbol('treesaver.previousPage',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.previousPage), window);
+    activeFunctionWrapper(treesaver.ui.ArticleManager.previousPage));
   goog.exportSymbol('treesaver.nextArticle',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.nextArticle), window);
+    activeFunctionWrapper(treesaver.ui.ArticleManager.nextArticle));
   goog.exportSymbol('treesaver.previousArticle',
-    activeFunctionWrapper(treesaver.ui.ArticleManager.previousArticle), window);
+    activeFunctionWrapper(treesaver.ui.ArticleManager.previousArticle));
 }

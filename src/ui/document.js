@@ -314,10 +314,10 @@ treesaver.ui.Document.prototype.load = function () {
   });
 };
 
-goog.exportSymbol('treesaver.Document', treesaver.ui.Document, window);
-goog.exportSymbol('treesaver.Document.prototype.setArticles', treesaver.ui.Document.prototype.setArticles, window);
-goog.exportSymbol('treesaver.Document.prototype.getNumberOfArticles', treesaver.ui.Document.prototype.getNumberOfArticles, window);
-goog.exportSymbol('treesaver.Document.prototype.getArticle', treesaver.ui.Document.prototype.getArticle, window);
-goog.exportSymbol('treesaver.Document.prototype.parse', treesaver.ui.Document.prototype.parse, window);
-goog.exportSymbol('treesaver.Document.prototype.getUrl', treesaver.ui.Document.prototype.getUrl, window);
-goog.exportSymbol('treesaver.Document.prototype.getMeta', treesaver.ui.Document.prototype.getMeta, window);
+goog.exportSymbol('treesaver.Document', treesaver.ui.Document);
+goog.exportSymbol('treesaver.Document.prototype.setArticles', treesaver.ui.Document.prototype.setArticles);
+goog.exportSymbol('treesaver.Document.prototype.getNumberOfArticles', treesaver.ui.Document.prototype.getNumberOfArticles);
+goog.exportSymbol('treesaver.Document.prototype.getArticle', treesaver.ui.Document.prototype.getArticle);
+goog.exportSymbol('treesaver.Document.prototype.parse', treesaver.ui.Document.prototype.parse);
+goog.exportSymbol('treesaver.Document.prototype.getUrl', treesaver.ui.Document.prototype.getUrl);
+goog.exportSymbol('treesaver.Document.prototype.getMeta', treesaver.ui.Document.prototype.getMeta);

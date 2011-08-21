@@ -278,5 +278,5 @@ if (SUPPORT_IE && (!('addEventListener' in document))) {
 }
 
 // Expose event helper functions via externs
-goog.exportSymbol('treesaver.addListener', treesaver.events.addListener, window);
-goog.exportSymbol('treesaver.removeListener', treesaver.events.removeListener, window);
+goog.exportSymbol('treesaver.addListener', treesaver.events.addListener);
+goog.exportSymbol('treesaver.removeListener', treesaver.events.removeListener);

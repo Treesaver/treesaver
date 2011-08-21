@@ -12,7 +12,7 @@ goog.provide('treesaver.constants');
  */
 treesaver.VERSION = 'dev';
 
-goog.exportSymbol('treesaver.VERSION', treesaver.VERSION, window);
+goog.exportSymbol('treesaver.VERSION', treesaver.VERSION);
 
 /**
  * @const

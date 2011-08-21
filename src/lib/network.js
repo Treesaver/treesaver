@@ -335,5 +335,5 @@ treesaver.network.requestTimeout_ = function requestTimeout_(request) {
 };
 
 if (WITHIN_IOS_WRAPPER) {
-  goog.exportSymbol('treesaver.setOnlineStatus', treesaver.network.setOnlineStatus, window);
+  goog.exportSymbol('treesaver.setOnlineStatus', treesaver.network.setOnlineStatus);
 }
