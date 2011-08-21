@@ -29,13 +29,6 @@ goog.require('treesaver.ui.Chrome');
 goog.require('treesaver.ui.StateManager');
 
 /**
- * A global configuration object. Use only as a last resort.
- */
-treesaver.config = {};
-
-goog.exportSymbol('treesaver.config', treesaver.config, window);
-
-/**
  * Load scripts and required resources
  */
 treesaver.boot = function() {

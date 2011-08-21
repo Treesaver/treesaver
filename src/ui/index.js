@@ -27,6 +27,16 @@ treesaver.ui.Index = function (url) {
   this.children = [];
 
   /**
+   * @type {!Object}
+   */
+  this.settings = {};
+
+  /**
+   * @type {!Object}
+   */
+  this.meta = {};
+
+  /**
    * @type {boolean}
    */
   this.loaded = false;
@@ -193,66 +203,123 @@ treesaver.ui.Index.prototype.getDocumentIndex = function (doc) {
 };
 
 /**
- * Returns the linear ordering of documents as extracted from a depth first traversal of the document hierarchy.
- * @return {!Array.<treesaver.ui.Document>}
- */
-treesaver.ui.Index.prototype.getDocuments = function () {
-  return this.documents;
-};
-
-/**
- * Returns all documents matching the given URL in the live index.
- * @param {!string} url
+ * Returns all documents matching the given URL in the live index, or the linear
+ * ordering of documents as extracted from a depth first traversal of the document
+ * hierarchy when no URL is given.
+ *
+ * @param {?string} url
  * @return {Array.<treesaver.ui.Document>}
  */
-treesaver.ui.Index.prototype.get = function (url) {
+treesaver.ui.Index.prototype.getDocuments = function (url) {
   var result = [];
 
-  this.walk(this.children, function (doc) {
-    if (doc.equals(url)) {
-      result.push(doc);
-    }
-  }, this);
-  return result;
+  if (!url) {
+    return this.documents;
+  } else {
+    this.walk(this.children, function (doc) {
+      if (doc.equals(url)) {
+        result.push(doc);
+      }
+    }, this);
+    return result;
+  }
 };
 
 /**
  * Parses a string or array as the document index.
  * @private
- * @param {!string|!Array} index
+ * @param {!string|!Object} index
  */
 treesaver.ui.Index.prototype.parse = function (index) {
-  var result = [];
+  var result = {
+        children: [],
+        settings: {},
+        meta: {}
+      };
 
   if (!index) {
-    return [];
+    return result;
   }
 
   if (typeof index === 'string') {
     try {
       index = /** @type {!Array} */ (treesaver.json.parse(index));
     } catch (e) {
-      treesaver.debug.warn('Tried to parse TOC index file, but failed: ' + e);
-      return [];
+      treesaver.debug.warn('Tried to parse index file, but failed: ' + e);
+      return result;
     }
   }
 
-  if (!Array.isArray(/** @type {!Object} */ (index))) {
-    treesaver.debug.warn('Document index should be an array of objects or URL strings.');
-    return [];
+  if (!treesaver.object.isObject(/** @type {!Object} */ (index))) {
+    treesaver.debug.warn('Document index should be an object.');
+    return result;
   }
 
-  result = index.map(function (entry) {
+  if (!index['children'] || !Array.isArray(index['children'])) {
+    treesaver.debug.warn('Document index does not contain a valid "children" array.');
+    return result;
+  }
+
+  result.children = index['children'].map(function (entry) {
     return this.parseEntry(entry);
   }, this);
 
-  result = result.filter(function (entry) {
+  result.children = result.children.filter(function (entry) {
     return entry !== null;
   });
 
-  return result.map(function (entry) {
+  result.children = result.children.map(function (entry) {
     return this.appendChild(entry);
   }, this);
+
+  if (index['settings']) {
+    result.settings = {};
+    Object.keys(index.settings).forEach(function (key) {
+      result.settings[key] = index.settings[key];
+    });
+  }
+
+  Object.keys(index).forEach(function (key) {
+    if (key !== 'settings') {
+      result.meta[key] = index[key];
+    }
+  });
+
+  return result;
+};
+
+/**
+ * Set a publication wide configuration property.
+ *
+ * @param {!string} key
+ * @param {!*} value
+ */
+treesaver.ui.Index.prototype.set = function (key, value) {
+  return this.settings[key] = value;
+};
+
+/**
+ * Retrieve a publication wide configuration property.
+ *
+ * @param {!string} key
+ * @param {*=} defaultValue
+ * @return {?*}
+ */
+treesaver.ui.Index.prototype.get = function (key, defaultValue) {
+  if (this.settings.hasOwnProperty(key)) {
+    return this.settings[key];
+  } else {
+    return defaultValue;
+  }
+};
+
+/**
+ * Returns the meta-data for this publication.
+ *
+ * @return {!Object}
+ */
+treesaver.ui.Index.prototype.getMeta = function () {
+  return this.meta;
 };
 
 /**
@@ -260,7 +327,8 @@ treesaver.ui.Index.prototype.parse = function (index) {
  */
 treesaver.ui.Index.prototype.load = function () {
   var that = this,
-      cached_text = null;
+      cached_text = null,
+      index = null;
 
   // TODO: Maybe generalize caching. There seems to be a pattern here.
 
@@ -284,7 +352,11 @@ treesaver.ui.Index.prototype.load = function () {
 
     if (cached_text) {
       treesaver.debug.log('Index.load: Processing cached content for index: ' + this.url);
-      this.children = this.parse(cached_text);
+      index = this.parse(cached_text);
+
+      this.children = index.children;
+      this.meta = index.meta;
+      this.settings = index.settings;
       this.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADED, {
@@ -323,7 +395,10 @@ treesaver.ui.Index.prototype.load = function () {
       }
 
       treesaver.debug.log('Index.load: Processing content for index: ' + that.url);
-      that.children = that.parse(text);
+      index = that.parse(text);
+      that.children = index.children;
+      that.meta = index.meta;
+      that.settings = index.settings;
       that.loaded = true;
 
       treesaver.events.fireEvent(document, treesaver.ui.Index.events.LOADED, {
@@ -336,3 +411,11 @@ treesaver.ui.Index.prototype.load = function () {
     }
   });
 };
+
+goog.exportSymbol('treesaver.Index', treesaver.ui.Index, window);
+goog.exportSymbol('treesaver.Index.prototype.get', treesaver.ui.Index.prototype.get, window);
+goog.exportSymbol('treesaver.Index.prototype.set', treesaver.ui.Index.prototype.set, window);
+goog.exportSymbol('treesaver.Index.prototype.update', treesaver.ui.Index.prototype.update, window);
+goog.exportSymbol('treesaver.Index.prototype.getDocuments', treesaver.ui.Index.prototype.getDocuments, window);
+goog.exportSymbol('treesaver.Index.prototype.getNumberOfDocuments', treesaver.ui.Index.prototype.getNumberOfDocuments, window);
+goog.exportSymbol('treesaver.Index.prototype.getMeta', treesaver.ui.Index.prototype.getMeta, window);
