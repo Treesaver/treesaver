@@ -14,7 +14,6 @@ goog.provide('treesaver');
 
 goog.require('treesaver.capabilities');
 goog.require('treesaver.constants');
-goog.require('treesaver.core');
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.domready');
@@ -23,6 +22,11 @@ goog.require('treesaver.history');
 goog.require('treesaver.html5');
 goog.require('treesaver.resources');
 goog.require('treesaver.scheduler');
+goog.require('treesaver.styles');
+goog.require('treesaver.ui.Article');
+goog.require('treesaver.ui.ArticleManager');
+goog.require('treesaver.ui.Chrome');
+goog.require('treesaver.ui.StateManager');
 
 /**
  * A global configuration object. Use only as a last resort.
@@ -34,7 +38,7 @@ goog.exportSymbol('treesaver.config', treesaver.config, window);
 /**
  * Load scripts and required resources
  */
-treesaver.load = function() {
+treesaver.boot = function() {
   treesaver.debug.info('Begin Treesaver booting');
 
   if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
@@ -51,7 +55,7 @@ treesaver.load = function() {
   // Load resources
   treesaver.resources.load(function() {
     treesaver.resourcesLoaded_ = true;
-    treesaver.loadProgress_();
+    treesaver.bootProgress_();
   });
 
   // Watch for dom ready
@@ -70,7 +74,7 @@ treesaver.load = function() {
   if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // Fallback in case things never load
     treesaver.scheduler.delay(
-      treesaver.unload,
+      treesaver.unboot,
       treesaver.LOAD_TIMEOUT,
       [],
       'unboot'
@@ -81,8 +85,8 @@ treesaver.load = function() {
 /**
  * Recover from errors and return the page to the original state
  */
-treesaver.unload = function() {
-  treesaver.debug.info('Treesaver unng');
+treesaver.unboot = function() {
+  treesaver.debug.info('Treesaver unbooting');
 
   // Restore HTML
   if (!WITHIN_IOS_WRAPPER && treesaver.inContainedMode) {
@@ -165,14 +169,14 @@ treesaver.domReady = function(e) {
   }
 
   // Update state
-  treesaver.loadProgress_();
+  treesaver.bootProgress_();
 };
 
 /**
  *
  * @private
  */
-treesaver.loadProgress_ = function() {
+treesaver.bootProgress_ = function() {
   if (!treesaver.resourcesLoaded_) {
     // Can't show loading screen until resources are loaded
     return;
@@ -201,15 +205,53 @@ treesaver.loadProgress_ = function() {
   if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
     // Start loading the core (UI, layout, etc)
 
-    // TODO: In compiled module mode, this function won't be visible if in a
-    // closure ... may need to export
-    treesaver.core.load();
+    // Start the real proces
+    treesaver.load();
   }
 };
 
-// Begin loading
+/**
+ * Load the UI
+ */
+treesaver.load = function() {
+  treesaver.debug.info('Load begin');
+
+  // Make sure we clean up when leaving the page
+  treesaver.events.addListener(window, 'unload', treesaver.unload);
+
+  // Root element for listening to UI events
+  treesaver.ui.eventRoot = treesaver.inContainedMode ?
+    treesaver.tsContainer : window;
+
+  // Kick off boot process, but back up if any single item fails
+  if (treesaver.ui.StateManager.load() &&
+      // Grids
+      treesaver.ui.ArticleManager.load(treesaver.originalHtml)) {
+  }
+  else {
+    treesaver.debug.error('Load failed');
+
+    treesaver.unload();
+  }
+};
+
+/**
+ * Unload the UI and cleanup
+ */
+treesaver.unload = function() {
+  treesaver.debug.info('Unloading');
+
+  treesaver.events.removeListener(window, 'unload', treesaver.unload);
+
+  treesaver.ui.ArticleManager.unload();
+  treesaver.ui.StateManager.unload();
+
+  treesaver.unboot();
+};
+
+// Start the process
 if (treesaver.capabilities.SUPPORTS_TREESAVER) {
-  treesaver.load();
+  treesaver.boot();
 }
 else {
   treesaver.debug.warn('Treesaver not supported');
