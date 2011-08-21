@@ -289,6 +289,11 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   });
   this.pages = null;
   this.pageArea = null;
+
+  // Clear out tasks
+  treesaver.scheduler.clear('idletimer');
+  treesaver.scheduler.clear('updateTOC');
+  this.stopDelayedFunctions();
 };
 
 /**
