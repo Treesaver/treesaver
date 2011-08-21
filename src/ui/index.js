@@ -415,4 +415,7 @@ treesaver.ui.Index.prototype.load = function () {
 goog.exportSymbol('treesaver.Index', treesaver.ui.Index, window);
 goog.exportSymbol('treesaver.Index.prototype.get', treesaver.ui.Index.prototype.get, window);
 goog.exportSymbol('treesaver.Index.prototype.set', treesaver.ui.Index.prototype.set, window);
+goog.exportSymbol('treesaver.Index.prototype.update', treesaver.ui.Index.prototype.update, window);
+goog.exportSymbol('treesaver.Index.prototype.getDocuments', treesaver.ui.Index.prototype.getDocuments, window);
+goog.exportSymbol('treesaver.Index.prototype.getNumberOfDocuments', treesaver.ui.Index.prototype.getNumberOfDocuments, window);
 goog.exportSymbol('treesaver.Index.prototype.getMeta', treesaver.ui.Index.prototype.getMeta, window);

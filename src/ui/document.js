@@ -196,6 +196,14 @@ treesaver.ui.Document.prototype.getMeta = function () {
 };
 
 /**
+ * Return the canonical URL for this Document.
+ * @return {!string}
+ */
+treesaver.ui.Document.prototype.getUrl = function () {
+  return this.url;
+};
+
+/**
  * Returns the number of articles in this Document. Does not include any child documents.
  * @return {!number}
  */
@@ -308,5 +316,8 @@ treesaver.ui.Document.prototype.load = function () {
 
 goog.exportSymbol('treesaver.Document', treesaver.ui.Document, window);
 goog.exportSymbol('treesaver.Document.prototype.setArticles', treesaver.ui.Document.prototype.setArticles, window);
+goog.exportSymbol('treesaver.Document.prototype.getNumberOfArticles', treesaver.ui.Document.prototype.getNumberOfArticles, window);
+goog.exportSymbol('treesaver.Document.prototype.getArticle', treesaver.ui.Document.prototype.getArticle, window);
 goog.exportSymbol('treesaver.Document.prototype.parse', treesaver.ui.Document.prototype.parse, window);
+goog.exportSymbol('treesaver.Document.prototype.getUrl', treesaver.ui.Document.prototype.getUrl, window);
 goog.exportSymbol('treesaver.Document.prototype.getMeta', treesaver.ui.Document.prototype.getMeta, window);
