@@ -5,11 +5,20 @@
 goog.provide('treesaver.constants');
 
 /**
- * Whether the code is loaded via modules or a single file
+ * The version number of the code used to build a production
+ * bundle.
  *
- * @define {boolean}
+ * @define {string}
  */
-var USE_MODULES = true;
+treesaver.VERSION = 'dev';
+
+goog.exportSymbol('treesaver.VERSION', treesaver.VERSION, window);
+
+/**
+ * @const
+ * @type {number}
+ */
+treesaver.LOAD_TIMEOUT = 5000; // 5 seconds
 
 /**
  * Whether older browsers should be supported

@@ -531,7 +531,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
     withinCurrentPage = this.pages[1] && this.pages[1].node.contains(el);
 
     // Go up the tree and see if there's anything we want to process
-    while (!handled && el && el !== treesaver.boot.tsContainer) {
+    while (!handled && el && el !== treesaver.tsContainer) {
       if (!withinCurrentPage) {
         if (treesaver.dom.hasClass(el, 'prev')) {
           this.previousPage_();
@@ -691,11 +691,11 @@ treesaver.ui.Chrome.prototype.mouseWheel = function(e) {
  */
 treesaver.ui.Chrome.findTarget_ = function(node) {
   if (!node) {
-    node = treesaver.boot.tsContainer;
+    node = treesaver.tsContainer;
   }
   else if (node.nodeType !== 1 && node.parentNode) {
     // Safari Bug that gives you textNode on events
-    node = node.parentNode || treesaver.boot.tsContainer;
+    node = node.parentNode || treesaver.tsContainer;
   }
 
   // Cast for compiler
@@ -717,7 +717,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
       withinViewer = this.viewer.contains(target),
       x, y, now;
 
-  if (!treesaver.boot.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
+  if (!treesaver.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
     return;
   }
 

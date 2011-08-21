@@ -21,13 +21,13 @@ treesaver.core.load = function() {
   treesaver.events.addListener(window, 'unload', treesaver.core.unload);
 
   // Root element for listening to UI events
-  treesaver.ui.eventRoot = treesaver.boot.inContainedMode ?
-    treesaver.boot.tsContainer : window;
+  treesaver.ui.eventRoot = treesaver.inContainedMode ?
+    treesaver.tsContainer : window;
 
   // Kick off boot process, but back up if any single item fails
   if (treesaver.ui.StateManager.load() &&
       // Grids
-      treesaver.ui.ArticleManager.load(treesaver.boot.originalHtml)) {
+      treesaver.ui.ArticleManager.load(treesaver.originalHtml)) {
   }
   else {
     treesaver.debug.error('Load failed');
@@ -47,6 +47,5 @@ treesaver.core.unload = function() {
   treesaver.ui.ArticleManager.unload();
   treesaver.ui.StateManager.unload();
 
-  treesaver.boot.unload();
+  treesaver.unload();
 };
-

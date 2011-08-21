@@ -4,7 +4,6 @@ import json
 import shutil
 from paver.easy import *
 from paver.path import path
-from hashlib import md5
 
 HOME_DIR = path(__file__).dirname().abspath()
 
@@ -25,7 +24,6 @@ options(
 
 # Run options again to use variables from previous declaration
 options(
-    modules_file = options.src_dir / 'modules.json',
     externs_dir = options.src_dir / 'externs',
     calcdeps = HOME_DIR / 'lib/closure/bin/calcdeps.py',
     depswriter = HOME_DIR / 'lib/closure/bin/build/depswriter.py',
@@ -63,9 +61,6 @@ def check_requirements():
     if not options.closure_compiler.isfile():
         raise BuildFailure("Closure compiler not found")
 
-    if not options.modules_file.isfile():
-        raise BuildFailure("modules.json not found")
-
 # Run requirements test no matter what
 check_requirements()
 
@@ -80,8 +75,6 @@ def clean():
 def default(args = []):
     """Write out dependency file in order to test non-compiled scripts"""
     js_files = options.src_dir.files('*.js')
-
-    write_module_file()
 
     output_mode = 'deps'
 
@@ -100,56 +93,32 @@ def debug(args):
     """Create debug versions for testing"""
     output_mode = 'script'
     is_ios = '--ios' in args
-    is_single = '--modules' not in args
 
     if not options.build_dir.isdir():
         options.build_dir.makedirs()
 
-    if is_single:
-        outfile = options.build_dir / 'treesaver.js'
-        js = sh('python %s -i %s -p % s -p %s -o %s --output_file %s' % (
-            options.calcdeps,
-            ' -i'.join(options.src_dir.files('*.js')),
-            options.src_dir,
-            options.closure_dir,
-            output_mode,
-            outfile
-        ), capture=True)
+    outfile = options.build_dir / 'treesaver.js'
+    js = sh('python %s -i %s -p % s -p %s -o %s --output_file %s' % (
+        options.calcdeps,
+        ' -i'.join(options.src_dir.files('*.js')),
+        options.src_dir,
+        options.closure_dir,
+        output_mode,
+        outfile
+    ), capture=True)
 
-        # Need to modify the output in order to set COMPILED to true, since
-        # this normally happens via the compiler
-        contents = outfile.text().replace('COMPILED = false', 'COMPILED = true', 1)
-        contents = contents.replace('USE_MODULES = true', 'USE_MODULES = false', 1)
+    # Need to modify the output in order to set COMPILED to true, since
+    # this normally happens via the compiler
+    contents = outfile.text().replace('COMPILED = false', 'COMPILED = true', 1)
 
-        if is_ios:
-            contents = contents.replace('SUPPORT_IE = true', 'SUPPORT_IE = false', 1)
-            contents = contents.replace('SUPPORT_LEGACY = true', 'SUPPORT_LEGACY = false', 1)
-            contents = contents.replace('WITHIN_IOS_WRAPPER = false', 'WITHIN_IOS_WRAPPER = true', 1)
+    if is_ios:
+        contents = contents.replace('SUPPORT_IE = true', 'SUPPORT_IE = false', 1)
+        contents = contents.replace('SUPPORT_LEGACY = true', 'SUPPORT_LEGACY = false', 1)
+        contents = contents.replace('WITHIN_IOS_WRAPPER = false', 'WITHIN_IOS_WRAPPER = true', 1)
 
-        outfile.write_text(contents)
+    outfile.write_text(contents)
 
-        prepend_lib(options.lib_dir / 'mustache/mustache.js', outfile, False)
-
-    else:
-        for i, jsfile in enumerate(options.src_dir.files('*.js')):
-            outfile = options.build_dir / jsfile.basename()
-            js = sh('python %s -i %s -p % s -p %s -o %s --output_file %s' % (
-                options.calcdeps,
-                jsfile,
-                options.src_dir,
-                options.closure_dir,
-                output_mode,
-                outfile
-            ), capture=True)
-
-            # Need to modify the output in order to set COMPILED to true, since
-            # this normally happens via the compiler
-            contents = outfile.text().replace('COMPILED = false', 'COMPILED = true', 1)
-
-            outfile.write_text(contents)
-
-            if i == 0:
-              prepend_lib(options.lib_dir / 'mustache/mustache.js', outfile, False)
+    prepend_lib(options.lib_dir / 'mustache/mustache.js', outfile, False)
 
 @task
 @consume_args
@@ -208,31 +177,6 @@ def get_dependency_list(js_files):
 
     return files
 
-def write_module_file():
-    """Writes a module file that can be referenced by the application code"""
-    modules = json.loads(open(options.modules_file).read())
-
-    outfile = open(options.src_dir / 'modules.js', "w")
-    outfile.writelines("// This file is generated. Do not modify.\n\
-goog.provide('treesaver.modules');\n\
-\n\
-treesaver.modules = {\n\
-%s\n\
-};\n\
-/**\n\
- * Returns a filename given a module name. The filename is\n\
- * dependant on whether the application is compiled.\n\
- *\n\
- * @param {!string} name Module name to look up a filename for.\n\
- * @return {!string} File name to load for the given module.\n\
- */\n\
-treesaver.modules.get = function (name) {\n\
-  return treesaver.modules[name][COMPILED ? 'target' : 'src'];\n\
-};" % (
-      ',\n'.join(['  "%s": { target: "%s-%s.js", src: "%s" }' % (module['name'], module['name'], options.tag, module['src']) for module in modules])
-    ))
-    outfile.close()
-
 @task
 @consume_args
 def compile(args):
@@ -240,12 +184,7 @@ def compile(args):
     if not options.build_dir.isdir():
         options.build_dir.makedirs()
 
-    write_module_file()
-
-    # Whether we should compile to a single file instead of modules
-    is_single = '--modules' not in args
-
-    single_filename = 'treesaver-%s.js' % options.tag
+    filename = 'treesaver-%s.js' % options.tag
 
     compiler_flags = [
         '--compilation_level=ADVANCED_OPTIMIZATIONS',
@@ -271,8 +210,7 @@ def compile(args):
         compiler_flags.append('--define="SUPPORT_IE=false"')
         compiler_flags.append('--define="SUPPORT_LEGACY=false"')
         compiler_flags.append('--define="WITHIN_IOS_WRAPPER=true"')
-        is_single = True
-        single_filename = 'treesaver-ios-%s.js' % options.tag
+        filename = 'treesaver-ios-%s.js' % options.tag
 
     # Make pretty output for debug mode
     if '--debug' in args:
@@ -291,47 +229,9 @@ def compile(args):
 
     js_files = options.src_dir.files('*.js')
 
-    # Compile into a single file or modules?
-    if is_single:
-        file_list = get_dependency_list(js_files)
-        compiler_flags.append('--js %s' % ' --js '.join(file_list))
-        compiler_flags.append('--js_output_file=%s' % (options.build_dir / single_filename))
-
-        # Let code know modules are not being used
-        compiler_flags.append('--define="USE_MODULES=false"')
-    else:
-        # Calculate the module info
-        modules = json.loads(open(options.modules_file).read())
-        # TODO: Refactor and make this sane. Do a topological sort on dependency
-        # graph so it doesn't have to be manually specified
-        file_list = []
-        file_counts = []
-        for module in modules:
-            file_count = 0
-            deps = get_dependency_list([options.src_dir / module['src']])
-            # Cannot include a file more than once
-            for dep in deps:
-                if dep not in file_list:
-                    file_list.append(dep)
-                    file_count += 1
-            file_counts.append(file_count)
-
-        compiler_flags.append('--module_output_path_prefix %s' % (options.build_dir / ''))
-        compiler_flags.append('--js %s' % ' --js '.join(file_list))
-        for i, module in enumerate(modules):
-            dependencies = ''
-            if len(module['dependencies']):
-                # We refer to modules by "treesaver_%s" where %s is an md5 hash of the module
-                # name. This is very ugly but it is a work-around for Closure Compiler's
-                # restrictions on module names. We rename the resulting files back once Closure
-                # has done its job.
-                dependencies = ':%s' % ','.join(["treesaver_%s" % md5(dependency).hexdigest() for dependency in module['dependencies']])
-
-            compiler_flags.append('--module treesaver_%s:%s%s' % (
-                md5(module['name']).hexdigest(),
-                file_counts[i],
-                dependencies
-            ))
+    file_list = get_dependency_list(js_files)
+    compiler_flags.append('--js %s' % ' --js '.join(file_list))
+    compiler_flags.append('--js_output_file=%s' % (options.build_dir / filename))
 
     # Run the compilation
     sh('java -jar %s %s' % (
@@ -339,21 +239,8 @@ def compile(args):
         ' '.join(compiler_flags),
     ))
 
-    if not is_single:
-      for i, module in enumerate(modules):
-        target_name = "%s-%s.js" % (module['name'], options.tag)
-
-        target_file = options.build_dir / target_name
-        js_file = options.build_dir / "treesaver_%s.js" % md5(module['name']).hexdigest()
-
-        os.rename(js_file, target_file)
-
-        contents = target_file.text()
-
-        if i == 0:
-          prepend_lib(options.lib_dir / 'mustache/mustache.js', target_file)
-    else:
-      prepend_lib(options.lib_dir / 'mustache/mustache.js', options.build_dir / single_filename)
+    # Add our dependencies
+    prepend_lib(options.lib_dir / 'mustache/mustache.js', options.build_dir / filename)
 
     size()
 

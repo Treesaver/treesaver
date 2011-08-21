@@ -38,7 +38,7 @@ treesaver.ui.StateManager.load = function() {
   };
 
   // Clean the body
-  treesaver.dom.clearChildren(/** @type {!Element} */ (treesaver.boot.tsContainer));
+  treesaver.dom.clearChildren(/** @type {!Element} */ (treesaver.tsContainer));
 
   // Install container for chrome used to measure screen space, etc
   treesaver.ui.StateManager.state_.chromeContainer = treesaver.ui.StateManager.getChromeContainer_();
@@ -64,7 +64,7 @@ treesaver.ui.StateManager.load = function() {
   treesaver.scheduler.repeat(treesaver.ui.StateManager.checkState, CHECK_STATE_INTERVAL, Infinity, [], 'checkState');
 
   if (treesaver.capabilities.SUPPORTS_ORIENTATION &&
-      !treesaver.boot.inContainedMode &&
+      !treesaver.inContainedMode &&
       !treesaver.capabilities.IS_FULLSCREEN) {
     treesaver.events.addListener(window, 'orientationchange',
       treesaver.ui.StateManager.onOrientationChange);
@@ -82,7 +82,7 @@ treesaver.ui.StateManager.load = function() {
 
 treesaver.ui.StateManager.unload = function() {
   // Remove handler
-  if (treesaver.capabilities.SUPPORTS_ORIENTATION && !treesaver.boot.inContainedMode) {
+  if (treesaver.capabilities.SUPPORTS_ORIENTATION && !treesaver.inContainedMode) {
     treesaver.events.removeListener(window, 'orientationchange',
       treesaver.ui.StateManager.onOrientationChange);
   }
@@ -110,13 +110,13 @@ treesaver.ui.StateManager.events = {
  * @return {!Element}
  */
 treesaver.ui.StateManager.getChromeContainer_ = function() {
-  if (treesaver.boot.inContainedMode) {
-    return treesaver.boot.tsContainer;
+  if (treesaver.inContainedMode) {
+    return treesaver.tsContainer;
   }
   else {
     var container = document.createElement('div');
     container.setAttribute('id', 'chromeContainer');
-    treesaver.boot.tsContainer.appendChild(container);
+    treesaver.tsContainer.appendChild(container);
     return container;
   }
 };
@@ -221,7 +221,7 @@ treesaver.ui.StateManager.onOrientationChange = function() {
 
   // Hide the address bar on iOS & others
   if (treesaver.capabilities.SUPPORTS_ORIENTATION &&
-      !treesaver.boot.inContainedMode &&
+      !treesaver.inContainedMode &&
       !treesaver.capabilities.IS_FULLSCREEN) {
     window.scrollTo(0, 0);
   }
@@ -238,7 +238,7 @@ treesaver.ui.StateManager.onOrientationChange = function() {
  * @return {{ w: number, h: number }}
  */
 treesaver.ui.StateManager.getAvailableSize_ = function() {
-  if (treesaver.capabilities.IS_NATIVE_APP || !treesaver.boot.inContainedMode) {
+  if (treesaver.capabilities.IS_NATIVE_APP || !treesaver.inContainedMode) {
     if (window.pageYOffset || window.pageXOffset) {
       window.scrollTo(0, 0);
     }
@@ -259,7 +259,7 @@ treesaver.ui.StateManager.getAvailableSize_ = function() {
     }
   }
   else {
-    return treesaver.dimensions.getSize(treesaver.boot.tsContainer);
+    return treesaver.dimensions.getSize(treesaver.tsContainer);
   }
 };
 
