@@ -9,17 +9,21 @@ $(function () {
       oldGet = treesaver.network.get;
       treesaver.network.get = function (url, fn) {
         if (url === 'http://www.example.com/index.json') {
-          fn(treesaver.json.stringify([
-            {
-              url: '1.html'
-            }
-          ]));
+          fn(treesaver.json.stringify({
+            children: [
+              {
+                url: '1.html'
+              }
+            ]
+          }));
         } else if (url === 'http://www.example.com/toc.json') {
-          fn(treesaver.json.stringify([
-            {
-              url: '1.html'
-            }
-          ]));
+          fn(treesaver.json.stringify({
+            children: [
+              {
+                url: '1.html'
+              }
+            ]
+          }));
         } else if (url === 'http://www.example.com/fail.json') {
           fn(null);
         }
@@ -38,31 +42,34 @@ $(function () {
         result = [];
     
     result = i.parse('');
-    equal(result.length, 0, 'empty index returns empty array');
+    equal(result.children.length, 0, 'empty index returns empty array');
 
     result = i.parse({});
-    equal(result.length, 0, 'invalid value returns empty array');
+    equal(result.children.length, 0, 'invalid value returns empty array');
 
     result = i.parse('{sdds]');
-    equal(result.length, 0, 'invalid JSON is rejected');
+    equal(result.children.length, 0, 'invalid JSON is rejected');
 
-    result = i.parse('[{"url": "test.html"}]');
-    equal(result.length, 1, 'string is correctly parsed as JSON');
+    result = i.parse('{"children":[{"url": "test.html"}]}');
+    equal(result.children.length, 1, 'string is correctly parsed as JSON');
 
-    result = i.parse([
-        {
-          "url": "index.html"
-        },
-        {
-          "url": "article1.html"
-        }
-      ]);
+    result = i.parse({
+        children: [
+          {
+            "url": "index.html"
+          },
+          {
+            "url": "article1.html"
+          }
+        ]
+    });
   
-    equal(result.length, 2, 'parsed two documents');
-    equal(result[0].url, treesaver.network.absoluteURL('index.html'), 'document one url resolved');
-    equal(result[1].url, treesaver.network.absoluteURL('article1.html'), 'document two url resolved');
+    equal(result.children.length, 2, 'parsed two documents');
+    equal(result.children[0].url, treesaver.network.absoluteURL('index.html'), 'document one url resolved');
+    equal(result.children[1].url, treesaver.network.absoluteURL('article1.html'), 'document two url resolved');
 
-    result = i.parse([
+    result = i.parse({
+      children: [
         {
           "url": "index.html"
         },
@@ -72,15 +79,17 @@ $(function () {
         {
           "url": "index.html#notes"
         }
-      ]);
+      ]
+    });
 
-    equal(result.length, 3, 'parsed three documents');
-    equal(result[0].url, treesaver.network.absoluteURL('index.html'), 'document one url resolved');
-    equal(result[1].url, treesaver.network.absoluteURL('article.php?id=1'), 'document two url resolved and correct');
-    equal(result[2].url, treesaver.network.absoluteURL('index.html'), 'document three resolved and hash stripped');
-    ok(result[0].equals(result[2]), 'first and third document are equal (but not strictly equal)');
+    equal(result.children.length, 3, 'parsed three documents');
+    equal(result.children[0].url, treesaver.network.absoluteURL('index.html'), 'document one url resolved');
+    equal(result.children[1].url, treesaver.network.absoluteURL('article.php?id=1'), 'document two url resolved and correct');
+    equal(result.children[2].url, treesaver.network.absoluteURL('index.html'), 'document three resolved and hash stripped');
+    ok(result.children[0].equals(result.children[2]), 'first and third document are equal (but not strictly equal)');
 
-    result = i.parse([
+    result = i.parse({
+      children: [
         {
           "url": "index.html",
           "children": [
@@ -92,50 +101,57 @@ $(function () {
             }
           ]
         }
-      ]);
-    equal(result.length, 1, 'parsed one document');
-    equal(result[0].children.length, 2, 'with two child documents');
+      ]
+    });
+    equal(result.children.length, 1, 'parsed one document');
+    equal(result.children[0].children.length, 2, 'with two child documents');
 
-    result = i.parse([
+    result = i.parse({
+      children: [
         {
           "url": "index.html",
           "title": "Hello World"
         }
-      ]);
-    equal(result.length, 1, 'parsed one document');
-    equal(result[0].meta['title'], 'Hello World', 'Meta data is extracted correctly');
+      ]
+    });
+    equal(result.children.length, 1, 'parsed one document');
+    equal(result.children[0].meta['title'], 'Hello World', 'Meta data is extracted correctly');
 
-    result = i.parse([
+    result = i.parse({
+      children: [
         'article1.html',
         'article2.html'
-      ]);
+      ]
+    });
 
-    equal(result.length, 2, 'parsed two documents');
-    equal(result[0].url, treesaver.network.absoluteURL('article1.html'));
-    equal(result[1].url, treesaver.network.absoluteURL('article2.html'));
+    equal(result.children.length, 2, 'parsed two documents');
+    equal(result.children[0].url, treesaver.network.absoluteURL('article1.html'));
+    equal(result.children[1].url, treesaver.network.absoluteURL('article2.html'));
   });
 
   test('Index.walk', function () {
     var i = new treesaver.ui.Index('http://www.example.com/toc.json'),
-        toc = i.parse([
-        {
-          "url": "index.html",
-          "children": [
-              {
-                "url": "one.html"
-              },
-              {
-                "url": "test.html"
-              }
+        toc = i.parse({
+          children: [
+            {
+              "url": "index.html",
+              "children": [
+                  {
+                    "url": "one.html"
+                  },
+                  {
+                    "url": "test.html"
+                  }
+              ]
+            },
+            {
+              "url": "two.html"
+            },
+            {
+              "url": "three.html"
+            }
           ]
-        },
-        {
-          "url": "two.html"
-        },
-        {
-          "url": "three.html"
-        }
-      ]),
+      }).children,
       j = 0;
 
     expect(5);
