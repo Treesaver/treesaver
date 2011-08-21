@@ -241,6 +241,13 @@ treesaver.dimensions.setCssPx = function(el, propName, val) {
 treesaver.dimensions.setOffset;
 
 /**
+ * Clear out any offset
+ *
+ * @param {!Element} el
+ */
+treesaver.dimensions.clearOffset;
+
+/**
  * Helper for setting the x-offset on an element, using CSS transforms if
  * supported, absolute positioning if not
  *
@@ -264,6 +271,10 @@ if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS) {
     else {
       el.style[treesaver.capabilities.domCSSPrefix + 'Transform'] = val;
     }
+  };
+
+  treesaver.dimensions.clearOffset = function(el) {
+    treesaver.dimensions.setTransformProperty_(el, 'none');
   };
 
   if (treesaver.capabilities.SUPPORTS_CSSTRANSFORMS3D) {
@@ -294,6 +305,10 @@ else {
   // Take the easy way out of setting the x offset
   treesaver.dimensions.setOffsetX = function(el, x) {
     treesaver.dimensions.setCssPx(el, 'left', x);
+  };
+
+  treesaver.dimensions.clearOffset = function(el) {
+    treesaver.dimensions.setOffset(el, 0, 0);
   };
 }
 

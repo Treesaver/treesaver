@@ -978,6 +978,9 @@ treesaver.layout.Page.prototype.deactivate = function() {
   this.active = false;
   this.scrollers = null;
 
+  // Remove hw-accelerated transition properties
+  treesaver.dimensions.clearOffset(/** @type {!Element} */ (this.node));
+
   // Dispose images properly to avoid memory leaks
   treesaver.dom.getElementsByTagName('img', this.node).
     forEach(treesaver.dom.disposeImg);
