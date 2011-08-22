@@ -1577,9 +1577,12 @@ treesaver.ui.Chrome.prototype.layoutPages = function(pageShift) {
   // TODO: Be much smarter about this
   if (pageShift) {
     if (pageShift > 0) {
+      currentPage.node.setAttribute('id', 'nextPage');
+
       // Shift everything to the left, making the next page the center
       if (nextPage) {
         pageShift = -this.pagePositions[2];
+        nextPage.node.setAttribute('id', 'currentPage');
       }
       else {
         // We don't know how large the next page will be, so guess it's the same
@@ -1588,9 +1591,12 @@ treesaver.ui.Chrome.prototype.layoutPages = function(pageShift) {
       }
     }
     else {
+      currentPage.node.setAttribute('id', 'previousPage');
+
       // Shift everything to the right, making the previous page the center
       if (prevPage) {
         pageShift = -this.pagePositions[0];
+        prevPage.node.setAttribute('id', 'currentPage');
       }
       else {
         // Don't know how large previous page will be, guess same as current
