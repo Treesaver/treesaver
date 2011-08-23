@@ -176,7 +176,7 @@ treesaver.ui.ArticleManager.initLoadingPage = function() {
   el.style.top = '50%';
   el.style.left = '50%';
   treesaver.dimensions.setCssPx(el, 'margin-top', -treesaver.dimensions.getOffsetHeight(el) / 2);
-  treesaver.dimensions.setCssPx(el, 'margin-left', -treesaver.dimensions.getOffsetHeight(el) / 2);
+  treesaver.dimensions.setCssPx(el, 'margin-left', -treesaver.dimensions.getOffsetWidth(el) / 2);
   document.body.removeChild(el);
 
   treesaver.ui.ArticleManager.loadingPageHTML = treesaver.dom.outerHTML(el);
@@ -202,7 +202,7 @@ treesaver.ui.ArticleManager.initErrorPage = function() {
   el.style.top = '50%';
   el.style.left = '50%';
   treesaver.dimensions.setCssPx(el, 'margin-top', -treesaver.dimensions.getOffsetHeight(el) / 2);
-  treesaver.dimensions.setCssPx(el, 'margin-left', -treesaver.dimensions.getOffsetHeight(el) / 2);
+  treesaver.dimensions.setCssPx(el, 'margin-left', -treesaver.dimensions.getOffsetWidth(el) / 2);
   document.body.removeChild(el);
 
   treesaver.ui.ArticleManager.errorPageHTML = treesaver.dom.outerHTML(el);
