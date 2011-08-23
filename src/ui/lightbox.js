@@ -134,6 +134,7 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
       largest = figure.getLargestSize(containerSize, true),
       screenW = treesaver.dimensions.getOffsetWidth(this.container.offsetParent),
       screenH = treesaver.dimensions.getOffsetHeight(this.container.offsetParent),
+      scrollNode,
       contentW, contentH, metrics;
 
   // TODO: Provide name for sizing via CSS?
@@ -166,6 +167,14 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
     }
     else {
       // TODO: What if the figure is too large and not scrolling?
+      //
+      // Should still check for scrollables, just like with figures
+      scrollNode = treesaver.dom.getElementsByClassName('scroll', this.container)[0];
+
+      if (scrollNode) {
+        this.scroller = new treesaver.ui.Scrollable(scrollNode);
+        treesaver.ui.Scrollable.initDom(scrollNode);
+      }
     }
 
     // Center the container on the screen (use offsetWidth to include border/padding)
