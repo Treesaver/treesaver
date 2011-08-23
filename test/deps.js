@@ -2,6 +2,7 @@
 goog.addDependency("../../../src/core.js", ['treesaver.core'], ['treesaver.debug', 'treesaver.styles', 'treesaver.ui.Article', 'treesaver.ui.ArticleManager', 'treesaver.ui.Chrome', 'treesaver.ui.StateManager']);
 goog.addDependency("../../../src/init.js", ['treesaver'], ['treesaver.boot', 'treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.history', 'treesaver.html5']);
 goog.addDependency("../../../src/modules.js", ['treesaver.modules'], []);
+goog.addDependency("../../../src/externs/animationframe.js", [], []);
 goog.addDependency("../../../src/externs/ios.js", [], []);
 goog.addDependency("../../../src/externs/mustache.js", [], []);
 goog.addDependency("../../../src/externs/treesaver.js", [], []);
