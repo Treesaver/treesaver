@@ -174,7 +174,9 @@ treesaver.ui.ArticleManager.initLoadingPage = function() {
   // Needed for correct positioning in chrome
   document.body.appendChild(el);
   el.style.top = '50%';
+  el.style.left = '50%';
   treesaver.dimensions.setCssPx(el, 'margin-top', -treesaver.dimensions.getOffsetHeight(el) / 2);
+  treesaver.dimensions.setCssPx(el, 'margin-left', -treesaver.dimensions.getOffsetHeight(el) / 2);
   document.body.removeChild(el);
 
   treesaver.ui.ArticleManager.loadingPageHTML = treesaver.dom.outerHTML(el);
@@ -198,7 +200,9 @@ treesaver.ui.ArticleManager.initErrorPage = function() {
   // Needed for correct positioning in chrome
   document.body.appendChild(el);
   el.style.top = '50%';
-  treesaver.dimensions.setCssPx(el, 'margin-top', treesaver.dimensions.getOffsetHeight(el) / 2);
+  el.style.left = '50%';
+  treesaver.dimensions.setCssPx(el, 'margin-top', -treesaver.dimensions.getOffsetHeight(el) / 2);
+  treesaver.dimensions.setCssPx(el, 'margin-left', -treesaver.dimensions.getOffsetHeight(el) / 2);
   document.body.removeChild(el);
 
   treesaver.ui.ArticleManager.errorPageHTML = treesaver.dom.outerHTML(el);
