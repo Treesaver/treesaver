@@ -91,7 +91,7 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
     url = entry;
   } else {
     url = entry['url'];
-    children = entry['children'];
+    children = entry['contents'];
 
     // Copy all fields into a new object
     Object.keys(entry).forEach(function (key) {
@@ -255,12 +255,12 @@ treesaver.ui.Index.prototype.parse = function (index) {
     return result;
   }
 
-  if (!index['children'] || !Array.isArray(index['children'])) {
+  if (!index['contents'] || !Array.isArray(index['contents'])) {
     treesaver.debug.warn('Document index does not contain a valid "children" array.');
     return result;
   }
 
-  result.children = index['children'].map(function (entry) {
+  result.children = index['contents'].map(function (entry) {
     return this.parseEntry(entry);
   }, this);
 
