@@ -7,7 +7,7 @@ $(function() {
       // Make request synchronously though
       $.ajax({
         async: false,
-        url: '../assets/chrome.html',
+        url: 'assets/chrome.html',
         success: function (data) {
           if (data) {
             var container = document.createElement('div');

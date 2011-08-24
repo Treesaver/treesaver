@@ -14,7 +14,7 @@ $(function() {
   test('get', function () {
     stop(4000);
     expect(2);
-    treesaver.network.get('../assets/resources.html', function (text) {
+    treesaver.network.get('assets/resources.html', function (text) {
       ok(true, 'Callback received');
       ok(text, 'Text received');
       start();
@@ -24,7 +24,7 @@ $(function() {
   test('get 404', function () {
     stop(4000);
     expect(2);
-    treesaver.network.get('../assets/404.html', function (text) {
+    treesaver.network.get('assets/404.html', function (text) {
       ok(true, 'Callback received on 404');
       ok(!text, 'No text received on 404');
       start();

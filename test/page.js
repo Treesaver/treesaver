@@ -14,7 +14,7 @@ $(function () {
       // Make request synchronously though
       $.ajax({
         async: false,
-        url: '../assets/grids.html',
+        url: 'assets/grids.html',
         success: function (data) {
           if (data) {
             var $container = $('<div class="testonly grids">').appendTo('body');
@@ -25,7 +25,7 @@ $(function () {
       // Fetch the content as well
       $.ajax({
         async: false,
-        url: '../assets/content.html',
+        url: 'assets/content.html',
         success: function (data) {
           if (data) {
             var $container = $('<div class="testonly column content">').appendTo('body');

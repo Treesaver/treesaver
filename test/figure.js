@@ -13,7 +13,7 @@ $(function () {
       // Make request synchronously though
       $.ajax({
         async: false,
-        url: '../assets/content.html',
+        url: 'assets/content.html',
         success: function (data) {
           if (data) {
             var $container = $('<div class="testonly column">').appendTo('body');

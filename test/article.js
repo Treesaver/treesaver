@@ -10,7 +10,7 @@ $(function () {
       // Make request synchronously though
       $.ajax({
         async: false,
-        url: '../assets/content.html',
+        url: 'assets/content.html',
         success: function (data) {
           if (data) {
             var container = document.createElement('div');
@@ -23,7 +23,7 @@ $(function () {
       });
       $.ajax({
         async: false,
-        url: '../assets/grids.html',
+        url: 'assets/grids.html',
         success: function (data) {
           if (data) {
             var container = document.createElement('div');

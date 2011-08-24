@@ -4,7 +4,7 @@ $(function() {
   module('resources', {
     setup: function () {
       treesaver.scheduler.stopAll();
-      jQuery('<link rel="resources" href="../assets/resources.html" />').appendTo(document.documentElement);
+      jQuery('<link rel="resources" href="assets/resources.html" />').appendTo(document.documentElement);
     },
     teardown: function () {
       jQuery('link[rel*=resources]').remove();
@@ -31,15 +31,15 @@ $(function() {
   });
 
   test('helpers', function () {
-    equals(treesaver.resources.getResourcesLinkUrl_(), '../assets/resources.html', 'getResourcesLinkUrl_');
+    equals(treesaver.resources.getResourcesLinkUrl_(), 'assets/resources.html', 'getResourcesLinkUrl_');
 
     // Remove from tree
     jQuery('link[rel*=resources]').remove();
     ok(!treesaver.resources.getResourcesLinkUrl_(), 'getResourcesLinkUrl_: No link element');
 
     // Add one with multiple values and try again
-    jQuery('<link rel="test resources prefetch hellothere" href="../assets/resources2.html" />').appendTo('head');
-    equals(treesaver.resources.getResourcesLinkUrl_(), '../assets/resources2.html', 'getResourcesLinkUrl_: Multiple rel values');
+    jQuery('<link rel="test resources prefetch hellothere" href="assets/resources2.html" />').appendTo('head');
+    equals(treesaver.resources.getResourcesLinkUrl_(), 'assets/resources2.html', 'getResourcesLinkUrl_: Multiple rel values');
   });
 
   test('findByClassName', function () {
