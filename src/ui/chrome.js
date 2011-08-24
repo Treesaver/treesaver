@@ -42,19 +42,7 @@ treesaver.ui.Chrome = function(node) {
     node.getAttribute('data-requires').split(' ') : null;
 
   // Create DOM infrastructure for scrolling elements
-  treesaver.dom.getElementsByClassName('scroll', node).
-    forEach(treesaver.ui.Scrollable.initDom);
-
-  /**
-   * @type {Array.<Element>}
-   */
-  this.scrollers = [];
-
-  /**
-   * Scrollers located within the currently displayed pages
-   * @type {Array.<Element>}
-   */
-  this.inPageScrollers = [];
+  treesaver.ui.Scrollable.initDomTree(node);
 
   /**
    * @type {?Element}
@@ -240,11 +228,6 @@ treesaver.ui.Chrome.prototype.activate = function() {
       return el.innerHTML;
     });
 
-    this.scrollers = treesaver.dom.getElementsByClassName('scroll', this.node).
-      map(function(el) {
-        return new treesaver.ui.Scrollable(el);
-      });
-
     this.menus = treesaver.dom.getElementsByClassName('menu', this.node);
     this.sidebars = treesaver.dom.getElementsByClassName('sidebar', this.node);
 
@@ -285,8 +268,6 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.pageWidth = null;
   this.menus = null;
   this.sidebars = null;
-  this.scrollers = null;
-  this.inPageScrollers = null;
   this.nextPage = null;
   this.nextArticle = null;
   this.prevPage = null;
@@ -731,7 +712,8 @@ treesaver.ui.Chrome.prototype.touchData_;
  */
 treesaver.ui.Chrome.prototype.touchStart = function(e) {
   var target = treesaver.ui.Chrome.findTarget_(e.target),
-      withinViewer = this.viewer.contains(target),
+      scroller = this.isWithinScroller_(target),
+      withinViewer, node, id,
       x, y, now;
 
   if (!treesaver.tsContainer.contains(treesaver.ui.Chrome.findTarget_(e.target))) {
@@ -743,10 +725,27 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
   e.preventDefault();
 
   // Lightbox active? Hide it only if it can't scroll
-  if (this.lightBoxActive && !this.lightBox.scroller) {
+  if (this.lightBoxActive && !scroller) {
     this.hideLightBox();
     return;
   }
+
+  // Ignore scrollers in prev/next page
+  if (scroller) {
+    node = scroller;
+    while (node) {
+      id = node.id;
+
+      if (id === 'prevPage' || id === 'nextPage') {
+        scroller = node = null;
+        break;
+      }
+
+      node = node.parentNode;
+    }
+  }
+
+  withinViewer = this.viewer.contains(target);
 
   x = e.touches[0].pageX;
   y = e.touches[0].pageY;
@@ -766,14 +765,14 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     totalY: 0,
     totalTime: 0,
     touchCount: e.touches.length,
-    withinViewer: withinViewer
+    withinViewer: withinViewer,
+    scroller: scroller,
+    canScrollHorizontally: scroller && treesaver.ui.Scrollable.canScrollHorizontally(scroller)
   };
 
   if (this.touchData_.touchCount === 2) {
     this.touchData_.startX2 = e.touches[1].pageX;
   }
-
-  this.touchData_.scroller = this.isWithinScroller_(target);
 
   // Pause other work for better swipe performance
   treesaver.scheduler.pause([], 2 * SWIPE_TIME_LIMIT);
@@ -819,10 +818,10 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     Math.abs(touchData.totalX) * 2 > Math.abs(touchData.totalY);
 
   if (touchData.scroller && (touchData.didScroll ||
-      (touchData.scroller.hasHorizontal() || !touchData.swipe))) {
-    touchData.didScroll = touchData.didScroll || touchData.scroller.hasHorizontal() ||
+      (touchData.canScrollHorizontally || !touchData.swipe))) {
+    touchData.didScroll = touchData.didScroll || touchData.canScrollHorizontally ||
       Math.abs(touchData.totalY) >= SWIPE_THRESHOLD;
-    touchData.scroller.setOffset(-touchData.deltaX, -touchData.deltaY);
+    treesaver.ui.Scrollable.setOffset(touchData.scroller, -touchData.deltaX, -touchData.deltaY);
 
     if (!touchData.withinViewer) {
       // Scrolling outside viewer means active, in case of long scroll
@@ -980,25 +979,18 @@ treesaver.ui.Chrome.prototype.mouseOver = function(e) {
 /**
  * Checks if the element is within one of our scrollable elements
  * @private
- * @param {Element} el
- * @returns {?treesaver.ui.Scrollable}
+ * @param {!Element} el
+ * @returns {?Element}
  */
 treesaver.ui.Chrome.prototype.isWithinScroller_ = function(el) {
-  var scroller,
-      // All the scrollers in the Chrome, first the chrome ones
-      allScrollers = this.scrollers.
-        // Plus scrollers of page content
-        concat(this.inPageScrollers).
-        // Plus the lightbox scroller (if there)
-        concat(this.lightBox ? this.lightBox.scroller : [])
+  var node = el;
 
-  allScrollers.forEach(function(s) {
-    if (s.contains(el)) {
-      scroller = s;
+  while (node) {
+    if (treesaver.dom.hasClass(node, 'scroll')) {
+        return node;
     }
-  }, this);
-
-  return scroller;
+    node = /** @type {?Element} */ (node.parentNode);
+  }
 };
 
 /**
@@ -1280,9 +1272,6 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
   // Update to our new page area
   this.calculatePageArea();
 
-  // Refresh the size of scrollable areas
-  this.scrollers.forEach(function(s) { s.refreshDimensions(); });
-
   if (treesaver.ui.ArticleManager.currentDocument) {
     // Re-query for pages later
     this.selectPagesDelayed();
@@ -1322,10 +1311,6 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function() {
       });
     }
   });
-
-  // Refresh the size of scrollable areas (often used with TOC)
-  // TODO: Figure out better separate here?
-  this.scrollers.forEach(function(s) { s.refreshDimensions(); });
 };
 
 treesaver.ui.Chrome.prototype.updatePosition = function () {
@@ -1542,9 +1527,6 @@ treesaver.ui.Chrome.prototype.populatePages = function() {
     }
   }, this);
 
-  // Reset scrollers
-  this.inPageScrollers = [];
-
   this.pages.forEach(function(page, i) {
     if (page) {
       var node = page.node || page.activate();
@@ -1554,11 +1536,6 @@ treesaver.ui.Chrome.prototype.populatePages = function() {
         // Insert into the tree, but make sure we display in the correct order
         this.viewer.appendChild(node);
       }
-
-      // Collect scrollers from each displayed page
-      this.inPageScrollers = page.scrollers.concat(this.inPageScrollers);
-      // Measure now that it is in the tree
-      this.inPageScrollers.forEach(function(s) { s.refreshDimensions(); });
 
       node.setAttribute('id',
         i === 0 ? 'previousPage' : i ===1 ? 'currentPage' : 'nextPage');

@@ -180,14 +180,6 @@ treesaver.layout.Page = function(content, grids, br) {
      */
     this.active = false;
 
-    /**
-     * Store references to scrollable objects
-     * TODO: This should really live within the Chrome?
-     * @type {Array.<treesaver.ui.Scrollable>}
-     */
-    this.scrollables;
-
-
     // Increment page number
     br.pageNumber += 1;
   }
@@ -210,7 +202,6 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
       containerHeight, sibling,
       metrics,
       maxContainerHeight,
-      scrollNodes,
       anchoredTop = true;
 
   size = map.size;
@@ -287,21 +278,10 @@ treesaver.layout.Page.fillContainer = function(container, figure, map,
     }
   }
 
-  // Is part of the content scrollable?
-  scrollNodes = treesaver.dom.getElementsByClassName('scroll', container);
-
-  // Scrolling setup
-  if (scrollNodes.length || figure.scrollable) {
-    // Set scrolling class on parent node, so the chrome can pick it up
-    if (!scrollNodes.length) {
-      treesaver.dom.addClass(container, 'scroll');
-      scrollNodes = [container];
-    }
-
-    // Initialize DOM for scrolling
-    scrollNodes.forEach(function (scrollNode) {
-      treesaver.ui.Scrollable.initDom(scrollNode);
-    });
+  if (figure.scrollable) {
+    // Make the container scroll
+    treesaver.dom.addClass(container, 'scroll');
+    treesaver.ui.Scrollable.initDom(container);
   }
 
   // Go through this containers siblings, adjusting their sizes
@@ -958,13 +938,6 @@ treesaver.layout.Page.prototype.activate = function() {
   // Re-hydrate the HTML
   this.node = treesaver.dom.createElementFromHTML(this.html);
 
-  // Create Scrollables
-  // TODO: Refactor / share code w/ Chrome
-  this.scrollers = treesaver.dom.getElementsByClassName('scroll', this.node).
-    map(function(el) {
-      return new treesaver.ui.Scrollable(el);
-    });
-
   // Flag
   this.active = true;
 
@@ -976,7 +949,6 @@ treesaver.layout.Page.prototype.activate = function() {
  */
 treesaver.layout.Page.prototype.deactivate = function() {
   this.active = false;
-  this.scrollers = null;
 
   // Remove hw-accelerated transition properties
   treesaver.dimensions.clearOffset(/** @type {!Element} */ (this.node));
