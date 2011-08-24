@@ -75,7 +75,7 @@ treesaver.ui.Document = function (url, meta) {
   /**
    * @type {!Array.<treesaver.ui.Document>}
    */
-  this.children = [];
+  this.contents = [];
 
   /**
    * @type {?string}

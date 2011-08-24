@@ -24,7 +24,7 @@ treesaver.ui.Index = function (url) {
   /**
    * @type {!Array.<treesaver.ui.Document>}
    */
-  this.children = [];
+  this.contents = [];
 
   /**
    * @type {!Object}
@@ -83,7 +83,7 @@ treesaver.ui.Index.events = {
  */
 treesaver.ui.Index.prototype.parseEntry = function(entry) {
   var url = null,
-      children = null,
+      contents = null,
       meta = {},
       doc = null;
 
@@ -91,14 +91,14 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
     url = entry;
   } else {
     url = entry['url'];
-    children = entry['contents'];
+    contents = entry['contents'];
 
     // Copy all fields into a new object
     Object.keys(entry).forEach(function (key) {
       meta[key] = entry[key];
     });
   }
-  
+
   if (!url) {
     treesaver.debug.warn('Ignored document index entry without URL');
     return null;
@@ -110,9 +110,9 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
   // Create a new document
   doc = new treesaver.ui.Document(url, meta);
 
-  // Depth first traversal of any children, and add them
-  if (children && Array.isArray(children)) {
-    children.forEach(function (child) {
+  // Depth first traversal of any contents, and add them
+  if (contents && Array.isArray(contents)) {
+    contents.forEach(function (child) {
       doc.appendChild(this.parseEntry(child));
     }, this);
   }
@@ -131,7 +131,7 @@ treesaver.ui.Index.prototype.update = function () {
   this.documentMap = {};
   this.documentPositions = {};
 
-  this.walk(this.children, function (doc) {
+  this.walk(this.contents, function (doc) {
     if (this.documentMap[doc.url]) {
       this.documentMap[doc.url].push(doc);
     } else {
@@ -156,13 +156,13 @@ treesaver.ui.Index.prototype.update = function () {
  * Depth first walk through the index.
  *
  * @private
- * @param {Array.<treesaver.ui.TreeNode>} children
+ * @param {Array.<treesaver.ui.TreeNode>} contents
  * @param {!function(!treesaver.ui.TreeNode)} fn Callback to call for each node. Return false to exit the traversal early.
  * @param {Object=} scope Scope bound to the callback.
  */
-treesaver.ui.Index.prototype.walk = function (children, fn, scope) {
-  return children.every(function (entry) {
-    return fn.call(scope, entry) !== false && this.walk(entry.children, fn, scope);
+treesaver.ui.Index.prototype.walk = function (contents, fn, scope) {
+  return contents.every(function (entry) {
+    return fn.call(scope, entry) !== false && this.walk(entry.contents, fn, scope);
   }, this);
 };
 
@@ -192,7 +192,7 @@ treesaver.ui.Index.prototype.getDocumentIndex = function (doc) {
   var result = -1,
       i = 0;
 
-  this.walk(this.children, function (d) {
+  this.walk(this.contents, function (d) {
     if (d.equals(doc)) {
       result = i;
     }
@@ -216,7 +216,7 @@ treesaver.ui.Index.prototype.getDocuments = function (url) {
   if (!url) {
     return this.documents;
   } else {
-    this.walk(this.children, function (doc) {
+    this.walk(this.contents, function (doc) {
       if (doc.equals(url)) {
         result.push(doc);
       }
@@ -232,7 +232,7 @@ treesaver.ui.Index.prototype.getDocuments = function (url) {
  */
 treesaver.ui.Index.prototype.parse = function (index) {
   var result = {
-        children: [],
+        contents: [],
         settings: {},
         meta: {}
       };
@@ -256,19 +256,19 @@ treesaver.ui.Index.prototype.parse = function (index) {
   }
 
   if (!index['contents'] || !Array.isArray(index['contents'])) {
-    treesaver.debug.warn('Document index does not contain a valid "children" array.');
+    treesaver.debug.warn('Document index does not contain a valid "contents" array.');
     return result;
   }
 
-  result.children = index['contents'].map(function (entry) {
+  result.contents = index['contents'].map(function (entry) {
     return this.parseEntry(entry);
   }, this);
 
-  result.children = result.children.filter(function (entry) {
+  result.contents = result.contents.filter(function (entry) {
     return entry !== null;
   });
 
-  result.children = result.children.map(function (entry) {
+  result.contents = result.contents.map(function (entry) {
     return this.appendChild(entry);
   }, this);
 
@@ -354,7 +354,7 @@ treesaver.ui.Index.prototype.load = function () {
       treesaver.debug.log('Index.load: Processing cached content for index: ' + this.url);
       index = this.parse(cached_text);
 
-      this.children = index.children;
+      this.contents = index.contents;
       this.meta = index.meta;
       this.settings = index.settings;
       this.loaded = true;
@@ -396,7 +396,7 @@ treesaver.ui.Index.prototype.load = function () {
 
       treesaver.debug.log('Index.load: Processing content for index: ' + that.url);
       index = that.parse(text);
-      that.children = index.children;
+      that.contents = index.contents;
       that.meta = index.meta;
       that.settings = index.settings;
       that.loaded = true;

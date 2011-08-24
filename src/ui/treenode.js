@@ -6,7 +6,7 @@ goog.provide('treesaver.ui.TreeNode');
  * @constructor
  */
 treesaver.ui.TreeNode = function () {
-  this.children = [];
+  this.contents = [];
   this.parent = null;
 };
 
@@ -17,7 +17,7 @@ treesaver.ui.TreeNode = function () {
  */
 treesaver.ui.TreeNode.prototype.appendChild = function (child) {
   child.parent = this;
-  this.children.push(child);
+  this.contents.push(child);
   return child;
 };
 
@@ -28,11 +28,11 @@ treesaver.ui.TreeNode.prototype.appendChild = function (child) {
  * @return {treesaver.ui.TreeNode} The old child, or null.
  */
 treesaver.ui.TreeNode.prototype.replaceChild = function (newChild, oldChild) {
-  var index = this.children.indexOf(oldChild);
+  var index = this.contents.indexOf(oldChild);
   if (index !== -1) {
     newChild.parent = oldChild.parent;
     oldChild.parent = null;
-    return this.children.splice(index, 1, newChild)[0];
+    return this.contents.splice(index, 1, newChild)[0];
   }
   return null;
 };
@@ -44,12 +44,12 @@ treesaver.ui.TreeNode.prototype.replaceChild = function (newChild, oldChild) {
  * @return {!treesaver.ui.TreeNode} The new child
  */
 treesaver.ui.TreeNode.prototype.insertBefore = function (newChild, reference) {
-  var index = this.children.indexOf(reference);
+  var index = this.contents.indexOf(reference);
   newChild.parent = this;
   if (index === 0) {
-    this.children.unshift(newChild);
+    this.contents.unshift(newChild);
   } else if (index > 1) {
-    this.children.splice(index, 0, newChild);
+    this.contents.splice(index, 0, newChild);
   }
   return newChild;
 };
@@ -61,12 +61,12 @@ treesaver.ui.TreeNode.prototype.insertBefore = function (newChild, reference) {
  * @return {!treesaver.ui.TreeNode} The new child
  */
 treesaver.ui.TreeNode.prototype.insertAfter = function (newChild, reference) {
-  var index = this.children.indexOf(reference);
+  var index = this.contents.indexOf(reference);
   newChild.parent = this;
-  if (index === this.children.length) {
-    this.children.push(newChild);
+  if (index === this.contents.length) {
+    this.contents.push(newChild);
   } else if (index !== -1) {
-    this.children.splice(index + 1, 0, newChild);
+    this.contents.splice(index + 1, 0, newChild);
   }
   return newChild;
 };
@@ -77,10 +77,10 @@ treesaver.ui.TreeNode.prototype.insertAfter = function (newChild, reference) {
  * @return {treesaver.ui.TreeNode} The removed node or null if the node was not found.
  */
 treesaver.ui.TreeNode.prototype.removeChild = function (child) {
-  var index = this.children.indexOf(child),
+  var index = this.contents.indexOf(child),
       node = null;
   if (index !== -1) {
-    node = this.children.splice(index, 1)[0];
+    node = this.contents.splice(index, 1)[0];
     node.parent = null;
   }
   return node;

@@ -1487,7 +1487,7 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
   treesaver.scheduler.clear('updateTOC');
 
   var toc = {
-    children: treesaver.ui.ArticleManager.index.children.map(function (child) {
+    contents: treesaver.ui.ArticleManager.index.contents.map(function (child) {
       return child.meta;
     })
   };
