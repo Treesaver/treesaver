@@ -66,11 +66,6 @@ treesaver.ui.LightBox = function(node) {
    * @type {?Element}
    */
   this.container = null;
-
-  /**
-   * @type {?treesaver.ui.Scrollable}
-   */
-  this.scroller;
 };
 
 /**
@@ -159,22 +154,8 @@ treesaver.ui.LightBox.prototype.showFigure = function(figure) {
       contentH = Math.min(containerSize.h, contentH);
       treesaver.dimensions.setCssPx(this.container, 'width', contentW);
       treesaver.dimensions.setCssPx(this.container, 'height', contentH);
-      // Temporary compiler cast here. Need to ensure there is always at least an element
-      // from the figure (should be true, but good to sanity check)
-      treesaver.ui.Scrollable.initDom(/** @type {!Element} */ (this.container.firstChild));
-      this.scroller = new treesaver.ui.Scrollable(this.container);
-      this.scroller.refreshDimensions();
-    }
-    else {
-      // TODO: What if the figure is too large and not scrolling?
-      //
-      // Should still check for scrollables, just like with figures
-      scrollNode = treesaver.dom.getElementsByClassName('scroll', this.container)[0];
-
-      if (scrollNode) {
-        this.scroller = new treesaver.ui.Scrollable(scrollNode);
-        treesaver.ui.Scrollable.initDom(scrollNode);
-      }
+      treesaver.dom.addClass(this.container, 'scroll');
+      treesaver.ui.Scrollable.initDom(this.container);
     }
 
     // Center the container on the screen (use offsetWidth to include border/padding)

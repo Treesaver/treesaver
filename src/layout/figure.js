@@ -264,6 +264,9 @@ treesaver.layout.Figure.prototype.processElement = function processElement(el) {
 
   // TODO: Remove properties we don't need to store (data-*)
 
+  // Set up any scrollable elements
+  treesaver.ui.Scrollable.initDomTree(el);
+
   // Grab HTML
   html = treesaver.dom.outerHTML(el);
 
