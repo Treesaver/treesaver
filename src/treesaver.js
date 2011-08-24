@@ -148,12 +148,12 @@ treesaver.domReady = function(e) {
     treesaver.tsContainer = document.body;
   }
 
-  treesaver.originalHtml = document.body.innerHTML;
-
-  // Remove main content
-  treesaver.dom.clearChildren(/** @type {!Element} */(treesaver.tsContainer));
-
   if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
+    treesaver.originalHtml = document.body.innerHTML;
+
+    // Remove main content
+    treesaver.dom.clearChildren(/** @type {!Element} */(treesaver.tsContainer));
+
     // Place a loading message
     treesaver.tsContainer.innerHTML =
       '<div id="loading">Loading ' + document.title + '...</div>';
