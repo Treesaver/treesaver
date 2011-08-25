@@ -278,6 +278,8 @@ treesaver.ui.Chrome.prototype.deactivate = function() {
   this.indexTemplates = null;
   this.currentDocumentElements = null;
   this.currentDocumentTemplates = null;
+  this.publicationElements = null;
+  this.publicationTemplates = null;
 
   // Deactivate pages
   this.pages.forEach(function(page) {
