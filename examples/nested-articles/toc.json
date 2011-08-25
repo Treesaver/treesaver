@@ -1,24 +1,18 @@
-[
-  {
-    "url": "index.html"
-  },
-  {
-    "url": "section1.html",
-    "children": [
-      {
-        "url": "one.html"
-      },
-      {
-        "url": "two.html"
-      }
-    ]
-  },
-  {
-    "url": "section2.html",
-    "children": [
-      {
-        "url": "three.html"
-      }
-    ]
-  }
-]
+{
+  "contents": [
+    "index.html",
+    {
+      "url": "section1.html",
+      "contents": [
+        "one.html",
+        "two.html"
+      ]
+    },
+    {
+      "url": "section2.html",
+      "contents": [
+        "three.html"
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "title": "Table of Contents Example",
   "author": "Bram Stein",
-  "children": [
+  "contents": [
     "index.html",
     "one.html",
     "two.html",
