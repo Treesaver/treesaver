@@ -16,7 +16,6 @@ goog.require('treesaver.capabilities');
 goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
-goog.require('treesaver.domready');
 goog.require('treesaver.events');
 goog.require('treesaver.history');
 goog.require('treesaver.html5');
@@ -52,16 +51,12 @@ treesaver.boot = function() {
   });
 
   // Watch for dom ready
-  if (!treesaver.domready.ready()) {
-    treesaver.events.addListener(
-      document,
-      treesaver.domready.events.READY,
-      treesaver.domReady
-    );
-  }
-  else {
+  if (/complete|loaded/.test(document.readyState)) {
     // DOM is already ready, call directly
     treesaver.domReady();
+  }
+  else {
+    treesaver.events.addListener(document, 'DOMContentLoaded', treesaver.domReady);
   }
 
   if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
@@ -115,11 +110,7 @@ treesaver.cleanup_ = function() {
   treesaver.scheduler.clear('unboot');
 
   // Remove DOM ready handler
-  treesaver.events.removeListener(
-    document,
-    treesaver.domready.events.READY,
-    treesaver.domReady
-  );
+  treesaver.events.removeListener(document, 'DOMContentLoaded', treesaver.domReady);
 
   // Kill loading flags
   delete treesaver.resourcesLoaded_;
