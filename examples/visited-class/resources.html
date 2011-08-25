@@ -6,12 +6,12 @@
       </div>
 
       <div class="controls">
-        <span data-template="position">Page {{pagenumber}} of {{pagecount}}</span>
+        <span data-ts-template="position">Page {{pagenumber}} of {{pagecount}}</span>
         <button class="prev">Previous</button>
         <button class="next">Next</button>
       </div>
 
-      <div class="toc" data-template="index">
+      <div class="toc" data-ts-template="index">
         {{#children}}
           {{^visited}}
             <div class="article">

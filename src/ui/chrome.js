@@ -208,22 +208,22 @@ treesaver.ui.Chrome.prototype.activate = function() {
     this.prevPage = treesaver.dom.getElementsByClassName('prev', this.node);
     this.prevArticle = treesaver.dom.getElementsByClassName('prevArticle', this.node);
 
-    this.positionElements = treesaver.dom.getElementsByProperty('data-template', 'position', null, this.node);
+    this.positionElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'position', null, this.node);
     this.positionTemplates = this.positionElements.map(function (el) {
       return el.innerHTML;
     });
 
-    this.indexElements = treesaver.dom.getElementsByProperty('data-template', 'index', null, this.node);
+    this.indexElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'index', null, this.node);
     this.indexTemplates = this.indexElements.map(function (el) {
       return el.innerHTML;
     });
 
-    this.currentDocumentElements = treesaver.dom.getElementsByProperty('data-template', 'currentdocument', null, this.node);
+    this.currentDocumentElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'currentdocument', null, this.node);
     this.currentDocumentTemplates = this.currentDocumentElements.map(function (el) {
       return el.innerHTML;
     });
 
-    this.publicationElements = treesaver.dom.getElementsByProperty('data-template', 'publication', null, this.node);
+    this.publicationElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'publication', null, this.node);
     this.publicationTemplates = this.publicationElements.map(function (el) {
       return el.innerHTML;
     });
