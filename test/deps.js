@@ -24,12 +24,12 @@ goog.addDependency("../../../src/lib/dom.js", ['treesaver.dom'], ['treesaver.arr
 goog.addDependency("../../../src/lib/events.js", ['treesaver.events'], ['treesaver.debug']);
 goog.addDependency("../../../src/lib/history.js", ['treesaver.history'], ['treesaver.capabilities', 'treesaver.debug', 'treesaver.scheduler', 'treesaver.storage']);
 goog.addDependency("../../../src/lib/html5.js", ['treesaver.html5'], ['treesaver.constants']);
-goog.addDependency("../../../src/lib/json.js", ['treesaver.json'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug']);
+goog.addDependency("../../../src/lib/json.js", ['treesaver.json'], ['treesaver.debug']);
 goog.addDependency("../../../src/lib/network.js", ['treesaver.network'], ['treesaver.array', 'treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.scheduler']);
 goog.addDependency("../../../src/lib/object.js", ['treesaver.object'], []);
 goog.addDependency("../../../src/lib/resources.js", ['treesaver.resources'], ['treesaver.constants', 'treesaver.debug', 'treesaver.dom', 'treesaver.network']);
 goog.addDependency("../../../src/lib/scheduler.js", ['treesaver.scheduler'], []);
-goog.addDependency("../../../src/lib/storage.js", ['treesaver.storage'], ['treesaver.array', 'treesaver.debug', 'treesaver.json']);
+goog.addDependency("../../../src/lib/storage.js", ['treesaver.storage'], ['treesaver.debug']);
 goog.addDependency("../../../src/lib/string.js", ['treesaver.string'], []);
 goog.addDependency("../../../src/lib/styles.js", ['treesaver.styles'], ['treesaver.capabilities', 'treesaver.constants', 'treesaver.debug', 'treesaver.dom']);
 goog.addDependency("../../../src/lib/uri.js", ['treesaver.uri'], []);

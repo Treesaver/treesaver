@@ -4,50 +4,30 @@
 
 goog.provide('treesaver.json');
 
-goog.require('treesaver.capabilities');
-goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 
-/**
- * Parse JSON and return the object
- *
- * @param {!string} str
- * @return {*}
- */
-treesaver.json.parse = function(str) {
-  return window.JSON.parse(str);
-};
+goog.scope(function() {
+  var json = treesaver.json,
+      debug = treesaver.debug,
+      nativeJSON = window.JSON;
 
-/**
- * Convert a value into JSON
- *
- * @param {*} val
- * @return {!string}
- */
-treesaver.json.stringify = function(val) {
-  return window.JSON.stringify(val);
-};
-
-if (SUPPORT_LEGACY && !('JSON' in window)) {
-  treesaver.debug.info('Non-native JSON implementation');
-
-  // TODO: Consider a secure implementation
-  treesaver.json.parse = function(str) {
-    var s = '(' + str + ')';
-
-    try {
-      return eval(s);
-    }
-    catch (ex) {
-    }
-
-    // TODO: Throw error?
-    return null;
+  /**
+   * Parse JSON and return the object
+   *
+   * @param {!string} str
+   * @return {*}
+   */
+  json.parse = function(str) {
+    return nativeJSON.parse(str);
   };
 
-  // Only storage uses stringify, and does so only on browsers with JSON
-  // support, so we don't need to support this manually
-  treesaver.json.stringify = function(val) {
-    return '';
+  /**
+   * Convert a value into JSON
+   *
+   * @param {*} val
+   * @return {!string}
+   */
+  json.stringify = function(val) {
+    return nativeJSON.stringify(val);
   };
-}
+});
