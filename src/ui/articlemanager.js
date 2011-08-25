@@ -76,10 +76,8 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
     treesaver.events.addListener(document, evt, treesaver.ui.ArticleManager.handleEvent);
   });
 
-  // No history when in native app
-  if (!WITHIN_IOS_WRAPPER) {
-    window['onpopstate'] = treesaver.ui.ArticleManager.onPopState;
-  }
+  // popstate is on window, not document
+  treesaver.events.addListener(window, treesaver.history.events.POPSTATE, treesaver.ui.ArticleManager.handleEvent);
 
   return true;
 };
@@ -106,7 +104,8 @@ treesaver.ui.ArticleManager.unload = function() {
   treesaver.ui.ArticleManager.watchedEvents.forEach(function(evt) {
     treesaver.events.removeListener(document, evt, treesaver.ui.ArticleManager.handleEvent);
   });
-  window['onpopstate'] = null;
+
+  treesaver.events.removeListener(window, treesaver.history.events.POPSTATE, treesaver.ui.ArticleManager.handleEvent);
 };
 
 treesaver.ui.ArticleManager.onIndexLoad = function (e) {
@@ -232,7 +231,7 @@ treesaver.ui.ArticleManager.watchedEvents = [
 ];
 
 /**
- * @param {Object} e
+ * @param {!Object|!Event} e
  */
 treesaver.ui.ArticleManager.handleEvent = function(e) {
   if (e.type === treesaver.ui.Article.events.PAGINATIONPROGRESS) {
@@ -258,6 +257,11 @@ treesaver.ui.ArticleManager.handleEvent = function(e) {
     // The current article failed to load, redirect to it
     treesaver.ui.ArticleManager.redirectToDocument(treesaver.ui.ArticleManager.currentDocument);
 
+    return;
+  }
+
+  if (e.type === treesaver.history.events.POPSTATE) {
+    treesaver.ui.ArticleManager.onPopState(/** @type {!Event} */ (e));
     return;
   }
 };

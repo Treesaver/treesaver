@@ -10,6 +10,13 @@ goog.require('treesaver.debug');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.storage');
 
+/**
+ * @type {Object.<string, string>}
+ */
+treesaver.history.events = {
+  POPSTATE: 'popstate'
+};
+
 // Don't do anything when in an app wrapper
 if (WITHIN_IOS_WRAPPER) {
   /**
@@ -18,7 +25,7 @@ if (WITHIN_IOS_WRAPPER) {
    * @param {!Object} data
    * @param {!string} title
    * @param {!string} url
-  */
+   */
   treesaver.history.pushState = function(data, title, url) {
   };
 
@@ -222,13 +229,9 @@ else {
       treesaver.debug.info('New hash: ' + treesaver.history.hash_);
 
       // Now, fire onpopstate with the state object
-      if ('onpopstate' in window &&
-          typeof window['onpopstate'] === 'function') {
-        window['onpopstate'].apply(window, [{ 'state': data ? data.state : null }]);
-      }
-      else {
-        treesaver.debug.info('State changed, but no handler!');
-      }
+      // NOTE: popstate fires on window, not document
+      treesaver.events.fireEvent(window, treesaver.history.events.POPSTATE,
+        { 'state': data ? data.state : null });
     };
 
     /**
