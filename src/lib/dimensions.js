@@ -136,87 +136,6 @@ treesaver.dimensions.getOffsetTop = function(el) {
 }
 
 /**
- * getBoundingClientRect wrapper for IE support
- *
- * @param {?Element} el
- * @return {!Object} boundingRect
- */
-treesaver.dimensions.getBoundingClientRect = function(el) {
-  if (!el) {
-    return {};
-  }
-
-  var rect = el.getBoundingClientRect(),
-      oldRect, key;
-
-  // IE (and others?) don't include height/width in the rect, and
-  // the object cannot be edited, so clone it here
-  if (!('height' in rect)) {
-    oldRect = rect;
-    rect = {};
-    for (key in oldRect) {
-      rect[key] = oldRect[key];
-    }
-    rect.height = rect['bottom'] - rect['top'];
-    rect.width  = rect['right'] - rect['left'];
-  }
-
-  return rect;
-};
-
-// IE doesn't support getComputedStyle
-if (SUPPORT_IE &&
-    !(document.defaultView && document.defaultView.getComputedStyle)) {
-  if (treesaver.capabilities.IS_LEGACY) {
-    treesaver.dimensions.getOffsetTop = function(el) {
-      if (el) {
-        el.style.zoom = 1;
-        return el.offsetTop;
-      }
-      return 0;
-    };
-
-    treesaver.dimensions.getOffsetHeight = function(el) {
-      if (el) {
-        el.style.zoom = 1;
-        return el.offsetHeight;
-      }
-      return 0;
-    };
-
-    treesaver.dimensions.getOffsetWidth = function(el) {
-      if (el) {
-        el.style.zoom = 1;
-        return el.offsetWidth;
-      }
-      return 0;
-    };
-  }
-
-  // If we are dealing with IE and the value contains some sort
-  // of number we try Dean Edward's hack:
-  // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
-  treesaver.dimensions.toPixels = function(el, val) {
-    var style, runtimeStyle, value;
-
-    if (val && treesaver.dimensions.pixel.test(val)) {
-      return parseFloat(val);
-    }
-    else if (val && treesaver.dimensions.number.test(val)) {
-      style = el.style.left;
-      runtimeStyle = el.runtimeStyle.left;
-      el.runtimeStyle.left = el.currentStyle.left;
-      el.style.left = val || 0;
-      value = el.style.pixelLeft;
-      el.style.left = style;
-      el.runtimeStyle.left = runtimeStyle;
-      return value;
-    }
-    return null;
-  };
-}
-
-/**
  * Helper for setting a CSS value in pixels
  *
  * @param {!Element} el
@@ -353,11 +272,6 @@ treesaver.dimensions.Metrics = function(el) {
   // Also: Getting computed style is kinda silly if we change the
   // styling -- may affect the measurements anyway
 
-  // Force hasLayout on IE7 so we get accurate measurements.
-  if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
-    el.style.zoom = 1;
-  }
-
   // Margin
   this.marginTop = treesaver.dimensions.toPixels(el, style.marginTop) || 0;
   this.marginBottom = treesaver.dimensions.toPixels(el, style.marginBottom) || 0;
@@ -415,12 +329,6 @@ treesaver.dimensions.Metrics = function(el) {
     //if (!el.getAttribute('style')) {
       //el.removeAttribute('style');
     //}
-  //}
-
-  // Not sure if resetting hasLayout is the right thing to do
-  // here, as it might affect the measurements we just did.
-  //if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
-  //  el.style.zoom = 'normal';
   //}
 };
 
