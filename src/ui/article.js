@@ -148,10 +148,6 @@ treesaver.ui.Article.prototype.processHTML = function(article_node) {
   treesaver.dom.addClass(fake_grid, 'offscreen grid');
   treesaver.dom.addClass(fake_column, 'column');
 
-  // Container needs to be in tree for measuring, and for
-  // IE HTML5 shiv to work properly as well
-  document.body.appendChild(fake_grid);
-
   // Remove any ID so CSS styles don't affect the elements within
   article_node.removeAttribute('id');
 
@@ -175,9 +171,12 @@ treesaver.ui.Article.prototype.processHTML = function(article_node) {
     fake_column.appendChild(article_node.firstChild);
   }
   fake_grid.appendChild(fake_column);
+
   // Re-enable visibility, so the browser can measure layout
   fake_column.style.display = 'block';
   fake_grid.style.display = 'block';
+  // Container needs to be in tree for measuring
+  document.body.appendChild(fake_grid);
 
   // Construct
   this.content = new treesaver.layout.Content(fake_column, this.doc);

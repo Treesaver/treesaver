@@ -70,11 +70,7 @@ treesaver.ui.StateManager.load = function() {
       treesaver.ui.StateManager.onOrientationChange);
 
     // Hide the address bar on iPhone
-    treesaver.scheduler.delay(function() {
-      // IE's window.scrollTo is some kind of weird function without an apply()
-      // so we have to wrap this call within a wrapper to avoid nasty errors
-      window.scrollTo(0, 0);
-    }, 100);
+    treesaver.scheduler.delay(window.scrollTo(0, 0), 100);
   }
 
   return true;
