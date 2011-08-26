@@ -243,20 +243,10 @@ treesaver.ui.StateManager.getAvailableSize_ = function() {
       window.scrollTo(0, 0);
     }
 
-    // IE9+ and all other browsers
-    if (!SUPPORT_IE || 'innerWidth' in window) {
-      return {
-        w: window.innerWidth,
-        h: window.innerHeight
-      };
-    }
-    else {
-      // IE8-
-      return {
-        w: document.documentElement.clientWidth,
-        h: document.documentElement.clientHeight
-      };
-    }
+    return {
+      w: window.innerWidth,
+      h: window.innerHeight
+    };
   }
   else {
     return treesaver.dimensions.getSize(treesaver.tsContainer);
