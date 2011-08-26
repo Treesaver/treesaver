@@ -203,7 +203,7 @@ treesaver.capabilities.domCSSPrefix = (function() {
 treesaver.capabilities.cssPropertySupported_ = function(propName, testPrefix, skipPrimary) {
   var styleObj = document.documentElement.style,
       prefixed = testPrefix && treesaver.capabilities.domCSSPrefix ?
-        (treesaver.capabilities.domCSSPrefix + propName.charAt(0).toUpperCase() + propName.substr(1)) :
+        (treesaver.capabilities.domCSSPrefix + propName[0].toUpperCase() + propName.substr(1)) :
         false;
 
   return (!skipPrimary && typeof styleObj[propName] !== 'undefined') ||

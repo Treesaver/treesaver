@@ -80,7 +80,7 @@ else {
 
     // Our hashes always start with the delimiter and have at least another
     // character there
-    if (current_hash.charAt(0) === treesaver.history.DELIMITER &&
+    if (current_hash[0] === treesaver.history.DELIMITER &&
         current_hash.length >= 2) {
       // Redirect, stripping the intial delimiter
       // Use location.replace instead of setting document.location to avoid

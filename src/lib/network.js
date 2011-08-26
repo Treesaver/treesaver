@@ -213,7 +213,7 @@ goog.scope(function() {
    */
   treesaver.network.absoluteURL = function(rel_path) {
     // Shortcut anything that starts with slash
-    if (rel_path && rel_path.charAt(0) === '/' || treesaver.network.protocolRegex_.test(rel_path)) {
+    if (rel_path && rel_path[0] === '/' || treesaver.network.protocolRegex_.test(rel_path)) {
       return rel_path;
     }
 
