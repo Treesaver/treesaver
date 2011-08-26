@@ -13,12 +13,3 @@ goog.provide('treesaver.css');
 treesaver.css.getStyleObject = function(el) {
   return document.defaultView.getComputedStyle(el, null);
 };
-
-// IE doesn't support getComputedStyle
-if (SUPPORT_IE &&
-    !(document.defaultView && document.defaultView.getComputedStyle)) {
-  // Patch to use MSIE API
-  treesaver.css.getStyleObject = function(el) {
-    return el.currentStyle;
-  };
-}
