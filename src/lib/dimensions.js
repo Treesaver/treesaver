@@ -156,6 +156,31 @@ goog.scope(function() {
   };
 
   /**
+    * Helper for setting the transform property on an element
+    *
+    * @param {!Element} el
+    * @param {!string} val
+    */
+  dimensions.setTransformProperty_ = function(el, val) {
+    // TODO: Detect once
+    if ('transformProperty' in el.style) {
+      el.style['transformProperty'] = val;
+    }
+    else {
+      el.style[capabilities.domCSSPrefix + 'Transform'] = val;
+    }
+  };
+
+  /**
+   * Clear out any offset
+   *
+   * @param {!Element} el
+   */
+  dimensions.clearOffset = function(el) {
+    dimensions.setTransformProperty_(el, 'none');
+  };
+
+  /**
    * Helper for setting the offset on an element, using CSS transforms if
    * supported, absolute positioning if not
    *
@@ -163,79 +188,28 @@ goog.scope(function() {
    * @param {!number} x
    * @param {!number} y
    */
-  dimensions.setOffset;
+  dimensions.setOffset = function(el, x, y) {
+    dimensions.setTransformProperty_(el,
+      'translate(' + x + 'px,' + y + 'px)');
+  };
+
+  // Use hw-accelerated 3D transforms if present
+  if (capabilities.SUPPORTS_CSSTRANSFORMS3D) {
+    dimensions.setOffset = function(el, x, y) {
+      dimensions.setTransformProperty_(el,
+        'translate3d(' + x + 'px,' + y + 'px,0)');
+    };
+  }
 
   /**
-   * Clear out any offset
-   *
-   * @param {!Element} el
-   */
-  dimensions.clearOffset;
-
-  /**
-   * Helper for setting the x-offset on an element, using CSS transforms if
-   * supported, absolute positioning if not
+   * Helper for setting the x-offset on an element
    *
    * @param {!Element} el
    * @param {!number} x
    */
-  dimensions.setOffsetX;
-
-  if (capabilities.SUPPORTS_CSSTRANSFORMS) {
-    /**
-     * Helper for setting the transform property on an element
-     *
-     * @param {!Element} el
-     * @param {!string} val
-     */
-    dimensions.setTransformProperty_ = function(el, val) {
-      // TODO: Detect once
-      if ('transformProperty' in el.style) {
-        el.style['transformProperty'] = val;
-      }
-      else {
-        el.style[capabilities.domCSSPrefix + 'Transform'] = val;
-      }
-    };
-
-    dimensions.clearOffset = function(el) {
-      dimensions.setTransformProperty_(el, 'none');
-    };
-
-    if (capabilities.SUPPORTS_CSSTRANSFORMS3D) {
-      dimensions.setOffset = function(el, x, y) {
-        dimensions.setTransformProperty_(el,
-          'translate3d(' + x + 'px,' + y + 'px,0)');
-      };
-    }
-    else {
-      dimensions.setOffset = function(el, x, y) {
-        dimensions.setTransformProperty_(el,
-          'translate(' + x + 'px,' + y + 'px)');
-      };
-    }
-
-    // Take the easy way out of setting the x offset
-    dimensions.setOffsetX = function(el, x) {
-      dimensions.setOffset(el, x, 0);
-    };
-  }
-  else {
-    // Fall back to absolute positioning
-    dimensions.setOffset = function(el, x, y) {
-      dimensions.setCssPx(el, 'left', x);
-      dimensions.setCssPx(el, 'top', y);
-    };
-
-    // Take the easy way out of setting the x offset
-    dimensions.setOffsetX = function(el, x) {
-      dimensions.setCssPx(el, 'left', x);
-    };
-
-    dimensions.clearOffset = function(el) {
-      dimensions.setOffset(el, 0, 0);
-    };
-  }
+  dimensions.setOffsetX = function(el, x) {
+    dimensions.setOffset(el, x, 0);
+  };
 
   /**
    * Round up to the nearest multiple of the base number
