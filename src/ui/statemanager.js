@@ -70,7 +70,7 @@ treesaver.ui.StateManager.load = function() {
       treesaver.ui.StateManager.onOrientationChange);
 
     // Hide the address bar on iPhone
-    treesaver.scheduler.delay(window.scrollTo(0, 0), 100);
+    treesaver.scheduler.delay(window.scrollTo, 100, [0, 0]);
   }
 
   return true;
