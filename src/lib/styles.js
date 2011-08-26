@@ -25,8 +25,8 @@ treesaver.styles.insertRule = function(selector, text) {
 treesaver.styles.stylesheet_ = document.createElement('style');
 treesaver.styles.stylesheet_.setAttribute('type', 'text/css');
 
-if (treesaver.dom.getElementsByTagName('head').length) {
-  treesaver.dom.getElementsByTagName('head')[0].appendChild(treesaver.styles.stylesheet_);
+if (treesaver.dom.querySelectorAll('head').length) {
+  treesaver.dom.querySelectorAll('head')[0].appendChild(treesaver.styles.stylesheet_);
   treesaver.styles.stylesheet_ = document.styleSheets[document.styleSheets.length - 1];
 
   // Offscreen

@@ -53,7 +53,7 @@ treesaver.ui.Scrollable.initDom = function(el) {
  * @param {!Element} root
  */
 treesaver.ui.Scrollable.initDomTree = function(root) {
-  var els = treesaver.dom.getElementsByClassName('scroll', root);
+  var els = treesaver.dom.querySelectorAll('.scroll', root);
 
   // Root element can be scrollable as well
   if (treesaver.dom.hasClass(root, 'scroll')) {

@@ -126,13 +126,13 @@ treesaver.ui.StateManager.getChromeContainer_ = function() {
  * @return {!Element}
  */
 treesaver.ui.StateManager.getViewport_ = function() {
-  var viewport = treesaver.dom.getElementsByProperty('name', 'viewport', 'meta')[0];
+  var viewport = treesaver.dom.querySelectorAll('meta[name=viewport]')[0];
 
   if (!viewport) {
     // Create a viewport if one doesn't exist
     viewport = document.createElement('meta');
     viewport.setAttribute('name', 'viewport');
-    treesaver.dom.getElementsByTagName('head')[0].appendChild(viewport);
+    treesaver.dom.querySelectorAll('head')[0].appendChild(viewport);
   }
 
   return viewport;

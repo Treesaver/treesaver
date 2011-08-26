@@ -46,7 +46,7 @@ treesaver.layout.Content = function(el, doc) {
   // stripped out of the content
   // TODO: Even without doing harm, this is a silly hack and it'd be
   // better to find a good way to deal with this situation.
-  treesaver.dom.getElementsByTagName('figure', el).forEach(function(figure) {
+  treesaver.dom.querySelectorAll('figure', el).forEach(function(figure) {
     figure.style.display = 'none';
   });
 

@@ -314,7 +314,7 @@ treesaver.ui.ArticleManager.onPopState = function(e) {
  * @return {?string}
  */
 treesaver.ui.ArticleManager.getIndexUrl = function () {
-  var link = treesaver.dom.getElementsByProperty('rel', 'index', 'link')[0];
+  var link = treesaver.dom.querySelectorAll('link[rel~=index]')[0];
 
   if (!link) {
     return null;

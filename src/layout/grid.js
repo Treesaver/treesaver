@@ -42,7 +42,10 @@ treesaver.layout.Grid = function(node) {
   /**
    * @type {Array.<string>}
    */
-  this.classes = treesaver.dom.classes(node, true);
+  this.classes = treesaver.dom.classes(node).map(function(c) {
+    // Force lowercase
+    return c.toLowerCase();
+  });
 
   /**
    * @type {boolean}
@@ -107,7 +110,7 @@ treesaver.layout.Grid = function(node) {
    * @type {Array.<treesaver.layout.Column>}
    */
   this.cols = [];
-  treesaver.dom.getElementsByClassName('column', node).forEach(function(colNode) {
+  treesaver.dom.querySelectorAll('.column', node).forEach(function(colNode) {
     var cur = new treesaver.layout.Column(colNode, this.size.h);
     this.cols.push(cur);
 
@@ -130,7 +133,7 @@ treesaver.layout.Grid = function(node) {
    * @type {Array.<treesaver.layout.Container>}
    */
   this.containers = [];
-  treesaver.dom.getElementsByClassName('container', node).forEach(function(containerNode) {
+  treesaver.dom.querySelectorAll('.container', node).forEach(function(containerNode) {
     var cur = new treesaver.layout.Container(containerNode, this.size.h);
     this.containers.push(cur);
   }, this);

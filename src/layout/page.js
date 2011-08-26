@@ -69,12 +69,15 @@ treesaver.layout.Page = function(content, grids, br) {
   treesaver.dimensions.setCssPx(this.node, 'width', this.size.w);
   treesaver.dimensions.setCssPx(this.node, 'height', this.size.h);
 
-  treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'document', null, this.node).forEach(function (el) {
+  treesaver.dom.querySelectorAll(
+    '[' + treesaver.dom.customAttributePrefix + 'template=document]',
+    this.node
+  ).forEach(function (el) {
     el.innerHTML = Mustache.to_html(el.innerHTML, content.doc.meta);
   });
 
   // Containers
-  treesaver.dom.getElementsByClassName('container', this.node).forEach(function(containerNode, i) {
+  treesaver.dom.querySelectorAll('.container', this.node).forEach(function(containerNode, i) {
     var mapping = best.containers[i],
         figure, figureIndex, success;
 
@@ -135,7 +138,7 @@ treesaver.layout.Page = function(content, grids, br) {
   }, this);
 
   // Columns
-  treesaver.dom.getElementsByClassName('column', this.node).forEach(function(colNode, i) {
+  treesaver.dom.querySelectorAll('.column', this.node).forEach(function(colNode, i) {
     var col = best.grid.cols[i];
     treesaver.layout.Page.fillColumn(content, br, colNode,
       best.grid.maxColHeight, col.minH);
@@ -954,7 +957,7 @@ treesaver.layout.Page.prototype.deactivate = function() {
   treesaver.dimensions.clearOffset(/** @type {!Element} */ (this.node));
 
   // Dispose images properly to avoid memory leaks
-  treesaver.dom.getElementsByTagName('img', this.node).
+  treesaver.dom.querySelectorAll('img', this.node).
     forEach(treesaver.dom.disposeImg);
 
   // Lose page reference

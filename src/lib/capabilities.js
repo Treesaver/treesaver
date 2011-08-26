@@ -53,24 +53,21 @@ treesaver.capabilities.IS_LEGACY = SUPPORT_LEGACY && !(
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_TREESAVER = !SUPPORT_LEGACY || (
+treesaver.capabilities.SUPPORTS_TREESAVER = (
   // Can't be in quirks mode (box model issues)
   document.compatMode !== 'BackCompat' &&
   // Need W3C AJAX (excludes IE6)
   'XMLHttpRequest' in window &&
-  // W3C or IE Event model (should be everywhere)
-  !!(document.addEventListener || document.attachEvent) &&
-  // Runtime styles (needed for measuring, should be everywhere)
-  !!(document.documentElement.currentStyle || window.getComputedStyle) &&
-  // Require querySelectorAll in order to exclude Firefox 3.0,
-  // but allow IE7 by checking for their non-W3C event model
-  ('querySelectorAll' in document ||
-    // Opera 9.64 passes as SUPPORT_LEGACY, does not have querySelectorAll,
-    // and has both attachEvent and addEventListener. We exclude it here
-    // by narrowing down the scope to browsers that do not have querySelectorAll,
-    // do have attachEvent but do not have addEventListener. Hopefully that only
-    // matches IE7.
-    (SUPPORT_IE && 'attachEvent' in document && !('addEventListener' in document)))
+  // W3C event model (excludes IE8 and below)
+  'addEventListener' in document &&
+  // Runtime styles (needed for measuring)
+  'getComputedStyle' in window &&
+  // querySelectorAll
+  'querySelectorAll' in document &&
+  // Local storage
+  'localStorage' in window &&
+  // JSON
+  'JSON' in window
 );
 
 /**

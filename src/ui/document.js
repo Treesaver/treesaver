@@ -112,7 +112,7 @@ treesaver.ui.Document.prototype.parse = function (text) {
 
   // We have the body of the document at 'requestUrl` in a node now,
   // and we try and find all top level articles.
-  articles = treesaver.dom.getElementsByTagName('article', node).filter(function (article) {
+  articles = treesaver.dom.querySelectorAll('article', node).filter(function (article) {
     return treesaver.dom.getAncestor(article, 'article') === null;
   });
 

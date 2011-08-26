@@ -23,7 +23,7 @@ goog.require('treesaver.ui.Scrollable');
 treesaver.ui.Chrome = function(node) {
   // DEBUG-only validation checks
   if (goog.DEBUG) {
-    if (!treesaver.dom.getElementsByClassName('viewer', node).length) {
+    if (!treesaver.dom.querySelectorAll('.viewer', node).length) {
       treesaver.debug.error('Chrome does not have a viewer');
     }
 
@@ -201,35 +201,54 @@ treesaver.ui.Chrome.prototype.activate = function() {
 
     this.node = treesaver.dom.createElementFromHTML(this.html);
     // Store references to the portions of the UI we must update
-    this.viewer = treesaver.dom.getElementsByClassName('viewer', this.node)[0];
-    this.pageWidth = treesaver.dom.getElementsByClassName('pagewidth', this.node);
-    this.nextPage = treesaver.dom.getElementsByClassName('next', this.node);
-    this.nextArticle = treesaver.dom.getElementsByClassName('nextArticle', this.node);
-    this.prevPage = treesaver.dom.getElementsByClassName('prev', this.node);
-    this.prevArticle = treesaver.dom.getElementsByClassName('prevArticle', this.node);
+    this.viewer = treesaver.dom.querySelectorAll('.viewer', this.node)[0];
+    this.pageWidth = treesaver.dom.querySelectorAll('.pagewidth', this.node);
+    this.nextPage = treesaver.dom.querySelectorAll('.next', this.node);
+    this.nextArticle = treesaver.dom.querySelectorAll('.nextArticle', this.node);
+    this.prevPage = treesaver.dom.querySelectorAll('.prev', this.node);
+    this.prevArticle = treesaver.dom.querySelectorAll('.prevArticle', this.node);
 
-    this.positionElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'position', null, this.node);
-    this.positionTemplates = this.positionElements.map(function (el) {
-      return el.innerHTML;
-    });
+    this.positionElements = [];
+    this.positionTemplates = [];
+    this.indexElements = [];
+    this.indexTemplates = [];
+    this.currentDocumentElements = [];
+    this.currentDocumentTemplates = [];
+    this.publicationElements = [];
+    this.publicationTemplates = [];
 
-    this.indexElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'index', null, this.node);
-    this.indexTemplates = this.indexElements.map(function (el) {
-      return el.innerHTML;
-    });
+    treesaver.dom.querySelectorAll('[' + treesaver.dom.customAttributePrefix + 'template]', this.node).forEach(function(el) {
+      var template_name = treesaver.dom.getCustomAttr(el, 'template'),
+          elementArray, templateArray;
 
-    this.currentDocumentElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'currentdocument', null, this.node);
-    this.currentDocumentTemplates = this.currentDocumentElements.map(function (el) {
-      return el.innerHTML;
-    });
+      switch(template_name) {
+      case 'position':
+        elementArray = this.positionElements;
+        templateArray = this.positionTemplates;
+        break;
+      case 'index':
+        elementArray = this.indexElements;
+        templateArray = this.indexTemplates;
+        break;
+      case 'currentdocument':
+        elementArray = this.currentDocumentElements;
+        templateArray = this.currentDocumentTemplates;
+        break;
+      case 'publication':
+        elementArray = this.publicationElements;
+        templateArray = this.publicationTemplates;
+        break;
+      default: // Unknown template
+        return;
+      }
 
-    this.publicationElements = treesaver.dom.getElementsByProperty(treesaver.dom.customAttributePrefix + 'template', 'publication', null, this.node);
-    this.publicationTemplates = this.publicationElements.map(function (el) {
-      return el.innerHTML;
-    });
+      // Add
+      elementArray.push(el);
+      templateArray.push(el.innerHTML);
+    }, this);
 
-    this.menus = treesaver.dom.getElementsByClassName('menu', this.node);
-    this.sidebars = treesaver.dom.getElementsByClassName('sidebar', this.node);
+    this.menus = treesaver.dom.querySelectorAll('.menu', this.node);
+    this.sidebars = treesaver.dom.querySelectorAll('.sidebar', this.node);
 
     this.pages = [];
 
@@ -1290,7 +1309,7 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function() {
   var currentUrl = treesaver.ui.ArticleManager.getCurrentUrl();
 
   this.indexElements.forEach(function (el) {
-    var anchors = treesaver.dom.getElementsByProperty('href', null, 'a', el).filter(function (a) {
+    var anchors = treesaver.dom.querySelectorAll('a[href]', el).filter(function (a) {
           // The anchors in the TOC may be relative URLs so we need to create absolute
           // ones when comparing to the currentUrl, which is always absolute.
           return treesaver.network.absoluteURL(a.href) === currentUrl;

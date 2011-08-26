@@ -144,7 +144,7 @@ treesaver.resources.loadComplete_ = function() {
 treesaver.resources.findByClassName = function(className) {
   // TODO: Restrict only to top-level children?
   return treesaver.resources.container_ ? treesaver.dom.
-    getElementsByClassName(className, treesaver.resources.container_) :
+    querySelectorAll('.' + className, treesaver.resources.container_) :
     [];
 };
 
@@ -165,7 +165,7 @@ treesaver.resources.unload = function() {
  * @return {?string} The url, if one was found.
  */
 treesaver.resources.getResourcesLinkUrl_ = function() {
-  var links = document.getElementsByTagName('link'),
+  var links = document.querySelectorAll('link'),
       i, len = links.length;
 
   for (i = 0; i < len; i += 1) {

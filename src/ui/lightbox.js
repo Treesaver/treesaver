@@ -19,7 +19,7 @@ goog.require('treesaver.ui.Scrollable');
  * @constructor
  */
 treesaver.ui.LightBox = function(node) {
-  var containerNode = treesaver.dom.getElementsByClassName('container', node)[0];
+  var containerNode = treesaver.dom.querySelectorAll('.container', node)[0];
 
   // DEBUG-only validation
   if (goog.DEBUG) {
@@ -76,7 +76,7 @@ treesaver.ui.LightBox.prototype.activate = function() {
     this.active = true;
 
     this.node = treesaver.dom.createElementFromHTML(this.html);
-    this.container = treesaver.dom.getElementsByClassName('container', this.node)[0];
+    this.container = treesaver.dom.querySelectorAll('.container', this.node)[0];
   }
 
   return /** @type {!Element} */ (this.node);
