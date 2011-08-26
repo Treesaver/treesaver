@@ -221,22 +221,8 @@ goog.scope(function() {
         div,
         url;
 
-    // IE7 doesn't properly compute the pathname if the link
-    // is not in the tree
-    if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
-      div = document.createElement('div');
-      document.body.appendChild(div);
-      div.appendChild(a);
-    }
-
     a.href = rel_path;
     url = a.href;
-
-    // Remove element from tree
-    if (SUPPORT_IE && treesaver.capabilities.IS_LEGACY) {
-      document.body.removeChild(/** @type {!Element} */ (div));
-      div.removeChild(a);
-    }
 
     return url;
   };
