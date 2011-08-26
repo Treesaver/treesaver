@@ -4,152 +4,44 @@
 
 goog.provide('treesaver.array');
 
-goog.require('treesaver.constants');
+goog.scope(function() {
+  var array = treesaver.array;
 
-// IE doesn't support these
-if (SUPPORT_IE) {
-  // TODO: Move into legacy?
-  if (!Array.prototype.forEach) {
-    Array.prototype.forEach = function arrayForEach(fun /*, thisp*/) {
-      var i = 0,
-          len = this.length,
-          thisp = arguments[1];
-
-      for (; i < len; i += 1) {
-        if (i in this) {
-          fun.call(thisp, this[i], i, this);
-        }
-      }
+  if (!'isArray' in Array) {
+    /**
+     * Test Array-ness.
+     *
+     * @param {*} arr
+     * @return {boolean}
+     * NOTE: Suppress warnings about duplication from built-in externs
+     * @suppress {duplicate}
+     */
+    Array.isArray = function(arr) {
+      return Object.prototype.toString.apply(/** @type {Object} */(arr)) === '[object Array]';
     };
   }
 
-  // Array functional helpers from MDC
-  if (!Array.prototype.some) {
-    Array.prototype.some = function arraySome(fun /*, thisp*/) {
-      var i = 0,
-          len = this.length,
-          thisp = arguments[1];
-
-      for (; i < len; i += 1) {
-        if (i in this && fun.call(thisp, this[i], i, this)) {
-          return true;
-        }
-      }
-
-      return false;
-    };
-  }
-
-  if (!Array.prototype.every) {
-    Array.prototype.every = function arrayEvery(fun /*, thisp*/) {
-      var i = 0,
-          len = this.length,
-          thisp = arguments[1];
-
-      for (; i < len; i += 1) {
-        if (i in this && !fun.call(thisp, this[i], i, this)) {
-          return false;
-        }
-      }
-
-      return true;
-    };
-  }
-
-  if (!Array.prototype.map) {
-    Array.prototype.map = function arrayMap(fun /*, thisp*/) {
-      var i = 0,
-          len = this.length,
-          thisp = arguments[1],
-          res = [];
-
-      for (; i < len; i += 1) {
-        if (i in this) {
-          res[i] = fun.call(thisp, this[i], i, this);
-        }
-      }
-
-      return res;
-    };
-  }
-
-  if (!Array.prototype.filter) {
-    Array.prototype.filter = function arrayFilter(fun /*, thisp*/) {
-      var i = 0, val,
-          len = this.length,
-          thisp = arguments[1],
-          res = [];
-
-      for (; i < len; i += 1) {
-        if (i in this) {
-          val = this[i]; // In case fun mutates this
-          if (fun.call(thisp, val, i, this)) {
-            res.push(val);
-          }
-        }
-      }
-
-      return res;
-    };
-  }
-
-  if (!Array.prototype.indexOf) {
-    Array.prototype.indexOf = function(obj, start) {
-      var i, len;
-      for (i = (start || 0), len = this.length; i < len; i += 1) {
-        if (this[i] === obj) {
-          return i;
-        }
-      }
-      return -1;
-    };
-  }
-}
-
-if (!Array.isArray) {
   /**
-   * Test Array-ness.
+   * Convert array-like things to an array
    *
-   * @param {*} arr
-   * @return {boolean}
-   * NOTE: Suppress warnings about duplication from built-in externs
-   * @suppress {duplicate}
+   * @param {*} obj
+   * @return {!Array}
    */
-  Array.isArray = function(arr) {
-    return Object.prototype.toString.apply(/** @type {Object} */(arr)) === '[object Array]';
+  array.toArray = function(obj) {
+    return Array.prototype.slice.call(/** @type {Object} */(obj), 0);
   };
-}
 
-/**
- * Convert array-like things to an array
- *
- * @param {*} obj
- * @return {!Array}
- */
-treesaver.array.toArray = function(obj) {
-  return Array.prototype.slice.call(/** @type {Object} */(obj), 0);
-};
-
-/**
- * Remove an index from an array
- * By John Resig (MIT Licensed)
- *
- * @param {!number} from
- * @param {number=} to
- */
-treesaver.array.remove = function(array, from, to) {
-  var rest = array.slice((to || from) + 1 || array.length);
-  array.length = from < 0 ? array.length + from : from;
-  return array.push.apply(array, rest);
-};
-
-// IE doesn't let you call slice on a nodelist, so provide a backup
-if (SUPPORT_IE && 'attachEvent' in document) {
-  treesaver.array.toArray = function(obj) {
-    var i, len, arr = [];
-    for (i = 0, len = obj.length; i < len; i += 1) {
-      arr.push(obj[i]);
-    }
-    return arr;
+  /**
+   * Remove an index from an array
+   * By John Resig (MIT Licensed)
+   *
+   * @param {!Array} arr
+   * @param {!number} from
+   * @param {number=} to
+   */
+  array.remove = function(arr, from, to) {
+    var rest = arr.slice((to || from) + 1 || arr.length);
+    arr.length = from < 0 ? arr.length + from : from;
+    return arr.push.apply(arr, rest);
   };
-}
+});

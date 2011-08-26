@@ -20,7 +20,7 @@ treesaver.scheduler.TASK_INTERVAL = 25; // 40 per second
  * Array of all tasks
  *
  * @private
- * @type {Array}
+ * @type {!Array}
  */
 treesaver.scheduler.tasks_ = [];
 
