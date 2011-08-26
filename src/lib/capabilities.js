@@ -29,23 +29,9 @@ treesaver.capabilities.ua_ = window.navigator.userAgent.toLowerCase();
  */
 treesaver.capabilities.platform_ =
   // Android 1.6 doesn't have a value for navigator.platform
-  !SUPPORT_LEGACY || window.navigator.platform ?
+  window.navigator.platform ?
   window.navigator.platform.toLowerCase() :
   /android/.test(treesaver.capabilities.ua_) ? 'android' : 'unknown';
-
-/**
- * Is this an older browser that requires some patching for key functionality
- * like querySelectorAll
- *
- * @const
- * @type {boolean}
- */
-treesaver.capabilities.IS_LEGACY = SUPPORT_LEGACY && !(
-  // Storage
-  'localStorage' in window &&
-  'querySelectorAll' in document &&
-  'JSON' in window
-);
 
 /**
  * Does the current browser meet the Treesaver requirements
@@ -69,15 +55,6 @@ treesaver.capabilities.SUPPORTS_TREESAVER = (
   // JSON
   'JSON' in window
 );
-
-/**
- * Is this browser IE8 running in IE7 compat mode?
- *
- * @const
- * @type {boolean}
- */
-treesaver.capabilities.IS_IE8INIE7 = SUPPORT_IE &&
-  'documentMode' in document && document.documentMode <= 7;
 
 /**
  * Are we running within a native app?
@@ -322,27 +299,10 @@ treesaver.capabilities.SUPPORTS_FLASH = !treesaver.capabilities.IS_NATIVE_APP &&
  * @type {boolean}
  */
 treesaver.capabilities.SUPPORTS_FONTFACE = (function() {
-  if (SUPPORT_LEGACY && treesaver.capabilities.IS_LEGACY) {
-    // Only legacy browser with @font-face support is IE7,
-    // which we don't care enough about
-    return false;
-  }
-
-  // Quick and easy test that works in FF2+, Safari, and Opera
+  // Quick and easy test that works in FF2+, Safari, IE9+, and Opera
   // Note: This gives a false positive for older versions of Chrome,
   // (version 3 and earlier). Market share is too low to care
-  if ('CSSFontFaceRule' in window) {
-    return true;
-  }
-
-  // IE fails in previous support even though it's suported EOT for a
-  // long long time
-  if (SUPPORT_IE && treesaver.capabilities.BROWSER_NAME === 'msie') {
-    return true;
-  }
-
-  // No @font-face support
-  return false;
+  return 'CSSFontFaceRule' in window;
 }());
 
 /**
@@ -411,10 +371,7 @@ treesaver.capabilities.SUPPORTS_VIDEO =
  * @const
  * @type {boolean}
  */
-treesaver.capabilities.SUPPORTS_LOCALSTORAGE =
-  'localStorage' in window &&
-  // FF3 supports localStorage, but doesn't have native JSON
-  !treesaver.capabilities.IS_LEGACY;
+treesaver.capabilities.SUPPORTS_LOCALSTORAGE = 'localStorage' in window;
 
 /**
  * Whether the browser supports offline web applications
@@ -538,7 +495,6 @@ treesaver.capabilities.update_ = function() {
       p(treesaver.capabilities.SUPPORTS_FLASH) + 'flash',
       p(treesaver.capabilities.SUPPORTS_ORIENTATION) + 'orientation',
       p(treesaver.capabilities.IS_FULLSCREEN) + 'fullscreen',
-      p(treesaver.capabilities.IS_LEGACY) + 'legacy',
       p(treesaver.capabilities.IS_MOBILE) + 'mobile',
       p(treesaver.capabilities.IS_SMALL_SCREEN) + 'smallscreen',
       p(treesaver.network.loadedFromCache()) + 'cached',
