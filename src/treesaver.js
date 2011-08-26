@@ -18,7 +18,6 @@ goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');
 goog.require('treesaver.history');
-goog.require('treesaver.html5');
 goog.require('treesaver.resources');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.styles');
