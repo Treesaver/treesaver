@@ -41,5 +41,5 @@ Object.clone = function(o) {
   /** @constructor */
   function Clone() {}
   Clone.prototype = o;
-	return new Clone();
+  return new Clone();
 };
