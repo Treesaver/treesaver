@@ -46,7 +46,7 @@ else {
    *
    * @const
    * @type {number}
-  */
+   */
   treesaver.history.HASH_INTERVAL = 100;
 
   /**
@@ -241,8 +241,7 @@ else {
       return treesaver.history.getNormalizedHash_() !== treesaver.history.hash_;
     };
 
-    // IE8 in IE7 mode defines onhashchange, but never fires it
-    if ('onhashchange' in window && !treesaver.capabilities.IS_IE8INIE7) {
+    if ('onhashchange' in window) {
       treesaver.debug.info('Browser has native onHashChange');
 
       window['onhashchange'] = treesaver.history.hashChange_;
@@ -256,54 +255,6 @@ else {
           treesaver.history.hashChange_();
         }
       }, treesaver.history.HASH_INTERVAL, Infinity);
-
-      // IE6 & 7 don't create history items if the hash doesn't match an
-      // element's ID so we need to create an iframe which we'll use
-      if (SUPPORT_IE && treesaver.capabilities.BROWSER_NAME === 'msie') {
-        treesaver.debug.info('Using iFrame history for IE7');
-
-        /**
-         * iFrame used for supporting the back button in IE7
-         * @private
-         * @type {Element}
-         */
-        treesaver.history.dummyIFrame_ = document.createElement('iframe');
-
-        // Add the iFrame to the document
-        document.documentElement.appendChild(treesaver.history.dummyIFrame_);
-
-        // Redefine the hasHashChanged_ function to ensure check the iFrame
-        // contents
-        treesaver.history.hasHashChanged_ = function() {
-          var hash = treesaver.history.dummyIFrame_.contentWindow.document.body.innerHTML;
-
-          if (hash !== treesaver.history.hash_) {
-            // Set the hash in case a user copies and pastes or shares the URL
-            document.location.hash = '#' + (hash || '');
-            return true;
-          }
-        };
-
-        // Redefine replaceLocationHash_ to change contents of dummy iframe w/o history
-        // entry
-        treesaver.history.replaceLocationHash_ = function(hash) {
-          var iDoc = treesaver.history.dummyIFrame_.contentWindow.document;
-          if (hash !== iDoc.body.innerHTML) {
-            iDoc.body.innerHTML = hash;
-          }
-          document.location.replace('#' + hash);
-        }
-
-        // Redefine setLocationHash_ to change the contents of the dummy iframe
-        // and create a new history entry
-        treesaver.history.setLocationHash_ = function(hash) {
-          var iDoc = treesaver.history.dummyIFrame_.contentWindow.document;
-          iDoc.open();
-          iDoc.write('<html><body>' + hash + '</body></html>');
-          iDoc.close();
-          document.location.hash = '#' + hash;
-        };
-      }
     }
   }
 }
