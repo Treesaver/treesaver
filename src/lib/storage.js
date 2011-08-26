@@ -54,14 +54,8 @@ goog.scope(function() {
    * @param {!string} key
    */
   storage.clear = function(key) {
-    // IE9 goes against spec here and throws an exception
-    // if the key doesn't exist. Be defensive
-    if (!SUPPORT_IE || sessionStore.getItem(key)) {
-      sessionStore.removeItem(key);
-    }
-    if (!SUPPORT_IE || localStore.getItem(key)) {
-      localStore.removeItem(key);
-    }
+    sessionStore.removeItem(key);
+    localStore.removeItem(key);
   };
 
   /**
