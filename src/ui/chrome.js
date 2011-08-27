@@ -482,14 +482,6 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.click = function(e) {
-  // Lightbox active? Hide it
-  if (this.lightBoxActive) {
-    this.hideLightBox();
-    e.stopPropagation();
-    e.preventDefault();
-    return;
-  }
-
   // Ignore if done with a modifier key (could be opening in new tab, etc)
   if (treesaver.ui.Chrome.specialKeyPressed_(e)) {
     return true;
@@ -503,12 +495,43 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   }
 
   var el = treesaver.ui.Chrome.findTarget_(e.target),
+      ancestor,
       url,
       withinCurrentPage = false,
       handled = false,
       withinSidebar = false,
       withinMenu = false,
       nearestSidebar = null;
+
+  // Lightbox active? Hide it
+  if (this.lightBoxActive) {
+    // Check if click was within lighbox
+    // TODO: FIXME
+    if (this.lightBox.node.contains(el)) {
+      if (el.nodeName === 'A') {
+        ancestor = el;
+      }
+      else {
+        ancestor = treesaver.dom.getAncestor(el, 'A');
+      }
+
+      // Was it a link?
+      if (ancestor && ancestor.href) {
+        url = treesaver.network.absoluteURL(ancestor.href);
+        // Try to go to the article
+        if (!treesaver.ui.ArticleManager.goToDocumentByURL(url)) {
+          // The URL is not an article, let the navigation happen normally
+          return;
+        }
+      }
+    }
+
+    // Close the lightbox no matter what
+    this.hideLightBox();
+    e.stopPropagation();
+    e.preventDefault();
+    return;
+  }
 
   // If there are any menus active and the event target
   // is contained within one, we deactive it and set
@@ -605,8 +628,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
 
       // Check links last since they may be used as UI commands as well
       // Links can occur in-page or in the chrome
-      // IE aliases the src property to read-only href on images
-      if (!handled && el.href && el.nodeName.toLowerCase() !== 'img') {
+      if (!handled && el.href) {
         // Lightbox-flagged elements are skipped as processing goes up the chain
         // if a zoomable is found on the way up the tree, it will be handled. If
         // not, the link is navigated as-is
