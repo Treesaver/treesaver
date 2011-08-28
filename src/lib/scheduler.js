@@ -302,9 +302,14 @@ goog.scope(function() {
    */
   scheduler.pause = function(whitelist, timeout) {
     scheduler.taskWhitelist_ = whitelist;
+
+    // Clear previous if there
+    if (scheduler.pauseTimeoutId_ !== -1) {
+      window.clearTimeout(scheduler.pauseTimeoutId_);
+    }
+
     if (timeout) {
-      scheduler.pauseTimeoutId_ =
-        setTimeout(scheduler.resume, timeout);
+      scheduler.pauseTimeoutId_ = setTimeout(scheduler.resume, timeout);
     }
   };
 
