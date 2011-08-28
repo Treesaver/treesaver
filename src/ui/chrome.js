@@ -809,6 +809,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
     totalTime: 0,
     touchCount: e.touches.length,
     withinViewer: withinViewer,
+    originalOffset: this.pageOffset,
     scroller: scroller,
     canScrollHorizontally: scroller && treesaver.ui.Scrollable.canScrollHorizontally(scroller)
   };
@@ -876,7 +877,7 @@ treesaver.ui.Chrome.prototype.touchMove = function(e) {
     touchData.totalX2 = e.touches[1].pageX - touchData.startX2;
   }
   else {
-    this.pageOffset = touchData.totalX;
+    this.pageOffset = touchData.originalOffset + touchData.totalX;
     this._updatePagePositions(true);
   }
 };
