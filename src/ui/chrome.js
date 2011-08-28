@@ -1029,7 +1029,7 @@ treesaver.ui.Chrome.prototype.mouseOver = function(e) {
 treesaver.ui.Chrome.prototype.isWithinScroller_ = function(el) {
   var node = el;
 
-  while (node) {
+  while (node && node != document.documentElement) {
     if (treesaver.dom.hasClass(node, 'scroll')) {
         return node;
     }
