@@ -181,7 +181,7 @@ goog.scope(function() {
     case 'offline':
       debug.info('Application offline');
 
-      network.setOnlineStatus(true);
+      network.setOnlineStatus(false);
 
       return;
 
