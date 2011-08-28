@@ -439,6 +439,11 @@ treesaver.ui.Chrome.prototype.keyDown = function(e) {
     return;
   }
 
+  // Ignore within forms
+  if (/input|select|textarea/i.test(e.target.tagName)) {
+    return;
+  }
+
   // Don't override keyboard commands
   if (!treesaver.ui.Chrome.specialKeyPressed_(e)) {
     switch (e.keyCode) {
