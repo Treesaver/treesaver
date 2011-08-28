@@ -85,6 +85,7 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
   var url = null,
       contents = null,
       meta = {},
+      requirements = null,
       doc = null;
 
   if (typeof entry === 'string') {
@@ -97,6 +98,21 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
     Object.keys(entry).forEach(function (key) {
       meta[key] = entry[key];
     });
+
+    if (entry['requires']) {
+      if (typeof entry['requires'] === 'string') {
+        requirements = entry['requires'].split(/\s|,\s/g);
+      } else if (Array.isArray(entry['requires'])) {
+        // Make sure our `requires` entries are actually strings
+        requirements = entry['requires'].map(function (value) {
+          return value.toString();
+        });
+      }
+
+      requirements = requirements.filter(function (value) {
+        return value.trim() !== '';
+      });
+    }
   }
 
   if (!url) {
@@ -115,6 +131,10 @@ treesaver.ui.Index.prototype.parseEntry = function(entry) {
     contents.forEach(function (child) {
       doc.appendChild(this.parseEntry(child));
     }, this);
+  }
+
+  if (requirements) {
+    doc.requirements = requirements;
   }
 
   return doc;

@@ -119,6 +119,7 @@ treesaver.ui.ArticleManager.onIndexLoad = function (e) {
     docs.forEach(function (doc) {
       treesaver.ui.ArticleManager.initialDocument.meta = doc.meta;
       treesaver.ui.ArticleManager.initialDocument.children = doc.children;
+      treesaver.ui.ArticleManager.initialDocument.requirements = doc.requirements;
 
       doc.parent.replaceChild(treesaver.ui.ArticleManager.initialDocument, doc);
     });
@@ -361,7 +362,14 @@ treesaver.ui.ArticleManager.canGoToPreviousArticle = function () {
  * @return {!boolean}
  */
 treesaver.ui.ArticleManager.canGoToPreviousDocument = function () {
-  return treesaver.ui.ArticleManager.currentDocumentIndex >= 1;
+  var i = treesaver.ui.ArticleManager.currentDocumentIndex - 1;
+
+  for (; i >= 0; i -= 1) {
+    if (treesaver.ui.ArticleManager.index.getDocumentByIndex(i).capabilityFilter()) {
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
@@ -376,16 +384,27 @@ treesaver.ui.ArticleManager.previousDocument = function(end, fetch) {
   }
 
   var index = treesaver.ui.ArticleManager.currentDocumentIndex - 1,
-      doc = treesaver.ui.ArticleManager.index.getDocumentByIndex(index),
+      doc = null,
       articlePosition = null;
 
-  if (doc.loaded) {
-    articlePosition = new treesaver.ui.ArticlePosition(doc.getNumberOfArticles() - 1);
-  } else {
-    articlePosition = treesaver.ui.ArticlePosition.END;
+  for (; index >= 0; index -= 1) {
+    doc = /** @type {!treesaver.ui.Document} */ (treesaver.ui.ArticleManager.index.getDocumentByIndex(index));
+    if (doc.capabilityFilter()) {
+      break;
+    }
   }
 
-  return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
+  if (doc) {
+    if (doc.loaded) {
+      articlePosition = new treesaver.ui.ArticlePosition(doc.getNumberOfArticles() - 1);
+    } else {
+      articlePosition = treesaver.ui.ArticlePosition.END;
+    }
+
+    return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
+  } else {
+    return null;
+  }
 };
 
 /**
@@ -501,8 +520,15 @@ treesaver.ui.ArticleManager.canGoToNextArticle = function() {
  * @return {boolean}
  */
 treesaver.ui.ArticleManager.canGoToNextDocument = function() {
-  return treesaver.ui.ArticleManager.currentDocumentIndex !== -1 &&
-          treesaver.ui.ArticleManager.currentDocumentIndex < treesaver.ui.ArticleManager.index.getNumberOfDocuments() - 1;
+  var i = treesaver.ui.ArticleManager.currentDocumentIndex + 1,
+      len = treesaver.ui.ArticleManager.index.getNumberOfDocuments();
+
+  for (; i < len; i += 1) {
+    if (treesaver.ui.ArticleManager.index.getDocumentByIndex(i).capabilityFilter()) {
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
@@ -516,9 +542,21 @@ treesaver.ui.ArticleManager.nextDocument = function (fetch) {
   }
 
   var index = treesaver.ui.ArticleManager.currentDocumentIndex + 1,
-      doc = /** @type {!treesaver.ui.Document} */ (treesaver.ui.ArticleManager.index.getDocumentByIndex(index));
+      doc = null,
+      len = treesaver.ui.ArticleManager.index.getNumberOfDocuments();
 
-  return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, treesaver.ui.ArticlePosition.BEGINNING, null, index);
+  for (; index < len; index += 1) {
+    doc = /** @type {!treesaver.ui.Document} */ (treesaver.ui.ArticleManager.index.getDocumentByIndex(index));
+    if (doc.capabilityFilter()) {
+      break;
+    }
+  }
+
+  if (doc) {
+    return fetch ? doc : treesaver.ui.ArticleManager.setCurrentDocument(doc, treesaver.ui.ArticlePosition.BEGINNING, null, index);
+  } else {
+    return null;
+  }
 };
 
 /**
