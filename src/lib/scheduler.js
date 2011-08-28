@@ -298,7 +298,7 @@ goog.scope(function() {
    * Pause all tasks except those named in the whitelist
    *
    * @param {Array.<string>} whitelist Names of tasks that can still execute.
-   * @param {?number} timeout Timeout before auto-resume.
+   * @param {number=} timeout Timeout before auto-resume.
    */
   scheduler.pause = function(whitelist, timeout) {
     scheduler.taskWhitelist_ = whitelist;
