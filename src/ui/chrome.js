@@ -824,7 +824,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
   }
 
   // Pause other work for better swipe performance
-  treesaver.scheduler.pause([], 2 * SWIPE_TIME_LIMIT);
+  treesaver.scheduler.pause([]);
 };
 
 /**
@@ -1006,8 +1006,8 @@ treesaver.ui.Chrome.prototype.touchEnd = function(e) {
  * @param {!Event} e
  */
 treesaver.ui.Chrome.prototype.touchCancel = function(e) {
-  // Let the tasks begin again
-  treesaver.scheduler.resume();
+  // Let the tasks begin again (in a bit)
+  treesaver.scheduler.queue(treesaver.scheduler.resume, [], 'resumeTasks');
 
   this.touchData_ = null;
 };
@@ -1686,23 +1686,23 @@ treesaver.ui.Chrome.prototype._updatePagePositionsDelayed = function() {
  * @param {boolean=} preventAnimation
  */
 treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) {
-  if (!preventAnimation) {
+  if (!preventAnimation && this.pageOffset) {
     if (MAX_ANIMATION_DURATION) {
       // Pause tasks to keep animation smooth
-      treesaver.scheduler.pause(['animatePages'], 2 * MAX_ANIMATION_DURATION);
+      treesaver.scheduler.pause(['animatePages', 'resumeTasks']);
 
       // Percent of time left in animation
       var t = 1 - (goog.now() - this.animationStart || 0) / MAX_ANIMATION_DURATION;
       // Clamp into 0,1
       t = Math.max(0, Math.min(1, t));
 
-      // Cubic easing
-      this.pageOffset = Math.round(this.pageOffset * Math.pow(t, 3));
+      // Ease and round
+      this.pageOffset = Math.round(this.pageOffset * t);
 
       if (!this.pageOffset) {
         this.pageOffset = 0;
-        // Re-enable other tasks
-        treesaver.scheduler.resume();
+        // Re-enable other tasks, soon
+        treesaver.scheduler.queue(treesaver.scheduler.resume, [], 'resumeTasks');
       }
       else {
         // Queue up another call in a bit
