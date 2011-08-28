@@ -1691,9 +1691,9 @@ treesaver.ui.Chrome.prototype._updatePagePositions = function(preventAnimation) 
       t = Math.max(0, Math.min(1, t));
 
       // Cubic easing
-      this.pageOffset *= Math.pow(t, 3);
+      this.pageOffset = Math.round(this.pageOffset * Math.pow(t, 3));
 
-      if (Math.abs(this.pageOffset) <= 1) {
+      if (!this.pageOffset) {
         this.pageOffset = 0;
         // Re-enable other tasks
         treesaver.scheduler.resume();
