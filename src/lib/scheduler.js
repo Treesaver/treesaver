@@ -107,13 +107,11 @@ goog.scope(function() {
    */
   scheduler.tick_ = function() {
     var now = goog.now();
-    // Clear out previous id
-    scheduler.tickID_ = -1;
 
     scheduler.tasks_.forEach(function(task, i) {
       // If the tick function is no longer on interval, prevent all task
       // execution
-      if (!scheduler.tickID_) {
+      if (scheduler.tickID_ === -1) {
         return;
       }
 
@@ -156,6 +154,9 @@ goog.scope(function() {
 
       task.fun.apply(task.obj, task.args);
     });
+
+    // Clear out previous id
+    scheduler.tickID_ = -1;
 
     // Don't do anything if no tasks waiting
     if (scheduler.tasks_.length) {
