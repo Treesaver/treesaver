@@ -1,0 +1,18 @@
+{
+  "contents": [
+    {
+      "url": "index.html"
+    },
+    {
+      "url": "one.html",
+      "requires": "flash"
+    },
+    {
+      "url": "two.html",
+      "requires": "no-offline"
+    },
+    {
+      "url": "three.html"
+    }
+  ]
+}

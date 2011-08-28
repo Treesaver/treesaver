@@ -78,6 +78,13 @@ treesaver.ui.Document = function (url, meta) {
   this.contents = [];
 
   /**
+   * A list of all (mutable) capability requirements for this document.
+   *
+   * @type {?Array.<string>}
+   */
+  this.requirements = null;
+
+  /**
    * @type {?string}
    */
   this.title = null;
@@ -167,6 +174,18 @@ treesaver.ui.Document.prototype.equals = function (o) {
     return url === treesaver.uri.stripFile(this.url);
   } else {
     return url === this.url;
+  }
+};
+
+/**
+ * Returns true if this document meets the (mutable) capabilities
+ * @return {!boolean}
+ */
+treesaver.ui.Document.prototype.capabilityFilter = function () {
+  if (!this.requirements) {
+    return true;
+  } else {
+    return treesaver.capabilities.check(this.requirements, true);
   }
 };
 
