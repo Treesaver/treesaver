@@ -13,7 +13,7 @@ goog.scope(function() {
       scheduler = treesaver.scheduler;
 
   // Mozilla doesn't support element.contains()
-  if ('Node' in window && Node.prototype && !'contains' in Node.prototype) {
+  if ('Node' in window && Node.prototype && !('contains' in Node.prototype)) {
     // Fix from PPK
     // http://www.quirksmode.org/blog/archives/2006/01/contains_for_mo.html
     Node.prototype.contains = function(arg) {
