@@ -119,6 +119,7 @@ treesaver.ui.ArticleManager.onIndexLoad = function (e) {
     docs.forEach(function (doc) {
       treesaver.ui.ArticleManager.initialDocument.meta = doc.meta;
       treesaver.ui.ArticleManager.initialDocument.children = doc.children;
+      treesaver.ui.ArticleManager.initialDocument.requirements = doc.requirements;
 
       doc.parent.replaceChild(treesaver.ui.ArticleManager.initialDocument, doc);
     });
