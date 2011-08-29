@@ -824,7 +824,7 @@ treesaver.ui.Chrome.prototype.touchStart = function(e) {
   }
 
   // Pause other work for better swipe performance
-  treesaver.scheduler.pause([]);
+  treesaver.scheduler.pause(['resumeTasks']);
 };
 
 /**
