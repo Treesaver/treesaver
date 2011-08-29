@@ -12,7 +12,7 @@
       </div>
 
       <div class="toc" data-ts-template="index">
-        {{#children}}
+        {{#contents}}
           {{^visited}}
             <div class="article">
               <h3><a href="{{url}}">{{title}}</a></h3>
@@ -23,7 +23,7 @@
               <h3><a href="{{url}}">{{title}}</a> (visited)</h3>
             </div>
           {{/visited}}
-        {{/children}}
+        {{/contents}}
       </div>
     </div>
 
