@@ -28,6 +28,8 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   // Initial values are meaningless, just annotate here
   /** @type {treesaver.ui.Document} */
   treesaver.ui.ArticleManager.currentDocument;
+  /** @type {treesaver.ui.Aricle} */
+  treesaver.ui.ArticleManager.currentArticle;
   /** @type {treesaver.layout.ContentPosition} */
   treesaver.ui.ArticleManager.currentPosition;
   /** @type {number} */
@@ -88,6 +90,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
 treesaver.ui.ArticleManager.unload = function() {
   // Clear out state
   treesaver.ui.ArticleManager.currentDocument = null;
+  treesaver.ui.ArticleManager.currentArticle = null;
   treesaver.ui.ArticleManager.currentPosition = null;
   treesaver.ui.ArticleManager.currentPageIndex = -1;
   treesaver.ui.ArticleManager.currentDocumentIndex = -1;
@@ -905,7 +908,8 @@ treesaver.ui.ArticleManager.redirectToDocument = function (doc) {
 treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition, pos, index, noHistory) {
   var articleAnchor = null,
       url = null,
-      path = null;
+      path = null,
+      article;
 
   if (!doc) {
     return false;
@@ -919,9 +923,10 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
       index !== treesaver.ui.ArticleManager.currentDocumentIndex &&
       !treesaver.ui.ArticleManager.currentArticlePosition.equals(articlePosition)) {
     // Same document, but different article
-    var article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
+    article = treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition.index);
 
-    // Update the article position
+    // Update the article position & article
+    treesaver.ui.ArticleManager.currentArticle = article;
     treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
 
     treesaver.ui.ArticleManager._setPosition(pos);
@@ -957,6 +962,8 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
   // Changing document/article always changes the current page index
   treesaver.ui.ArticleManager.currentPageIndex = -1;
   treesaver.ui.ArticleManager.currentArticlePosition = articlePosition;
+  treesaver.ui.ArticleManager.currentArticle =
+    treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition && articlePosition.index || 0);
 
   if (!doc.loaded) {
     doc.load();
@@ -993,7 +1000,7 @@ treesaver.ui.ArticleManager.setCurrentDocument = function (doc, articlePosition,
     'path': path
   });
   treesaver.events.fireEvent(document, treesaver.ui.ArticleManager.events.ARTICLECHANGED, {
-    'article': treesaver.ui.ArticleManager.currentDocument.getArticle(articlePosition && articlePosition.index || 0)
+    'article': treesaver.ui.ArticleManager.currentArticle
   });
 
   return true;
