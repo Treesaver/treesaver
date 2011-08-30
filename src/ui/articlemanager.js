@@ -348,7 +348,7 @@ treesaver.ui.ArticleManager.canGoToPreviousPage = function() {
  * @return {!boolean}
  */
 treesaver.ui.ArticleManager.canGoToPreviousArticle = function () {
-  return !!treesaver.ui.ArticleManager.currentArticlePosition.index || treesaver.ui.ArticleManager.canGoToPreviousDocument();
+  return treesaver.ui.ArticleManager.currentArticlePosition.index > 0 || treesaver.ui.ArticleManager.canGoToPreviousDocument();
 };
 
 /**
@@ -394,7 +394,7 @@ treesaver.ui.ArticleManager.previousArticle = function (end, fetch) {
     return null;
   }
 
-  if (!!treesaver.ui.ArticleManager.currentArticlePosition.index) {
+  if (treesaver.ui.ArticleManager.currentArticlePosition.index > 0) {
     var articlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentArticlePosition.index - 1),
         index = treesaver.ui.ArticleManager.currentDocumentIndex,
         doc = /** @type {!treesaver.ui.Document} */ (treesaver.ui.ArticleManager.currentDocument);
