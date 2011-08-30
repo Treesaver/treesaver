@@ -592,7 +592,7 @@ treesaver.capabilities.mutableCapabilityRegex_ = (function() {
     return '((no-)?' + term + ')';
   });
 
-  return new RegExp(terms.join('|'));
+  return new RegExp(terms.join('|'), 'g');
 }());
 
 /**
