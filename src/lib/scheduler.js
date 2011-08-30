@@ -152,7 +152,17 @@ goog.scope(function() {
         }
       }
 
-      task.fun.apply(task.obj, task.args);
+      if (goog.DEBUG) {
+        try {
+          task.fun.apply(task.obj, task.args);
+        }
+        catch (ex) {
+          treesaver.debug.error('Task ' + (task.name || 'untitled') + ' threw: ' + ex);
+        }
+      }
+      else {
+        task.fun.apply(task.obj, task.args);
+      }
     });
 
     // Clear out previous id
