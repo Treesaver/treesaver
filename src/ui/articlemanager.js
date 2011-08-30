@@ -28,7 +28,7 @@ treesaver.ui.ArticleManager.load = function(initialHTML) {
   // Initial values are meaningless, just annotate here
   /** @type {treesaver.ui.Document} */
   treesaver.ui.ArticleManager.currentDocument;
-  /** @type {treesaver.ui.Aricle} */
+  /** @type {treesaver.ui.Article} */
   treesaver.ui.ArticleManager.currentArticle;
   /** @type {treesaver.layout.ContentPosition} */
   treesaver.ui.ArticleManager.currentPosition;
