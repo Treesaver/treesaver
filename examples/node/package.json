@@ -1,0 +1,17 @@
+{
+  "author": "",
+  "name": "treesaver-node",
+  "description": "A Node.js Treesaver example",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bramstein/treesaver.git"
+  },
+  "engines": {
+    "node": ">=0.4.8"
+  },
+  "dependencies": {
+    "express": "2.4.6" 
+  },
+  "devDependencies": {}
+}
