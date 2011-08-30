@@ -676,9 +676,9 @@ treesaver.ui.ArticleManager.goToDocumentByURL = function (url, pos) {
  * @return {Array.<?treesaver.layout.Page>} Array of pages, some may be null.
  */
 treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
-  if (treesaver.ui.ArticleManager.currentArticlePosition.atEnding()) {
+  if (treesaver.ui.ArticleManager.currentArticlePosition.atEnding() && treesaver.ui.ArticleManager.currentDocument.loaded) {
     treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.articles.length - 1);
-  } else if (treesaver.ui.ArticleManager.currentArticlePosition.isAnchor()) {
+  } else if (treesaver.ui.ArticleManager.currentArticlePosition.isAnchor() && treesaver.ui.ArticleManager.currentDocument.loaded) {
     // This will return 0 (meaning the first article) if the anchor is not found.
     treesaver.ui.ArticleManager.currentArticlePosition = new treesaver.ui.ArticlePosition(treesaver.ui.ArticleManager.currentDocument.getArticleIndex(/** @type {string} */(treesaver.ui.ArticleManager.currentArticlePosition.anchor)));
   }
@@ -723,7 +723,7 @@ treesaver.ui.ArticleManager.getPages = function(maxSize, buffer) {
   if (startIndex < 0) {
     prevDocument = treesaver.ui.ArticleManager.previousArticle(false, true);
 
-    if (prevDocument && prevDocument === treesaver.ui.ArticleManager.currentDocument) {
+    if (prevDocument && prevDocument.loaded && prevDocument === treesaver.ui.ArticleManager.currentDocument) {
       prevDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index - 1].setMaxPageSize(maxSize);
       pages = prevDocument.articles[treesaver.ui.ArticleManager.currentArticlePosition.index - 1].getPages(startIndex, -startIndex);
     } else if (prevDocument && prevDocument.loaded && prevDocument.articles[prevDocument.articles.length - 1].paginationComplete) {
