@@ -140,7 +140,7 @@ goog.scope(function() {
    * Whether the element has a custom Treesaver-namespaced attribute
    *
    * @param {!Element} el
-   * @param {!string} propName Unescaped
+   * @param {!string} propName Unescaped.
    * @return {boolean}
    */
   dom.hasCustomAttr = function(el, propName) {
@@ -151,7 +151,7 @@ goog.scope(function() {
    * Whether the element has a custom Treesaver-namespaced attribute
    *
    * @param {!Element} el
-   * @param {!string} propName Unescaped
+   * @param {!string} propName Unescaped.
    * @return {string}
    */
   dom.getCustomAttr = function(el, propName) {
@@ -239,7 +239,8 @@ goog.scope(function() {
 
     if (dom.dummyDiv_.childNodes.length === 1) {
       node = dom.dummyDiv_.firstChild;
-    } else {
+    }
+    else {
       node = document.createDocumentFragment();
       while (dom.dummyDiv_.firstChild) {
         node.appendChild(dom.dummyDiv_.firstChild);
@@ -260,7 +261,7 @@ goog.scope(function() {
    *
    * @param {!Node} el
    * @param {!string} tagName
-   * @returns {?Node}
+   * @return {?Node}
    */
   dom.getAncestor = function(el, tagName) {
     var parent = el,

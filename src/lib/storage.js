@@ -1,5 +1,5 @@
 /**
- * @fileoverview Simple wrapper for localStorage
+ * @fileoverview Simple wrapper for localStorage.
  */
 
 goog.provide('treesaver.storage');

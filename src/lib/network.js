@@ -4,9 +4,9 @@
 
 goog.provide('treesaver.network');
 
-goog.require('treesaver.events');
 goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
+goog.require('treesaver.events');
 goog.require('treesaver.scheduler');
 
 goog.scope(function() {
@@ -133,7 +133,7 @@ goog.scope(function() {
   /**
    * Sets the online status
    *
-   * @param {boolean} onLine True if should behave as if online
+   * @param {boolean} onLine True if should behave as if online.
    */
   network.setOnlineStatus = function(onLine) {
     network.onlineStatus_ = onLine;

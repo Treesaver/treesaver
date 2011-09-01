@@ -1,5 +1,5 @@
 /**
- * @fileoverview CSS helper functions
+ * @fileoverview CSS helper functions.
  */
 
 goog.provide('treesaver.css');

@@ -6,7 +6,7 @@ if (!Object.keys) {
    *
    * @param {!Object} o
    * @return {Array.<string>}
-   * NOTE: Suppress warnings about duplication from built-in externs
+   * NOTE: Suppress warnings about duplication from built-in externs.
    * @suppress {duplicate}
    */
   Object.keys = function(o) {

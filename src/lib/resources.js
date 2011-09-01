@@ -106,7 +106,7 @@ goog.scope(function() {
       }
       else {
         debug.error('Body not found in resource file');
-      } 
+      }
     }
     else {
       debug.error('Could not load resource file');
