@@ -1355,7 +1355,8 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function() {
 
         if (containsUrl) {
           treesaver.dom.addClass(c, 'current');
-        } else {
+        }
+        else {
           treesaver.dom.removeClass(c, 'current');
         }
       });

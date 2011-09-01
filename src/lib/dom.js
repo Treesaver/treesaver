@@ -239,7 +239,8 @@ goog.scope(function() {
 
     if (dom.dummyDiv_.childNodes.length === 1) {
       node = dom.dummyDiv_.firstChild;
-    } else {
+    }
+    else {
       node = document.createDocumentFragment();
       while (dom.dummyDiv_.firstChild) {
         node.appendChild(dom.dummyDiv_.firstChild);

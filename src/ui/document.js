@@ -178,11 +178,14 @@ goog.scope(function() {
 
     if (uri.isIndex(url) && uri.isIndex(this.url)) {
       return url === this.url;
-    } else if (uri.isIndex(url)) {
+    }
+    else if (uri.isIndex(url)) {
       return uri.stripFile(url) === this.url;
-    } else if (uri.isIndex(this.url)) {
+    }
+    else if (uri.isIndex(this.url)) {
       return url === uri.stripFile(this.url);
-    } else {
+    }
+    else {
       return url === this.url;
     }
   };
@@ -194,7 +197,8 @@ goog.scope(function() {
   Document.prototype.capabilityFilter = function() {
     if (!this.requirements) {
       return true;
-    } else {
+    }
+    else {
       return treesaver.capabilities.check(this.requirements, true);
     }
   };
@@ -317,11 +321,13 @@ goog.scope(function() {
             'document': that
           });
           return;
-        } else {
+        }
+        else {
           // Stick with cached content
           treesaver.debug.log('Document.load: Using cached content for document: ' + that.url);
         }
-      } else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
+      }
+      else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
         if (!treesaver.capabilities.IS_NATIVE_APP) {
           treesaver.debug.log('Document.load: Fetched content newer than cache for document: ' + that.url);
 
@@ -337,7 +343,8 @@ goog.scope(function() {
         treesaver.events.fireEvent(document, Document.events.LOADED, {
           'document': that
         });
-      } else {
+      }
+      else {
         treesaver.debug.log('Document.load: Fetched document content same as cached');
       }
     });

@@ -67,7 +67,8 @@ goog.scope(function() {
 
     if (url.file) {
       return (/^(index|default)\.(html?|php|asp|aspx)$/i.test(url.file) || (treesaver.ui.ArticleManager.index && treesaver.ui.ArticleManager.index.get('DirectoryIndex', 'index.html') === url.file));
-    } else {
+    }
+    else {
       return false;
     }
   };

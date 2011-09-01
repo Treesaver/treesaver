@@ -143,7 +143,8 @@ goog.scope(function() {
       ArticleManager.currentDocumentIndex = index.getDocumentIndex(ArticleManager.initialDocument);
 
       document.title = ArticleManager.initialDocument.meta['title'] || ArticleManager.initialDocument.title;
-    } else {
+    }
+    else {
       // Whoops, what happens here? We loaded a document, it has an index, but
       // the index does not contain a reference to the document that referenced it.
       // Emit an error for now.
@@ -309,10 +310,12 @@ goog.scope(function() {
           index,
           true
         );
-      } else {
+      }
+      else {
         ArticleManager.goToDocumentByURL(e['state'].url);
       }
-    } else {
+    }
+    else {
       // Assume initial article
       index = ArticleManager.index.getDocumentIndex(ArticleManager.initialDocument);
 
@@ -413,12 +416,14 @@ goog.scope(function() {
     if (doc) {
       if (doc.loaded) {
         articlePosition = new ArticlePosition(doc.getNumberOfArticles() - 1);
-      } else {
+      }
+      else {
         articlePosition = ArticlePosition.END;
       }
 
       return fetch ? doc : ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
-    } else {
+    }
+    else {
       return null;
     }
   };
@@ -439,7 +444,8 @@ goog.scope(function() {
           doc = /** @type {!treesaver.ui.Document} */ (ArticleManager.currentDocument);
 
       return fetch ? doc : ArticleManager.setCurrentDocument(doc, articlePosition, end ? treesaver.layout.ContentPosition.END : null, index);
-    } else {
+    }
+    else {
       return ArticleManager.previousDocument(end, fetch);
     }
   };
@@ -507,14 +513,17 @@ goog.scope(function() {
       if (ArticleManager.currentPageIndex <
           ArticleManager.currentDocument.articles[ArticleManager.currentArticlePosition.index].pageCount - 1) {
         return true;
-      } else {
+      }
+      else {
         return ArticleManager.currentDocument.articles[ArticleManager.currentArticlePosition.index].paginationComplete && ArticleManager.canGoToNextArticle();
       }
-    } else {
+    }
+    else {
       // Perhaps we're on the last page of the article?
       if (ArticleManager.currentPosition === treesaver.layout.ContentPosition.END) {
         return ArticleManager.canGoToNextArticle();
-      } else {
+      }
+      else {
         // We have no idea what page we are on, so we don't know if we can advance
         return false;
       }
@@ -570,7 +579,8 @@ goog.scope(function() {
 
     if (doc) {
       return fetch ? doc : ArticleManager.setCurrentDocument(doc, ArticlePosition.BEGINNING, null, index);
-    } else {
+    }
+    else {
       return null;
     }
   };
@@ -590,7 +600,8 @@ goog.scope(function() {
           doc = /** @type {!treesaver.ui.Document} */ (ArticleManager.currentDocument);
 
       return fetch ? doc : ArticleManager.setCurrentDocument(doc, articlePosition, null, index);
-    } else {
+    }
+    else {
       return ArticleManager.nextDocument(fetch);
     }
   };
@@ -669,7 +680,8 @@ goog.scope(function() {
       // If the document is loaded and we have an anchor, we can just look up the desired article index
       if (doc.loaded && articleAnchor) {
         articlePosition = new ArticlePosition(doc.getArticleIndex(articleAnchor));
-      } else {
+      }
+      else {
         articlePosition = new ArticlePosition(0, articleAnchor);
       }
 
@@ -691,7 +703,8 @@ goog.scope(function() {
   ArticleManager.getPages = function(maxSize, buffer) {
     if (ArticleManager.currentArticlePosition.atEnding() && ArticleManager.currentDocument.loaded) {
       ArticleManager.currentArticlePosition = new ArticlePosition(ArticleManager.currentDocument.articles.length - 1);
-    } else if (ArticleManager.currentArticlePosition.isAnchor() && ArticleManager.currentDocument.loaded) {
+    }
+    else if (ArticleManager.currentArticlePosition.isAnchor() && ArticleManager.currentDocument.loaded) {
       // This will return 0 (meaning the first article) if the anchor is not found.
       ArticleManager.currentArticlePosition = new ArticlePosition(ArticleManager.currentDocument.getArticleIndex(/** @type {string} */(ArticleManager.currentArticlePosition.anchor)));
     }
@@ -739,9 +752,11 @@ goog.scope(function() {
       if (prevDocument && prevDocument.loaded && prevDocument === ArticleManager.currentDocument) {
         prevDocument.articles[ArticleManager.currentArticlePosition.index - 1].setMaxPageSize(maxSize);
         pages = prevDocument.articles[ArticleManager.currentArticlePosition.index - 1].getPages(startIndex, -startIndex);
-      } else if (prevDocument && prevDocument.loaded && prevDocument.articles[prevDocument.articles.length - 1].paginationComplete) {
+      }
+      else if (prevDocument && prevDocument.loaded && prevDocument.articles[prevDocument.articles.length - 1].paginationComplete) {
         pages = prevDocument.articles[prevDocument.articles.length - 1].getPages(startIndex, -startIndex);
-      } else {
+      }
+      else {
         // Previous article isn't there or isn't ready
         for (i = 0, len = -startIndex; i < len; i += 1) {
           // Don't show loading page, looks weird in the UI and we're not loading
@@ -751,7 +766,8 @@ goog.scope(function() {
 
       missingPageCount = pageCount + startIndex;
       startIndex = 0;
-    } else {
+    }
+    else {
       missingPageCount = pageCount;
     }
 
@@ -769,17 +785,20 @@ goog.scope(function() {
 
       // The next article could either be in this document (a document with more than one article), or in the next document
       if (nextDocument && nextDocument === ArticleManager.currentDocument) {
-          nextDocument.articles[ArticleManager.currentArticlePosition.index + 1].setMaxPageSize(maxSize);
-          pages = pages.concat(nextDocument.articles[ArticleManager.currentArticlePosition.index + 1].getPages(0, missingPageCount));
-      } else if (nextDocument) {
+        nextDocument.articles[ArticleManager.currentArticlePosition.index + 1].setMaxPageSize(maxSize);
+        pages = pages.concat(nextDocument.articles[ArticleManager.currentArticlePosition.index + 1].getPages(0, missingPageCount));
+      }
+      else if (nextDocument) {
         if (!nextDocument.loaded) {
           nextDocument.load();
           pages.length = pageCount;
-        } else {
+        }
+        else {
           nextDocument.articles[0].setMaxPageSize(maxSize);
           pages = pages.concat(nextDocument.articles[0].getPages(0, missingPageCount));
         }
-      } else {
+      }
+      else {
         // No next article = leave blank
       }
     }
@@ -790,7 +809,8 @@ goog.scope(function() {
       if (!pages[i]) {
         if (!ArticleManager.currentDocument.error) {
           pages[i] = ArticleManager._createLoadingPage();
-        } else {
+        }
+        else {
           pages[i] = ArticleManager._createErrorPage();
         }
       }
@@ -855,7 +875,8 @@ goog.scope(function() {
     if (!ArticleManager.currentDocument.articles[ArticleManager.currentArticlePosition.index] ||
         ArticleManager.currentArticlePosition === ArticlePosition.END) {
       return 1;
-    } else {
+    }
+    else {
       return ArticleManager.currentDocument.articles[ArticleManager.currentArticlePosition.index].pageCount || 1;
     }
   };
@@ -910,7 +931,8 @@ goog.scope(function() {
   ArticleManager.redirectToDocument = function(doc) {
     if (network.isOnline()) {
       document.location = doc.url;
-    } else {
+    }
+    else {
       debug.error('Tried to redirect to a document while offline');
     }
   };
@@ -956,7 +978,8 @@ goog.scope(function() {
           url: url,
           position: pos
         }, doc.meta['title'], path);
-      } else {
+      }
+      else {
         treesaver.history.replaceState({
           index: index,
           url: url,
@@ -979,18 +1002,19 @@ goog.scope(function() {
     // Changing document/article always changes the current page index
     ArticleManager.currentPageIndex = -1;
     ArticleManager.currentArticlePosition = articlePosition;
-    ArticleManager.currentArticle =
-      ArticleManager.currentDocument.getArticle(articlePosition && articlePosition.index || 0);
+    ArticleManager.currentArticle = ArticleManager.currentDocument.getArticle(articlePosition && articlePosition.index || 0);
 
     if (!doc.loaded) {
       doc.load();
-    } else if (doc.error) {
+    }
+    else if (doc.error) {
       ArticleManager.redirectToDocument(doc);
     }
 
     if (index || index === 0) {
       ArticleManager.currentDocumentIndex = index;
-    } else {
+    }
+    else {
       ArticleManager.currentDocumentIndex = ArticleManager.index.getDocumentIndex(doc);
     }
 
@@ -1001,7 +1025,8 @@ goog.scope(function() {
         url: url,
         position: pos
       }, doc.meta['title'] || '', path);
-    } else {
+    }
+    else {
       treesaver.history.replaceState({
         index: index,
         url: url,

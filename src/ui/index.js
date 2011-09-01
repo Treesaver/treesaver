@@ -103,7 +103,8 @@ goog.scope(function() {
 
     if (typeof entry === 'string') {
       url = entry;
-    } else {
+    }
+    else {
       url = entry['url'];
       contents = entry['contents'];
 
@@ -115,7 +116,8 @@ goog.scope(function() {
       if (entry['requires']) {
         if (typeof entry['requires'] === 'string') {
           requirements = entry['requires'].split(/\s|,\s/g);
-        } else if (Array.isArray(entry['requires'])) {
+        }
+        else if (Array.isArray(entry['requires'])) {
           // Make sure our `requires` entries are actually strings
           requirements = entry['requires'].map(function(value) {
             return value.toString();
@@ -167,14 +169,16 @@ goog.scope(function() {
     this.walk(this.contents, function(doc) {
       if (this.documentMap[doc.url]) {
         this.documentMap[doc.url].push(doc);
-      } else {
+      }
+      else {
         this.documentMap[doc.url] = [doc];
       }
       this.documents.push(doc);
 
       if (this.documentPositions[doc.url]) {
         this.documentPositions[doc.url].push(index);
-      } else {
+      }
+      else {
         this.documentPositions[doc.url] = [index];
       }
       index += 1;
@@ -248,7 +252,8 @@ goog.scope(function() {
 
     if (!url) {
       return this.documents;
-    } else {
+    }
+    else {
       this.walk(this.contents, function(doc) {
         if (doc.equals(url)) {
           result.push(doc);
@@ -341,7 +346,8 @@ goog.scope(function() {
   Index.prototype.get = function(key, defaultValue) {
     if (this.settings.hasOwnProperty(key)) {
       return this.settings[key];
-    } else {
+    }
+    else {
       return defaultValue;
     }
   };
@@ -415,11 +421,13 @@ goog.scope(function() {
             'index': that
           });
           return;
-        } else {
+        }
+        else {
           // Stick with cached content
           debug.log('Index.load: Using cached content for index: ' + that.url);
         }
-      } else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
+      }
+      else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
         if (!treesaver.capabilities.IS_NATIVE_APP) {
           debug.log('Index.load: Fetched content newer than cache for index: ' + that.url);
 
@@ -439,7 +447,8 @@ goog.scope(function() {
         });
 
         that.update();
-      } else {
+      }
+      else {
         debug.log('Index.load: Fetched index same as cached');
       }
     });
