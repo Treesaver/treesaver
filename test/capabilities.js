@@ -32,8 +32,14 @@ $(function() {
   test('mutableCapabilityRegex', function () {
     // Make sure the regex catches positive and negative capability names
     ok(treesaver.capabilities.mutableCapabilityRegex_.test('offline'), 'offline');
+    // Reset Regex
+    treesaver.capabilities.mutableCapabilityRegex_.lastIndex = 0;
     ok(treesaver.capabilities.mutableCapabilityRegex_.test('no-offline'), 'no-offline');
+    // Reset Regex
+    treesaver.capabilities.mutableCapabilityRegex_.lastIndex = 0;
     ok(treesaver.capabilities.mutableCapabilityRegex_.test('bogus offline'), 'bogus offline');
+    // Reset Regex
+    treesaver.capabilities.mutableCapabilityRegex_.lastIndex = 0;
     ok(treesaver.capabilities.mutableCapabilityRegex_.test('orientation-horizontal'), 'orientation-horizontal');
   });
 });

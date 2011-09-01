@@ -557,6 +557,8 @@ goog.scope(function() {
 
     // Now, remove values of mutable capabilities
     // TODO: As we get more of these, need a simpler way to filter out the old values
+    // Make sure to reset the lastIndex for non-sticky search
+    capabilities.mutableCapabilityRegex_.lastIndex = 0;
     className = className.replace(capabilities.mutableCapabilityRegex_, '');
 
     className += ' ' + capabilities.mutableCaps_.join(' ');
