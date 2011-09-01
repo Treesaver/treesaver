@@ -109,7 +109,7 @@ goog.scope(function() {
     // Luckily it runs only once
     if (/webkit/.test(capabilities.ua_)) {
       if (/chrome|safari/.test(capabilities.ua_)) {
-        return /(chrome|safari)/.exec(capabilities.ua_)[0];
+        return (/(chrome|safari)/).exec(capabilities.ua_)[0];
       }
       else {
         return 'webkit';

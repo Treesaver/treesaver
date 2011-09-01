@@ -114,7 +114,7 @@ goog.scope(function() {
       return false;
     }
 
-    var i, len, block;
+    var i, len, figure, delayed, block;
 
     // Check if there are any blocks left to layout, not including
     // fallbacks for optional (or used) figures
@@ -142,8 +142,7 @@ goog.scope(function() {
 
     // We have some figures left, gotta figure out if any of them are
     // required
-    var i, len, figure,
-        delayed = this.delayed.slice(0);
+    delayed = this.delayed.slice(0);
 
     // First, check the delayed figures
     while (delayed.length) {
