@@ -27,11 +27,6 @@ goog.scope(function() {
         originalBr = br.clone(),
         containerFilled = false;
 
-    /**
-     * @type {boolean}
-     */
-    this.ignore;
-
     if (!best || !best.grid) {
       // Might have leftover figures that just won't fit
       br.finished = br.atEnd(content) ||
@@ -50,13 +45,7 @@ goog.scope(function() {
     }
 
     // Store state
-    /**
-     * @type {!treesaver.dimensions.Metrics}
-     */
     this.size = best.grid.stretchedSize.clone();
-    /**
-     * @type {!treesaver.layout.ContentPosition}
-     */
     this.begin = br.getPosition();
 
     // Create our host for measuring and producing HTML
@@ -65,9 +54,6 @@ goog.scope(function() {
     // TODO: Perhaps not, since IE has innerHTML issues when disconnected
     document.body.appendChild(host);
     host.innerHTML = best.grid.html;
-    /**
-     * @type {?Element}
-     */
     this.node = /** @type {!Element} */ (host.firstChild);
 
     // Manually set dimensions on the page
@@ -172,21 +158,8 @@ goog.scope(function() {
         dom.addClass(this.node, 'last-page');
       }
 
-      /**
-      * @type {string}
-      */
       this.html = host.innerHTML;
-
-      /**
-      * @type {!treesaver.layout.ContentPosition}
-      */
       this.end = br.getPosition();
-
-      // Page is not yet active
-      /**
-      * @type {boolean}
-      */
-      this.active = false;
 
       // Increment page number
       br.pageNumber += 1;
@@ -204,6 +177,41 @@ goog.scope(function() {
       dimensions = treesaver.dimensions,
       dom = treesaver.dom,
       Scrollable = treesaver.ui.Scrollable;
+
+  /**
+   * @type {boolean}
+   */
+  Page.prototype.ignore;
+
+  /**
+   * @type {!treesaver.dimensions.Metrics}
+   */
+  Page.prototype.size;
+
+  /**
+   * @type {!treesaver.layout.ContentPosition}
+   */
+  Page.prototype.begin;
+
+  /**
+   * @type {?Element}
+   */
+  Page.prototype.node;
+
+  /**
+   * @type {string}
+   */
+  Page.prototype.html;
+
+  /**
+   * @type {!treesaver.layout.ContentPosition}
+   */
+  Page.prototype.end;
+
+  /**
+   * @type {boolean}
+   */
+  Page.prototype.active;
 
   /**
    * @param {!Element} container

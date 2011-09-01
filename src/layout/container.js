@@ -21,14 +21,8 @@ goog.scope(function() {
   treesaver.layout.Container = function(el, gridHeight) {
     var d = new treesaver.dimensions.Metrics(el);
 
-    /**
-     * @type {boolean}
-     */
     this.flexible = !treesaver.dom.hasClass(el, 'fixed');
 
-    /**
-     * @type {number}
-     */
     this.minH = d.minH;
 
     // Need to clear the minHeight, if there is one, in order to get an accurate
@@ -37,14 +31,8 @@ goog.scope(function() {
       treesaver.dimensions.setCssPx(el, 'minHeight', 0);
     }
 
-    /**
-     * @type {number}
-     */
     this.h = d.outerH;
 
-    /**
-     * @type {number}
-     */
     this.delta = Math.max(0, gridHeight - this.h);
 
     var sizesProperty = el.getAttribute('data-sizes');
@@ -60,6 +48,31 @@ goog.scope(function() {
   var Container = treesaver.layout.Container,
       dimensions = treesaver.dimensions,
       dom = treesaver.dom;
+
+  /**
+   * @type {boolean}
+   */
+  Container.prototype.flexible;
+
+  /**
+   * @type {number}
+   */
+  Container.prototype.minH;
+
+  /**
+   * @type {number}
+   */
+  Container.prototype.h;
+
+  /**
+   * @type {number}
+   */
+  Container.prototype.delta;
+
+  /**
+   * @type {!Array.<string>}
+   */
+  Container.prototype.sizes;
 
   /**
    * @param {number} gridHeight

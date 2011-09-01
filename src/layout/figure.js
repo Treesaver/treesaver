@@ -23,33 +23,14 @@ goog.scope(function() {
    * @constructor
    */
   treesaver.layout.Figure = function(el, baseLineHeight, indices) {
-    /** @type {number} */
     this.anchorIndex = indices.index;
-    /** @type {number} */
     this.figureIndex = indices.figureIndex;
     indices.figureIndex += 1;
-    /** @type {?treesaver.layout.Block} */
     this.fallback = null;
-    /** @type {Object.<string, Array.<treesaver.layout.FigureSize>>} */
     this.sizes = {};
 
-    /**
-     * Does this figure need to be displayed? If not, then it may be omitted
-     * when there is not enough space.
-     * @type {boolean}
-     */
     this.optional = !dom.hasClass(el, 'required');
-
-    /**
-     * Does the figure support zooming/lightboxing?
-     * @type {boolean}
-     */
     this.zoomable = dom.hasClass(el, 'zoomable');
-
-    /**
-     * Does the figure support scrolling?
-     * @type {boolean}
-     */
     this.scrollable = dom.hasClass(el, 'scroll');
 
     // Go through and process our sizes
@@ -84,6 +65,45 @@ goog.scope(function() {
       capabilities = treesaver.capabilities,
       dom = treesaver.dom,
       FigureSize = treesaver.layout.FigureSize;
+
+  /**
+   * @type {number}
+   */
+  Figure.prototype.anchorIndex;
+
+  /**
+   * @type {number}
+   */
+  Figure.prototype.figureIndex;
+
+  /**
+   * @type {?treesaver.layout.Block}
+   */
+  Figure.prototype.fallback;
+
+  /**
+   * @type {Object.<string, Array.<treesaver.layout.FigureSize>>}
+   */
+  Figure.prototype.sizes;
+
+  /**
+   * Does this figure need to be displayed? If not, then it may be omitted
+   * when there is not enough space.
+   * @type {boolean}
+   */
+  Figure.prototype.optional;
+
+  /**
+   * Does the figure support zooming/lightboxing?
+   * @type {boolean}
+   */
+  Figure.prototype.zoomable;
+
+  /**
+   * Does the figure support scrolling?
+   * @type {boolean}
+   */
+  Figure.prototype.scrollable;
 
   /**
    * @param {!string} html

@@ -16,7 +16,7 @@ goog.scope(function() {
       dom = treesaver.dom;
 
   /**
-   * Lightbox
+   * LightBox
    *
    * @param {!Element} node HTML node.
    * @constructor
@@ -31,44 +31,17 @@ goog.scope(function() {
       }
     }
 
-    /**
-    * List of required capabilities for this LightBox
-    * TODO: Only store mutable capabilities
-    *
-    * @type {?Array.<string>}
-    */
+    // TODO: Only store mutable capabilities
     this.requirements = dom.hasAttr(node, 'data-requires') ?
       node.getAttribute('data-requires').split(' ') : null;
 
-    /**
-    * @type {string}
-    */
     this.html = node.parentNode.innerHTML;
 
-    /**
-    * The measurements of the chrome
-    * @type {!treesaver.dimensions.Metrics}
-    */
     this.size = new dimensions.Metrics(node);
 
     // Clean up metrics object
     delete this.size.w;
     delete this.size.h;
-
-    /**
-    * @type {boolean}
-    */
-    this.active = false;
-
-    /**
-    * @type {?Element}
-    */
-    this.node = null;
-
-    /**
-    * @type {?Element}
-    */
-    this.container = null;
   };
 });
 
@@ -79,6 +52,39 @@ goog.scope(function() {
       dimensions = treesaver.dimensions,
       dom = treesaver.dom,
       Scrollable = treesaver.ui.Scrollable;
+
+  /**
+   * List of required capabilities for this LightBox
+   *
+   * @type {?Array.<string>}
+   */
+  LightBox.prototype.requirements;
+
+  /**
+   * @type {string}
+   */
+  LightBox.prototype.html;
+
+  /**
+   * The measurements of the chrome
+   * @type {!treesaver.dimensions.Metrics}
+   */
+  LightBox.prototype.size;
+
+  /**
+   * @type {boolean}
+   */
+  LightBox.prototype.active;
+
+  /**
+   * @type {?Element}
+   */
+  LightBox.prototype.node;
+
+  /**
+   * @type {?Element}
+   */
+  LightBox.prototype.container;
 
   /**
    * @return {!Element} The activated node.

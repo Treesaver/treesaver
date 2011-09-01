@@ -25,86 +25,9 @@ goog.scope(function() {
    * @param {?Element} node
    */
   treesaver.ui.Article = function(grids, node, doc) {
-    /**
-     * @type {?string}
-     */
-    this.theme = null;
-
-    /**
-     * @type {treesaver.layout.Content} The content of this article
-     */
-    this.content = null;
-
-    /**
-     * @type {treesaver.layout.BreakRecord}
-     */
-    this.br = null;
-
-    /**
-     * @type {number}
-     */
-    this.pageCount = 0;
-
-    /**
-     * @type {Array.<treesaver.layout.Page>}
-     */
     this.pages = [];
-
-    /**
-     * @type {boolean}
-     */
-    this.paginationClean = false;
-
-    /**
-     * @type {boolean}
-     */
-    this.paginationComplete = false;
-
-    /**
-     * @type {boolean}
-     */
-    this.loaded = false;
-
-    /**
-     * @type {boolean}
-     */
-    this.loading = false;
-
-    /**
-     * @type {boolean}
-     */
-    this.loadFailed = false;
-
-    /**
-     * @type {boolean}
-     */
-    this.error = false;
-
-    /**
-     * @type {?{ w: number, h: number }} size
-     */
-    this.maxPageSize = null;
-
-    /**
-     * Constraint ...
-     * @type {?treesaver.dimensions.SizeRange}
-     */
-    this.constraint = null;
-
-    /**
-     * @type {!Array.<treesaver.layout.Grid>}
-     */
     this.eligible_grids = [];
-
-    /**
-     * @type {Array.<treesaver.layout.Grid>}
-     */
     this.grids = grids;
-
-    /**
-     * Reference to the parent document.
-     * @type {!treesaver.ui.Document}
-     */
     this.doc = doc;
 
     // Automatically process the HTML, if any was given to us
@@ -127,6 +50,88 @@ goog.scope(function() {
       ContentPosition = treesaver.layout.ContentPosition,
       Grid = treesaver.layout.Grid,
       Page = treesaver.layout.Page;
+
+  /**
+   * @type {?string}
+   */
+  Article.prototype.theme;
+
+  /**
+   * @type {treesaver.layout.Content} The content of this article
+   */
+  Article.prototype.content;
+
+  /**
+   * @type {treesaver.layout.BreakRecord}
+   */
+  Article.prototype.br;
+
+  /**
+   * @type {number}
+   */
+  Article.prototype.pageCount;
+
+  /**
+   * @type {Array.<treesaver.layout.Page>}
+   */
+  Article.prototype.pages;
+
+  /**
+   * @type {boolean}
+   */
+  Article.prototype.paginationClean;
+
+  /**
+   * @type {boolean}
+   */
+  Article.prototype.paginationComplete;
+
+  /**
+   * @type {boolean}
+   */
+  Article.prototype.loaded;
+
+  /**
+   * @type {boolean}
+   */
+  Article.prototype.loading;
+
+  /**
+   * @type {boolean}
+   */
+  Article.prototype.loadFailed;
+
+  /**
+   * @type {boolean}
+   */
+  Article.prototype.error;
+
+  /**
+   * @type {?{ w: number, h: number }} size
+   */
+  Article.prototype.maxPageSize;
+
+  /**
+   * Constraint ...
+   * @type {?treesaver.dimensions.SizeRange}
+   */
+  Article.prototype.constraint;
+
+  /**
+   * @type {!Array.<treesaver.layout.Grid>}
+   */
+  Article.prototype.eligible_grids;
+
+  /**
+   * @type {Array.<treesaver.layout.Grid>}
+   */
+  Article.prototype.grids;
+
+  /**
+   * Reference to the parent document.
+   * @type {!treesaver.ui.Document}
+   */
+  Article.prototype.doc;
 
   /**
    * Names of events fired by this class

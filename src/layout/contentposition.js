@@ -19,6 +19,21 @@ goog.scope(function() {
   var ContentPosition = treesaver.layout.ContentPosition;
 
   /**
+   * @type {number}
+   */
+  ContentPosition.prototype.block;
+
+  /**
+   * @type {number}
+   */
+  ContentPosition.prototype.figure;
+
+  /**
+   * @type {number}
+   */
+  ContentPosition.prototype.overhang;
+
+  /**
    * Position at the end of content
    *
    * @const

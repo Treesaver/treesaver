@@ -38,164 +38,22 @@ goog.scope(function() {
       }
     }
 
-    /**
-     * List of required capabilities for this Chrome
-     * TODO: Only store mutable capabilities
-     *
-     * @type {?Array.<string>}
-     */
+    // TODO: Only store mutable capabilities
     this.requirements = dom.hasAttr(node, 'data-requires') ?
       node.getAttribute('data-requires').split(' ') : null;
 
     // Create DOM infrastructure for scrolling elements
     Scrollable.initDomTree(node);
 
-    /**
-     * @type {?Element}
-     */
-    this.node = null;
-
-    /**
-     * @type {string}
-     */
+    // Save out the HTML now that the DOM is prepped
     this.html = node.parentNode.innerHTML;
 
-    /**
-     * The measurements of the chrome
-     * @type {!treesaver.dimensions.Metrics}
-     */
+    // Measure the chrome
     this.size = new dimensions.Metrics(node);
 
     // Clean up metrics object
     delete this.size.w;
     delete this.size.h;
-
-    /**
-     * The area available to pages (i.e. the size of the viewer)
-     * @type {?treesaver.dimensions.Size}
-     */
-    this.pageArea = null;
-
-    /**
-     * @type {boolean}
-     */
-    this.active = false;
-
-    /**
-     * Cached reference to viewer DOM
-     * @type {?Element}
-     */
-    this.viewer = null;
-
-    /**
-     * Cached reference to page width DOM
-     * @type {?Array.<Element>}
-     */
-    this.pageWidth = null;
-
-    /**
-     * @type {?Array.<treesaver.layout.Page>}
-     */
-    this.pages = null;
-
-    /**
-     * Whether the UI is current in active state
-     * @type {boolean}
-     */
-    this.uiActive = false;
-
-    /**
-     * Cached references to the menu TOC
-     * @type {?Array.<Element>}
-     */
-    this.menus = [];
-
-    /**
-     * @type {boolean}
-     */
-    this.lightBoxActive = false;
-
-    /**
-     * @type {?treesaver.ui.LightBox}
-     */
-    this.lightBox = null;
-
-    /**
-     * @type {?Array.<Element>}
-     */
-    this.sidebars = null;
-
-    /**
-     * Cached reference to the next page DOM
-     * @type {?Array.<Element>}
-     */
-    this.nextPage = null;
-
-    /**
-     * Cached reference to the next article DOM
-     * @type {?Array.<Element>}
-     */
-    this.nextArticle = null;
-
-    /**
-     * Cached reference to the previous page DOM
-     * @type {?Array.<Element>}
-     */
-    this.prevPage = null;
-
-    /**
-     * Cached reference to the previous article DOM
-     * @type {?Array.<Element>}
-     */
-    this.prevArticle = null;
-
-    /**
-     * Cached references to the position templates elements
-     * @type {?Array.<Element>}
-     */
-    this.positionElements = [];
-
-    /**
-     * Cached reference to the original position templates
-     * @type {?Array.<string>}
-     */
-    this.positionTemplates = [];
-
-    /**
-     * Cached references to the index templates elements
-     * @type {?Array.<Element>}
-     */
-    this.indexElements = [];
-
-    /**
-     * Cached reference to the original index templates
-     * @type {?Array.<string>}
-     */
-    this.indexTemplates = [];
-
-    /**
-     * Cached references to the current-document template elements
-     * @type {?Array.<Element>}
-     */
-    this.currentDocumentElements = [];
-
-    /**
-     * Cached reference to the original current-document templates
-     * @type {?Array.<string>}
-     */
-    this.currentDocumentTemplates = [];
-
-    /**
-     * Cached references to the publication template elements
-     * @type {?Array.<Element>}
-     */
-    this.publicationElements = [];
-
-    /**
-     * Cached reference to the original publication templates
-     * @type {?Array.<string>}
-     */
-    this.publicationTemplates = [];
   };
 });
 
@@ -206,11 +64,161 @@ goog.scope(function() {
       debug = treesaver.debug,
       dimensions = treesaver.dimensions,
       dom = treesaver.dom,
-      network = treesaver.network
+      network = treesaver.network,
       scheduler = treesaver.scheduler,
       ArticleManager = treesaver.ui.ArticleManager,
       Index = treesaver.ui.Index,
       Scrollable = treesaver.ui.Scrollable;
+
+  /**
+   * List of required capabilities for this Chrome
+   *
+   * @type {?Array.<string>}
+   */
+  Chrome.prototype.requirements;
+
+  /**
+   * @type {?Element}
+   */
+  Chrome.prototype.node;
+
+  /**
+   * @type {string}
+   */
+  Chrome.prototype.html;
+
+  /**
+   * The measurements of the chrome
+   * @type {!treesaver.dimensions.Metrics}
+   */
+  Chrome.prototype.size;
+
+  /**
+   * The area available to pages (i.e. the size of the viewer)
+   * @type {?treesaver.dimensions.Size}
+   */
+  Chrome.prototype.pageArea;
+
+  /**
+   * @type {boolean}
+   */
+  Chrome.prototype.active;
+
+  /**
+   * Cached reference to viewer DOM
+   * @type {?Element}
+   */
+  Chrome.prototype.viewer;
+
+  /**
+   * Cached reference to page width DOM
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.pageWidth;
+
+  /**
+   * @type {?Array.<treesaver.layout.Page>}
+   */
+  Chrome.prototype.pages;
+
+  /**
+   * Whether the UI is current in active state
+   * @type {boolean}
+   */
+  Chrome.prototype.uiActive;
+
+  /**
+   * Cached references to the menu TOC
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.menus;
+
+  /**
+   * @type {boolean}
+   */
+  Chrome.prototype.lightBoxActive;
+
+  /**
+   * @type {?treesaver.ui.LightBox}
+   */
+  Chrome.prototype.lightBox;
+
+  /**
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.sidebars;
+
+  /**
+   * Cached reference to the next page DOM
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.nextPage;
+
+  /**
+   * Cached reference to the next article DOM
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.nextArticle;
+
+  /**
+   * Cached reference to the previous page DOM
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.prevPage;
+
+  /**
+   * Cached reference to the previous article DOM
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.prevArticle;
+
+  /**
+   * Cached references to the position templates elements
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.positionElements;
+
+  /**
+   * Cached reference to the original position templates
+   * @type {?Array.<string>}
+   */
+  Chrome.prototype.positionTemplates;
+
+  /**
+   * Cached references to the index templates elements
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.indexElements;
+
+  /**
+   * Cached reference to the original index templates
+   * @type {?Array.<string>}
+   */
+  Chrome.prototype.indexTemplates;
+
+  /**
+   * Cached references to the current-document template elements
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.currentDocumentElements;
+
+  /**
+   * Cached reference to the original current-document templates
+   * @type {?Array.<string>}
+   */
+  Chrome.prototype.currentDocumentTemplates;
+
+  /**
+   * Cached references to the publication template elements
+   * @type {?Array.<Element>}
+   */
+  Chrome.prototype.publicationElements;
+
+  /**
+   * Cached reference to the original publication templates
+   * @type {?Array.<string>}
+   */
+  Chrome.prototype.publicationTemplates;
 
   /**
    * @return {!Element} The activated node.
@@ -1751,7 +1759,7 @@ goog.scope(function() {
   /**
    * Find the first chrome that meets the current requirements
    *
-   * @param {Array.<treesver.ui.Chrome>} chromes
+   * @param {Array.<treesaver.ui.Chrome>} chromes
    * @param {treesaver.dimensions.Size} availSize
    * @return {?treesaver.ui.Chrome} A suitable Chrome, if one was found.
    */

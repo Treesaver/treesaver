@@ -17,52 +17,7 @@ goog.require('treesaver.uri');
  * @param {?string} url The url the index was loaded from.
  */
 treesaver.ui.Index = function(url) {
-
-  /**
-   * @type {?string}
-   */
   this.url = url;
-
-  /**
-   * @type {!Array.<treesaver.ui.Document>}
-   */
-  this.contents = [];
-
-  /**
-   * @type {!Object}
-   */
-  this.settings = {};
-
-  /**
-   * @type {!Object}
-   */
-  this.meta = {};
-
-  /**
-   * @type {boolean}
-   */
-  this.loaded = false;
-
-  /**
-   * @type {boolean}
-   */
-  this.loading = false;
-
-  /**
-   * @type {!Object}
-   */
-  this.documentMap = {};
-
-  /**
-   * @type {!Object}
-   */
-  this.documentPositions = {};
-
-  /**
-   * Linear list of documents. This is used as a cache. You can invalidate and repopulate the cache by calling update().
-   * @type {!Array.<treesaver.ui.Document>}
-   */
-  this.documents = [];
 };
 
 goog.scope(function() {
@@ -77,6 +32,52 @@ goog.scope(function() {
       json = treesaver.json;
 
   Index.prototype = new TreeNode();
+
+  /**
+   * @type {?string}
+   */
+  Index.prototype.url;
+
+  /**
+   * @type {!Array.<treesaver.ui.Document>}
+   */
+  Index.prototype.contents;
+
+  /**
+   * @type {!Object}
+   */
+  Index.prototype.settings;
+
+  /**
+   * @type {!Object}
+   */
+  Index.prototype.meta;
+
+  /**
+   * @type {boolean}
+   */
+  Index.prototype.loaded;
+
+  /**
+   * @type {boolean}
+   */
+  Index.prototype.loading;
+
+  /**
+   * @type {!Object}
+   */
+  Index.prototype.documentMap;
+
+  /**
+   * @type {!Object}
+   */
+  Index.prototype.documentPositions;
+
+  /**
+   * Linear list of documents. This is used as a cache. You can invalidate and repopulate the cache by calling update().
+   * @type {!Array.<treesaver.ui.Document>}
+   */
+  Index.prototype.documents = [];
 
   // Do we ever use a different cache prefix? If not, perhaps we should
   // pull this up.

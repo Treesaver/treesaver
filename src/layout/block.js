@@ -68,14 +68,9 @@ goog.scope(function() {
       return;
     }
 
-    /**
-     * Index of this block within the article
-     * @type {!number}
-     */
     this.index = indices.index;
     indices.index += 1;
 
-    /** @type {boolean} */
     this.hasBlockChildren = !isReplacedElement &&
       treesaver.layout.Block.hasBlockChildren(node);
 
@@ -83,25 +78,9 @@ goog.scope(function() {
     // Hierarchy
     ///////////////
 
-    /** @type {boolean } */
-    this.isFallback = false; // Set during process children
-    /** @type {boolean } */
-    this.withinFallback = false; // Set during process children
-    /** @type {boolean } */
-    this.containsFallback = false;
-    /** @type {?treesaver.layout.Figure} */
-    this.figure = null;
-
-    /**
-     * Blocks contained within this block
-     * @type {?Array.<treesaver.layout.Block>}
-     */
     this.blocks = [];
-    /**
-     * Figures contained within this block
-     * @type {?Array.<treesaver.layout.Block>}
-     */
     this.figures = [];
+
     /** @type {?boolean} */
     hasFigures = false;
     if (this.hasBlockChildren && !dom.hasClass(node, 'keeptogether')) {
@@ -121,43 +100,9 @@ goog.scope(function() {
       // Or a paragraph, for that matter
     }
 
-    // Listing and annotation of all class variables for Closure Compiler type
-    // checking
-
-    /**
-     * Next Sibling
-     * @type {?treesaver.layout.Block}
-     */
-    //this.nextSibling = null;
-
-    /**
-     * Parent block
-     * @type {?treesaver.layout.Block}
-     */
-    //this.parent = null;
-
-    /**
-     * Can this block be broken into multiple pieces (across cols/pages)
-     * @type {boolean}
-     */
     this.breakable = this.breakable || !isReplacedElement;
-
-    /**
-     * Make sure this block and the next block are in the same column
-     * @type {boolean}
-     */
     this.keepwithnext = dom.hasClass(node, 'keepwithnext');
-
-    /**
-     * Begin a new column before adding this block
-     * @type {boolean}
-     */
     this.columnBreak = dom.hasClass(node, 'columnbreak');
-
-    /**
-     * Should this block remain unbroken, if possible
-     * @type {boolean}
-     */
     this.keeptogether = this.keeptogether || !this.breakable ||
                         dom.hasClass(node, 'keeptogether');
 
@@ -165,9 +110,6 @@ goog.scope(function() {
     // Metrics
     /////////////
 
-    /**
-     * @type {!treesaver.dimensions.Metrics}
-     */
     this.metrics = new dimensions.Metrics(node);
 
     // Correct line height in case there's a funky non-pixel value
@@ -216,23 +158,9 @@ goog.scope(function() {
     // HTML
     ////////////
 
-    /**
-     * HTML for entire element (content and children)
-     * @type {!string}
-     */
     this.html = dom.outerHTML(node);
-
-    /**
-     * HTML for opening tag
-     * @type {?string}
-     */
     this.openTag = this.hasBlockChildren ?
       this.html.substr(0, this.html.indexOf('>') + 1) : null;
-
-    /**
-     * HTML for closing tag
-     * @type {?string}
-     */
     this.closeTag = this.hasBlockChildren ?
       this.html.slice(this.html.lastIndexOf('<')) : null;
 
@@ -266,10 +194,6 @@ goog.scope(function() {
       html_zero = dom.outerHTML(clone);
     }
 
-    /**
-     * HTML for opening tag when in progress
-     * @type {?string}
-     */
     this.openTag_zero = this.hasBlockChildren ?
       html_zero.substr(0, html_zero.indexOf('>') + 1) : null;
   };
@@ -283,6 +207,120 @@ goog.scope(function() {
       dimensions = treesaver.dimensions,
       dom = treesaver.dom,
       Figure = treesaver.layout.Figure;
+
+  /**
+   * Index of this block within the article
+   * @type {!number}
+   */
+  Block.prototype.index;
+
+  /**
+   * @type {boolean}
+   */
+  Block.prototype.hasBlockChildren;
+
+  /**
+   * @type {boolean}
+   */
+  Block.prototype.isFallback;
+
+  /**
+   * @type {boolean}
+   */
+  Block.prototype.withinFallback;
+
+  /**
+   * @type {boolean}
+   */
+  Block.prototype.containsFallback;
+
+  /**
+   * @type {?treesaver.layout.Figure}
+   */
+  Block.prototype.figure;
+
+  /**
+   * Blocks contained within this block
+   * @type {?Array.<treesaver.layout.Block>}
+   */
+  Block.prototype.blocks;
+
+  /**
+   * Figures contained within this block
+   * @type {?Array.<treesaver.layout.Block>}
+   */
+  Block.prototype.figures;
+
+  /**
+   * Next Sibling
+   * @type {?treesaver.layout.Block}
+   */
+  Block.prototype.nextSibling;
+
+  /**
+   * Parent block
+   * @type {?treesaver.layout.Block}
+   */
+  Block.prototype.parent;
+
+  /**
+   * Can this block be broken into multiple pieces (across cols/pages)
+   * @type {boolean}
+   */
+  Block.prototype.breakable;
+
+  /**
+   * Make sure this block and the next block are in the same column
+   * @type {boolean}
+   */
+  Block.prototype.keepwithnext;
+
+  /**
+   * Begin a new column before adding this block
+   * @type {boolean}
+   */
+  Block.prototype.columnBreak;
+
+  /**
+   * Should this block remain unbroken, if possible
+   * @type {boolean}
+   */
+  Block.prototype.keeptogether;
+
+  /**
+   * @type {!treesaver.dimensions.Metrics}
+   */
+  Block.prototype.metrics;
+
+  /**
+   * Distance from the top edge of the border to the first line of content
+   * @type {number}
+   */
+  Block.prototype.firstLine;
+
+  /**
+   * HTML for entire element (content and children)
+   * @type {!string}
+   */
+  Block.prototype.html;
+
+  /**
+   * HTML for opening tag
+   * @type {?string}
+   */
+  Block.prototype.openTag;
+
+  /**
+   * HTML for closing tag
+   * @type {?string}
+   */
+  Block.prototype.closeTag;
+
+  /**
+   * HTML for opening tag when in progress
+   * @type {?string}
+   */
+  Block.prototype.openTag_zero;
 
   /**
    * Find the next block, never going to children
@@ -310,7 +348,6 @@ goog.scope(function() {
    * @param {!number} baseLineHeight
    * @param {!Object} indices Current block and figure index.
    * @param {?boolean=} isFallback Whether child figures should be ignored.
-   * @return {{blocks: Array.<treesaver.layout.Block>, figures: Array.<treesaver.layout.Figure>}}
    */
   Block.processChildren =
     function(owner, node, baseLineHeight, indices, isFallback) {
@@ -375,7 +412,9 @@ goog.scope(function() {
 
         // Keep track of hierarchy
         // But only if owner is a block (i.e. not Figure or Content)
-        child.parent = isBlock ? owner : null;
+        child.parent = isBlock ?
+          (/** @type {!treesaver.layout.Block} */ (owner)) : null;
+
         if (prev) {
           prev.nextSibling = child;
         }

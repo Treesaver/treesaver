@@ -30,21 +30,10 @@ goog.scope(function() {
       figureIndex: 0
     };
 
-    /**
-     * Base line height used throughout the article
-     * TODO: More intelligent back-up value
-     *
-     * @type {number}
-     */
-    this.lineHeight = dimensions.toPixels(el,
-      css.getStyleObject(el).lineHeight
-    ) || 1;
+    // TODO: More intelligent back-up value
+    this.lineHeight =
+      dimensions.toPixels(el, css.getStyleObject(el).lineHeight) || 1;
 
-    /**
-     * The column width at which this content was measured
-     *
-     * @type {number}
-     */
     this.colWidth = el.offsetWidth;
 
     // In order to properly measure the dimensions of all the content,
@@ -63,25 +52,44 @@ goog.scope(function() {
     // Note that this modifies the tree in place
     Block.sanitizeNode(el, this.lineHeight);
 
-    /**
-     * @type {Array.<treesaver.layout.Figure>}
-     */
     this.figures = [];
-
-    /**
-     * @type {Array.<treesaver.layout.Block>}
-     */
     this.blocks = [];
 
-    /**
-     * @type {!treesaver.ui.Document}
-     */
     this.doc = doc;
 
     // Now we're ready to create our objects, re-use the processChildren
     // function because it does exactly what we need
     Block.processChildren(this, el, this.lineHeight, indices);
   };
+
+  /**
+   * Base line height used throughout the article
+   *
+   * @type {number}
+   */
+  treesaver.layout.Content.prototype.lineHeight;
+
+  /**
+   * The column width at which this content was measured
+   *
+   * @type {number}
+   */
+  treesaver.layout.Content.prototype.colWidth;
+
+  /**
+   * @type {Array.<treesaver.layout.Figure>}
+   */
+  treesaver.layout.Content.prototype.figures;
+
+  /**
+   * @type {Array.<treesaver.layout.Block>}
+   */
+  treesaver.layout.Content.prototype.blocks;
+
+  /**
+   * @type {!treesaver.ui.Document}
+   */
+  treesaver.layout.Content.prototype.doc;
 
   if (goog.DEBUG) {
     treesaver.layout.Content.prototype.toString = function() {

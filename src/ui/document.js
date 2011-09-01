@@ -22,74 +22,14 @@ treesaver.ui.Document = function(url, meta) {
     return;
   }
 
-  /**
-   * @type {!string}
-   */
   this.url = url;
-
-  /**
-   * @type {!string}
-   */
   this.path = treesaver.uri.parse(url)['relative'];
-
-  /**
-   * @type {!Object}
-   */
   this.meta = meta || {};
 
-  /**
-   * @type {Array.<treesaver.ui.Article>}
-   */
   this.articles = [];
-
-  /**
-   * Maps identifiers to articles
-   * @type {!Object}
-   */
   this.articleMap = {};
-
-  /**
-   * Maps article positions to anchors
-   * @type {Array.<!string>}
-   */
   this.anchorMap = [];
-
-  /**
-   * @type {boolean}
-   */
-  this.loaded = false;
-
-  /**
-   * @type {boolean}
-   */
-  this.loading = false;
-
-  /**
-   * @type {boolean}
-   */
-  this.loadFailed = false;
-
-  /**
-   * @type {boolean}
-   */
-  this.error = false;
-
-  /**
-   * @type {!Array.<treesaver.ui.Document>}
-   */
   this.contents = [];
-
-  /**
-   * A list of all (mutable) capability requirements for this document.
-   *
-   * @type {?Array.<string>}
-   */
-  this.requirements = null;
-
-  /**
-   * @type {?string}
-   */
-  this.title = null;
 };
 
 goog.scope(function() {
@@ -99,6 +39,75 @@ goog.scope(function() {
       Article = treesaver.ui.Article,
       TreeNode = treesaver.ui.TreeNode,
       uri = treesaver.uri;
+
+  /**
+   * @type {!string}
+   */
+  Document.prototype.url;
+
+  /**
+   * @type {!string}
+   */
+  Document.prototype.path;
+
+  /**
+   * @type {!Object}
+   */
+  Document.prototype.meta;
+
+  /**
+   * @type {Array.<treesaver.ui.Article>}
+   */
+  Document.prototype.articles;
+
+  /**
+   * Maps identifiers to articles
+   * @type {!Object}
+   */
+  Document.prototype.articleMap;
+
+  /**
+   * Maps article positions to anchors
+   * @type {Array.<!string>}
+   */
+  Document.prototype.anchorMap;
+
+  /**
+   * @type {boolean}
+   */
+  Document.prototype.loaded;
+
+  /**
+   * @type {boolean}
+   */
+  Document.prototype.loading;
+
+  /**
+   * @type {boolean}
+   */
+  Document.prototype.loadFailed;
+
+  /**
+   * @type {boolean}
+   */
+  Document.prototype.error;
+
+  /**
+   * @type {!Array.<treesaver.ui.Document>}
+   */
+  Document.prototype.contents;
+
+  /**
+   * A list of all (mutable) capability requirements for this document.
+   *
+   * @type {?Array.<string>}
+   */
+  Document.prototype.requirements;
+
+  /**
+   * @type {?string}
+   */
+  Document.prototype.title;
 
   Document.CACHE_STORAGE_PREFIX = 'cache:';
 
@@ -112,11 +121,11 @@ goog.scope(function() {
   Document.prototype = new TreeNode();
 
   /**
-  * Parse the content of a document, creating articles where necessary.
-  *
-  * @param {!string} text The HTML text of a document.
-  * @return {Array.<!treesaver.ui.Article>} A list of Article instances that were extracted from the text.
-  */
+   * Parse the content of a document, creating articles where necessary.
+   *
+   * @param {!string} text The HTML text of a document.
+   * @return {Array.<!treesaver.ui.Article>} A list of Article instances that were extracted from the text.
+   */
   Document.prototype.parse = function(text) {
     var node = document.createElement('div'),
         articles = [];
@@ -159,12 +168,12 @@ goog.scope(function() {
   };
 
   /**
-  * Tests for document equality. This usually comes down to comparing their URLs. There is a
-  * special exception for when the document is a directory index file.
-  *
-  * @param {treesaver.ui.Document|string} o A document to compare against, or a url.
-  * @return {boolean} True if this document equals `o`.
-  */
+   * Tests for document equality. This usually comes down to comparing their URLs. There is a
+   * special exception for when the document is a directory index file.
+   *
+   * @param {treesaver.ui.Document|string} o A document to compare against, or a url.
+   * @return {boolean} True if this document equals `o`.
+   */
   Document.prototype.equals = function(o) {
     var url = o;
 
@@ -191,9 +200,9 @@ goog.scope(function() {
   };
 
   /**
-  * Returns true if this document meets the (mutable) capabilities
-  * @return {!boolean}
-  */
+   * Returns true if this document meets the (mutable) capabilities
+   * @return {!boolean}
+   */
   Document.prototype.capabilityFilter = function() {
     if (!this.requirements) {
       return true;
@@ -204,70 +213,70 @@ goog.scope(function() {
   };
 
   /**
-  * Returns the article at the given index.
-  * @param {!number} index
-  * @return {?treesaver.ui.Article}
-  */
+   * Returns the article at the given index.
+   * @param {!number} index
+   * @return {?treesaver.ui.Article}
+   */
   Document.prototype.getArticle = function(index) {
     return this.articles[index] || null;
   };
 
   /**
-  * Manually set the articles for this Document.
-  * @param {Array.<treesaver.ui.Article>} articles
-  */
+   * Manually set the articles for this Document.
+   * @param {Array.<treesaver.ui.Article>} articles
+   */
   Document.prototype.setArticles = function(articles) {
     this.articles = articles;
   };
 
   /**
-  * Retrieve the meta data for this Document.
-  * @return {!Object}
-  */
+   * Retrieve the meta data for this Document.
+   * @return {!Object}
+   */
   Document.prototype.getMeta = function() {
     return this.meta;
   };
 
   /**
-  * Return the canonical URL for this Document.
-  * @return {!string}
-  */
+   * Return the canonical URL for this Document.
+   * @return {!string}
+   */
   Document.prototype.getUrl = function() {
     return this.url;
   };
 
   /**
-  * Returns the number of articles in this Document. Does not include any child documents.
-  * @return {!number}
-  */
+   * Returns the number of articles in this Document. Does not include any child documents.
+   * @return {!number}
+   */
   Document.prototype.getNumberOfArticles = function() {
     return this.articles.length;
   };
 
   /**
-  * Returns the anchor at the given article index.
-  * @param {!number} index
-  * @return {?string} The anchor or null if the article does not exist or does not have an anchor.
-  */
+   * Returns the anchor at the given article index.
+   * @param {!number} index
+   * @return {?string} The anchor or null if the article does not exist or does not have an anchor.
+   */
   Document.prototype.getArticleAnchor = function(index) {
     return this.anchorMap[index] || null;
   };
 
   /**
-  * Returns the article index for the given anchor.
-  * @param {!string} anchor
-  * @return {!number} The index for the given anchor, or zero (the first article, which is a sensible fallback when the anchor is not found.).
-  */
+   * Returns the article index for the given anchor.
+   * @param {!string} anchor
+   * @return {!number} The index for the given anchor, or zero (the first article, which is a sensible fallback when the anchor is not found.).
+   */
   Document.prototype.getArticleIndex = function(anchor) {
     return this.articleMap[anchor] || 0;
   };
 
   /**
-  * Extract the document title from a string of HTML text.
-  * @private
-  * @param {!string} text
-  * @return {?string}
-  */
+   * Extract the document title from a string of HTML text.
+   * @private
+   * @param {!string} text
+   * @return {?string}
+   */
   Document.prototype.extractTitle = function(text) {
     var res = Document.titleRegExp.exec(text);
 
@@ -278,8 +287,8 @@ goog.scope(function() {
   };
 
   /**
-  * Load this document by an XHR, if it hasn't already been loaded.
-  */
+   * Load this document by an XHR, if it hasn't already been loaded.
+   */
   Document.prototype.load = function() {
     var that = this,
         cached_text = null;

@@ -33,42 +33,16 @@ goog.scope(function() {
     // Insert into tree for measuring
     document.body.appendChild(node);
 
-    /**
-     * List of required capabilities for this Grid
-     * TODO: Only store mutable capabilities
-     *
-     * @type {?Array.<string>}
-     */
+    // TODO: Only store mutable capabilities
     this.requirements = dom.hasAttr(node, 'data-requires') ?
       node.getAttribute('data-requires').split(' ') : null;
 
-    /**
-     * @type {Array.<string>}
-     */
     this.classes = dom.classes(node).map(function(c) {
       // Force lowercase
       return c.toLowerCase();
     });
 
-    /**
-     * @type {boolean}
-     */
     this.flexible = !dom.hasClass(node, 'fixed');
-
-    /**
-     * @type {Object.<string, boolean>}
-     */
-    this.scoringFlags;
-
-    /**
-     * @type {?Object.<number, boolean>}
-     */
-    this.pageNumberFlags;
-
-    /**
-     * @type {?Object.<number, boolean>}
-     */
-    this.pageNumberNegationFlags;
 
     // Calculate all page scoring flags
     this.findScoringFlags();
@@ -88,30 +62,10 @@ goog.scope(function() {
     // TODO: What's a reasonable back-up value here?
     this.lineHeight = this.size.lineHeight || 1;
 
-    /**
-     * @type {number}
-     */
     this.textHeight = 0;
-
-    /**
-     * @type {number}
-     */
     this.maxColHeight = 0;
-
-    /**
-     * Width of columns used in this Grid
-     * @type {number}
-     */
     this.colWidth = 0;
 
-    /**
-     * @type {boolean}
-     */
-    this.error = false;
-
-    /**
-     * @type {Array.<treesaver.layout.Column>}
-     */
     this.cols = [];
     dom.querySelectorAll('.column', node).forEach(function(colNode) {
       var cur = new Column(colNode, this.size.h);
@@ -132,9 +86,6 @@ goog.scope(function() {
       }
     }, this);
 
-    /**
-    * @type {Array.<treesaver.layout.Container>}
-    */
     this.containers = [];
     dom.querySelectorAll('.container', node).forEach(function(containerNode) {
       var cur = new Container(containerNode, this.size.h);
@@ -143,9 +94,6 @@ goog.scope(function() {
 
     // Save out the HTML after processing Columns and Containers, in order to maintain
     // any sanitization that may have occurred.
-    /**
-    * @type {string}
-    */
     this.html = dom.outerHTML(node);
 
     // Remove the child
@@ -158,6 +106,89 @@ goog.scope(function() {
       capabilities = treesaver.capabilities,
       debug = treesaver.debug,
       dimensions = treesaver.dimensions;
+
+  /**
+   * List of required capabilities for this Grid
+   *
+   * @type {?Array.<string>}
+   */
+  Grid.prototype.requirements;
+
+  /**
+   * @type {Array.<string>}
+   */
+  Grid.prototype.classes;
+
+  /**
+   * @type {boolean}
+   */
+  Grid.prototype.flexible;
+
+  /**
+   * @type {Object.<string, boolean>}
+   */
+  Grid.prototype.scoringFlags;
+
+  /**
+   * @type {?Object.<number, boolean>}
+   */
+  Grid.prototype.pageNumberFlags;
+
+  /**
+   * @type {?Object.<number, boolean>}
+   */
+  Grid.prototype.pageNumberNegationFlags;
+
+  /**
+   * @type {!treesaver.dimensions.Metrics}
+   */
+  Grid.prototype.stretchedSize;
+
+  /**
+   * @type {!treesaver.dimensions.Metrics}
+   */
+  Grid.prototype.size;
+
+  /**
+   * @type {number}
+   */
+  Grid.prototype.lineHeight;
+
+  /**
+   * @type {number}
+   */
+  Grid.prototype.textHeight;
+
+  /**
+   * @type {number}
+   */
+  Grid.prototype.maxColHeight;
+
+  /**
+   * Width of columns used in this Grid
+   * @type {number}
+   */
+  Grid.prototype.colWidth;
+
+  /**
+   * @type {boolean}
+   */
+  Grid.prototype.error;
+
+  /**
+   * @type {Array.<treesaver.layout.Column>}
+   */
+  Grid.prototype.cols;
+
+  /**
+   * @type {Array.<treesaver.layout.Container>}
+   */
+  Grid.prototype.containers;
+
+  /**
+   * @type {string}
+   */
+  Grid.prototype.html;
 
   Grid.knownFlags = {
     'onlypage': true,

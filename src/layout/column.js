@@ -21,14 +21,8 @@ goog.scope(function() {
   treesaver.layout.Column = function(el, gridHeight) {
     var d = new dimensions.Metrics(el);
 
-    /**
-    * @type {boolean}
-    */
     this.flexible = !dom.hasClass(el, 'fixed');
 
-    /**
-    * @type {number}
-    */
     this.minH = d.minH;
 
     // Need to clear the minHeight, if there is one, in order to get an accurate
@@ -37,20 +31,34 @@ goog.scope(function() {
       dimensions.setCssPx(el, 'minHeight', 0);
     }
 
-    /**
-    * @type {number}
-    */
     this.h = d.outerH;
 
-    /**
-    * @type {number}
-    */
     this.delta = Math.max(0, gridHeight - this.h);
   };
 });
 
 goog.scope(function() {
   var Column = treesaver.layout.Column;
+
+  /**
+   * @type {boolean}
+   */
+  Column.prototype.flexible;
+
+  /**
+   * @type {number}
+   */
+  Column.prototype.minH;
+
+  /**
+   * @type {number}
+   */
+  Column.prototype.h;
+
+  /**
+   * @type {number}
+   */
+  Column.prototype.delta;
 
   /**
    * @param {number} gridHeight

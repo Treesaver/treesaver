@@ -12,33 +12,11 @@ goog.require('treesaver.layout.ContentPosition');
  * @constructor
  */
 treesaver.layout.BreakRecord = function() {
-  /**
-   * @type {number}
-   */
   this.index = 0;
-  /**
-   * @type {number}
-   */
   this.figureIndex = 0;
-  /**
-   * @type {number}
-   */
   this.overhang = 0;
-  /**
-   * @type {boolean}
-   */
-  this.finished = false;
-  /**
-   * @type {Array.<number>}
-   */
   this.delayed = [];
-  /**
-   * @type {Array.<number>}
-   */
   this.failed = [];
-  /**
-   * @type {number}
-   */
   this.pageNumber = 0;
 };
 
@@ -46,6 +24,41 @@ goog.scope(function() {
   var BreakRecord = treesaver.layout.BreakRecord,
       ContentPosition = treesaver.layout.ContentPosition,
       array = treesaver.array;
+
+  /**
+   * @type {number}
+   */
+  BreakRecord.prototype.index;
+
+  /**
+   * @type {number}
+   */
+  BreakRecord.prototype.figureIndex;
+
+  /**
+   * @type {number}
+   */
+  BreakRecord.prototype.overhang;
+
+  /**
+   * @type {boolean}
+   */
+  BreakRecord.prototype.finished;
+
+  /**
+   * @type {Array.<number>}
+   */
+  BreakRecord.prototype.delayed;
+
+  /**
+   * @type {Array.<number>}
+   */
+  BreakRecord.prototype.failed;
+
+  /**
+   * @type {number}
+   */
+  BreakRecord.prototype.pageNumber;
 
   /**
    * Create a new copy, and return

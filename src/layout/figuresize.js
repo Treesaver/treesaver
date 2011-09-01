@@ -15,11 +15,6 @@ goog.require('treesaver.dom');
  * @constructor
  */
 treesaver.layout.FigureSize = function(html, minW, minH, requirements) {
-  /**
-   * The full HTML content for this payload.
-   *
-   * @type {string}
-   */
   this.html = html;
 
   // TODO: Use outerHTML from the node eventually in order to sanitize bad
@@ -27,28 +22,40 @@ treesaver.layout.FigureSize = function(html, minW, minH, requirements) {
 
   // Provide a rough measure the element so we know if we can fit within
   // containers
-  /**
-   * @type {number}
-   */
   this.minW = parseInt(minW || 0, 10);
-
-  /**
-   * @type {number}
-   */
   this.minH = parseInt(minH || 0, 10);
 
-  /**
-   * List of required capabilities for this Chrome
-   * TODO: Only store mutable capabilities
-   *
-   * @type {?Array.<string>}
-   */
+  // TODO: Only store mutable capabilities
   this.requirements = requirements;
 };
 
 goog.scope(function() {
   var FigureSize = treesaver.layout.FigureSize,
       dom = treesaver.dom;
+
+  /**
+   * The full HTML content for this payload.
+   *
+   * @type {string}
+   */
+  FigureSize.prototype.html;
+
+  /**
+   * @type {number}
+   */
+  FigureSize.prototype.minW;
+
+  /**
+   * @type {number}
+   */
+  FigureSize.prototype.minH;
+
+  /**
+   * List of required capabilities for this Chrome
+   *
+   * @type {?Array.<string>}
+   */
+  FigureSize.prototype.requirements;
 
   /**
    * @return {boolean} True if the figureSize meets current browser capabilities.
