@@ -28,6 +28,7 @@ goog.require('treesaver.ui.StateManager');
 
 goog.scope(function() {
   var debug = treesaver.debug,
+      dom = treesaver.dom,
       events = treesaver.events,
       capabilities = treesaver.capabilities,
       ArticleManager = treesaver.ui.ArticleManager,
@@ -126,7 +127,7 @@ goog.scope(function() {
   /**
    * Receive DOM ready event
    *
-   * @param {Event=} e
+   * @param {Event=} e Event object.
    */
   treesaver.domReady = function(e) {
     treesaver.domReady_ = true;
@@ -149,7 +150,7 @@ goog.scope(function() {
       treesaver.originalHtml = document.body.innerHTML;
 
       // Remove main content
-      treesaver.dom.clearChildren(/** @type {!Element} */(treesaver.tsContainer));
+      dom.clearChildren(/** @type {!Element} */(treesaver.tsContainer));
 
       // Place a loading message
       treesaver.tsContainer.innerHTML =
