@@ -7,59 +7,68 @@ goog.provide('treesaver.layout.Column');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 
-/**
- * A column within a grid
- *
- * @constructor
- * @param {!Element} el         HTML element.
- * @param {number}   gridHeight The height of the grid that contains this column.
- */
-treesaver.layout.Column = function(el, gridHeight) {
-  var d = new treesaver.dimensions.Metrics(el);
+goog.scope(function() {
+  var dimensions = treesaver.dimensions,
+      dom = treesaver.dom;
 
   /**
-   * @type {boolean}
+   * A column within a grid
+   *
+   * @constructor
+   * @param {!Element} el         HTML element.
+   * @param {number}   gridHeight The height of the grid that contains this column.
    */
-  this.flexible = !treesaver.dom.hasClass(el, 'fixed');
+  treesaver.layout.Column = function(el, gridHeight) {
+    var d = new dimensions.Metrics(el);
 
-  /**
-   * @type {number}
-   */
-  this.minH = d.minH;
+    /**
+    * @type {boolean}
+    */
+    this.flexible = !dom.hasClass(el, 'fixed');
 
-  // Need to clear the minHeight, if there is one, in order to get an accurate
-  // delta reading
-  if (this.minH) {
-    treesaver.dimensions.setCssPx(el, 'minHeight', 0);
-  }
+    /**
+    * @type {number}
+    */
+    this.minH = d.minH;
 
-  /**
-   * @type {number}
-   */
-  this.h = d.outerH;
+    // Need to clear the minHeight, if there is one, in order to get an accurate
+    // delta reading
+    if (this.minH) {
+      dimensions.setCssPx(el, 'minHeight', 0);
+    }
 
-  /**
-   * @type {number}
-   */
-  this.delta = Math.max(0, gridHeight - this.h);
-};
+    /**
+    * @type {number}
+    */
+    this.h = d.outerH;
 
-/**
- * @param {number} gridHeight
- * @return {!treesaver.layout.Column} Returns self for chaining support.
- */
-treesaver.layout.Column.prototype.stretch = function stretchColumn(gridHeight) {
-  if (!this.flexible) {
-    return this;
-  }
-
-  this.h = Math.max(0, gridHeight - this.delta);
-
-  return this;
-};
-
-if (goog.DEBUG) {
-  treesaver.layout.Column.prototype.toString = function toString() {
-    return '[Column ' + this.h + '/' + this.delta + ']';
+    /**
+    * @type {number}
+    */
+    this.delta = Math.max(0, gridHeight - this.h);
   };
-}
+});
+
+goog.scope(function() {
+  var Column = treesaver.layout.Column;
+
+  /**
+   * @param {number} gridHeight
+   * @return {!treesaver.layout.Column} Returns self for chaining support.
+   */
+  Column.prototype.stretch = function(gridHeight) {
+    if (!this.flexible) {
+      return this;
+    }
+
+    this.h = Math.max(0, gridHeight - this.delta);
+
+    return this;
+  };
+
+  if (goog.DEBUG) {
+    Column.prototype.toString = function() {
+      return '[Column ' + this.h + '/' + this.delta + ']';
+    };
+  }
+});
