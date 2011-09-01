@@ -12,6 +12,7 @@ goog.require('treesaver.layout.Figure');
 
 goog.scope(function() {
   var array = treesaver.array,
+      debug = treesaver.debug,
       dimensions = treesaver.dimensions,
       dom = treesaver.dom,
       Figure = treesaver.layout.Figure;
@@ -35,7 +36,7 @@ goog.scope(function() {
 
     if (goog.DEBUG) {
       if (!indices) {
-        treesaver.debug.warn('Autogen indices. Will not work in production!');
+        debug.warn('Autogen indices. Will not work in production!');
         indices = {
           index: 0,
           figureIndex: 0
@@ -46,7 +47,7 @@ goog.scope(function() {
     // Is this an HTML element?
     // TODO: Remove this check?
     if (node.nodeType !== 1) {
-      treesaver.debug.error('Non-element sent into Block constructor: ' + node);
+      debug.error('Non-element sent into Block constructor: ' + node);
 
       // Ignore whitespace, comments, etc
       this.ignore = true;
@@ -61,7 +62,7 @@ goog.scope(function() {
       // This is a very defensive move, since a display: none item that
       // is made visible when in a specific column or grid can really mess up a
       // layout
-      treesaver.debug.warn('Zero-height block ignored');
+      debug.warn('Zero-height block ignored');
 
       this.ignore = true;
       return;
@@ -177,8 +178,8 @@ goog.scope(function() {
     // Check if the entire element is a single line, if so then we need to
     // mark keeptogether
     if (!this.keeptogether) {
-      this.keeptogether =
-        (this.metrics.bpHeight + this.metrics.lineHeight) === this.metrics.outerH;
+      this.keeptogether = ((this.metrics.bpHeight + this.metrics.lineHeight) ===
+        this.metrics.outerH);
     }
 
     /**
@@ -278,6 +279,7 @@ goog.scope(function() {
 goog.scope(function() {
   var array = treesaver.array,
       Block = treesaver.layout.Block,
+      debug = treesaver.debug,
       dimensions = treesaver.dimensions,
       dom = treesaver.dom,
       Figure = treesaver.layout.Figure;
@@ -286,9 +288,9 @@ goog.scope(function() {
    * Find the next block, never going to children
    *
    * @return {?treesaver.layout.Block} The next block in content that is not
-   *                                   contained within this block
+   *                                   contained within this block.
    */
-  treesaver.layout.Block.prototype.getNextNonChildBlock = function() {
+  Block.prototype.getNextNonChildBlock = function() {
     if (this.nextSibling) {
       return this.nextSibling;
     }
@@ -310,10 +312,10 @@ goog.scope(function() {
    * @param {?boolean=} isFallback Whether child figures should be ignored.
    * @return {{blocks: Array.<treesaver.layout.Block>, figures: Array.<treesaver.layout.Figure>}}
    */
-  treesaver.layout.Block.processChildren =
+  Block.processChildren =
     function(owner, node, baseLineHeight, indices, isFallback) {
     var prev,
-        isBlock = owner instanceof treesaver.layout.Block,
+        isBlock = owner instanceof Block,
         // Is checking 'start' enough here?
         isList = node.nodeName.toLowerCase() === 'ol' && 'start' in node,
         listIndex = isList ? node.start : null;
@@ -340,7 +342,7 @@ goog.scope(function() {
       if (Figure.isFigure(childNode)) {
         // Want to prevent figures nested within fallbacks (gets confusing)
         if (isFallback) {
-          treesaver.debug.warn('Child figure ignored');
+          debug.warn('Child figure ignored');
 
           return; // Next
         }
@@ -355,7 +357,7 @@ goog.scope(function() {
         }
       }
       else {
-        child = new treesaver.layout.Block(childNode, baseLineHeight, indices, !!isFallback);
+        child = new Block(childNode, baseLineHeight, indices, !!isFallback);
         if (isBlock && !owner.containsFallback) {
           owner.containsFallback = child.containsFallback;
         }
@@ -387,7 +389,7 @@ goog.scope(function() {
    *                          zero-margin versions.
    * @return {string}
    */
-  treesaver.layout.Block.prototype.openAllTags = function(useZero) {
+  Block.prototype.openAllTags = function(useZero) {
     var cur = this.parent,
         tags = [];
 
@@ -403,7 +405,7 @@ goog.scope(function() {
   /**
    * @return {string}
    */
-  treesaver.layout.Block.prototype.closeAllTags = function() {
+  Block.prototype.closeAllTags = function() {
     var cur = this.parent,
         tags = [];
 
@@ -418,7 +420,7 @@ goog.scope(function() {
   /**
    * @return {number}
    */
-  treesaver.layout.Block.prototype.totalBpBottom = function() {
+  Block.prototype.totalBpBottom = function() {
     var cur = this,
         total = cur.metrics.bpBottom;
 
@@ -440,14 +442,14 @@ goog.scope(function() {
    * @param {!Element} node
    * @return {boolean} True if the node has children that are blocks.
    */
-  treesaver.layout.Block.hasBlockChildren = function(node) {
+  Block.hasBlockChildren = function(node) {
     // Assume paragraph nodes are never block parents
-    if (treesaver.layout.Block.isInlineContainer(node)) {
+    if (Block.isInlineContainer(node)) {
       return false;
     }
 
     // Assume lists are containers
-    if (treesaver.layout.Block.isBlockContainer(node)) {
+    if (Block.isBlockContainer(node)) {
       return true;
     }
 
@@ -465,7 +467,7 @@ goog.scope(function() {
       }
       else if (child.nodeType === 1) {
         // If we see a container, then we are definitely a container ourselves
-        if (treesaver.layout.Block.isInlineContainer(child) || treesaver.layout.Block.isBlockContainer(child)) {
+        if (Block.isInlineContainer(child) || Block.isBlockContainer(child)) {
           return true;
         }
 
@@ -494,47 +496,47 @@ goog.scope(function() {
    * TODO: Remove table
    * @type {Array.<string>}
    */
-  treesaver.layout.Block.replaced_elements = ['img', 'video', 'object', 'embed',
+  Block.replaced_elements = ['img', 'video', 'object', 'embed',
     'iframe', 'audio', 'canvas', 'svg', 'table'];
 
   /**
    * @param {!Node} el
    * @return {boolean} True if the element is a replaced element.
    */
-  treesaver.layout.Block.isReplacedElement = function(el) {
+  Block.isReplacedElement = function(el) {
     var nodeName = el.nodeName.toLowerCase();
     return el.nodeType === 1 &&
-          treesaver.layout.Block.replaced_elements.indexOf(nodeName) !== -1;
+          Block.replaced_elements.indexOf(nodeName) !== -1;
   };
 
   /**
    * @type {Array.<string>}
    */
-  treesaver.layout.Block.inline_containers = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+  Block.inline_containers = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
 
   /**
    * @param {!Element} el
    * @return {boolean} True if the element is a replaced element.
    */
-  treesaver.layout.Block.isInlineContainer = function(el) {
+  Block.isInlineContainer = function(el) {
     var nodeName = el.nodeName.toLowerCase();
     return el.nodeType === 1 &&
-          treesaver.layout.Block.inline_containers.indexOf(nodeName) !== -1;
+          Block.inline_containers.indexOf(nodeName) !== -1;
   };
 
   /**
    * @type {Array.<string>}
    */
-  treesaver.layout.Block.block_containers = ['div', 'article', 'ul', 'ol', 'figure', 'aside'];
+  Block.block_containers = ['div', 'article', 'ul', 'ol', 'figure', 'aside'];
 
   /**
    * @param {!Element} el
    * @return {boolean} True if the element is a replaced element.
    */
-  treesaver.layout.Block.isBlockContainer = function(el) {
+  Block.isBlockContainer = function(el) {
     var nodeName = el.nodeName.toLowerCase();
     return el.nodeType === 1 &&
-          treesaver.layout.Block.block_containers.indexOf(nodeName) !== -1;
+          Block.block_containers.indexOf(nodeName) !== -1;
   };
 
   /**
@@ -544,10 +546,10 @@ goog.scope(function() {
    * @param {!number} baseLineHeight
    * @return {Element} The same node passed in (for chaining).
    */
-  treesaver.layout.Block.sanitizeNode = function(node, baseLineHeight) {
+  Block.sanitizeNode = function(node, baseLineHeight) {
     // Should never get text & comment nodes
     if (node.nodeType !== 1) {
-      treesaver.debug.error('Text node sent to sanitize: ' + node);
+      debug.error('Text node sent to sanitize: ' + node);
       return node;
     }
 
@@ -566,7 +568,7 @@ goog.scope(function() {
     }
 
     // Strip out all non-element nodes (textnodes, comments) from block nodes
-    if (treesaver.layout.Block.hasBlockChildren(node) && !dom.hasClass(node, 'keeptogether')) {
+    if (Block.hasBlockChildren(node) && !dom.hasClass(node, 'keeptogether')) {
       for (i = node.childNodes.length - 1; i >= 0; i -= 1) {
         childNode = node.childNodes[i];
         if (childNode.nodeType !== 1) {
@@ -574,7 +576,7 @@ goog.scope(function() {
         }
         else {
           // Sanitize child nodes
-          treesaver.layout.Block.sanitizeNode(childNode, baseLineHeight);
+          Block.sanitizeNode(childNode, baseLineHeight);
         }
       }
     }
@@ -584,7 +586,7 @@ goog.scope(function() {
 
     // Make sure all our metrics line up with our vertical grid
     if (!window.TS_NO_AUTOMETRICS) {
-      treesaver.layout.Block.normalizeMetrics_(node, baseLineHeight);
+      Block.normalizeMetrics_(node, baseLineHeight);
     }
 
     return node;
@@ -598,9 +600,9 @@ goog.scope(function() {
    * @param {!Element} node
    * @param {!number} baseLineHeight
    */
-  treesaver.layout.Block.normalizeMetrics_ = function(node, baseLineHeight) {
+  Block.normalizeMetrics_ = function(node, baseLineHeight) {
     if (!baseLineHeight) {
-      treesaver.debug.error('No line height provided to normalizeMetrics_');
+      debug.error('No line height provided to normalizeMetrics_');
     }
 
     var metrics = new dimensions.Metrics(node);
@@ -616,7 +618,7 @@ goog.scope(function() {
     }
 
     // Special handling for unbreakable elements
-    if (treesaver.layout.Block.isReplacedElement(node) || dom.hasClass(node, 'keeptogether')) {
+    if (Block.isReplacedElement(node) || dom.hasClass(node, 'keeptogether')) {
       // TODO: What if there are figures within a keeptogether?
       // Currently, ignore anything in a keeptogether (figures, children, etc)
 
@@ -661,7 +663,7 @@ goog.scope(function() {
     if (metrics.outerH % baseLineHeight) {
       // Shit, looks like even with the normalization, we're still out of
       // sync. Use padding bottom to fix it up
-      treesaver.debug.info('Forcing padding due to mismatch: ' + node);
+      debug.info('Forcing padding due to mismatch: ' + node);
 
       metrics.paddingBottom += baseLineHeight - metrics.outerH % baseLineHeight;
 
@@ -673,7 +675,7 @@ goog.scope(function() {
   };
 
   if (goog.DEBUG) {
-    treesaver.layout.Block.prototype.toString = function() {
+    Block.prototype.toString = function() {
       return '[Block: ' + this.metrics.outerH + '/' +
         this.metrics.lineHeight + ']';
     };

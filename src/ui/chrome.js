@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.ui.Chrome');
 
+goog.require('treesaver.array');
 goog.require('treesaver.capabilities');
 goog.require('treesaver.constants');
 goog.require('treesaver.debug');
