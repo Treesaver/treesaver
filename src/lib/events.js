@@ -48,7 +48,7 @@ goog.scope(function() {
       try {
         obj.addEventListener(type, fn, false);
       }
-      catch(ex) {
+      catch (ex) {
         debug.error('Could not add ' + type + ' listener to: ' + obj);
         debug.error('Exception ' + ex);
       }

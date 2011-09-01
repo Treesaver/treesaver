@@ -6,7 +6,7 @@ goog.provide('treesaver.ui.ArticlePosition');
  * @param {!number} index The index of the article, or fallback in case anchor is specified.
  * @param {string=} anchor Identifier by which an article can be referenced. If not used, or not found, index is used.
  */
-treesaver.ui.ArticlePosition = function (index, anchor) {
+treesaver.ui.ArticlePosition = function(index, anchor) {
   this.index = index;
   this.anchor = anchor;
 };
@@ -40,7 +40,7 @@ goog.scope(function() {
    * Returns true if the position is at the beginning of a document.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.atBeginning = function () {
+  ArticlePosition.prototype.atBeginning = function() {
     return this.index === 0;
   };
 
@@ -48,7 +48,7 @@ goog.scope(function() {
    * Returns true if the position is at the end of a document.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.atEnding = function () {
+  ArticlePosition.prototype.atEnding = function() {
     return this.index === Infinity;
   };
 
@@ -56,7 +56,7 @@ goog.scope(function() {
    * Returns true if this instance represents an anchor.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.isAnchor = function () {
+  ArticlePosition.prototype.isAnchor = function() {
     return !!this.anchor;
   };
 
@@ -64,7 +64,7 @@ goog.scope(function() {
    * Compares two article positions. Only compares the article indices, not their anchors.
    * @return {!boolean}
    */
-  ArticlePosition.prototype.equals = function (other) {
+  ArticlePosition.prototype.equals = function(other) {
     return this.index === other.index;
   };
 });

@@ -161,7 +161,7 @@ goog.scope(function() {
     case 'webkit':
       return '-webkit-';
     case 'mozilla':
-      return '-moz-'
+      return '-moz-';
     case 'msie':
       return '-ms-';
     case 'opera':
@@ -184,7 +184,7 @@ goog.scope(function() {
     case 'webkit':
       return 'Webkit';
     case 'mozilla':
-      return 'Moz'
+      return 'Moz';
     case 'msie':
       return 'ms';
     case 'opera':

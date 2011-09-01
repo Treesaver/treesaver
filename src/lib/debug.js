@@ -26,7 +26,7 @@ goog.scope(function() {
 
       if (msg) {
         msg = window.escape(msg);
-        document.location = "ts://log/" + msg;
+        document.location = 'ts://log/' + msg;
       }
     }, 50, Infinity);
   }

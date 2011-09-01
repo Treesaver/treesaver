@@ -13,11 +13,12 @@ goog.scope(function() {
      *
      * @param {*} arr
      * @return {boolean}
-     * NOTE: Suppress warnings about duplication from built-in externs
+     * NOTE: Suppress warnings about duplication from built-in externs.
      * @suppress {duplicate}
      */
     Array.isArray = function(arr) {
-      return Object.prototype.toString.apply(/** @type {Object} */(arr)) === '[object Array]';
+      return Object.prototype.toString.apply(/** @type {Object} */(arr)) ===
+        '[object Array]';
     };
   }
 

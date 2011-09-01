@@ -5,9 +5,9 @@ goog.scope(function() {
 
   // URI parser, based on parseUri by Steven Levithan <stevenlevithan.com> (MIT License)
   uri._parserRegex = /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/;
-  uri._keys = ["source", "scheme", "authority", "userInfo", "user", "password", "host", "port", "relative", "path", "directory", "file", "query", "anchor"];
+  uri._keys = ['source', 'scheme', 'authority', 'userInfo', 'user', 'password', 'host', 'port', 'relative', 'path', 'directory', 'file', 'query', 'anchor'];
 
-  uri.parse = function (str) {
+  uri.parse = function(str) {
       var i = uri._keys.length,
           m = uri._parserRegex.exec(str),
           result = {};
@@ -18,7 +18,7 @@ goog.scope(function() {
       return result;
   };
 
-  uri.stringify = function (o) {
+  uri.stringify = function(o) {
       var result = '';
 
       if (o['scheme']) {
@@ -62,7 +62,7 @@ goog.scope(function() {
       return result;
   };
 
-  uri.isIndex = function (str) {
+  uri.isIndex = function(str) {
     var url = uri.parse(str);
 
     if (url.file) {
@@ -72,13 +72,13 @@ goog.scope(function() {
     }
   };
 
-  uri.stripHash = function (str) {
+  uri.stripHash = function(str) {
     var tmp = uri.parse(str);
     tmp.anchor = null;
     return uri.stringify(tmp);
   };
 
-  uri.stripFile = function (str) {
+  uri.stripFile = function(str) {
     var tmp = uri.parse(str);
     tmp.file = null;
     return uri.stringify(tmp);

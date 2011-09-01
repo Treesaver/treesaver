@@ -27,7 +27,7 @@ goog.scope(function() {
    * @param {!Element} el
    * @param {number} x
    * @param {number} y
-   * @return {boolean} true if scrolling happened
+   * @return {boolean} true if scrolling happened.
    */
   Scrollable.setOffset = function(el, x, y) {
     var left = el.scrollLeft,

@@ -222,7 +222,7 @@ treesaver.ui.Chrome.prototype.activate = function() {
       var template_name = treesaver.dom.getCustomAttr(el, 'template'),
           elementArray, templateArray;
 
-      switch(template_name) {
+      switch (template_name) {
       case 'position':
         elementArray = this.positionElements;
         templateArray = this.positionTemplates;
@@ -542,7 +542,7 @@ treesaver.ui.Chrome.prototype.click = function(e) {
   // If there are any menus active and the event target
   // is contained within one, we deactive it and set
   // withinMenu to true.
-  this.menus.forEach(function (menu) {
+  this.menus.forEach(function(menu) {
     if (this.isMenuActive(menu)) {
       withinMenu = menu.contains(el);
       this.menuInactive(menu);
@@ -1030,7 +1030,7 @@ treesaver.ui.Chrome.prototype.mouseOver = function(e) {
  * Checks if the element is within one of our scrollable elements
  * @private
  * @param {!Element} el
- * @returns {?Element}
+ * @return {?Element}
  */
 treesaver.ui.Chrome.prototype.isWithinScroller_ = function(el) {
   var node = el;
@@ -1337,8 +1337,8 @@ treesaver.ui.Chrome.prototype.setSize = function(availSize) {
 treesaver.ui.Chrome.prototype.updateTOCActive = function() {
   var currentUrl = treesaver.ui.ArticleManager.getCurrentUrl();
 
-  this.indexElements.forEach(function (el) {
-    var anchors = treesaver.dom.querySelectorAll('a[href]', el).filter(function (a) {
+  this.indexElements.forEach(function(el) {
+    var anchors = treesaver.dom.querySelectorAll('a[href]', el).filter(function(a) {
           // The anchors in the TOC may be relative URLs so we need to create absolute
           // ones when comparing to the currentUrl, which is always absolute.
           return treesaver.network.absoluteURL(a.href) === currentUrl;
@@ -1348,8 +1348,8 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function() {
     if (anchors.length) {
       children = treesaver.array.toArray(el.children);
 
-      children.forEach(function (c) {
-        var containsUrl = anchors.some(function (a) {
+      children.forEach(function(c) {
+        var containsUrl = anchors.some(function(a) {
              return c.contains(a);
             });
 
@@ -1363,8 +1363,8 @@ treesaver.ui.Chrome.prototype.updateTOCActive = function() {
   });
 };
 
-treesaver.ui.Chrome.prototype.updatePosition = function () {
-  this.positionElements.forEach(function (el, i) {
+treesaver.ui.Chrome.prototype.updatePosition = function() {
+  this.positionElements.forEach(function(el, i) {
     var template = this.positionTemplates[i];
 
     el.innerHTML = Mustache.to_html(template, {
@@ -1377,16 +1377,16 @@ treesaver.ui.Chrome.prototype.updatePosition = function () {
   }, this);
 };
 
-treesaver.ui.Chrome.prototype.updatePublication = function () {
-  this.publicationElements.forEach(function (el, i) {
+treesaver.ui.Chrome.prototype.updatePublication = function() {
+  this.publicationElements.forEach(function(el, i) {
     var template = this.publicationTemplates[i];
 
     el.innerHTML = Mustache.to_html(template, treesaver.ui.ArticleManager.index.meta);
   }, this);
 };
 
-treesaver.ui.Chrome.prototype.updateCurrentDocument = function () {
-  this.currentDocumentElements.forEach(function (el, i) {
+treesaver.ui.Chrome.prototype.updateCurrentDocument = function() {
+  this.currentDocumentElements.forEach(function(el, i) {
     var template = this.currentDocumentTemplates[i];
 
     el.innerHTML = Mustache.to_html(template, treesaver.ui.ArticleManager.getCurrentDocument().meta);
@@ -1537,12 +1537,12 @@ treesaver.ui.Chrome.prototype.updateTOC = function() {
   treesaver.scheduler.clear('updateTOC');
 
   var toc = {
-    contents: treesaver.ui.ArticleManager.index.contents.map(function (child) {
+    contents: treesaver.ui.ArticleManager.index.contents.map(function(child) {
       return child.meta;
     })
   };
 
-  this.indexElements.forEach(function (el, i) {
+  this.indexElements.forEach(function(el, i) {
     var template = this.indexTemplates[i];
 
     el.innerHTML = Mustache.to_html(template, toc);
@@ -1588,7 +1588,7 @@ treesaver.ui.Chrome.prototype.populatePages = function() {
       }
 
       node.setAttribute('id',
-        i === 0 ? 'previousPage' : i ===1 ? 'currentPage' : 'nextPage');
+        i === 0 ? 'previousPage' : i === 1 ? 'currentPage' : 'nextPage');
     }
   }, this);
 };
@@ -1607,7 +1607,7 @@ treesaver.ui.Chrome.prototype.layoutPages = function(pageShift) {
       currentPage = this.pages[1],
       nextPage = this.pages[2],
       leftMargin, rightMargin,
-      halfPageWidth = currentPage.size.outerW/2,
+      halfPageWidth = currentPage.size.outerW / 2,
       oldOffset = this.pageOffset;
 
   // Register the positions of each page
@@ -1618,13 +1618,13 @@ treesaver.ui.Chrome.prototype.layoutPages = function(pageShift) {
   if (prevPage) {
     leftMargin = Math.max(currentPage.size.marginLeft, prevPage.size.marginRight);
     // Positioned to the left of the main page
-    this.pagePositions[0] = -(halfPageWidth + leftMargin + prevPage.size.outerW/2);
+    this.pagePositions[0] = -(halfPageWidth + leftMargin + prevPage.size.outerW / 2);
   }
 
   if (nextPage) {
     rightMargin = Math.max(currentPage.size.marginRight, nextPage.size.marginLeft);
     // Positioned to the right of the main page
-    this.pagePositions[2] = halfPageWidth + rightMargin + nextPage.size.outerW/2;
+    this.pagePositions[2] = halfPageWidth + rightMargin + nextPage.size.outerW / 2;
   }
 
   // TODO: Be much smarter about this

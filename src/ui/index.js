@@ -3,12 +3,12 @@ goog.provide('treesaver.ui.Index');
 goog.require('treesaver.debug');
 goog.require('treesaver.events');
 goog.require('treesaver.json');
-goog.require('treesaver.uri');
-goog.require('treesaver.object');
 goog.require('treesaver.network');
+goog.require('treesaver.object');
 goog.require('treesaver.storage');
-goog.require('treesaver.ui.TreeNode');
 goog.require('treesaver.ui.Document');
+goog.require('treesaver.ui.TreeNode');
+goog.require('treesaver.uri');
 
 /**
  * Class representing the index file (i.e. the table of contents for documents.)
@@ -16,7 +16,7 @@ goog.require('treesaver.ui.Document');
  * @extends {treesaver.ui.TreeNode}
  * @param {?string} url The url the index was loaded from.
  */
-treesaver.ui.Index = function (url) {
+treesaver.ui.Index = function(url) {
 
   /**
    * @type {?string}
@@ -108,7 +108,7 @@ goog.scope(function() {
       contents = entry['contents'];
 
       // Copy all fields into a new object
-      Object.keys(entry).forEach(function (key) {
+      Object.keys(entry).forEach(function(key) {
         meta[key] = entry[key];
       });
 
@@ -117,12 +117,12 @@ goog.scope(function() {
           requirements = entry['requires'].split(/\s|,\s/g);
         } else if (Array.isArray(entry['requires'])) {
           // Make sure our `requires` entries are actually strings
-          requirements = entry['requires'].map(function (value) {
+          requirements = entry['requires'].map(function(value) {
             return value.toString();
           });
         }
 
-        requirements = requirements.filter(function (value) {
+        requirements = requirements.filter(function(value) {
           return value.trim() !== '';
         });
       }
@@ -141,7 +141,7 @@ goog.scope(function() {
 
     // Depth first traversal of any contents, and add them
     if (contents && Array.isArray(contents)) {
-      contents.forEach(function (child) {
+      contents.forEach(function(child) {
         doc.appendChild(this.parseEntry(child));
       }, this);
     }
@@ -157,14 +157,14 @@ goog.scope(function() {
    * Updates the document cache and repopulates it. This
    * should be called after manually modifying the index.
    */
-  Index.prototype.update = function () {
+  Index.prototype.update = function() {
     var index = 0;
-    
+
     this.documents = [];
     this.documentMap = {};
     this.documentPositions = {};
 
-    this.walk(this.contents, function (doc) {
+    this.walk(this.contents, function(doc) {
       if (this.documentMap[doc.url]) {
         this.documentMap[doc.url].push(doc);
       } else {
@@ -193,8 +193,8 @@ goog.scope(function() {
    * @param {!function(!treesaver.ui.TreeNode)} fn Callback to call for each node. Return false to exit the traversal early.
    * @param {Object=} scope Scope bound to the callback.
    */
-  Index.prototype.walk = function (contents, fn, scope) {
-    return contents.every(function (entry) {
+  Index.prototype.walk = function(contents, fn, scope) {
+    return contents.every(function(entry) {
       return fn.call(scope, entry) !== false && this.walk(entry.contents, fn, scope);
     }, this);
   };
@@ -204,7 +204,7 @@ goog.scope(function() {
    * @param {!number} index
    * @return {?treesaver.ui.Document}
    */
-  Index.prototype.getDocumentByIndex = function (index) {
+  Index.prototype.getDocumentByIndex = function(index) {
     return this.documents[index];
   };
 
@@ -212,7 +212,7 @@ goog.scope(function() {
    * Returns the total number of documents in this index.
    * @return {!number}
    */
-  Index.prototype.getNumberOfDocuments = function () {
+  Index.prototype.getNumberOfDocuments = function() {
     return this.documents.length;
   };
 
@@ -221,11 +221,11 @@ goog.scope(function() {
    * @param {!treesaver.ui.Document} doc
    * @return {!number}
    */
-  Index.prototype.getDocumentIndex = function (doc) {
+  Index.prototype.getDocumentIndex = function(doc) {
     var result = -1,
         i = 0;
 
-    this.walk(this.contents, function (d) {
+    this.walk(this.contents, function(d) {
       if (d.equals(doc)) {
         result = i;
       }
@@ -243,13 +243,13 @@ goog.scope(function() {
    * @param {?string} url
    * @return {Array.<treesaver.ui.Document>}
    */
-  Index.prototype.getDocuments = function (url) {
+  Index.prototype.getDocuments = function(url) {
     var result = [];
 
     if (!url) {
       return this.documents;
     } else {
-      this.walk(this.contents, function (doc) {
+      this.walk(this.contents, function(doc) {
         if (doc.equals(url)) {
           result.push(doc);
         }
@@ -263,7 +263,7 @@ goog.scope(function() {
    * @private
    * @param {!string|!Object} index
    */
-  Index.prototype.parse = function (index) {
+  Index.prototype.parse = function(index) {
     var result = {
           contents: [],
           settings: {},
@@ -293,26 +293,26 @@ goog.scope(function() {
       return result;
     }
 
-    result.contents = index['contents'].map(function (entry) {
+    result.contents = index['contents'].map(function(entry) {
       return this.parseEntry(entry);
     }, this);
 
-    result.contents = result.contents.filter(function (entry) {
+    result.contents = result.contents.filter(function(entry) {
       return entry !== null;
     });
 
-    result.contents = result.contents.map(function (entry) {
+    result.contents = result.contents.map(function(entry) {
       return this.appendChild(entry);
     }, this);
 
     if (index['settings']) {
       result.settings = {};
-      Object.keys(index.settings).forEach(function (key) {
+      Object.keys(index.settings).forEach(function(key) {
         result.settings[key] = index.settings[key];
       });
     }
 
-    Object.keys(index).forEach(function (key) {
+    Object.keys(index).forEach(function(key) {
       if (key !== 'settings') {
         result.meta[key] = index[key];
       }
@@ -327,7 +327,7 @@ goog.scope(function() {
    * @param {!string} key
    * @param {!*} value
    */
-  Index.prototype.set = function (key, value) {
+  Index.prototype.set = function(key, value) {
     return this.settings[key] = value;
   };
 
@@ -338,7 +338,7 @@ goog.scope(function() {
    * @param {*=} defaultValue
    * @return {?*}
    */
-  Index.prototype.get = function (key, defaultValue) {
+  Index.prototype.get = function(key, defaultValue) {
     if (this.settings.hasOwnProperty(key)) {
       return this.settings[key];
     } else {
@@ -351,14 +351,14 @@ goog.scope(function() {
    *
    * @return {!Object}
    */
-  Index.prototype.getMeta = function () {
+  Index.prototype.getMeta = function() {
     return this.meta;
   };
 
   /**
    * Load the index file through XHR if it hasn't already been loaded.
    */
-  Index.prototype.load = function () {
+  Index.prototype.load = function() {
     var that = this,
         cached_text = null,
         index = null;
@@ -402,7 +402,7 @@ goog.scope(function() {
 
     debug.info('Index.load: Downloading index: ' + this.url);
 
-    network.get(this.url, function (text) {
+    network.get(this.url, function(text) {
       that.loading = false;
 
       if (!text) {

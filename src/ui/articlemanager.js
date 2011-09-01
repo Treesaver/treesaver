@@ -124,7 +124,7 @@ goog.scope(function() {
     events.removeListener(window, treesaver.history.events.POPSTATE, ArticleManager.handleEvent);
   };
 
-  ArticleManager.onIndexLoad = function (e) {
+  ArticleManager.onIndexLoad = function(e) {
     var index = e.index,
         docs = index.getDocuments(ArticleManager.initialDocument.url),
         doc = null;
@@ -132,7 +132,7 @@ goog.scope(function() {
     // Note that this may get called twice, once from the cache and once from the XHR response
     if (docs.length) {
       // Update the new index with the articles from the initial document, which we have already loaded.
-      docs.forEach(function (doc) {
+      docs.forEach(function(doc) {
         ArticleManager.initialDocument.meta = doc.meta;
         ArticleManager.initialDocument.children = doc.children;
         ArticleManager.initialDocument.requirements = doc.requirements;
@@ -296,7 +296,7 @@ goog.scope(function() {
 
     if (e['state']) {
       index = e['state'].index;
-      doc = (index || index === 0) ? 
+      doc = (index || index === 0) ?
         ArticleManager.index.getDocumentByIndex(index) : null;
 
       if (doc) {
@@ -330,7 +330,7 @@ goog.scope(function() {
    * @private
    * @return {?string}
    */
-  ArticleManager.getIndexUrl = function () {
+  ArticleManager.getIndexUrl = function() {
     var link = dom.querySelectorAll('link[rel~=index]')[0];
 
     if (!link) {
@@ -368,7 +368,7 @@ goog.scope(function() {
    * Returns true if it is possible to go to a previous article.
    * @return {!boolean}
    */
-  ArticleManager.canGoToPreviousArticle = function () {
+  ArticleManager.canGoToPreviousArticle = function() {
     return ArticleManager.currentArticlePosition.index > 0 || ArticleManager.canGoToPreviousDocument();
   };
 
@@ -377,7 +377,7 @@ goog.scope(function() {
    *
    * @return {!boolean}
    */
-  ArticleManager.canGoToPreviousDocument = function () {
+  ArticleManager.canGoToPreviousDocument = function() {
     var i = ArticleManager.currentDocumentIndex - 1;
 
     for (; i >= 0; i -= 1) {
@@ -428,7 +428,7 @@ goog.scope(function() {
    * @param {boolean=} end Whether to go to the end of the previous article or document.
    * @param {boolean=} fetch Whether to go to the previous article (or document) or fetch it without navigating to it.
    */
-  ArticleManager.previousArticle = function (end, fetch) {
+  ArticleManager.previousArticle = function(end, fetch) {
     if (!ArticleManager.canGoToPreviousArticle()) {
       return null;
     }
@@ -552,7 +552,7 @@ goog.scope(function() {
    * @param {boolean=} fetch Only return the document, don't move.
    * @return {treesaver.ui.Document} The next document.
    */
-  ArticleManager.nextDocument = function (fetch) {
+  ArticleManager.nextDocument = function(fetch) {
     if (!ArticleManager.canGoToNextDocument()) {
       return null;
     }
@@ -579,7 +579,7 @@ goog.scope(function() {
    * Go to or fetch the next article or document.
    * @param {boolean=} fetch Whether to go to the next article (or document) or fetch it without navigating to it.
    */
-  ArticleManager.nextArticle = function (fetch) {
+  ArticleManager.nextArticle = function(fetch) {
     if (!ArticleManager.canGoToNextArticle()) {
       return null;
     }
@@ -653,7 +653,7 @@ goog.scope(function() {
    * @param {treesaver.layout.ContentPosition=} pos
    * @return {boolean} True if successful.
    */
-  ArticleManager.goToDocumentByURL = function (url, pos) {
+  ArticleManager.goToDocumentByURL = function(url, pos) {
     var articleAnchor = treesaver.uri.parse(url)['anchor'],
         docs = ArticleManager.index.getDocuments(treesaver.uri.stripHash(url)),
         doc,
@@ -835,7 +835,7 @@ goog.scope(function() {
    * Returns the current document
    * @return {treesaver.ui.Document}
    */
-  ArticleManager.getCurrentDocument = function () {
+  ArticleManager.getCurrentDocument = function() {
     return ArticleManager.currentDocument;
   };
 
@@ -864,7 +864,7 @@ goog.scope(function() {
    * Return the document number (1-based) of the current document.
    * @return {number}
    */
-  ArticleManager.getCurrentDocumentNumber = function () {
+  ArticleManager.getCurrentDocumentNumber = function() {
     return (ArticleManager.currentDocumentIndex + 1) || 1;
   };
 
@@ -872,7 +872,7 @@ goog.scope(function() {
    * Return the number of documents in the index.
    * @return {number}
    */
-  ArticleManager.getDocumentCount = function () {
+  ArticleManager.getDocumentCount = function() {
     return ArticleManager.index.getNumberOfDocuments();
   };
 
@@ -907,7 +907,7 @@ goog.scope(function() {
    * @private
    * @param {!treesaver.ui.Document} doc
    */
-  ArticleManager.redirectToDocument = function (doc) {
+  ArticleManager.redirectToDocument = function(doc) {
     if (network.isOnline()) {
       document.location = doc.url;
     } else {
@@ -922,7 +922,7 @@ goog.scope(function() {
    * @param {?number} index The index at which the document should be placed.
    * @param {boolean=} noHistory Whether to modify the history or not.
    */
-  ArticleManager.setCurrentDocument = function (doc, articlePosition, pos, index, noHistory) {
+  ArticleManager.setCurrentDocument = function(doc, articlePosition, pos, index, noHistory) {
     var articleAnchor = null,
         url = null,
         path = null,
@@ -934,7 +934,7 @@ goog.scope(function() {
 
     articleAnchor = doc.getArticleAnchor(articlePosition && articlePosition.index || 0) || articlePosition.isAnchor() && articlePosition.anchor;
     url = doc.url + (articleAnchor ? '#' + articleAnchor : '');
-    path = doc.path + (articleAnchor ? '#' + articleAnchor: '');
+    path = doc.path + (articleAnchor ? '#' + articleAnchor : '');
 
     if (doc.equals(ArticleManager.currentDocument) &&
         index !== ArticleManager.currentDocumentIndex &&

@@ -1,5 +1,5 @@
 /**
- * @fileoverview Create a stylesheet with the built-in styles required by Treesaver
+ * @fileoverview Create a stylesheet with the built-in styles required by Treesaver.
  */
 
 goog.provide('treesaver.styles');
@@ -34,6 +34,6 @@ goog.scope(function() {
     styles.insertRule('.viewer .grid', 'top:50%;left:50%;margin:0');
   }
   else {
-    debug.error("No head to put default stylesheet into");
+    debug.error('No head to put default stylesheet into');
   }
 });

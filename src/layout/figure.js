@@ -172,7 +172,7 @@ goog.scope(function() {
    * Retrieve the largest figureSize that fits within the allotted space
    *
    * @param {!treesaver.dimensions.Size} maxSize
-   * @param {boolean=} isLightbox True if display is for a lightbox
+   * @param {boolean=} isLightbox True if display is for a lightbox.
    * @return {?{name: string, figureSize: treesaver.layout.FigureSize}} Null if none fit
    */
   Figure.prototype.getLargestSize = function(maxSize, isLightbox) {
@@ -184,9 +184,9 @@ goog.scope(function() {
         current,
         sizes = this.sizes;
 
-    if (isLightbox && this.sizes["lightbox"]) {
+    if (isLightbox && this.sizes['lightbox']) {
       // Only look at lightbox figures
-      sizes = { "lightbox": this.sizes["lightbox"] };
+      sizes = { 'lightbox': this.sizes['lightbox'] };
     }
 
     for (current in sizes) {

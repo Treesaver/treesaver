@@ -77,7 +77,7 @@ goog.scope(function() {
     dom.querySelectorAll(
       '[' + dom.customAttributePrefix + 'template=document]',
       this.node
-    ).forEach(function (el) {
+    ).forEach(function(el) {
       el.innerHTML = Mustache.to_html(el.innerHTML, content.doc.meta);
     });
 
