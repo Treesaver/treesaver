@@ -1565,7 +1565,7 @@ goog.scope(function() {
     scheduler.clear('updateTOC');
 
     var toc = {
-      contents: ArticleManager.index.contents.map(function(child) {
+      'contents': ArticleManager.index.contents.map(function(child) {
         return child.meta;
       })
     };
