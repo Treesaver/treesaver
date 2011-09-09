@@ -18,6 +18,7 @@ goog.require('treesaver.uri');
  */
 treesaver.ui.Index = function(url) {
   this.url = url;
+  this.settings = {};
 };
 
 goog.scope(function() {
