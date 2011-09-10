@@ -21,13 +21,6 @@ goog.exportSymbol('treesaver.VERSION', treesaver.VERSION);
 treesaver.LOAD_TIMEOUT = 5000; // 5 seconds
 
 /**
- * Whether older browsers should be supported
- *
- * @define {boolean}
- */
-var SUPPORT_LEGACY = true;
-
-/**
  * Whether Internet Explorer should be supported
  *
  * @define {boolean}
