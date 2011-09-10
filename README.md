@@ -16,7 +16,8 @@ Use the instructions below if you wish to build Treesaver from scratch. *Most pe
 
 ### Dependencies
 
-* [Paver](http://www.blueskyonmars.com/projects/paver/): For running build script. Requires Python.
+* [CoffeeScript](http://jashkenas.github.com/coffee-script/): For running build script.
+* [Python](http://www.python.org/): For using Google's compiler tools.
 * [Closure Linter](http://code.google.com/closure/utilities/docs/linter_howto.html): Check and fix coding style. (optional)
 
 ### Setup Instructions
@@ -26,21 +27,17 @@ Use the instructions below if you wish to build Treesaver from scratch. *Most pe
 
 ### Commands
 
-Note that these commands *must* be run from the root directory of the repository.
+Note that these commands *must* be run from the root directory of the repository. You can type `cake` to view available commands.
 
-* `paver`: Create dependency script for testing
-* `paver compile`: Compile JavaScript files for production. Can be used with one or more compilation flags:
-  * `--modules`: Compile into modules for async loading (compiles into two separate files)
-  * `--debug`: Use debug-friendly minification
-  * `--ios`: Compile version for use within an IOS `UIWebView`
-  * `--noie`: Compile without IE support
-  * `--nolegacy`: Compile without support for legacy browsers (IE7, mostly)
-* `paver debug`: Concatenate files for use when debugging (preserves comments, formatting, etc). Supports the following compilation flags:
-  * `--ios`: Compile version for use within an IOS `UIWebView`
-  * `--modules`: Compile into modules for async loading (compiles into two separate files)
-* `paver clean`: remove build artifacts
-* `paver lint`: Check style with lint
-* `paver fix_lint`: Automatically fix lint errors
+* `cake deps`: Create dependency script for testing
+* `cake compile`: Compile JavaScript files for production. Can be used with one or more compilation flags:
+  * `cake --debug compile`: Use debug-friendly minification
+  * `cake --ios compile`: Compile version for use within an IOS `UIWebView`
+* `cake debug`: Concatenate files for use when debugging (preserves comments, formatting, etc). Supports the following compilation flags:
+  * `cake --ios debug`: Compile version for use within an IOS `UIWebView`
+* `cake lint`: Check style with lint
+* `cake fix_lint`: Automatically fix lint errors
+* `cake clean`: remove build artifacts
 
 ## License
 
