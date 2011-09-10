@@ -1068,6 +1068,8 @@ goog.scope(function() {
       }
       node = /** @type {?Element} */ (node.parentNode);
     }
+
+    return null;
   };
 
   /**
@@ -1320,7 +1322,6 @@ goog.scope(function() {
 
   /**
    * @private
-   * @return {treesaver.dimensions.Size}
    */
   Chrome.prototype.calculatePageArea = function() {
     if (goog.DEBUG) {

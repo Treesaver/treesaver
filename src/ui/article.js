@@ -233,7 +233,6 @@ goog.scope(function() {
    * Stretch the grids into appropriate heights, and filter out any grids
    * which do not fit. Return the stretched subset of grids in an array
    * @param {{ w: number, h: number }} size
-   * @return {Array.<treesaver.layout.Grid>}
    */
   Article.prototype.stretchGrids = function(size) {
     this.eligible_grids = this.grids.filter(function(grid) {
