@@ -17,7 +17,7 @@ Use the instructions below if you wish to build Treesaver from scratch. *Most pe
 ### Dependencies
 
 * [CoffeeScript](http://jashkenas.github.com/coffee-script/): For running build script.
-* [Python](http://www.python.org/): For using Google's compiler tools.
+* [Python](http://www.python.org/) & [Java](http://www.java.com/en/download/): For using Google's compiler tools.
 * [Closure Linter](http://code.google.com/closure/utilities/docs/linter_howto.html): Check and fix coding style. (optional)
 
 ### Setup Instructions
