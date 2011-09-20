@@ -66,7 +66,7 @@ goog.scope(function() {
       events.addListener(document, 'DOMContentLoaded', treesaver.domReady);
     }
 
-    if (!goog.DEBUG || !window.TS_NO_AUTOLOAD) {
+    if (!WITHIN_IOS_WRAPPER && (!goog.DEBUG || !window.TS_NO_AUTOLOAD)) {
       // Fallback in case things never load
       treesaver.scheduler.delay(
         treesaver.unboot,
