@@ -10,7 +10,7 @@ goog.require('treesaver.debug');
 
 goog.scope(function() {
   var scheduler = treesaver.scheduler,
-      debug = treesaver.debug;
+      debug = treesaver.debug,
       array = treesaver.array;
 
   /**
@@ -19,7 +19,7 @@ goog.scope(function() {
    * @const
    * @type {number}
    */
-  scheduler.TASK_INTERVAL = 25; // 40 per second
+  scheduler.TASK_INTERVAL = 17; // ~60 fps
 
   /**
    * Array of all tasks
@@ -186,20 +186,22 @@ goog.scope(function() {
    * @param {string=}     name
    * @param {Object=}     obj
    */
-  scheduler.addTask_ =
-    function(fun, interval, times, args, immediate, name, obj) {
-    var now = goog.now(),
-        // Re-use previous task if it exists
-        task = name ? scheduler.namedTasks_[name] : null;
-
+  scheduler.addTask_ = function(fun, interval, times, args, immediate, name, obj) {
     if (goog.DEBUG) {
-      if (!fun.apply) {
-        treesaver.debug.error('Function without apply() not added to the scheduler');
+      if (!'apply' in fun) {
+        debug.error('Function without apply() not added to the scheduler');
         return;
       }
     }
 
-    if (!task) {
+    var now = goog.now(),
+        task = name ? scheduler.namedTasks_[name] : null;
+
+    // Re-use previous task if it exists
+    if (name && name in scheduler.namedTasks_) {
+      task = scheduler.namedTasks_[name];
+    }
+    else {
       // Create a new task object
       task = {
         fun: fun,
@@ -217,7 +219,7 @@ goog.scope(function() {
 
     task.args = args || [];
     task.times = times;
-    task.interval = Math.max(interval, scheduler.TASK_INTERVAL);
+    task.interval = interval;
     task.immediate = immediate;
     task.removed = false;
 
