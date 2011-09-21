@@ -5,31 +5,9 @@
 goog.provide('treesaver.debug');
 
 goog.require('treesaver.capabilities');
-goog.require('treesaver.scheduler');
 
 goog.scope(function() {
-  var debug = treesaver.debug,
-      scheduler = treesaver.scheduler;
-
-  if (goog.DEBUG && WITHIN_IOS_WRAPPER) {
-    /**
-     * Message queue for IOS debugging
-     *
-     * @type {Array.<string>}
-     */
-    debug.messageQueue_ = [];
-
-    // Outputs items from the queue at a limited rate, because the logging
-    // "API" used can't handle many messages at once (will merge into one)
-    scheduler.repeat(function() {
-      var msg = debug.messageQueue_.pop();
-
-      if (msg) {
-        msg = window.escape(msg);
-        document.location = 'ts://log/' + msg;
-      }
-    }, 50, Infinity);
-  }
+  var debug = treesaver.debug;
 
   /**
    * Original load time of debug code
@@ -56,10 +34,7 @@ goog.scope(function() {
     if (goog.DEBUG && window.console) {
       msg = debug.timestamp_() + msg;
 
-      if (window.TS_WITHIN_NATIVE_IOS_APP) {
-        debug.messageQueue_.push(msg);
-      }
-      else if ('info' in window.console) {
+      if ('info' in window.console) {
         window.console['info'](msg);
       }
       else {
@@ -76,10 +51,7 @@ goog.scope(function() {
     if (goog.DEBUG && window.console) {
       msg = debug.timestamp_() + msg;
 
-      if (window.TS_WITHIN_NATIVE_IOS_APP) {
-        debug.messageQueue_.push(msg);
-      }
-      else if ('debug' in window.console) {
+      if ('debug' in window.console) {
         window.console['debug'](msg);
       }
       else {
@@ -96,10 +68,7 @@ goog.scope(function() {
     if (goog.DEBUG && window.console) {
       msg = debug.timestamp_() + msg;
 
-      if (window.TS_WITHIN_NATIVE_IOS_APP) {
-        debug.messageQueue_.push(msg);
-      }
-      else if ('warn' in window.console) {
+      if ('warn' in window.console) {
         window.console['warn'](msg);
       }
       else {
@@ -116,10 +85,7 @@ goog.scope(function() {
     if (goog.DEBUG && window.console) {
       msg = debug.timestamp_() + msg;
 
-      if (window.TS_WITHIN_NATIVE_IOS_APP) {
-        debug.messageQueue_.push(msg);
-      }
-      else if ('error' in window.console) {
+      if ('error' in window.console) {
         window.console['error'](msg);
       }
       else {
@@ -135,12 +101,7 @@ goog.scope(function() {
    */
   debug.assert = function(assertion, msg) {
     if (goog.DEBUG && window.console) {
-      if (window.TS_WITHIN_NATIVE_IOS_APP) {
-        if (!assertion) {
-          debug.messageQueue_.push('Assertion failed: ' + msg);
-        }
-      }
-      else if ('assert' in window.console) {
+      if ('assert' in window.console) {
         window.console['assert'](assertion, msg);
       }
       else if (!assertion) {

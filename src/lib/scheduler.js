@@ -6,11 +6,11 @@
 goog.provide('treesaver.scheduler');
 
 goog.require('treesaver.array');
-// Avoid circular dependency
-//goog.require('treesaver.debug');
+goog.require('treesaver.debug');
 
 goog.scope(function() {
   var scheduler = treesaver.scheduler,
+      debug = treesaver.debug;
       array = treesaver.array;
 
   /**
@@ -157,7 +157,7 @@ goog.scope(function() {
           task.fun.apply(task.obj, task.args);
         }
         catch (ex) {
-          treesaver.debug.error('Task ' + (task.name || 'untitled') + ' threw: ' + ex);
+          debug.error('Task ' + (task.name || 'untitled') + ' threw: ' + ex);
         }
       }
       else {
