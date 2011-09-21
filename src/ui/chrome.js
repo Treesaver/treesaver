@@ -104,6 +104,16 @@ goog.scope(function() {
   Chrome.prototype.pageArea;
 
   /**
+   * @type {number}
+   */
+  Chrome.prototype.pageOffset;
+
+  /**
+   * @type {number|undefined}
+   */
+  Chrome.prototype.pageShift_;
+
+  /**
    * @type {boolean}
    */
   Chrome.prototype.active;
@@ -1086,8 +1096,10 @@ goog.scope(function() {
       // Adjust the offset immediately for animation
       this.layoutPages(-1);
 
-      // Now change the page in the article manager, etc
-      return ArticleManager.previousPage();
+      // Change the page in the article manager in a bit
+      scheduler.delay(ArticleManager.previousPage, 50, [], 'prevPage');
+
+      return true;
     }
   };
 
@@ -1101,8 +1113,10 @@ goog.scope(function() {
       // Adjust the offset immediately for animation
       this.layoutPages(1);
 
-      // Now change the page in the article manager, etc
-      return ArticleManager.nextPage();
+      // Change the page in the article manager in a bit
+      scheduler.delay(ArticleManager.nextPage, 50, [], 'nextPage');
+
+      return true;
     }
   };
 
@@ -1643,6 +1657,13 @@ goog.scope(function() {
         halfPageWidth = currentPage.size.outerW / 2,
         oldOffset = this.pageOffset;
 
+    // Ignore redundant updates
+    if (this.pageShift_ && pageShift === this.pageShift_) {
+      return;
+    }
+
+    this.pageShift_ = pageShift;
+
     // Register the positions of each page
     // The main page is dead centered via CSS absolute positioning, so no work
     // needs to be done
@@ -1720,13 +1741,15 @@ goog.scope(function() {
    * @param {boolean=} preventAnimation
    */
   Chrome.prototype._updatePagePositions = function(preventAnimation) {
+    var t;
+
     if (!preventAnimation && this.pageOffset) {
-      if (MAX_ANIMATION_DURATION) {
+      if (MAX_ANIMATION_DURATION && this.animationStart) {
         // Pause tasks to keep animation smooth
         scheduler.pause(['animatePages', 'resumeTasks']);
 
         // Percent of time left in animation
-        var t = 1 - (goog.now() - this.animationStart || 0) / MAX_ANIMATION_DURATION;
+        t = 1 - (goog.now() - this.animationStart) / MAX_ANIMATION_DURATION;
         // Clamp into 0,1
         t = Math.max(0, Math.min(1, t));
 
