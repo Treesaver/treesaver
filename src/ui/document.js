@@ -1,5 +1,8 @@
 goog.provide('treesaver.ui.Document');
 
+goog.require('treesaver.capabilities');
+goog.require('treesaver.debug');
+goog.require('treesaver.dom');
 goog.require('treesaver.events');
 goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
@@ -34,6 +37,9 @@ treesaver.ui.Document = function(url, meta) {
 
 goog.scope(function() {
   var Document = treesaver.ui.Document,
+      capabilities = treesaver.capabilities,
+      debug = treesaver.debug,
+      dom = treesaver.dom,
       events = treesaver.events,
       storage = treesaver.storage,
       Article = treesaver.ui.Article,
@@ -138,8 +144,8 @@ goog.scope(function() {
 
     // We have the body of the document at 'requestUrl` in a node now,
     // and we try and find all top level articles.
-    articles = treesaver.dom.querySelectorAll('article', node).filter(function(article) {
-      return treesaver.dom.getAncestor(article, 'article') === null;
+    articles = dom.querySelectorAll('article', node).filter(function(article) {
+      return dom.getAncestor(article, 'article') === null;
     });
 
     // We don't have any articles so we'll just copy the entire body and call it an article
@@ -208,7 +214,7 @@ goog.scope(function() {
       return true;
     }
     else {
-      return treesaver.capabilities.check(this.requirements, true);
+      return capabilities.check(this.requirements, true);
     }
   };
 
@@ -300,11 +306,11 @@ goog.scope(function() {
 
     this.loading = true;
 
-    if (!treesaver.capabilities.IS_NATIVE_APP) {
-      cached_text = /** @type {?string} */ (treesaver.storage.get(Document.CACHE_STORAGE_PREFIX + this.url));
+    if (!capabilities.IS_NATIVE_APP) {
+      cached_text = /** @type {?string} */ (storage.get(Document.CACHE_STORAGE_PREFIX + this.url));
 
       if (cached_text) {
-        treesaver.debug.log('Document.load: Processing cached HTML content for document: ' + this.url);
+        debug.log('Document.load: Processing cached HTML content for document: ' + this.url);
         this.articles = this.parse(cached_text);
         this.title = this.extractTitle(cached_text);
         this.loaded = true;
@@ -315,14 +321,14 @@ goog.scope(function() {
       }
     }
 
-    treesaver.debug.info('Document.load: Downloading document: ' + this.url);
+    debug.info('Document.load: Downloading document: ' + this.url);
 
     treesaver.network.get(this.url, function(text) {
       that.loading = false;
 
       if (!text) {
-        if (treesaver.capabilities.IS_NATIVE_APP || !cached_text) {
-          treesaver.debug.info('Document.load: Load failed, no content: ' + that.url);
+        if (capabilities.IS_NATIVE_APP || !cached_text) {
+          debug.info('Document.load: Load failed, no content: ' + that.url);
           that.loadFailed = true;
           that.loaded = false;
 
@@ -333,18 +339,18 @@ goog.scope(function() {
         }
         else {
           // Stick with cached content
-          treesaver.debug.log('Document.load: Using cached content for document: ' + that.url);
+          debug.log('Document.load: Using cached content for document: ' + that.url);
         }
       }
-      else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
-        if (!treesaver.capabilities.IS_NATIVE_APP) {
-          treesaver.debug.log('Document.load: Fetched content newer than cache for document: ' + that.url);
+      else if (capabilities.IS_NATIVE_APP || cached_text !== text) {
+        if (!capabilities.IS_NATIVE_APP) {
+          debug.log('Document.load: Fetched content newer than cache for document: ' + that.url);
 
           // Save the HTML in the cache
-          treesaver.storage.set(Document.CACHE_STORAGE_PREFIX + that.url, text, true);
+          storage.set(Document.CACHE_STORAGE_PREFIX + that.url, text, true);
         }
 
-        treesaver.debug.log('Document.load: Processing HTML content for document: ' + that.url);
+        debug.log('Document.load: Processing HTML content for document: ' + that.url);
         that.articles = that.parse(text);
         that.title = that.extractTitle(text);
         that.loaded = true;
@@ -354,7 +360,7 @@ goog.scope(function() {
         });
       }
       else {
-        treesaver.debug.log('Document.load: Fetched document content same as cached');
+        debug.log('Document.load: Fetched document content same as cached');
       }
     });
   };

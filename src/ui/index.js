@@ -1,5 +1,6 @@
 goog.provide('treesaver.ui.Index');
 
+goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
 goog.require('treesaver.events');
 goog.require('treesaver.json');
@@ -26,6 +27,7 @@ goog.scope(function() {
   var Index = treesaver.ui.Index,
       Document = treesaver.ui.Document,
       TreeNode = treesaver.ui.TreeNode,
+      capabilities = treesaver.capabilities,
       debug = treesaver.debug,
       uri = treesaver.uri,
       events = treesaver.events,
@@ -389,7 +391,7 @@ goog.scope(function() {
 
     this.loading = true;
 
-    if (!treesaver.capabilities.IS_NATIVE_APP) {
+    if (!capabilities.IS_NATIVE_APP) {
       cached_text = /** @type {?string} */ (storage.get(Index.CACHE_STORAGE_PREFIX + this.url));
 
       if (cached_text) {
@@ -430,8 +432,8 @@ goog.scope(function() {
           debug.log('Index.load: Using cached content for index: ' + that.url);
         }
       }
-      else if (treesaver.capabilities.IS_NATIVE_APP || cached_text !== text) {
-        if (!treesaver.capabilities.IS_NATIVE_APP) {
+      else if (capabilities.IS_NATIVE_APP || cached_text !== text) {
+        if (!capabilities.IS_NATIVE_APP) {
           debug.log('Index.load: Fetched content newer than cache for index: ' + that.url);
 
           // Save the HTML in the cache
