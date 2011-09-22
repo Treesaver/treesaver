@@ -274,10 +274,15 @@ goog.scope(function() {
 
     if (e.type === Document.events.LOADFAILED &&
         e.document === ArticleManager.currentDocument) {
-      // The current article failed to load, redirect to it
-      ArticleManager.redirectToDocument(ArticleManager.currentDocument);
+      if (capabilities.IS_NATIVE_APP) {
+        // Article did not load, for now just ignore
+      }
+      else {
+        // The current article failed to load, redirect to it
+        ArticleManager.redirectToDocument(ArticleManager.currentDocument);
 
-      return;
+        return;
+      }
     }
 
     if (e.type === treesaver.history.events.POPSTATE) {
@@ -1010,7 +1015,14 @@ goog.scope(function() {
       doc.load();
     }
     else if (doc.error) {
-      ArticleManager.redirectToDocument(doc);
+      if (capabilities.IS_NATIVE_APP) {
+        // Article did not load correctly, can happen due to long wait on 3G
+        // or even being offline
+        // for now, ignore
+      }
+      else {
+        ArticleManager.redirectToDocument(doc);
+      }
     }
 
     if (index || index === 0) {
