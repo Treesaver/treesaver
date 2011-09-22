@@ -4,6 +4,7 @@
 
 goog.provide('treesaver.ui.ArticleManager');
 
+goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
@@ -18,6 +19,7 @@ goog.require('treesaver.uri');
 
 goog.scope(function() {
   var ArticleManager = treesaver.ui.ArticleManager,
+      capabilities = treesaver.capabilities,
       debug = treesaver.debug,
       dimensions = treesaver.dimensions,
       dom = treesaver.dom,
@@ -165,7 +167,7 @@ goog.scope(function() {
       var requires = node.getAttribute('data-requires'),
           grid;
       // Make sure the grid meets our requirements
-      if (!requires || treesaver.capabilities.check(requires.split(' '))) {
+      if (!requires || capabilities.check(requires.split(' '))) {
         // Initialize each grid and store
         grid = new treesaver.layout.Grid(node);
         if (!grid.error) {
