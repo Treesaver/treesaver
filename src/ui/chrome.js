@@ -534,6 +534,7 @@ goog.scope(function() {
         handled = false,
         withinSidebar = false,
         withinMenu = false,
+        target = null,
         nearestSidebar = null;
 
     // Lightbox active? Hide it
@@ -662,18 +663,24 @@ goog.scope(function() {
         // Check links last since they may be used as UI commands as well
         // Links can occur in-page or in the chrome
         if (!handled && el.href) {
+          target = el.getAttribute('target');
+
           // Lightbox-flagged elements are skipped as processing goes up the chain
           // if a zoomable is found on the way up the tree, it will be handled. If
           // not, the link is navigated as-is
-          if (el.getAttribute('target') === 'lightbox') {
+          if (target === 'lightbox') {
             // Skip this element and process the parent zoomable
             el = /** @type {!Element} */ (el.parentNode);
             continue;
           }
 
           url = network.absoluteURL(el.href);
-          if (!ArticleManager.goToDocumentByURL(url)) {
-            // The URL is not an article, let the navigation happen normally
+          if (target === '_blank' ||
+              target === '_parent' ||
+              target === '_top' ||
+              !ArticleManager.goToDocumentByURL(url)) {
+            // The URL is not an article or explicitly opted out,
+            // so let the navigation happen normally.
             return;
           }
 
