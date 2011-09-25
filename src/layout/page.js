@@ -4,6 +4,7 @@ goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
 goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
+goog.require('treesaver.template');
 goog.require('treesaver.layout.Grid');
 goog.require('treesaver.ui.Scrollable');
 
@@ -64,7 +65,7 @@ goog.scope(function() {
       '[' + dom.customAttributePrefix + 'template=document]',
       this.node
     ).forEach(function(el) {
-      el.innerHTML = Mustache.to_html(el.innerHTML, content.doc.meta);
+      treesaver.template.expand(el, el.innerHTML, content.doc.meta);
     });
 
     // Containers

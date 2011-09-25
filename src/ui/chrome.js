@@ -11,6 +11,7 @@ goog.require('treesaver.dimensions');
 goog.require('treesaver.dom');
 goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
+goog.require('treesaver.template');
 goog.require('treesaver.ui.ArticleManager');
 goog.require('treesaver.ui.Index');
 goog.require('treesaver.ui.Scrollable');
@@ -247,7 +248,7 @@ goog.scope(function() {
 
       dom.querySelectorAll('[' + treesaver.dom.customAttributePrefix + 'template]', this.node).forEach(function(el) {
         var template_name = dom.getCustomAttr(el, 'template'),
-            elementArray, templateArray;
+            elementArray, templateArray, newEl;
 
         switch (template_name) {
         case 'position':
@@ -271,8 +272,14 @@ goog.scope(function() {
         }
 
         // Add
-        elementArray.push(el);
         templateArray.push(el.innerHTML);
+
+        if (el.nodeName.toLowerCase() === 'script') {
+          newEl = document.createElement('div');
+          el.parentNode.replaceChild(newEl, el);
+          el = newEl;
+        }
+        elementArray.push(el);
       }, this);
 
       this.menus = dom.querySelectorAll('.menu', this.node);
@@ -1403,7 +1410,7 @@ goog.scope(function() {
     this.positionElements.forEach(function(el, i) {
       var template = this.positionTemplates[i];
 
-      el.innerHTML = Mustache.to_html(template, {
+      treesaver.template.expand(el, template, {
         'pagenumber': ArticleManager.getCurrentPageNumber(),
         'pagecount': ArticleManager.getCurrentPageCount(),
         'url': ArticleManager.getCurrentUrl(),
@@ -1417,7 +1424,7 @@ goog.scope(function() {
     this.publicationElements.forEach(function(el, i) {
       var template = this.publicationTemplates[i];
 
-      el.innerHTML = Mustache.to_html(template, ArticleManager.index.meta);
+      treesaver.template.expand(el, template, ArticleManager.index.meta);
     }, this);
   };
 
@@ -1425,7 +1432,7 @@ goog.scope(function() {
     this.currentDocumentElements.forEach(function(el, i) {
       var template = this.currentDocumentTemplates[i];
 
-      el.innerHTML = Mustache.to_html(template, ArticleManager.getCurrentDocument().meta);
+      treesaver.template.expand(el, template, ArticleManager.getCurrentDocument().meta);
     }, this);
   };
 
@@ -1581,7 +1588,7 @@ goog.scope(function() {
     this.indexElements.forEach(function(el, i) {
       var template = this.indexTemplates[i];
 
-      el.innerHTML = Mustache.to_html(template, toc);
+      treesaver.template.expand(el, template, toc);
     }, this);
 
     this.updateTOCActive();
