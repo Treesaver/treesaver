@@ -81,7 +81,7 @@ goog.scope(function() {
     container.innerHTML = this.html;
 
     // Find any cloaked images
-    dom.querySelectorAll('img[data-src], iframe[data-src], video[data-src], source[src], audio[src]', container).forEach(function(e) {
+    dom.querySelectorAll('img[data-src], iframe[data-src], video[data-src], source[data-src], audio[data-src]', container).forEach(function(e) {
       e.setAttribute('src', e.getAttribute('data-src'));
     });
   };
