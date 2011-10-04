@@ -13,6 +13,7 @@ goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.template');
 goog.require('treesaver.ui.ArticleManager');
+goog.require('treesaver.ui.Document');
 goog.require('treesaver.ui.Index');
 goog.require('treesaver.ui.Scrollable');
 
@@ -60,6 +61,7 @@ goog.scope(function() {
 
 goog.scope(function() {
   var Chrome = treesaver.ui.Chrome,
+      Document = treesaver.ui.Document,
       array = treesaver.array,
       capabilities = treesaver.capabilities,
       debug = treesaver.debug,
@@ -686,6 +688,16 @@ goog.scope(function() {
           }
           else if (ArticleManager.goToDocumentByURL(url)) {
             handled = true;
+          }
+          // Target is not blank a lightbox and it is not in the index.
+          else if (target === 'ts-treesaver') {
+            // Force processing the document as a Treesaver document by
+            // adding it to the index.
+            ArticleManager.index.appendChild(new Document(url));
+            ArticleManager.index.update();
+            if (ArticleManager.goToDocumentByURL(url)) {
+              handled = true;
+            }
           }
         }
         el = /** @type {!Element} */ (el.parentNode);
