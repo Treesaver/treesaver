@@ -127,7 +127,8 @@ goog.scope(function() {
   ArticleManager.onIndexLoad = function(e) {
     var index = e.index,
         docs = index.getDocuments(ArticleManager.initialDocument.url),
-        doc = null;
+        doc = null,
+        initialDocumentMeta = dom.querySelectorAll('meta[name]');
 
     // Note that this may get called twice, once from the cache and once from the XHR response
     if (docs.length) {
@@ -136,6 +137,16 @@ goog.scope(function() {
         ArticleManager.initialDocument.meta = doc.meta;
         ArticleManager.initialDocument.children = doc.children;
         ArticleManager.initialDocument.requirements = doc.requirements;
+
+        // Copy over the meta data inside the initial document
+        initialDocumentMeta.forEach(function (meta) {
+          var name = meta.getAttribute('name'),
+              content = meta.getAttribute('content');
+
+          if (name && name !== 'content' && content) {
+            doc.meta[name] = content;
+          }
+        });
 
         doc.parent.replaceChild(ArticleManager.initialDocument, doc);
       });

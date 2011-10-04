@@ -7,6 +7,7 @@ goog.require('treesaver.ui.Article');
 // Avoid circular ref
 // goog.require('treesaver.ui.ArticleManager');
 goog.require('treesaver.ui.TreeNode');
+goog.require('treesaver.object');
 goog.require('treesaver.uri');
 
 /**
@@ -137,6 +138,19 @@ goog.scope(function() {
     }
 
     node.innerHTML = text;
+
+    // Copy all meta tags with a name and content into the meta-data
+    // object. The values specified in the <meta> tag take precendence
+    // over values in the index file, except `content`, which can not
+    // be overwritten.
+    dom.querySelectorAll('meta[name]', node).forEach(function (meta) {
+      var name = meta.getAttribute('name'),
+          content = meta.getAttribute('content');
+
+      if (name && name !== 'content' && content) {
+        this.meta[name] = content;
+      }
+    }, this);
 
     // We have the body of the document at 'requestUrl` in a node now,
     // and we try and find all top level articles.
