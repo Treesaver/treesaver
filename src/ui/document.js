@@ -1,6 +1,7 @@
 goog.provide('treesaver.ui.Document');
 
 goog.require('treesaver.events');
+goog.require('treesaver.dom');
 goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
 // Avoid circular ref
@@ -35,6 +36,7 @@ treesaver.ui.Document = function(url, meta) {
 goog.scope(function() {
   var Document = treesaver.ui.Document,
       events = treesaver.events,
+      dom = treesaver.dom,
       storage = treesaver.storage,
       Article = treesaver.ui.Article,
       TreeNode = treesaver.ui.TreeNode,
@@ -138,8 +140,8 @@ goog.scope(function() {
 
     // We have the body of the document at 'requestUrl` in a node now,
     // and we try and find all top level articles.
-    articles = treesaver.dom.querySelectorAll('article', node).filter(function(article) {
-      return treesaver.dom.getAncestor(article, 'article') === null;
+    articles = dom.querySelectorAll('article', node).filter(function(article) {
+      return dom.getAncestor(article, 'article') === null;
     });
 
     // We don't have any articles so we'll just copy the entire body and call it an article
