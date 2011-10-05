@@ -141,13 +141,12 @@ goog.scope(function() {
 
     // Copy all meta tags with a name and content into the meta-data
     // object. The values specified in the <meta> tag take precendence
-    // over values in the index file, except `content`, which can not
-    // be overwritten.
+    // over values in the index file.
     dom.querySelectorAll('meta[name]', node).forEach(function (meta) {
       var name = meta.getAttribute('name'),
           content = meta.getAttribute('content');
 
-      if (name && name !== 'content' && content) {
+      if (name && content) {
         this.meta[name] = content;
       }
     }, this);

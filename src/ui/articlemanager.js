@@ -143,7 +143,7 @@ goog.scope(function() {
           var name = meta.getAttribute('name'),
               content = meta.getAttribute('content');
 
-          if (name && name !== 'content' && content) {
+          if (name && content) {
             doc.meta[name] = content;
           }
         });
