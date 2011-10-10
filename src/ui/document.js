@@ -261,6 +261,14 @@ goog.scope(function() {
   };
 
   /**
+   * Set the canonical URL for this Document.
+   * @param {!string} url
+   */
+  Document.prototype.setUrl = function(url) {
+    this.url = url;
+  };
+
+  /**
    * Returns the number of articles in this Document. Does not include any child documents.
    * @return {!number}
    */
@@ -380,5 +388,6 @@ goog.scope(function() {
   goog.exportSymbol('treesaver.Document.prototype.getArticle', Document.prototype.getArticle);
   goog.exportSymbol('treesaver.Document.prototype.parse', Document.prototype.parse);
   goog.exportSymbol('treesaver.Document.prototype.getUrl', Document.prototype.getUrl);
+  goog.exportSymbol('treesaver.Document.prototype.setUrl', Document.prototype.setUrl);
   goog.exportSymbol('treesaver.Document.prototype.getMeta', Document.prototype.getMeta);
 });
