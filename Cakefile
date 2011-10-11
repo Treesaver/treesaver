@@ -340,7 +340,7 @@ getCompiledScript = (info, options, callback) ->
   getDependencyList (fileList) ->
     args += " --js #{fileList.join ' --js '}"
 
-    exec "java -jar #{path.join lib_dir, 'closure/compiler.jar'} #{args}", null, (error, stdout, stderr) ->
+    exec "java -jar #{path.join lib_dir, 'closure/compiler.jar'} #{args}", { maxBuffer: 1000 * 1024 }, (error, stdout, stderr) ->
       if error
         console.error stderr
         throw error

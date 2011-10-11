@@ -4,11 +4,13 @@ goog.require('treesaver.capabilities');
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');
+goog.require('treesaver.dom');
 goog.require('treesaver.storage');
 goog.require('treesaver.ui.Article');
 // Avoid circular ref
 // goog.require('treesaver.ui.ArticleManager');
 goog.require('treesaver.ui.TreeNode');
+goog.require('treesaver.object');
 goog.require('treesaver.uri');
 
 /**
@@ -41,6 +43,7 @@ goog.scope(function() {
       debug = treesaver.debug,
       dom = treesaver.dom,
       events = treesaver.events,
+      dom = treesaver.dom,
       storage = treesaver.storage,
       Article = treesaver.ui.Article,
       TreeNode = treesaver.ui.TreeNode,
@@ -141,6 +144,18 @@ goog.scope(function() {
     }
 
     node.innerHTML = text;
+
+    // Copy all meta tags with a name and content into the meta-data
+    // object. The values specified in the <meta> tag take precendence
+    // over values in the index file.
+    dom.querySelectorAll('meta[name]', node).forEach(function (meta) {
+      var name = meta.getAttribute('name'),
+          content = meta.getAttribute('content');
+
+      if (name && content) {
+        this.meta[name] = content;
+      }
+    }, this);
 
     // We have the body of the document at 'requestUrl` in a node now,
     // and we try and find all top level articles.
@@ -249,6 +264,14 @@ goog.scope(function() {
    */
   Document.prototype.getUrl = function() {
     return this.url;
+  };
+
+  /**
+   * Set the canonical URL for this Document.
+   * @param {!string} url
+   */
+  Document.prototype.setUrl = function(url) {
+    this.url = url;
   };
 
   /**
@@ -371,5 +394,6 @@ goog.scope(function() {
   goog.exportSymbol('treesaver.Document.prototype.getArticle', Document.prototype.getArticle);
   goog.exportSymbol('treesaver.Document.prototype.parse', Document.prototype.parse);
   goog.exportSymbol('treesaver.Document.prototype.getUrl', Document.prototype.getUrl);
+  goog.exportSymbol('treesaver.Document.prototype.setUrl', Document.prototype.setUrl);
   goog.exportSymbol('treesaver.Document.prototype.getMeta', Document.prototype.getMeta);
 });

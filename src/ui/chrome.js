@@ -14,8 +14,7 @@ goog.require('treesaver.network');
 goog.require('treesaver.scheduler');
 goog.require('treesaver.template');
 goog.require('treesaver.ui.ArticleManager');
-// Avoid circular dep
-// goog.require('treesaver.ui.StateManager');
+goog.require('treesaver.ui.Document');
 goog.require('treesaver.ui.Index');
 goog.require('treesaver.ui.Scrollable');
 
@@ -63,6 +62,7 @@ goog.scope(function() {
 
 goog.scope(function() {
   var Chrome = treesaver.ui.Chrome,
+      Document = treesaver.ui.Document,
       array = treesaver.array,
       capabilities = treesaver.capabilities,
       debug = treesaver.debug,
@@ -685,29 +685,33 @@ goog.scope(function() {
         // Links can occur in-page or in the chrome
         if (!handled && el.href) {
           target = el.getAttribute('target');
+          url = network.absoluteURL(el.href);
 
+          if (target === '_blank') {
+            return;
+          }
           // Lightbox-flagged elements are skipped as processing goes up the chain
           // if a zoomable is found on the way up the tree, it will be handled. If
           // not, the link is navigated as-is
-          if (target === 'lightbox') {
+          else if (target === 'ts-lightbox') {
             // Skip this element and process the parent zoomable
             el = /** @type {!Element} */ (el.parentNode);
             continue;
           }
-
-          url = network.absoluteURL(el.href);
-          if (target === '_blank' ||
-              target === '_parent' ||
-              target === '_top' ||
-              !ArticleManager.goToDocumentByURL(url)) {
-            // The URL is not an article or explicitly opted out,
-            // so let the navigation happen normally.
-            return;
+          else if (ArticleManager.goToDocumentByURL(url)) {
+            handled = true;
           }
-
-          handled = true;
+          // Target is not blank a lightbox and it is not in the index.
+          else if (target === 'ts-treesaver') {
+            // Force processing the document as a Treesaver document by
+            // adding it to the index.
+            ArticleManager.index.appendChild(new Document(url));
+            ArticleManager.index.update();
+            if (ArticleManager.goToDocumentByURL(url)) {
+              handled = true;
+            }
+          }
         }
-
         el = /** @type {!Element} */ (el.parentNode);
       }
     }
