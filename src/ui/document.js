@@ -43,7 +43,6 @@ goog.scope(function() {
       debug = treesaver.debug,
       dom = treesaver.dom,
       events = treesaver.events,
-      dom = treesaver.dom,
       storage = treesaver.storage,
       Article = treesaver.ui.Article,
       TreeNode = treesaver.ui.TreeNode,
