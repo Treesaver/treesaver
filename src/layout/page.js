@@ -854,7 +854,7 @@ goog.scope(function() {
               block.style.marginTop = 0;
             }
             else {
-              debug.error('No block on fucked up code');
+              debug.error('No block on bad code');
             }
           }
         }
