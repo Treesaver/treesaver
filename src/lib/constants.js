@@ -75,7 +75,7 @@ var CHECK_STATE_INTERVAL = 100; // .1 seconds
  *
  * @define {number}
  */
-var MOUSE_WHEEL_INTERVAL = 1500; // 1.5 seconds
+var MOUSE_WHEEL_INTERVAL = 400; // .4 seconds
 
 /**
  * Is the application being hosted within the iOS wrapper?
