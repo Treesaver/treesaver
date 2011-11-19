@@ -156,6 +156,15 @@ $(function () {
     ok(article.processHTML(tmp), 'Returns true on success');
     equals(article.theme, 'theme', 'Theme stored');
 
+    tmp = articleNode.cloneNode(true);
+
+    // Make sure classes are properly extracted
+    tmp.setAttribute('class', 'one two three');
+    article = new treesaver.ui.Article([]);
+    console.log(tmp.outerHTML);
+    ok(article.processHTML(tmp), 'Returns true on success');
+    deepEqual(article.extra_classes, ['one', 'two', 'three'], 'Classes extracted');
+
     // Make sure we don't do extra work when calling process again
     tmp = article.content;
     ok(article.processHTML(articleNode.cloneNode(true)), 'Returns true on repeat call');
