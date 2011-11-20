@@ -21,8 +21,9 @@ goog.scope(function() {
    * @param {!treesaver.layout.Content} content
    * @param {!Array.<treesaver.layout.Grid>} grids
    * @param {!treesaver.layout.BreakRecord} br The current breakRecord.
+   *  @param {!Array.<string>} extra_classes Extra classes to apply.
    */
-  treesaver.layout.Page = function(content, grids, br) {
+  treesaver.layout.Page = function(content, grids, br, extra_classes) {
     var best = Grid.best(content, grids, br),
         host = document.createElement('div'),
         originalBr = br.clone(),
@@ -55,6 +56,7 @@ goog.scope(function() {
     // TODO: Perhaps not, since IE has innerHTML issues when disconnected
     document.body.appendChild(host);
     host.innerHTML = best.grid.html;
+    host.firstChild.className += ' ' + extra_classes.join(' ');
     this.node = /** @type {!Element} */ (host.firstChild);
 
     // Manually set dimensions on the page

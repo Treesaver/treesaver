@@ -247,6 +247,34 @@ $(function () {
     // Make sure events get called
   });
 
+  test('Pagination: extra classes are copied to every page', function () {
+    var $content = $('.testonly.content article')[0];
+    $content.className = 'one three five';
+    var article = new treesaver.ui.Article([], $content),
+        grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
+        pos;
+
+    // First, let's paginate just the first page
+    article.setGrids([grid]);
+    article.setMaxPageSize({ w: 3000, h: 300 });
+    article.resetPagination(); // Call manually since we're hitting private API
+    ok(article.paginationClean, 'Article pagination clean after reset');
+    article.paginate(false, 0);
+    ok(article.pages, 'Pages array exists');
+    equals(article.pages.length, 1, 'Pages array has only one page');
+    var node = treesaver.dom.createElementFromHTML(article.pages[0].html);
+    equals(node.className, 'grid twocontainer one three five', 'Classes');
+
+    // OK, now let's paginate two pages
+    article.resetPagination(); // Call manually since we're hitting private API
+    article.paginate(false, 1);
+    equals(article.pages.length, 2, 'Pages array has two pages when index is 2');
+    node = treesaver.dom.createElementFromHTML(article.pages[0].html);
+    equals(node.className, 'grid twocontainer one three five', 'Classes');
+    node = treesaver.dom.createElementFromHTML(article.pages[1].html);
+    equals(node.className, 'grid twocontainer one three five', 'Classes');
+  });
+
   test('getPages', function () {
     var $content = $('.testonly.content article')[0],
         article = new treesaver.ui.Article([], $content),
