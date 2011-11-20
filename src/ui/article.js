@@ -333,7 +333,8 @@ goog.scope(function() {
       page = new Page(
         /** @type {!treesaver.layout.Content } */ (this.content),
         this.eligible_grids,
-        /** @type {!treesaver.layout.BreakRecord} */ (this.br)
+        /** @type {!treesaver.layout.BreakRecord} */ (this.br),
+        this.extra_classes
       );
 
       // Pagination can fail to produce a useful page
