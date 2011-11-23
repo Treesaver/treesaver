@@ -1120,8 +1120,7 @@ goog.scope(function() {
     });
   };
 
-  // Expose functions when hosted within iOS wrapper
-  if (WITHIN_IOS_WRAPPER) {
+  // Expose functions
     goog.exportSymbol('treesaver.canGoToNextPage', ArticleManager.canGoToNextPage);
     goog.exportSymbol('treesaver.canGoToPreviousPage', ArticleManager.canGoToPreviousPage);
     goog.exportSymbol('treesaver.canGoToNextDocument', ArticleManager.canGoToNextDocument);
@@ -1133,5 +1132,4 @@ goog.scope(function() {
     goog.exportSymbol('treesaver.getCurrentDocument', ArticleManager.getCurrentDocument);
     goog.exportSymbol('treesaver.getDocumentCount', ArticleManager.getDocumentCount);
     goog.exportSymbol('treesaver.goToDocumentByURL', ArticleManager.goToDocumentByURL);
-  }
 });
