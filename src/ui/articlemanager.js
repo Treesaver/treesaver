@@ -1120,18 +1120,16 @@ goog.scope(function() {
     });
   };
 
-  // Expose functions when hosted within iOS wrapper
-  if (WITHIN_IOS_WRAPPER) {
-    goog.exportSymbol('treesaver.canGoToNextPage', ArticleManager.canGoToNextPage);
-    goog.exportSymbol('treesaver.canGoToPreviousPage', ArticleManager.canGoToPreviousPage);
-    goog.exportSymbol('treesaver.canGoToNextDocument', ArticleManager.canGoToNextDocument);
-    goog.exportSymbol('treesaver.canGoToPreviousDocument', ArticleManager.canGoToPreviousDocument);
-    goog.exportSymbol('treesaver.getCurrentUrl', ArticleManager.getCurrentUrl);
-    goog.exportSymbol('treesaver.getCurrentPageNumber', ArticleManager.getCurrentPageNumber);
-    goog.exportSymbol('treesaver.getCurrentPageCount', ArticleManager.getCurrentPageCount);
-    goog.exportSymbol('treesaver.getCurrentDocumentNumber', ArticleManager.getCurrentDocumentNumber);
-    goog.exportSymbol('treesaver.getCurrentDocument', ArticleManager.getCurrentDocument);
-    goog.exportSymbol('treesaver.getDocumentCount', ArticleManager.getDocumentCount);
-    goog.exportSymbol('treesaver.goToDocumentByURL', ArticleManager.goToDocumentByURL);
-  }
+  // Expose functions
+  goog.exportSymbol('treesaver.canGoToNextPage', ArticleManager.canGoToNextPage);
+  goog.exportSymbol('treesaver.canGoToPreviousPage', ArticleManager.canGoToPreviousPage);
+  goog.exportSymbol('treesaver.canGoToNextDocument', ArticleManager.canGoToNextDocument);
+  goog.exportSymbol('treesaver.canGoToPreviousDocument', ArticleManager.canGoToPreviousDocument);
+  goog.exportSymbol('treesaver.getCurrentUrl', ArticleManager.getCurrentUrl);
+  goog.exportSymbol('treesaver.getCurrentPageNumber', ArticleManager.getCurrentPageNumber);
+  goog.exportSymbol('treesaver.getCurrentPageCount', ArticleManager.getCurrentPageCount);
+  goog.exportSymbol('treesaver.getCurrentDocumentNumber', ArticleManager.getCurrentDocumentNumber);
+  goog.exportSymbol('treesaver.getCurrentDocument', ArticleManager.getCurrentDocument);
+  goog.exportSymbol('treesaver.getDocumentCount', ArticleManager.getDocumentCount);
+  goog.exportSymbol('treesaver.goToDocumentByURL', ArticleManager.goToDocumentByURL);
 });
