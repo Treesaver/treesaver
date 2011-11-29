@@ -156,6 +156,15 @@ $(function () {
     ok(article.processHTML(tmp), 'Returns true on success');
     equals(article.theme, 'theme', 'Theme stored');
 
+    tmp = articleNode.cloneNode(true);
+
+    // Make sure classes are properly extracted
+    tmp.setAttribute('class', 'one two three');
+    article = new treesaver.ui.Article([]);
+    console.log(tmp.outerHTML);
+    ok(article.processHTML(tmp), 'Returns true on success');
+    deepEqual(article.extra_classes, ['one', 'two', 'three'], 'Classes extracted');
+
     // Make sure we don't do extra work when calling process again
     tmp = article.content;
     ok(article.processHTML(articleNode.cloneNode(true)), 'Returns true on repeat call');
@@ -236,6 +245,34 @@ $(function () {
   test('Pagination: Async', function () {
     // TODO
     // Make sure events get called
+  });
+
+  test('Pagination: extra classes are copied to every page', function () {
+    var $content = $('.testonly.content article')[0];
+    $content.className = 'one three five';
+    var article = new treesaver.ui.Article([], $content),
+        grid = new treesaver.layout.Grid($('.grid.twocontainer')[0]),
+        pos;
+
+    // First, let's paginate just the first page
+    article.setGrids([grid]);
+    article.setMaxPageSize({ w: 3000, h: 300 });
+    article.resetPagination(); // Call manually since we're hitting private API
+    ok(article.paginationClean, 'Article pagination clean after reset');
+    article.paginate(false, 0);
+    ok(article.pages, 'Pages array exists');
+    equals(article.pages.length, 1, 'Pages array has only one page');
+    var node = treesaver.dom.createElementFromHTML(article.pages[0].html);
+    equals(node.className, 'grid twocontainer one three five', 'Classes');
+
+    // OK, now let's paginate two pages
+    article.resetPagination(); // Call manually since we're hitting private API
+    article.paginate(false, 1);
+    equals(article.pages.length, 2, 'Pages array has two pages when index is 2');
+    node = treesaver.dom.createElementFromHTML(article.pages[0].html);
+    equals(node.className, 'grid twocontainer one three five', 'Classes');
+    node = treesaver.dom.createElementFromHTML(article.pages[1].html);
+    equals(node.className, 'grid twocontainer one three five', 'Classes');
   });
 
   test('getPages', function () {

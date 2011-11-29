@@ -183,6 +183,7 @@ goog.scope(function() {
       // New theme means grids need to be filtered again
       this.setGrids(this.grids);
     }
+    this.extra_classes = dom.classes(article_node);
 
     // Move the content from the article to the column
     while (article_node.firstChild) {
@@ -332,7 +333,8 @@ goog.scope(function() {
       page = new Page(
         /** @type {!treesaver.layout.Content } */ (this.content),
         this.eligible_grids,
-        /** @type {!treesaver.layout.BreakRecord} */ (this.br)
+        /** @type {!treesaver.layout.BreakRecord} */ (this.br),
+        this.extra_classes
       );
 
       // Pagination can fail to produce a useful page
