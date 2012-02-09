@@ -604,7 +604,9 @@ goog.scope(function() {
 
     if (!withinSidebar) {
       this.sidebars.forEach(function(sidebar) {
-        this.sidebarInactive(sidebar);
+        if (!dom.hasClass(sidebar, 'drawer')) {
+          this.sidebarInactive(sidebar);
+        }
       }, this);
     }
 
