@@ -96,6 +96,9 @@ goog.scope(function() {
     // any sanitization that may have occurred.
     this.html = dom.outerHTML(node);
 
+    this.bonus = dom.hasAttr(node, 'data-bonus') ?
+      parseInt(node.getAttribute('data-bonus'), 10) : 0;
+
     // Remove the child
     document.body.removeChild(node);
   };
@@ -184,6 +187,11 @@ goog.scope(function() {
    * @type {Array.<treesaver.layout.Container>}
    */
   Grid.prototype.containers;
+
+  /**
+   * @type {number}
+   */
+  Grid.prototype.bonus;
 
   /**
    * @type {string}
@@ -346,6 +354,10 @@ goog.scope(function() {
     else {
       score += this.scoringFlags['even'] ? Grid.SCORING.EVEN_PAGE :
         this.scoringFlags['odd'] ? -Grid.SCORING.NON_EVEN_ODD : 0;
+    }
+
+    if (this.bonus && score >= 0) {
+      score += this.bonus;
     }
 
     return score;
