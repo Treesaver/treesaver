@@ -606,6 +606,14 @@ goog.scope(function() {
       this.sidebars.forEach(function(sidebar) {
         this.sidebarInactive(sidebar);
       }, this);
+    } else {
+      if ((nearestSidebar = this.getNearestSidebar(el))) {
+        if (dom.hasClass(nearestSidebar, 'sidebar') && dom.hasClass(nearestSidebar, 'close-on-click')) {
+          this.sidebars.forEach(function(sidebar) {
+            this.sidebarInactive(sidebar);
+          }, this);
+        }
+      }
     }
 
     // Compiler cast
