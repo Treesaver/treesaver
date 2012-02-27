@@ -96,8 +96,8 @@ goog.scope(function() {
     // any sanitization that may have occurred.
     this.html = dom.outerHTML(node);
 
-    this.bonus = dom.hasAttr(node, 'data-bonus') ?
-      parseInt(node.getAttribute('data-bonus'), 10) : 0;
+    this.bonus = dom.hasCustomAttr(node, 'bonus') ?
+      parseInt(dom.getCustomAttr(node, 'bonus'), 10) : 0;
 
     // Remove the child
     document.body.removeChild(node);
