@@ -32,14 +32,14 @@ goog.scope(function() {
    * Regex to determine whether a value is a pixel value.
    * @private
    */
-  dimensions.pixel = /^-?\d+(?:px)?$/i;
+  dimensions.pixel = /^-?\d+(:?\.\d+)?(?:px)?$/i;
 
 
   /**
    * Regex to determine whether a value contains a number.
    * @private
    */
-  dimensions.number = /^-?\d/;
+  dimensions.number = /^-?\d(:?\.\d+)?/;
 
   /**
    * Whether the given size fits within the bounds set by the range
