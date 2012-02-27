@@ -1222,6 +1222,10 @@ goog.scope(function() {
       sidebar: sidebar
     });
     dom.addClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+    if (dom.hasClass(sidebar, 'drawer')) {
+      dom.addClass(/** @type {!Element} */ (this.viewer), 'sidebar-drawer-active');
+      treesaver.ui.StateManager.resizeChrome();
+    }
   };
 
   /**
@@ -1234,6 +1238,10 @@ goog.scope(function() {
       });
     }
     dom.removeClass(/** @type {!Element} */ (sidebar), 'sidebar-active');
+    if (dom.hasClass(sidebar, 'drawer')) {
+      dom.removeClass(/** @type {!Element} */ (this.viewer), 'sidebar-drawer-active');
+      treesaver.ui.StateManager.resizeChrome();
+    }
   };
 
   /**
