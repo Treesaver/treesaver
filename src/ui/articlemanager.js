@@ -137,7 +137,7 @@ goog.scope(function() {
       // Update the new index with the articles from the initial document, which we have already loaded.
       docs.forEach(function(doc) {
         ArticleManager.initialDocument.meta = doc.meta;
-        ArticleManager.initialDocument.children = doc.children;
+        ArticleManager.initialDocument.contents = doc.contents;
         ArticleManager.initialDocument.requirements = doc.requirements;
 
         // Copy over the meta data inside the initial document
