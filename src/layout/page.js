@@ -435,7 +435,7 @@ goog.scope(function() {
       block = content.blocks[br.index];
       nextSibling = block.nextSibling;
       nextNonChild = nextSibling || block.getNextNonChildBlock();
-      nextNotUsed = nextSibling && this.nextNotUsedBlock(content, br, nextSibling, blockCount);
+      nextNotUsed = nextSibling && Page.nextNotUsedBlock(content, br, nextSibling, blockCount);
 
       // First, we must check if this block is a figure's fallback content.
       // If so, then we must see if the figure has been used
