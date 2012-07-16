@@ -127,22 +127,28 @@ goog.scope(function() {
       return false;
     }
 
-    var i, len, figure, delayed, block;
+    var i = this.index,
+		len = content.blocks.length,
+		nextNonChild,
+		figure, delayed, block;
 
     // Check if there are any blocks left to layout, not including
     // fallbacks for optional (or used) figures
-    for (i = this.index, len = content.blocks.length; i < len; i += 1) {
+    while (i < len) {
       block = content.blocks[i];
+      nextNonChild = block.getNextNonChildBlock();
 
       if (!block.isFallback) {
         // We have a non-fallback block left, which means we are not done
         return false;
       }
 
-      if (!this.figureUsed(i) && !block.figure.optional) {
+      if (!this.figureUsed(block.figure.figureIndex) && !block.figure.optional) {
         // Have the unused fallback of a required figure, we are not done
         return false;
       }
+
+	  i = nextNonChild ? nextNonChild.index : len;
     }
 
     // No blocks left, check figures
