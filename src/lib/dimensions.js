@@ -219,7 +219,7 @@ goog.scope(function() {
    * @return {number} A multiple of the base number.
    */
   dimensions.roundUp = function(number, base) {
-    return Math.ceil(number) + base - (number % base);
+    return Math.ceil(number) + base - Math.ceil(number % base);
   };
 
   /**
