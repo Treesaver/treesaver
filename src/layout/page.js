@@ -382,6 +382,7 @@ goog.scope(function() {
         block = content.blocks[br.index],
         nextSibling,
         nextNonChild,
+        nextNotUsed,
         parent, closeTags = [],
         effectiveBlockHeight,
         finishColumn = false,
@@ -434,6 +435,7 @@ goog.scope(function() {
       block = content.blocks[br.index];
       nextSibling = block.nextSibling;
       nextNonChild = nextSibling || block.getNextNonChildBlock();
+      nextNotUsed = nextSibling && Page.nextNotUsedBlock(content, br, nextSibling, blockCount);
 
       // First, we must check if this block is a figure's fallback content.
       // If so, then we must see if the figure has been used
@@ -506,7 +508,7 @@ goog.scope(function() {
       // Note that keepwithnext is ignored if there is no next sibling, or if the
       // block was already broken (has overhang) -- or if this is the isFirstBlock
       // in a non-short column
-      if (!finishColumn && block.keepwithnext && nextSibling &&
+      if (!finishColumn && block.keepwithnext && nextNotUsed &&
           !(br.overhang || (isFirstBlock && !shortColumn))) {
         // Keepwithnext means that we must attempt to keep this block in the same
         // column/page as it's next sibling. However, the current block can still
@@ -524,7 +526,7 @@ goog.scope(function() {
         // out if we need to end the column early
         finishColumn = (remainingHeight >= effectiveBlockHeight) &&
           (remainingHeight <
-            (effectiveBlockHeight + marginBottom + nextSibling.firstLine));
+            (effectiveBlockHeight + marginBottom + nextNotUsed.firstLine));
 
         if (finishColumn) {
           debug.info('Leaving column due to keepwithnext');
@@ -881,6 +883,24 @@ goog.scope(function() {
       // Clear out column contents, since no block was added
       dom.clearChildren(node);
     }
+  };
+
+  /**
+   * @param {!treesaver.layout.Content} content
+   * @param {!treesaver.layout.BreakRecord} br
+   * @param {!treesaver.layout.Block} nextBlock
+   * @param {number} blockCount
+   */
+  Page.nextNotUsedBlock = function(content, br, nextBlock, blockCount) {
+    var index,
+        block;
+    for (index = nextBlock.index; index < blockCount; index++) {
+      block = content.blocks[index];
+      if (!block.isFallback || !br.figureUsed(block.figure.figureIndex)) {
+        return block;
+      }
+    }
+    return null;
   };
 
   /**
