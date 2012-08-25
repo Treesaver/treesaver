@@ -77,9 +77,9 @@ goog.scope(function() {
 
       // Confirm column width
       if (!this.colWidth) {
-        this.colWidth = colNode.offsetWidth;
+        this.colWidth = cur.w;
       }
-      else if (this.colWidth !== colNode.offsetWidth) {
+      else if (this.colWidth !== cur.w) {
         debug.error('Inconsistent column widths in grid');
 
         this.error = true;

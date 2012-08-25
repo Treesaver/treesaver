@@ -17,6 +17,7 @@ $(function() {
     ok(col, 'Object constructed');
     ok(!col.flexible, 'Fixed flag detected');
     equals(col.h, 550, 'Height computed');
+    equals(col.w, 200, 'Width computed');
     equals(col.minH, 200, 'Height computed');
     equals(col.delta, 250, 'Computed delta');
 
