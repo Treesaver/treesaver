@@ -149,6 +149,22 @@ $(function() {
     equals(d2.outerW, treesaver.capabilities.SUPPORTS_SUBPIXELS ? 279.5 : 279);
   });
 
+  test('offsetWidth rounding', function() {
+    var mockWithWidth = function(w) {
+      return {
+        getBoundingClientRect: function() {
+          return { width: w };
+        }
+      };
+    };
+
+    equals(treesaver.dimensions.getOffsetWidth(mockWithWidth(1)), 1);
+    equals(treesaver.dimensions.getOffsetWidth(mockWithWidth(1.2344)), 1.234);
+    equals(treesaver.dimensions.getOffsetWidth(mockWithWidth(1.2345)), 1.235);
+    equals(treesaver.dimensions.getOffsetWidth(mockWithWidth(1.2346)), 1.235);
+    equals(treesaver.dimensions.getOffsetWidth(mockWithWidth(0.00000001)), 0);
+  });
+
   test('lineHeight', function() {
     var e = $('<div></div>').addClass('testonly').appendTo('body').css({
           fontSize: '14px',
