@@ -199,4 +199,16 @@ $(function() {
     equals(treesaver.dimensions.toPixels(null, '40px'), 40, 'toPixels');
     ok(!treesaver.dimensions.toPixels('1em'), 'toPixels: Non-px value');
   });
+
+  test('roundUp', function() {
+    equals(treesaver.dimensions.roundUp(0, 18), 18, 'round 0 to 18');
+    equals(treesaver.dimensions.roundUp(1, 18), 18, 'round 0 to 18');
+    equals(treesaver.dimensions.roundUp(17, 18), 18, 'round 17 to 18');
+    equals(treesaver.dimensions.roundUp(18, 18), 36, 'round 18 to 36');
+    equals(treesaver.dimensions.roundUp(19, 18), 36, 'round 19 to 36');
+
+    equals(treesaver.dimensions.roundUp(17.9, 18), 18, 'round 17.9 to 18');
+    equals(treesaver.dimensions.roundUp(18.1, 18), 36, 'round 18.1 to 36');
+  });
+
 });
