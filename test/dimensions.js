@@ -1,4 +1,5 @@
 goog.require('treesaver.dimensions');
+goog.require('treesaver.capabilities');
 
 $(function() {
   module("dimensions", {
@@ -140,6 +141,25 @@ $(function() {
         d = new treesaver.dimensions.Metrics(e[0]);
 
     equals(d.lineHeight, 20);
+  });
+
+  test('lineHeight with subpixels', function() {
+    var e = $('<div></div>').addClass('testonly').appendTo('body').css({
+          fontSize: '14px',
+          lineHeight: '1.45em'
+        }),
+        h = $('<h2>Hello World</h2>').appendTo(e).css({
+          margin: 0,
+          padding: 0,
+          fontSize: '1.45em'
+        }),
+        d = new treesaver.dimensions.Metrics(e[0]);
+
+    if (treesaver.capabilities.SUPPORTS_SUBPIXELS) {
+      equals((20.3 - d.lineHeight) < 0.001, true);
+    } else {
+      equals(d.lineHeight, 20);
+    }
   });
 
   test('helpers', function () {
