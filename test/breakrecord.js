@@ -1,7 +1,25 @@
 goog.require('treesaver.layout.BreakRecord');
 
 $(function () {
-  module('breakrecord');
+  module('breakrecord', {
+    setup: function () {
+      // Create an HTML tree for test data
+      // Make request synchronously though
+      $.ajax({
+        async: false,
+        url: 'assets/content.html',
+        success: function (data) {
+          if (data) {
+            var $container = $('<div class="testonly column">').appendTo('body');
+            $container[0].innerHTML = data;
+          }
+        }
+      });
+    },
+    teardown: function () {
+      $('.testonly').remove();
+    }
+  });
 
   test('Equality check', function () {
     var br1 = new treesaver.layout.BreakRecord(),
@@ -44,7 +62,7 @@ $(function () {
         content = {
       // Doesn't really matter what's in blocks array,
       // as long as something is in there
-      blocks: [{}, {}, {}, {}],
+      blocks: [new treesaver.layout.Block($('h1.bad')[0], 20), new treesaver.layout.Block($('h1.bad')[0], 20), new treesaver.layout.Block($('h1.bad')[0], 20), new treesaver.layout.Block($('h1.bad')[0], 20)],
       // Figures just need to indicate whether they are
       // required
       figures: []
@@ -73,10 +91,17 @@ $(function () {
     br.useFigure(0);
     ok(br.atEnd(content), 'Blocks done, figures done');
 
-    var new_fig = { optional: true };
+		var fwrap = $('<div></div>').appendTo('body');
+		fwrap.html('<figure></figure>');
+		var f = $('figure', fwrap);
+		f.addClass('testonly');
+    f.html('<p data-sizes="one">Size one</p>' +
+        '<p>Paragraph within figure within container</p>');
+    var new_fig = new treesaver.layout.Block(fwrap[0], 20);
+		new_fig = new_fig.figures[0];
     // Add an optional figure with a fallback at the end
     content.figures.push(new_fig);
-    content.blocks.push({ isFallback: true, figure: new_fig });
+    content.blocks.push(new_fig.fallback);
 
     ok(br.atEnd(content), 'Optional fallback left');
 
