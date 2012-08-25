@@ -128,6 +128,27 @@ $(function() {
     equals(d.outerH, 20);
   });
 
+  test('offsetWidth with subpixels', function() {
+    var e = $('<div></div>').addClass('testonly').appendTo('body').css({
+          fontSize: '13px',
+          lineHeight: '13px'
+        }),
+        c1 = $('<div></div>').appendTo(e).css({
+          "margin-left": '15em',
+          width: '21.5em'
+        }),
+        c2 = $('<div></div>').appendTo(e).css({
+          "margin-left": '37.5em',
+          width: '21.5em'
+        }),
+        d1 = new treesaver.dimensions.Metrics(c1[0]),
+        d2 = new treesaver.dimensions.Metrics(c2[0]);
+
+    equals(d1.outerW, d2.outerW);
+    equals(d1.outerW, treesaver.capabilities.SUPPORTS_SUBPIXELS ? 279.5 : 279);
+    equals(d2.outerW, treesaver.capabilities.SUPPORTS_SUBPIXELS ? 279.5 : 279);
+  });
+
   test('lineHeight', function() {
     var e = $('<div></div>').addClass('testonly').appendTo('body').css({
           fontSize: '14px',

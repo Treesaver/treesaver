@@ -128,7 +128,7 @@ goog.scope(function() {
    * @return {!number} Value in pixels.
    */
   dimensions.getOffsetWidth = function(el) {
-    return el && el.offsetWidth || 0;
+    return el && el.getBoundingClientRect()['width'] || 0;
   };
 
   /**
