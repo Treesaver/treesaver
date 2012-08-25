@@ -32,7 +32,7 @@ goog.scope(function() {
 
     // TODO: More intelligent back-up value
     this.lineHeight =
-      dimensions.toPixels(el, css.getStyleObject(el).lineHeight) || 1;
+      Math.ceil(dimensions.toPixels(el, css.getStyleObject(el).lineHeight) || 1);
 
     this.colWidth = dimensions.getOffsetWidth(el);
 
