@@ -437,6 +437,27 @@ goog.scope(function() {
     capabilities.cssPropertySupported_('transitionProperty', true);
 
   /**
+   * Whether the browser supports sub-pixel rendering
+   *
+   * @const
+   * @type {boolean}
+   */
+  capabilities.SUPPORTS_SUBPIXELS = (function() {
+    var d = document.createElement('div'),
+        result;
+
+    d.style['visibility'] = 'hidden';
+    d.style['fontSize'] = '13px';
+    d.style['height'] = '1.5em';
+
+    document.documentElement.appendChild(d);
+    result = (d.getBoundingClientRect().height % 1);
+    document.documentElement.removeChild(d);
+
+    return result;
+  }());
+
+  /**
    * Current browser capabilities
    *
    * @private
@@ -502,6 +523,7 @@ goog.scope(function() {
         p(capabilities.IS_SMALL_SCREEN) + 'smallscreen',
         p(treesaver.network.loadedFromCache()) + 'cached',
         p(capabilities.IS_NATIVE_APP) + 'nativeapp',
+        p(capabilities.SUPPORTS_SUBPIXELS) + 'subpixels',
         // Browser/platform info
         'browser-' + capabilities.BROWSER_NAME,
         'os-' + capabilities.BROWSER_OS

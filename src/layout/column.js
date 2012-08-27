@@ -32,6 +32,7 @@ goog.scope(function() {
     }
 
     this.h = d.outerH;
+    this.w = d.outerW;
 
     this.delta = Math.max(0, gridHeight - this.h);
   };

@@ -42,6 +42,12 @@ goog.scope(function() {
   dimensions.number = /^-?\d(:?\.\d+)?/;
 
   /**
+   * Round fractional widths to 1/round_to.
+   * @private
+   */
+  dimensions.round_to = 1000;
+
+  /**
    * Whether the given size fits within the bounds set by the range
    *
    * @param {treesaver.dimensions.SizeRange|treesaver.dimensions.Metrics} range
@@ -128,7 +134,7 @@ goog.scope(function() {
    * @return {!number} Value in pixels.
    */
   dimensions.getOffsetWidth = function(el) {
-    return el && el.offsetWidth || 0;
+    return el && (Math.round(el.getBoundingClientRect()['width'] * dimensions.round_to) / dimensions.round_to) || 0;
   };
 
   /**
@@ -219,7 +225,7 @@ goog.scope(function() {
    * @return {number} A multiple of the base number.
    */
   dimensions.roundUp = function(number, base) {
-    return Math.ceil(number) + base - (number % base);
+    return Math.ceil(number) + base - Math.ceil(number % base);
   };
 
   /**
