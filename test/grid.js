@@ -52,6 +52,26 @@ $(function () {
     equals(fiver_grid.maxColHeight, 200, 'Fiver: MaxColHeight');
   });
 
+  test('grid: Error on columns with different width', function () {
+    var $fiver = $('.grids .fiver'),
+        first_column = $('.column:first', $fiver).css({width: "250px"}),
+        fiver_grid = new treesaver.layout.Grid($fiver[0]);
+
+    ok(!!fiver_grid, 'Empty grid: Created');
+    ok(fiver_grid.error, 'Empty grid: Error');
+  });
+
+  test('grid: Columns with subpixel widths', function () {
+    var $two = $('.grids .twocontainer'),
+        columns = $('.column', $two).css({"font-size": "13px", width: "21.5em"}),
+        first_column = $(columns[0]).css({"margin-left": "15em"}),
+        second_column = $(columns[0]).css({"margin-left": "37.5em"}),
+        twocol_grid = new treesaver.layout.Grid($two[0]);
+
+    ok(!!twocol_grid, 'Empty grid: Created');
+    ok(!twocol_grid.error, 'Empty grid: No error');
+  });
+
   test('grid: Stretching', function () {
     var $fiver = $('.grids .fiver'),
         fiver_grid = new treesaver.layout.Grid($fiver[0]);

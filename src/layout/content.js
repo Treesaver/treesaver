@@ -32,9 +32,9 @@ goog.scope(function() {
 
     // TODO: More intelligent back-up value
     this.lineHeight =
-      dimensions.toPixels(el, css.getStyleObject(el).lineHeight) || 1;
+      Math.ceil(dimensions.toPixels(el, css.getStyleObject(el).lineHeight) || 1);
 
-    this.colWidth = el.offsetWidth;
+    this.colWidth = dimensions.getOffsetWidth(el);
 
     // In order to properly measure the dimensions of all the content,
     // we need to hide all figures to prevent them from being laid out
