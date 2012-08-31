@@ -72,6 +72,14 @@ $(function () {
     ok(!twocol_grid.error, 'Empty grid: No error');
   });
 
+  test('grid: Grid subpixel line height', function () {
+    var $two = $('.grids .twocontainer').css({"font-size": "13px", "line-height": "1.375em"}),
+        twocol_grid = new treesaver.layout.Grid($two[0]);
+
+    ok(!!twocol_grid, 'Empty grid: Created');
+    equal(twocol_grid.lineHeight, treesaver.capabilities.SUPPORTS_SUBPIXELS? 18: 17, 'lineHeight is rounded correctly');
+  });
+
   test('grid: Stretching', function () {
     var $fiver = $('.grids .fiver'),
         fiver_grid = new treesaver.layout.Grid($fiver[0]);
