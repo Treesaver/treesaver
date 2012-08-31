@@ -168,6 +168,40 @@ $(function () {
     equals(map[4] && map[4].size, 'five', 'Last container size name');
   });
 
+  test('grid: score', function () {
+    var $grid = $('.grids .fields').css({"font-size": "13px", "line-height": "1em"}),
+        grid = new treesaver.layout.Grid($grid[0]),
+        fake_grid = $('<div></div>').addClass('offscreen grid').appendTo('body'),
+        fake_column = $('<div></div>').addClass('column').appendTo(fake_grid),
+        $p = $('<p></p>').addClass('testonly').appendTo(fake_column).css({
+          fontSize: '13px',
+          lineHeight: '1em'
+        }),
+        p = new treesaver.layout.Content($p[0]),
+        br = new treesaver.layout.BreakRecord(),
+        score;
+
+    score = grid.score(p, br);
+    equals(score, 50, 'Score column without modifiers');
+  });
+
+  test('grid: score with fractional lineHeight', function () {
+    var $grid = $('.grids .fields').css({"font-size": "13px", "line-height": "1.375em"}),
+        grid = new treesaver.layout.Grid($grid[0]),
+        fake_grid = $('<div></div>').addClass('offscreen grid').appendTo('body'),
+        fake_column = $('<div></div>').addClass('column').appendTo(fake_grid),
+        $p = $('<p></p>').addClass('testonly').appendTo(fake_column).css({
+          fontSize: '13px',
+          lineHeight: '1.375em'
+        }),
+        p = new treesaver.layout.Content($p[0]),
+        br = new treesaver.layout.BreakRecord(),
+        score;
+
+    score = grid.score(p, br);
+    equals(score, 50, 'Score column without modifiers');
+  });
+
   test('grid: Best', function () {
   });
 });
