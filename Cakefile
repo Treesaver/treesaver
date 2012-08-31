@@ -181,7 +181,7 @@ Helpers
 createDirs = ->
   [build_dir, tmp_dir].forEach (dir) ->
     try
-      fs.mkdirSync dir, 0755
+      fs.mkdirSync dir, 0o0755
     catch error
       # Ignore
 
