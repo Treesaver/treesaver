@@ -17,6 +17,7 @@ goog.require('treesaver.constants');
 goog.require('treesaver.debug');
 goog.require('treesaver.dom');
 goog.require('treesaver.events');
+goog.require('treesaver.fonts');
 goog.require('treesaver.history');
 goog.require('treesaver.resources');
 goog.require('treesaver.scheduler');
@@ -30,6 +31,7 @@ goog.scope(function() {
   var debug = treesaver.debug,
       dom = treesaver.dom,
       events = treesaver.events,
+      fonts = treesaver.fonts,
       capabilities = treesaver.capabilities,
       ArticleManager = treesaver.ui.ArticleManager,
       StateManager = treesaver.ui.StateManager;
@@ -66,6 +68,12 @@ goog.scope(function() {
       treesaver.resourcesLoaded_ = true;
       treesaver.bootProgress_();
     });
+
+    fonts.load(function() {
+      treesaver.fontsLoaded_ = true;
+      treesaver.bootProgress_();
+    });
+
 
     // Watch for dom ready
     if (/complete|loaded/.test(document.readyState)) {
@@ -110,6 +118,7 @@ goog.scope(function() {
     // Clean up libraries
     treesaver.resources.unload();
     treesaver.network.unload();
+    treesaver.fonts.unload();
 
     // Setup classes
     capabilities.resetClasses();
@@ -180,7 +189,7 @@ goog.scope(function() {
    * @private
    */
   treesaver.bootProgress_ = function() {
-    if (!treesaver.resourcesLoaded_) {
+    if (!treesaver.resourcesLoaded_ || !treesaver.fontsLoaded_) {
       // Can't show loading screen until resources are loaded
       return;
     }
