@@ -1,0 +1,20 @@
+{
+  "contents": [
+    {
+      "url": "index.html",
+      "hidden": true
+    },
+    {
+      "url": "one.html",
+      "title": "Article One",
+      "thumb": "openroad-thumb.jpg",
+      "byline": "John Doe"
+    },
+    {
+      "url": "two.html",
+      "title": "Article Two",
+      "thumb": "river-thumb.jpg",
+      "byline": "Jane Doe"
+    }
+  ]
+}
