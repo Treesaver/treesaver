@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <body>
+    <div class="chrome">
+      <div class="viewer">
+        <div class="next overlay">
+        </div>
+        <div class="prev overlay">
+        </div>
+      </div>
+
+      <div class="controls">
+        <span data-ts-template="position">Page {{pagenumber}} of {{pagecount}}</span>
+        <button class="prev">Previous</button>
+        <button class="next">Next</button>
+
+        <div class="menu">
+          <button>Menu</button>
+          <ul>
+            <li><a href="http://www.treesaver.net/">About treesaver</a></li>
+            <li data-ts-template="position"><a href="http://twitter.com/?status={{$url$}}" target="external">Tweet this!</a></li>
+            <li><a href="index.html">Table of contents</a></li>
+            <li><a href="#" class="nextArticle">Next article</a></li>
+            <li><a href="#" class="prevArticle">Previous article</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="toc" data-ts-template="index">
+          {{#contents}}
+            {{^hidden}}
+              <div class="article">
+                <img class="thumb" data-src="{{thumb}}"/>
+                <h3><a data-href="{{url}}">{{title}}</a></h3>
+                <p class="byline">{{byline}}</p>
+              </div>
+            {{/hidden}}
+          {{/contents}}
+        </div>
+        <div class="sidebar-controls">
+          <button class="open-sidebar">Open</button>
+          <button class="toggle-sidebar">Toggle</button>
+          <button class="close-sidebar">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="container title" data-sizes="title"></div>
+      <div class="container cols-1 bottom" data-sizes="one"></div>
+      <div class="column"></div>
+    </div>
+
+    <div class="grid cols-2">
+      <div data-ts-template="document">
+        {{#title}}
+          {{title}}
+        {{/title}}
+      </div>
+      <div class="container title cols-2" data-sizes="title"></div>
+      <div class="container cols-3 bottom" data-sizes="two"></div>
+      <div class="column"></div>
+      <div class="column col-2"></div>
+    </div>
+
+    <div class="grid cols-3">
+      <div data-ts-template="document">
+        {{#title}}
+          {{title}}
+        {{/title}}
+      </div>
+      <div class="container title cols-3" data-sizes="title"></div>
+      <div class="container cols-3 bottom" data-sizes="three"></div>
+      <div class="column"></div>
+      <div class="column col-2"></div>
+      <div class="container pullquote bottom col-3" data-sizes="pullquote"></div>
+      <div class="column col-3"></div>
+    </div>
+
+    <div class="loading">
+      Loading
+    </div>
+
+    <div class="error">
+      Error
+    </div>
+
+    <div class="lightbox">
+      <div class="container"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Simple Test: Table of Contents</title>
+
+    <link rel="resources" href="resources.html" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="index" href="toc.json" type="application/json"/>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+
+    <script src="../../lib/mustache/mustache.js"></script>
+    <script src="../../lib/closure/goog/base.js"></script>
+
+    <script>
+      window.treesaverFonts = { google: { families: [ 'Tangerine', 'Jim+Nightshade', 'Scada' ] } };
+    </script>
+    <script src="../../test/deps.js"></script>
+    <script>
+      goog.require('treesaver');
+    </script>
+  </head>
+
+  <body>
+    <article>
+      <figure>
+        <div data-sizes="title fallback">
+          <h1><a href="index.html">Table of contents</a></h1>
+        </div>
+      </figure>
+
+      <div>
+        <h2><a href="one.html">Article One</a></h2>
+        <p class="keeptogether thumb"><img src="openroad-thumb.jpg"/></p>
+        <p>John Doe</p>
+        <p>Lorem ipsum dolor sit amet, consequeter adipiscing elit.</p>
+      </div>
+
+      <div>
+        <h2><a href="two.html">Article Two</a></h2>
+        <p class="keeptogether thumb"><img src="river-thumb.jpg"/></p>
+        <p>Jane Doe</p>
+        <p>Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus.</p>
+      </div>
+    </article>
+  </body>
+</html>
