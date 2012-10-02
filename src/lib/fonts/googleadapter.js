@@ -10,9 +10,19 @@ goog.scope(function() {
   var googleadapter = treesaver.fonts.googleadapter,
       debug = treesaver.debug;
 
+  /**
+   * @private
+   * @const
+   * @type {number}
+   */
+   googleadapter.DEFAULT_TIMEOUT = 4000;
+
   googleadapter.load = function(config, callback) {
     googleadapter.callback_ = callback;
     googleadapter.fontState_ = {};
+    googleadapter.done_ = false;
+
+    googleadapter.timeout_ = setTimeout(googleadapter.abort_, googleadapter.DEFAULT_TIMEOUT);
 
     (function() {
       var wf = document.createElement('script');
@@ -48,10 +58,23 @@ goog.scope(function() {
     'typekit'
   ];
 
+  googleadapter.complete_ = function(payload) {
+    clearTimeout(googleadapter.timeout_);
+    if (!googleadapter.done_) {
+      googleadapter.done_ = true;
+      googleadapter.callback_(payload);
+    }
+  };
+
+  googleadapter.abort_ = function() {
+    debug.info('googleadapter.abort');
+    googleadapter.complete_(googleadapter.fontState_);
+  };
+
   googleadapter.internal_ = {
     "active": function() {
       debug.info('googleadapter.active');
-      googleadapter.callback_(googleadapter.fontState_);
+      googleadapter.complete_(googleadapter.fontState_);
     },
     "fontactive": function(family) {
       debug.info('WebFont.fontactive ' + family);
@@ -67,7 +90,7 @@ goog.scope(function() {
     },
     "inactive": function() {
       debug.info('WebFont.inactive');
-      googleadapter.callback_(googleadapter.fontState_);
+      googleadapter.complete_(googleadapter.fontState_);
     },
     "loading": function() {
       debug.info('WebFont.loading');
