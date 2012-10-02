@@ -34,6 +34,16 @@ goog.scope(function() {
       ArticleManager = treesaver.ui.ArticleManager,
       StateManager = treesaver.ui.StateManager;
 
+
+  /**
+   * Treesaver events fired
+   * @const
+   * @type {Object.<string, string>}
+   */
+  treesaver.customevents = {
+    LOADERSHOWN: 'treesaver.loader_shown'
+  };
+
   /**
    * Load scripts and required resources
    */
@@ -157,6 +167,8 @@ goog.scope(function() {
         '<div id="loading">Loading ' + document.title + '...</div>';
       // Re-enable content display
       document.documentElement.style.display = 'block';
+
+      events.fireEvent(document, treesaver.customevents.LOADERSHOWN);
     }
 
     // Update state
