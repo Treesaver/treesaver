@@ -72,6 +72,14 @@ $(function () {
     ok(!twocol_grid.error, 'Empty grid: No error');
   });
 
+  test('grid: Grid subpixel line height', function () {
+    var $two = $('.grids .twocontainer').css({"font-size": "13px", "line-height": "1.375em"}),
+        twocol_grid = new treesaver.layout.Grid($two[0]);
+
+    ok(!!twocol_grid, 'Empty grid: Created');
+    equal(twocol_grid.lineHeight, treesaver.capabilities.SUPPORTS_SUBPIXELS? 18: 17, 'lineHeight is rounded correctly');
+  });
+
   test('grid: Stretching', function () {
     var $fiver = $('.grids .fiver'),
         fiver_grid = new treesaver.layout.Grid($fiver[0]);
@@ -158,6 +166,40 @@ $(function () {
     ok(map[4], 'Last container matched');
     equals(map[4] && map[4].figureIndex, 1, 'Last container figureIndex');
     equals(map[4] && map[4].size, 'five', 'Last container size name');
+  });
+
+  test('grid: score', function () {
+    var $grid = $('.grids .fields').css({"font-size": "13px", "line-height": "1em"}),
+        grid = new treesaver.layout.Grid($grid[0]),
+        fake_grid = $('<div></div>').addClass('offscreen grid').appendTo('body'),
+        fake_column = $('<div></div>').addClass('column').appendTo(fake_grid),
+        $p = $('<p></p>').addClass('testonly').appendTo(fake_column).css({
+          fontSize: '13px',
+          lineHeight: '1em'
+        }),
+        p = new treesaver.layout.Content($p[0]),
+        br = new treesaver.layout.BreakRecord(),
+        score;
+
+    score = grid.score(p, br);
+    equals(score, 50, 'Score column without modifiers');
+  });
+
+  test('grid: score with fractional lineHeight', function () {
+    var $grid = $('.grids .fields').css({"font-size": "13px", "line-height": "1.375em"}),
+        grid = new treesaver.layout.Grid($grid[0]),
+        fake_grid = $('<div></div>').addClass('offscreen grid').appendTo('body'),
+        fake_column = $('<div></div>').addClass('column').appendTo(fake_grid),
+        $p = $('<p></p>').addClass('testonly').appendTo(fake_column).css({
+          fontSize: '13px',
+          lineHeight: '1.375em'
+        }),
+        p = new treesaver.layout.Content($p[0]),
+        br = new treesaver.layout.BreakRecord(),
+        score;
+
+    score = grid.score(p, br);
+    equals(score, 50, 'Score column without modifiers');
   });
 
   test('grid: Best', function () {
