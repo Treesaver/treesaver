@@ -60,7 +60,7 @@ goog.scope(function() {
     }
     // Line height needs to be set for stretch sizing ...
     // TODO: What's a reasonable back-up value here?
-    this.lineHeight = this.size.lineHeight || 1;
+    this.lineHeight = Math.ceil(this.size.lineHeight || 1);
 
     this.textHeight = 0;
     this.maxColHeight = 0;
