@@ -33,7 +33,7 @@ goog.scope(function() {
   capabilities.platform_ =
     // Android 1.6 doesn't have a value for navigator.platform
     window.navigator.platform ?
-    window.navigator.platform.toLowerCase() :
+    (/Linux armv[6,7]l/.test(window.navigator.platform) ? 'android' : window.navigator.platform.toLowerCase()) :
     /android/.test(capabilities.ua_) ? 'android' : 'unknown';
 
   /**
