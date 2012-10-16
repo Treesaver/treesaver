@@ -488,7 +488,7 @@ goog.scope(function() {
       // Collapse the bottom margin with our next sibling, if there is one
       // TODO: What if this is the last child of a block?
       marginBottom = Math.max(block.metrics.marginBottom,
-          nextSibling ? nextSibling.metrics.marginTop : 0);
+          nextNotUsed ? nextNotUsed.metrics.marginTop : 0);
 
       // The amount of space our block will take up in this column if inserted
       // Height plus whatever our margin ended up being
