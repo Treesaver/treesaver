@@ -95,6 +95,30 @@ goog.scope(function() {
   };
 
   /**
+   * Helper that returns an identifying string for an HTML element
+   * @param {element} node 
+   */
+  debug.idnode = function (node) {
+    // ID is most accurate
+    var identifier = node.getAttribute('id');
+    if(goog.isString(id)) {  
+        return '#'+id;
+    }
+    // data-sizes is usually rather specific
+    identifier = node.getAttribute('data-sizes');
+    if(goog.isString(identifier)) {  
+        return node+' (data-sizes='+identifier+')';
+    }
+    // classes identify it better than nothing
+    identifier = node.getAttribute('class');
+    if(goog.isString(identifier)) {  
+        return node+' (class='+identifier+')';
+    }
+    // Can't identify it, just return
+    return node;
+  };
+
+  /**
    * Assert helper
    * @param {boolean} assertion
    * @param {?string} msg
