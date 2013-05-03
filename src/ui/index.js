@@ -317,8 +317,8 @@ goog.scope(function() {
 
     if (index['settings']) {
       result.settings = {};
-      Object.keys(index.settings).forEach(function(key) {
-        result.settings[key] = index.settings[key];
+      Object.keys(index['settings']).forEach(function(key) {
+        result.settings[key] = index['settings'][key];
       });
     }
 
