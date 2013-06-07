@@ -26,7 +26,7 @@ $(function() {
   });
 
   test('className helpers on SVG', function () {
-    var svg = document.createElement('svg');
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
     equals(treesaver.dom.classes(svg).length, 0, 'classes: Unset className');
 
