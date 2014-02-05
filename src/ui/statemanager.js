@@ -282,43 +282,54 @@ goog.scope(function() {
 
     // Check if we're at a new size
     if (availSize.h !== StateManager.state_.size.h || availSize.w !== StateManager.state_.size.w) {
-      StateManager.state_.size = availSize;
+      StateManager.resizeChrome();
+    }
+  };
 
-      // Check if chrome still fits
-      if (!StateManager.state_.chrome ||
-          !StateManager.state_.chrome.meetsRequirements() ||
-          !StateManager.state_.chrome.fits(availSize)) {
-        // Chrome doesn't fit, need to install a new one
-        newChrome = Chrome.select(StateManager.chromes_, availSize);
+  /**
+   * Force computation of chrome size, including selection of a new one
+   * if necessary.
+   */
+  StateManager.resizeChrome = function() {
+    var availSize = StateManager.getAvailableSize_(),
+        newChrome;
 
-        if (!newChrome) {
-          // TODO: Fire chrome failed event
-          // TODO: Show error page (no chrome)
-          return;
-        }
+    StateManager.state_.size = availSize;
 
-        // Remove existing chrome
-        dom.clearChildren(StateManager.state_.chromeContainer);
-        // Deactivate previous
-        if (StateManager.state_.chrome) {
-          StateManager.state_.chrome.deactivate();
-        }
+    // Check if chrome still fits
+    if (!StateManager.state_.chrome ||
+        !StateManager.state_.chrome.meetsRequirements() ||
+        !StateManager.state_.chrome.fits(availSize)) {
+      // Chrome doesn't fit, need to install a new one
+      newChrome = Chrome.select(StateManager.chromes_, availSize);
 
-        // Activate and store
-        StateManager.state_.chromeContainer.appendChild(newChrome.activate());
-        StateManager.state_.chrome = newChrome;
-
-        // Fire chrome change event
-        events.fireEvent(
-          document, StateManager.events.CHROMECHANGED, {
-            'node': newChrome.node
-          }
-        );
+      if (!newChrome) {
+        // TODO: Fire chrome failed event
+        // TODO: Show error page (no chrome)
+        return;
       }
 
-      // Chrome handles page re-layout, if necessary
-      StateManager.state_.chrome.setSize(availSize);
+      // Remove existing chrome
+      dom.clearChildren(StateManager.state_.chromeContainer);
+      // Deactivate previous
+      if (StateManager.state_.chrome) {
+        StateManager.state_.chrome.deactivate();
+      }
+
+      // Activate and store
+      StateManager.state_.chromeContainer.appendChild(newChrome.activate());
+      StateManager.state_.chrome = newChrome;
+
+      // Fire chrome change event
+      events.fireEvent(
+        document, StateManager.events.CHROMECHANGED, {
+          'node': newChrome.node
+        }
+      );
     }
+
+    // Chrome handles page re-layout, if necessary
+    StateManager.state_.chrome.setSize(availSize);
   };
 
   // Expose special functions for use by the native app wrappers
