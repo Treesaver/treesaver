@@ -25,6 +25,23 @@ $(function() {
     ok(!treesaver.dom.hasClass(div, 'test'), 'hasClass: Removed class');
   });
 
+  test('className helpers on SVG', function () {
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+    equals(treesaver.dom.classes(svg).length, 0, 'classes: Unset className');
+
+    treesaver.dom.addClass(svg, 'test');
+
+    equals(treesaver.dom.classes(svg).length, 1, 'classes: Single class');
+    ok(treesaver.dom.hasClass(svg, 'test'), 'hasClass: Single class');
+    ok(!treesaver.dom.hasClass(svg, 'bogus'), 'hasClass: Single class failure');
+
+    treesaver.dom.removeClass(svg, 'test');
+
+    equals(treesaver.dom.classes(svg).length, 0, 'classes: Removed class');
+    ok(!treesaver.dom.hasClass(svg, 'test'), 'hasClass: Removed class');
+  });
+
   test('hasAttr', function () {
     var div = document.createElement('div'),
         attr = document.createAttribute('width');
