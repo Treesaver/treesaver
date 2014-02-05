@@ -54,7 +54,7 @@ goog.scope(function() {
      * @return {boolean} True if the element has that class.
      */
     dom.hasClass = function(el, className) {
-      return el.classList.contains(className);
+      return el.classList && el.classList.contains(className);
     };
 
     /**
