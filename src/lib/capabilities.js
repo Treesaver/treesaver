@@ -123,7 +123,12 @@ goog.scope(function() {
     }
     else if (!/compatible/.test(capabilities.ua_) &&
       /mozilla/.test(capabilities.ua_)) {
-      return 'mozilla';
+        if (/trident/.test(capabilities.ua_)) {
+          return 'msie';
+        }
+        else {
+          return 'mozilla';
+        }
     }
     else {
       return 'unknown';
