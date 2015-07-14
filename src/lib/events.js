@@ -27,7 +27,11 @@ goog.scope(function() {
     // Copy provided data into event object
     if (data) {
       for (cur in data) {
-        e[cur] = data[cur];
+        try{
+          e[cur] = data[cur];
+        }catch(exception){
+          // Fix for chrome 42 since UIEvent.path is not writable
+        }
       }
     }
 
