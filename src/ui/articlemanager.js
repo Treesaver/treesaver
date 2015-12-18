@@ -1064,7 +1064,7 @@ goog.scope(function() {
     events.fireEvent(document, ArticleManager.events.DOCUMENTCHANGED, {
       'document': doc,
       'url': url,
-      'path': path
+      'docpath': path
     });
     events.fireEvent(document, ArticleManager.events.ARTICLECHANGED, {
       'article': ArticleManager.currentArticle

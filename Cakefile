@@ -85,7 +85,7 @@ task 'deps', 'Write out dependency file for running in non-compiled mode', ->
 
 task 'size', 'Display file sizes', (options) ->
   # Nothing to do if no build directory
-  return if not path.existsSync build_dir
+  return if not fs.existsSync build_dir
 
   sizes = {}
   maxFileLength = 0
@@ -187,7 +187,7 @@ createDirs = ->
 
 # Remove directory and its contents
 rmdirTreeSync = (dir) ->
-  return if not path.existsSync dir
+  return if not fs.existsSync dir
   console.log "Removing: #{dir}"
 
   fs.readdirSync(dir).forEach (f) ->
@@ -201,7 +201,7 @@ rmdirTreeSync = (dir) ->
 
 # Recursively fetch all files within a directory
 getFilesSync = (dir, match, exclude) ->
-  return [] if not path.existsSync dir
+  return [] if not fs.existsSync dir
 
   files = []
 
@@ -332,7 +332,7 @@ getCompiledScript = (info, options, callback) ->
     args += " --define='goog.DEBUG=false'"
 
   # Externs
-  if path.existsSync externs_dir
+  if fs.existsSync externs_dir
     fs.readdirSync(externs_dir).forEach (f) ->
       args += " --externs=#{path.join externs_dir, f}"
 
