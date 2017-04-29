@@ -62,7 +62,7 @@ goog.scope(function() {
       // This is a very defensive move, since a display: none item that
       // is made visible when in a specific column or grid can really mess up a
       // layout
-      debug.warn('Zero-height block ignored');
+      debug.warn('Zero-height block ignored: ' + debug.idnode(node));
 
       this.ignore = true;
       return;
@@ -588,7 +588,7 @@ goog.scope(function() {
   Block.sanitizeNode = function(node, baseLineHeight) {
     // Should never get text & comment nodes
     if (node.nodeType !== 1) {
-      debug.error('Text node sent to sanitize: ' + node);
+      debug.error('Text node sent to sanitize: ' + debug.idnode(node));
       return node;
     }
 
@@ -702,7 +702,7 @@ goog.scope(function() {
     if (metrics.outerH % baseLineHeight) {
       // Shit, looks like even with the normalization, we're still out of
       // sync. Use padding bottom to fix it up
-      debug.info('Forcing padding due to mismatch: ' + node);
+      debug.info('Forcing padding due to mismatch: ' + debug.idnode(node));
 
       metrics.paddingBottom += baseLineHeight - metrics.outerH % baseLineHeight;
 
